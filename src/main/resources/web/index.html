@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event-PVP Konfigurator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4caf50;
+            --primary-dark: #388e3c;
+            --primary-light: #66bb6a;
+            --secondary: #81c784;
+            --background: #1a1a1a;
+            --surface: #2d2d2d;
+            --card: #3a3a3a;
+            --card-hover: #454545;
+            --text: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --text-muted: #808080;
+            --error: #f44336;
+            --warning: #ff9800;
+            --success: #4caf50;
+            --info: #2196f3;
+            --border: #404040;
+            --border-light: #505050;
+            --shadow: rgba(0, 0, 0, 0.3);
+            --transition: 0.2s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--card) 100%);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary);
+            box-shadow: 0 2px 10px var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .header-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+            margin: 0 0.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-hover);
+            border-color: var(--primary);
+        }
+
+        .btn-danger {
+            background: var(--error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #d32f2f;
+        }
+
+        .btn-icon {
+            padding: 0.6rem;
+            border-radius: 6px;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            position: sticky;
+            top: 70px;
+            height: calc(100vh - 70px);
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            padding-left: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition);
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .nav-item.active {
+            background: rgba(76, 175, 80, 0.15);
+            color: var(--primary);
+            border-left: 3px solid var(--primary);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--primary);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        /* Section styling - CRITICAL: Force hide/show */
+        .section {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+        }
+        
+        .section.active {
+            display: block !important;
+            visibility: visible !important;
+            height: auto !important;
+            overflow: visible !important;
+            opacity: 1 !important;
+            position: relative !important;
+        }
+
+        /* Connection Status Styling */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.connecting {
+            background: var(--warning);
+            animation: pulse 1s infinite;
+        }
+        
+        .status-dot.active {
+            background: var(--success);
+            animation: none;
+            box-shadow: 0 0 6px var(--success);
+        }
+        
+        .status-dot.inactive {
+            background: var(--error);
+            animation: none;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .content-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .content-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1rem 1.5rem;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        .form-label-hint {
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 0.9rem;
+            transition: all var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Toggle Switch */
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--background);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .toggle-label {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .toggle-label span:first-child {
+            font-weight: 500;
+        }
+
+        .toggle-label span:last-child {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--border);
+            border-radius: 26px;
+            transition: all var(--transition);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: all var(--transition);
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background: var(--primary);
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Number Input with Stepper */
+        .number-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .number-input .form-control {
+            width: 100px;
+            text-align: center;
+        }
+
+        .number-btn {
+            width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background: var(--background);
+            color: var(--text);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+
+        .number-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Coordinates Input */
+        .coords-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr) repeat(2, 0.8fr);
+            gap: 0.75rem;
+        }
+
+        .coord-input {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .coord-input label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        /* Item Selector */
+        .item-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .item-selector:hover {
+            border-color: var(--primary);
+        }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--surface);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .item-icon img {
+            width: 32px;
+            height: 32px;
+            image-rendering: pixelated;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 500;
+        }
+
+        .item-type {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* List Items */
+        .list-container {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--background);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+
+        .list-item:hover {
+            background: var(--background);
+        }
+
+        .list-item-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .list-item-actions {
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: all var(--transition);
+        }
+
+        .list-item:hover .list-item-actions {
+            opacity: 1;
+        }
+
+        .list-item-drag {
+            cursor: grab;
+            color: var(--text-muted);
+            padding: 0.25rem;
+        }
+
+        .list-empty {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            transition: all var(--transition);
+        }
+
+        .tab:hover {
+            color: var(--text);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Equipment Preview */
+        .equipment-preview {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .armor-slots {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .armor-slot {
+            width: 60px;
+            height: 60px;
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .armor-slot:hover {
+            border-color: var(--primary);
+        }
+
+        .armor-slot.filled {
+            border-color: var(--primary);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 4px;
+        }
+
+        .inventory-slot {
+            aspect-ratio: 1;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all var(--transition);
+        }
+
+        .inventory-slot:hover {
+            border-color: var(--primary);
+        }
+
+        .inventory-slot.filled {
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .inventory-slot img {
+            width: 80%;
+            height: 80%;
+            image-rendering: pixelated;
+        }
+
+        .inventory-slot .amount {
+            position: absolute;
+            bottom: 2px;
+            right: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 1px black;
+        }
+
+        /* Spawn Visualizer */
+        .spawn-visualizer {
+            background: var(--background);
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .spawn-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 2px;
+            aspect-ratio: 1;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .spawn-cell {
+            background: var(--surface);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .spawn-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .spawn-marker.player1 {
+            background: var(--info);
+        }
+
+        .spawn-marker.player2 {
+            background: var(--error);
+        }
+
+        .spawn-marker.spectator {
+            background: var(--warning);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px var(--shadow);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0.25rem;
+            transition: all var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--error);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: calc(80vh - 140px);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+        }
+
+        /* Item Picker Grid */
+        .item-picker-search {
+            margin-bottom: 1rem;
+        }
+
+        .item-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .item-picker-item {
+            aspect-ratio: 1;
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition);
+        }
+
+        .item-picker-item:hover {
+            border-color: var(--primary);
+            transform: scale(1.05);
+        }
+
+        .item-picker-item.selected {
+            border-color: var(--primary);
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .item-picker-item img {
+            width: 70%;
+            height: 70%;
+            image-rendering: pixelated;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 2000;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: var(--surface);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 20px var(--shadow);
+            animation: slideIn 0.3s ease;
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--error);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Collapsible Section */
+        .collapsible {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            overflow: hidden;
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.25rem;
+            background: var(--background);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .collapsible-header:hover {
+            background: var(--surface);
+        }
+
+        .collapsible-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .collapsible-icon {
+            transition: transform var(--transition);
+        }
+
+        .collapsible.open .collapsible-icon {
+            transform: rotate(180deg);
+        }
+
+        .collapsible-content {
+            padding: 0 1.25rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .collapsible.open .collapsible-content {
+            padding: 1.25rem;
+            max-height: 2000px;
+        }
+
+        /* Tag Input */
+        .tag-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            min-height: 44px;
+        }
+
+        .tag {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid var(--primary);
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity var(--transition);
+        }
+
+        .tag-remove:hover {
+            opacity: 1;
+            color: var(--error);
+        }
+
+        .tag-input {
+            flex: 1;
+            min-width: 100px;
+            border: none;
+            background: transparent;
+            color: var(--text);
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        /* Color Picker */
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+        }
+
+        .color-input {
+            flex: 1;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 240px;
+            }
+            
+            .coords-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .content {
+                order: 1;
+            }
+            
+            .header {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .equipment-preview {
+                grid-template-columns: 1fr;
+            }
+            
+            .item-picker-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Search */
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-box input {
+            padding-left: 2.75rem;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-error {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+
+        .badge-info {
+            background: rgba(33, 150, 243, 0.2);
+            color: var(--info);
+        }
+
+        /* Status indicator */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .status-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .status-dot.inactive {
+            background: var(--error);
+        }
+
+        .status-dot.connecting {
+            background: var(--warning);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Quick Actions Panel */
+        .quick-actions {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--surface);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px var(--shadow);
+            border: 1px solid var(--border);
+            z-index: 50;
+        }
+
+        .quick-actions.hidden {
+            display: none;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--background) 0%, #0d1f0d 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-container {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .login-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .login-instruction {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .login-instruction-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-instruction-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .login-instruction code {
+            background: var(--background);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: var(--primary-light);
+        }
+
+        .login-input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .login-input-group label {
+            display: block;
+            text-align: left;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .login-input-group input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
+            font-size: 1rem;
+            font-family: 'Consolas', 'Monaco', monospace;
+            letter-spacing: 0.1em;
+            text-align: center;
+            transition: all var(--transition);
+        }
+
+        .login-input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
+        .login-input-group input::placeholder {
+            color: var(--text-muted);
+            letter-spacing: normal;
+        }
+
+        #login-error {
+            background: rgba(244, 67, 54, 0.15);
+            border: 1px solid var(--error);
+            color: var(--error);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        #login-button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        #login-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+
+        #login-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* User Display in Header */
+        #user-display {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--card);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .user-name {
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            padding: 0.3rem 0.5rem;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all var(--transition);
+            font-size: 1rem;
+        }
+
+        .logout-btn:hover {
+            background: var(--error);
+        }
+
+        /* Main Content wrapper for auth */
+        #main-content {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-container">
+            <div class="login-logo">
+                <img src="logo.png" alt="Event-PVP Logo">
+            </div>
+            <h1 class="login-title" data-i18n="auth.title">Event-PVP Konfigurator</h1>
+            <p class="login-subtitle" data-i18n="auth.subtitle">Authentifizierung erforderlich</p>
+            
+            <div class="login-instruction">
+                <div class="login-instruction-title" data-i18n="auth.tokenInstructionTitle">📋 So erhältst du einen Token:</div>
+                <div class="login-instruction-text" data-i18n-html="auth.tokenInstruction">
+                    Führe im Spiel als Admin den Befehl<br>
+                    <code>/eventpvp webtoken</code><br>
+                    aus und gib den Token hier ein.
+                </div>
+            </div>
+            
+            <div id="login-error"></div>
+            
+            <div class="login-input-group">
+                <label for="login-token" data-i18n="auth.tokenLabel">Zugangs-Token</label>
+                <input type="text" id="login-token" placeholder="ABC123..." autocomplete="off" spellcheck="false" data-i18n-placeholder="auth.tokenPlaceholder">
+            </div>
+            
+            <button id="login-button" onclick="performLogin()">
+                <span aria-hidden="true">🔓</span> <span data-i18n="auth.login">Anmelden</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content (hidden until authenticated) -->
+    <div id="main-content" style="display: none;">
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <img src="logo.png" alt="Event-PVP Logo">
+            </div>
+            <div>
+                <h1 data-i18n="app.title">Event-PVP Konfigurator</h1>
+                <div id="connection-status" class="connection-status">
+                    <span class="status-dot connecting" id="status-dot"></span>
+                    <span id="status-text" data-i18n="status.initializing">Initialisiere...</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <!-- User Display -->
+            <div id="user-display"></div>
+            
+            <!-- Server Actions -->
+            <button class="btn btn-secondary" onclick="reloadServer()" data-i18n-title="header.reload">
+                <i class="fas fa-power-off"></i>
+            </button>
+            <button class="btn btn-secondary" onclick="checkServerStatus()" data-i18n-title="header.serverStatus">
+                <i class="fas fa-heartbeat"></i>
+            </button>
+            
+            <div class="header-divider"></div>
+            
+            <button class="btn btn-secondary" onclick="loadAllConfigs()" data-i18n-title="header.reloadConfigs">
+                <i class="fas fa-cloud-download-alt"></i>
+            </button>
+            <button class="btn btn-secondary" onclick="showYamlPreview()" data-i18n-title="header.yamlPreview">
+                <i class="fas fa-code"></i>
+            </button>
+            <button class="btn btn-secondary" onclick="undoChange()" data-i18n-title="button.undo">
+                <i class="fas fa-undo"></i>
+            </button>
+            <button class="btn btn-secondary" onclick="redoChange()" data-i18n-title="button.redo">
+                <i class="fas fa-redo"></i>
+            </button>
+            <label class="btn btn-secondary" style="cursor: pointer;" data-i18n-title="button.import">
+                <i class="fas fa-upload"></i>
+                <input type="file" accept=".json" onchange="importConfig(event)" style="display: none;">
+            </label>
+            <button class="btn btn-secondary" onclick="exportConfig()">
+                <i class="fas fa-download"></i> <span data-i18n="button.export">Export</span>
+            </button>
+            <button class="btn btn-primary" onclick="saveAllConfigs()">
+                <i class="fas fa-save"></i> <span data-i18n="button.save">Speichern</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title" data-i18n="sidebar.configuration">Konfiguration</div>
+                <a class="nav-item active" data-section="settings" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span data-i18n="nav.general">Allgemeine Einstellungen</span>
+                </a>
+                <a class="nav-item" data-section="events" onclick="showSection('events')">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span data-i18n="nav.events">Events</span>
+                    <span class="nav-badge" id="events-count">0</span>
+                </a>
+                <a class="nav-item" data-section="worlds" onclick="showSection('worlds')">
+                    <i class="fas fa-globe"></i>
+                    <span data-i18n="nav.worlds">Welten & Arenen</span>
+                    <span class="nav-badge" id="worlds-count">0</span>
+                </a>
+                <a class="nav-item" data-section="equipment" onclick="showSection('equipment')">
+                    <i class="fas fa-shield-alt"></i>
+                    <span data-i18n="nav.equipment">Equipment-Sets</span>
+                    <span class="nav-badge" id="equipment-count">0</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title" data-i18n="sidebar.web">Web Interface</div>
+                <a class="nav-item" data-section="theme" onclick="showSection('theme')">
+                    <i class="fas fa-palette"></i>
+                    <span data-i18n="nav.theme">Theme & Farben</span>
+                </a>
+            </div>
+
+            <div class="sidebar-section" id="server-info-section" style="margin-top: 1rem; padding: 0.75rem; background: var(--background); border-radius: 8px;">
+                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;" data-i18n="sidebar.serverInfo">Server Info</div>
+                <div id="server-info" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    <p><i class="fas fa-users" style="width: 16px;"></i> <span id="online-players">-</span> <span data-i18n="label.serverPlayers">Spieler</span></p>
+                    <p><i class="fas fa-tachometer-alt" style="width: 16px;"></i> <span id="server-tps">-</span> <span data-i18n="label.serverTps">TPS</span></p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content" id="main-content">
+            <!-- Settings Section -->
+            <section id="section-settings" class="section active">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title" data-i18n="general.title">Allgemeine Einstellungen</h2>
+                        <p class="content-subtitle" data-i18n="general.subtitle">Globale Plugin-Konfiguration</p>
+                    </div>
+                </div>
+
+                <!-- Basic Settings Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-sliders-h"></i>
+                            <span data-i18n="settings.base">Basis-Einstellungen</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span data-i18n="settings.prefixLabel">Prefix</span>
+                                <span class="form-label-hint" data-i18n="settings.prefixHint">(Wird vor Nachrichten angezeigt)</span>
+                            </label>
+                            <input type="text" class="form-control" id="settings-prefix" value="&6[Event]&r" 
+                                   onchange="updateConfig('settings.prefix', this.value)">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="general.mainWorld">Hauptwelt</label>
+                            <input type="text" class="form-control" id="settings-main-world" value="world"
+                                   onchange="updateConfig('settings.main-world', this.value)">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.languageSelector">Interface-Sprache</label>
+                            <select class="form-control" id="settings-language" onchange="changeLanguage(this.value)">
+                                <!-- Options are dynamically populated from languages.json -->
+                            </select>
+                        </div>
+
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.saveLocation">Spielerposition speichern</span>
+                                <span data-i18n="settings.saveLocationHint">Speichert die Position vor Events/Matches</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-save-location" checked
+                                       onchange="updateConfig('settings.save-player-location', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.joinPhase">Beitrittsphase (Sekunden)</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-join-phase')">-</button>
+                                <input type="number" class="form-control" id="settings-join-phase" value="30" min="5" max="300"
+                                       onchange="updateConfig('settings.join-phase-duration', parseInt(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-join-phase')">+</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.lobbyCountdown">Lobby-Countdown (Sekunden)</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-lobby-countdown')">-</button>
+                                <input type="number" class="form-control" id="settings-lobby-countdown" value="10" min="5" max="120"
+                                       onchange="updateConfig('settings.lobby-countdown', parseInt(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-lobby-countdown')">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Snapshots Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-archive"></i>
+                            <span data-i18n="settings.inventorySnapshots">Inventar-Snapshots</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.snapshotsEnabled">Snapshots aktivieren</span>
+                                <span data-i18n="settings.snapshotsEnabledHint">Sichert Inventare vor Events/Matches</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-snapshots-enabled" checked
+                                       onchange="updateConfig('settings.inventory-snapshots.enabled', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.defaultGroup">Standard-Gruppe</label>
+                            <input type="text" class="form-control" id="settings-snapshot-group" value="default"
+                                   onchange="updateConfig('settings.inventory-snapshots.default-group', this.value)">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.retainDays">Aufbewahrung (Tage)</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-retain-days')">-</button>
+                                <input type="number" class="form-control" id="settings-retain-days" value="30" min="1" max="365"
+                                       onchange="updateConfig('settings.inventory-snapshots.retain-days', parseInt(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-retain-days')">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- World Loading Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-globe-americas"></i>
+                            <span data-i18n="settings.worldManagement">Weltenverwaltung</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.worldLoading">Welt-Ladung</label>
+                            <select class="form-control" id="settings-world-loading"
+                                    onchange="updateConfig('settings.world-loading', this.value)">
+                                <option value="both" data-i18n="settings.worldLoadingBoth">Beide (Event + PvP)</option>
+                                <option value="event" data-i18n="settings.worldLoadingEvent">Nur Events</option>
+                                <option value="lobby" data-i18n="settings.worldLoadingLobby">Nur Lobby</option>
+                                <option value="arena" data-i18n="settings.worldLoadingArena">Nur Arena (PvP)</option>
+                                <option value="none" data-i18n="settings.worldLoadingNone">Keine</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.commandRestriction">Befehlseinschränkung</label>
+                            <select class="form-control" id="settings-command-restriction"
+                                    onchange="updateConfig('settings.command-restriction', this.value)">
+                                <option value="both" data-i18n="settings.commandRestrictionBoth">Beide (Event + PvP)</option>
+                                <option value="event" data-i18n="settings.commandRestrictionEvent">Nur in Events</option>
+                                <option value="pvp" data-i18n="settings.commandRestrictionPvp">Nur in PvP</option>
+                                <option value="none" data-i18n="settings.commandRestrictionNone">Keine</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Spectator Settings -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-eye"></i>
+                            <span data-i18n="settings.spectatorsTitle">Zuschauer-System</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.spectatorsEnabled">Zuschauer aktivieren</span>
+                                <span data-i18n="settings.spectatorsEnabledHint">Erlaubt Spielern, Matches zuzuschauen</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-spectators-enabled" checked
+                                       onchange="updateConfig('settings.spectators.enabled', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.maxSpectators">Max. Zuschauer</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-max-spectators')">-</button>
+                                <input type="number" class="form-control" id="settings-max-spectators" value="10" min="0" max="100"
+                                       onchange="updateConfig('settings.spectators.max-spectators', parseInt(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-max-spectators')">+</button>
+                            </div>
+                        </div>
+
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.announceJoin">Beitritt ankündigen</span>
+                                <span data-i18n="settings.announceJoinHint">Zeigt Nachricht wenn Zuschauer beitritt</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-announce-join" checked
+                                       onchange="updateConfig('settings.spectators.announce-join', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Match Settings -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-swords"></i>
+                            <span data-i18n="settings.matchSettings">Match-Einstellungen</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.matchCountdown">Countdown (Sekunden)</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-match-countdown')">-</button>
+                                <input type="number" class="form-control" id="settings-match-countdown" value="10" min="3" max="60"
+                                       onchange="updateConfig('settings.match.countdown-time', parseInt(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-match-countdown')">+</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.matchDuration">Max. Dauer (Sekunden)</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-match-duration', 60)">-</button>
+                                <input type="number" class="form-control" id="settings-match-duration" value="600" min="60" max="3600"
+                                       onchange="updateConfig('settings.match.max-duration', parseInt(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-match-duration', 60)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.allowNoWager">Wetten ohne Einsatz erlauben</span>
+                                <span data-i18n="settings.allowNoWagerHint">Spieler können ohne Wette kämpfen</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-allow-no-wager" checked
+                                       onchange="updateConfig('settings.match.allow-no-wager', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arena Regeneration -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-sync"></i>
+                            <span data-i18n="settings.arenaRegenTitle">Arena-Regeneration</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.createBackups">Backups erstellen</span>
+                                <span data-i18n="settings.createBackupsHint">Erstellt Backups vor Regeneration</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-arena-backups" checked
+                                       onchange="updateConfig('settings.arena-regeneration.backups', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.backupAsync">Async Backup</span>
+                                <span data-i18n="settings.backupAsyncHint">Backup im Hintergrund (empfohlen)</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-backup-async" checked
+                                       onchange="updateConfig('settings.arena-regeneration.backup-async', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Checks -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-shield-check"></i>
+                            <span data-i18n="settings.securityChecks">Sicherheitsprüfungen</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.checkInventory">Inventarplatz prüfen</span>
+                                <span data-i18n="settings.checkInventoryHint">Prüft freien Platz für Wetten</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-check-inventory" checked
+                                       onchange="updateConfig('settings.checks.inventory-space', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.minBet">Min. Geld-Wette</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-min-bet', 10)">-</button>
+                                <input type="number" class="form-control" id="settings-min-bet" value="10" min="0"
+                                       onchange="updateConfig('settings.checks.minimum-bet-money', parseFloat(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-min-bet', 10)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span data-i18n="settings.maxBet">Max. Geld-Wette</span> <span class="form-label-hint" data-i18n="settings.maxBetHint">(0 = unbegrenzt)</span>
+                            </label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-max-bet', 1000)">-</button>
+                                <input type="number" class="form-control" id="settings-max-bet" value="100000" min="0"
+                                       onchange="updateConfig('settings.checks.max-bet-money', parseFloat(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-max-bet', 1000)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Auto-Events -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-clock"></i>
+                            <span data-i18n="settings.autoEventsTitle">Auto-Event System</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.autoEventsEnabled">Auto-Events aktivieren</span>
+                                <span data-i18n="settings.autoEventsEnabledHint">Startet Events automatisch in festgelegten Intervallen</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-auto-events-enabled"
+                                       onchange="updateConfig('settings.auto-events.enabled', this.checked); toggleAutoEventSettings()">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div id="auto-event-settings" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label" data-i18n="settings.autoEventsIntervalMin">Minimales Intervall (Sekunden)</label>
+                                <div class="number-input">
+                                    <button class="number-btn" onclick="decrementValue('settings-auto-events-interval-min', 300)">-</button>
+                                    <input type="number" class="form-control" id="settings-auto-events-interval-min" value="1800" min="300" max="7200"
+                                           onchange="updateConfig('settings.auto-events.interval-min', parseInt(this.value))">
+                                    <button class="number-btn" onclick="incrementValue('settings-auto-events-interval-min', 300)">+</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" data-i18n="settings.autoEventsIntervalMax">Maximales Intervall (Sekunden)</label>
+                                <div class="number-input">
+                                    <button class="number-btn" onclick="decrementValue('settings-auto-events-interval-max', 300)">-</button>
+                                    <input type="number" class="form-control" id="settings-auto-events-interval-max" value="3600" min="600" max="14400"
+                                           onchange="updateConfig('settings.auto-events.interval-max', parseInt(this.value))">
+                                    <button class="number-btn" onclick="incrementValue('settings-auto-events-interval-max', 300)">+</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span data-i18n="settings.autoEventsSelectionMode">Event-Auswahl-Modus</span>
+                                    <span class="form-label-hint" data-i18n="settings.autoEventsSelectionModeHint">Bestimmt, wie Events ausgewählt werden</span>
+                                </label>
+                                <select class="form-control" id="settings-auto-events-mode" onchange="updateConfig('settings.auto-events.random-selection', this.value === 'random'); toggleEventSelectionMode()">
+                                    <option value="random" data-i18n="settings.autoEventsModeRandom">Zufällig</option>
+                                    <option value="sequential" data-i18n="settings.autoEventsModeSequential">Sortiert</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <span data-i18n="settings.autoEventsSelectedEvents">Ausgewählte Events</span>
+                                    <span class="form-label-hint" id="event-selection-mode-hint" data-i18n="settings.autoEventsSelectedEventsHint">(Leer = alle Events werden verwendet)</span>
+                                </label>
+                                <div id="auto-events-selection-list" style="margin-bottom: 0.5rem;">
+                                    <!-- Selected events will be listed here -->
+                                </div>
+                                <select class="form-control" id="auto-events-add-select" onchange="addAutoEventSelection(this.value); this.value='';">
+                                    <option value="" data-i18n="settings.autoEventsSelectEvent">Event hinzufügen...</option>
+                                    <!-- Options populated dynamically -->
+                                </select>
+                            </div>
+
+                            <div class="toggle-wrapper">
+                                <div class="toggle-label">
+                                    <span data-i18n="settings.autoEventsCheckPlayers">Online-Spieler prüfen</span>
+                                    <span data-i18n="settings.autoEventsCheckPlayersHint">Startet Events nur, wenn genug Spieler online sind</span>
+                                </div>
+                                <label class="toggle">
+                                    <input type="checkbox" id="settings-auto-events-check-players" checked
+                                           onchange="updateConfig('settings.auto-events.check-online-players', this.checked)">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Events Section -->
+            <section id="section-events" class="section">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title" data-i18n="events.title">Events</h2>
+                        <p class="content-subtitle" data-i18n="events.subtitle">Konfiguriere deine Event-Typen</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="createNewEvent()">
+                        <i class="fas fa-plus"></i> <span data-i18n="events.new">Neues Event</span>
+                    </button>
+                </div>
+
+                <div id="events-list">
+                    <!-- Events werden dynamisch geladen -->
+                </div>
+            </section>
+
+            <!-- Worlds Section -->
+            <section id="section-worlds" class="section">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title" data-i18n="worlds.title">Welten & Arenen</h2>
+                        <p class="content-subtitle" data-i18n="worlds.subtitle">PvP-Welten und Arena-Konfigurationen</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="createNewWorld()">
+                        <i class="fas fa-plus"></i> <span data-i18n="worlds.new">Neue Welt</span>
+                    </button>
+                </div>
+
+                <div id="worlds-list">
+                    <!-- Welten werden dynamisch geladen -->
+                </div>
+            </section>
+
+            <!-- Equipment Section -->
+            <section id="section-equipment" class="section">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title" data-i18n="equipment.title">Equipment-Sets</h2>
+                        <p class="content-subtitle" data-i18n="equipment.subtitle">Rüstungs- und Inventar-Konfigurationen</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="createNewEquipment()">
+                        <i class="fas fa-plus"></i> <span data-i18n="equipment.new">Neues Set</span>
+                    </button>
+                </div>
+
+                <div id="equipment-list">
+                    <!-- Equipment-Sets werden dynamisch geladen -->
+                </div>
+            </section>
+
+            <!-- Theme Section -->
+            <section id="section-theme" class="section">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title" data-i18n="theme.title">Theme & Farben</h2>
+                        <p class="content-subtitle" data-i18n="theme.subtitle">Passe das Aussehen des Web-Interface an</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="resetTheme()">
+                        <i class="fas fa-undo"></i> <span data-i18n="theme.resetButton">Standard wiederherstellen</span>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-paint-brush"></i>
+                            <span data-i18n="theme.colorScheme">Farbschema</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.primary">Primärfarbe (Akzent)</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-primary" value="#4caf50"
+                                       onchange="updateThemeColor('primary', this.value)">
+                                <input type="text" class="form-control color-input" value="#4caf50"
+                                       oninput="document.getElementById('theme-primary').value = this.value; updateThemeColor('primary', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.secondary">Sekundärfarbe</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-secondary" value="#66bb6a"
+                                       onchange="updateThemeColor('secondary', this.value)">
+                                <input type="text" class="form-control color-input" value="#66bb6a"
+                                       oninput="document.getElementById('theme-secondary').value = this.value; updateThemeColor('secondary', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.background">Hintergrundfarbe</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-background" value="#1a1a1a"
+                                       onchange="updateThemeColor('background', this.value)">
+                                <input type="text" class="form-control color-input" value="#1a1a1a"
+                                       oninput="document.getElementById('theme-background').value = this.value; updateThemeColor('background', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.surface">Oberflächen-Farbe</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-surface" value="#2d2d2d"
+                                       onchange="updateThemeColor('surface', this.value)">
+                                <input type="text" class="form-control color-input" value="#2d2d2d"
+                                       oninput="document.getElementById('theme-surface').value = this.value; updateThemeColor('surface', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.card">Karten-Farbe</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-card" value="#3a3a3a"
+                                       onchange="updateThemeColor('card', this.value)">
+                                <input type="text" class="form-control color-input" value="#3a3a3a"
+                                       oninput="document.getElementById('theme-card').value = this.value; updateThemeColor('card', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.text">Textfarbe</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-text" value="#e0e0e0"
+                                       onchange="updateThemeColor('text', this.value)">
+                                <input type="text" class="form-control color-input" value="#e0e0e0"
+                                       oninput="document.getElementById('theme-text').value = this.value; updateThemeColor('text', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-server"></i>
+                            <span data-i18n="web.settingsTitle">Web-Server Einstellungen</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="web.port">Port</label>
+                            <input type="number" class="form-control" id="web-port" value="8085" min="1024" max="65535"
+                                   onchange="updateWebConfig('web.port', parseInt(this.value))">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="web.title">Titel</label>
+                            <input type="text" class="form-control" id="web-title" value="Event-PVP Konfigurator"
+                                   onchange="updateWebConfig('web.title', this.value)">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Item Picker Modal -->
+    <div class="modal-overlay" id="item-picker-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" data-i18n="modal.itemPickerTitle">Item auswählen</h3>
+                <button class="modal-close" onclick="closeItemPicker()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="search-box item-picker-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Item suchen..." 
+                           id="item-search" oninput="filterItems(this.value)" data-i18n-placeholder="modal.itemSearch">
+                </div>
+                <div class="item-picker-grid" id="item-grid">
+                    <!-- Items werden dynamisch geladen -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeItemPicker()" data-i18n="button.cancel">Abbrechen</button>
+                <button class="btn btn-primary" onclick="confirmItemSelection()" data-i18n="button.select">Auswählen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- YAML Preview Modal -->
+    <div class="modal-overlay" id="yaml-modal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3 class="modal-title" data-i18n="modal.yamlPreview">YAML Vorschau</h3>
+                <button class="modal-close" onclick="closeYamlPreview()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <div class="tab active" onclick="showYamlTab('config')" data-i18n="modal.tabConfig">config.yml</div>
+                    <div class="tab" onclick="showYamlTab('worlds')" data-i18n="modal.tabWorlds">worlds.yml</div>
+                    <div class="tab" onclick="showYamlTab('equipment')" data-i18n="modal.tabEquipment">equipment.yml</div>
+                </div>
+                <pre style="background: var(--background); padding: 1rem; border-radius: 6px; overflow-x: auto; max-height: 400px;"><code id="yaml-content"></code></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="copyYaml()">
+                    <i class="fas fa-copy"></i> <span data-i18n="button.copy">Kopieren</span>
+                </button>
+                <button class="btn btn-primary" onclick="closeYamlPreview()" data-i18n="button.close">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Quick Actions (shown when changes are pending) -->
+    <div class="quick-actions hidden" id="quick-actions">
+        <span style="color: var(--text-secondary);" data-i18n="quick.unsavedChanges">Ungespeicherte Änderungen</span>
+        <button class="btn btn-secondary btn-icon" onclick="discardChanges()" data-i18n-title="quick.discard">
+            <i class="fas fa-times"></i>
+        </button>
+        <button class="btn btn-primary" onclick="saveAllConfigs()">
+            <i class="fas fa-save"></i> <span data-i18n="button.save">Speichern</span>
+        </button>
+    </div>
+
+    </div><!-- End #main-content -->
+
+    <script src="app.js"></script>
+    <script src="editors.js"></script>
+</body>
+</html>

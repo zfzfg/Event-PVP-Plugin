@@ -1,0 +1,116 @@
+# ============================================
+# Event-PVP Web Interface Konfiguration
+# ============================================
+
+web:
+  # Web-Server aktivieren
+  enabled: true
+  
+  # Port für den Web-Server
+  port: 8085
+  
+  # Öffentliche URL für das Web-Interface
+  # Diese URL wird in der /eventpvp webtoken Nachricht angezeigt
+  # Beispiele:
+  #   - http://localhost:8085 (Standard, für lokalen Zugriff)
+  #   - http://meinserver.de:8085 (Domain mit Port)
+  #   - https://web.meinserver.de (Domain mit HTTPS)
+  # {port} wird automatisch durch den konfigurierten Port ersetzt
+  public-url: "http://localhost:{port}"
+  
+  # Titel im Browser-Tab
+  title: "Event-PVP Konfigurator"
+  
+  # Theme-Farben (anpassbar)
+  theme:
+    # Hauptakzentfarbe
+    primary-color: "#4caf50"
+    # Sekundäre Akzentfarbe
+    secondary-color: "#66bb6a"
+    # Hintergrundfarbe (dunkelgrau)
+    background-color: "#1a1a1a"
+    # Zweiter Hintergrund für Panels
+    surface-color: "#2d2d2d"
+    # Dritter Hintergrund für Karten
+    card-color: "#3a3a3a"
+    # Textfarbe
+    text-color: "#e0e0e0"
+    # Sekundäre Textfarbe
+    text-secondary: "#b0b0b0"
+    # Fehlerfarbe
+    error-color: "#f44336"
+    # Warnfarbe
+    warning-color: "#ff9800"
+    # Erfolgsfarbe
+    success-color: "#4caf50"
+    # Info-Farbe
+    info-color: "#2196f3"
+
+# Sicherheitseinstellungen
+security:
+  # Token-basierte Authentifizierung aktivieren
+  # Wenn true: Spieler müssen /eventpvp webtoken eingeben um Zugang zu bekommen
+  # Wenn false: Keine Authentifizierung nötig (nur für lokale Entwicklung empfohlen!)
+  auth-enabled: true
+  
+  # Wie lange ein Token gültig ist (in Minuten)
+  # Spieler haben diese Zeit um sich einzuloggen nach /eventpvp webtoken
+  token-validity-minutes: 10
+  
+  # Wie lange eine Session gültig bleibt (in Minuten)
+  # Bei Aktivität wird die Session automatisch verlängert
+  session-validity-minutes: 60
+  
+  # Erforderliche Permission für Web-Interface Zugang
+  # Standard: eventpvp.admin.web
+  # OP-Spieler haben immer Zugang
+  required-permission: "eventpvp.admin.web"
+  
+  # Legacy-Einstellungen (nicht mehr verwendet)
+  session-timeout: 24
+  verification-timeout: 5
+  password: ""
+  
+  # Erlaubte IPs (leer = alle erlaubt)
+  allowed-ips: []
+
+# Item-Texturen
+items:
+  # Texturen aktivieren
+  enable-textures: true
+  
+  # Lokale Textur-Quelle (Plugin-Ordner)
+  local-texture-path: "minecraft_textures_item/"
+  
+  # Fallback: Remote Textur-Quelle (wenn lokal nicht verfügbar)
+  texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/item/"
+  
+  # Block-Texturen Fallback
+  block-texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/block/"
+
+# Interface-Einstellungen
+interface:
+  # Auto-Refresh Intervall in Sekunden (0 = deaktiviert)
+  auto-refresh-interval: 0
+  
+  # Änderungen automatisch speichern
+  auto-save: false
+  
+  # Bestätigung vor Speichern anzeigen
+  confirm-save: true
+  
+  # Anzahl der Undo-Schritte
+  max-undo-steps: 20
+  
+  # Kompakte Ansicht als Standard
+  compact-view: false
+  
+  # Syntax-Highlighting aktivieren
+  syntax-highlighting: true
+
+# Editierbare Dateien
+editable-files:
+  - config.yml
+  - worlds.yml
+  - equipment.yml
+  # messages.yml und plugin.yml sind ausgeschlossen

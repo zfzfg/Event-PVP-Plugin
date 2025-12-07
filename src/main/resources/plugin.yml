@@ -1,0 +1,142 @@
+name: Event-PVP-Plugin
+version: ${project.version}
+main: de.zfzfg.eventplugin.EventPlugin
+api-version: 1.19
+author: zfzfg
+depend: [Vault]
+softdepend: [Multiverse-Core]
+
+commands:
+  pvp:
+    description: Unified PvP command with sub-commands
+    usage: /<command> <challenge|accept|deny|spectate|leave|surrender|draw>
+    aliases: [pvpwager]
+  
+  pvpask:
+    description: Send a PvP Wager request to a player (clickable in chat)
+    usage: /<command> <player>
+    aliases: [pvpgui, wagergui, pvpchallenge]
+    permission: pvpwager.use
+
+  pvpaccept:
+    description: Accept a PvP Wager request and open the Wager GUI
+    usage: /<command> [player]
+    permission: pvpwager.use
+
+  pvpdeny:
+    description: Deny a PvP Wager request
+    usage: /<command> [player]
+    permission: pvpwager.use
+    
+  pvpa:
+    description: Send a PvP wager request with full configuration
+    usage: /<command> <player> <wager> <amount> <arena> <equipment>
+    aliases: [pvprequest]
+    
+  pvpanswer:
+    description: Respond to a PvP wager request
+    usage: /<command> <wager> <amount> [arena] [equipment]
+    
+  pvprespond:
+    description: Opens the response GUI for PvP wager requests
+    usage: /<command> gui
+    permission: pvpwager.use
+    
+  pvpyes:
+    description: Accept the counter-offer (old system)
+    usage: /<command>
+    aliases: [pvpconfirm]
+    
+  pvpno:
+    description: Decline the request/counter-offer (old system)
+    usage: /<command>
+    aliases: [pvpdecline, pvpcancel]
+    
+  pvpadmin:
+    description: Admin commands for PvPWager
+    usage: /<command> [reload|stopall|info]
+    permission: pvpwager.admin
+    aliases: [pvpwageradmin]
+    
+  surrender:
+    description: Surrender the current match
+    usage: /<command>
+    
+  draw:
+    description: Vote for a draw
+    usage: /<command>
+    
+  pvpainfo:
+    description: Show all available PvP commands and usage
+    usage: /<command>
+    aliases: [pvphelp, pvpinfo]
+
+  pvpstats:
+    description: Show PvP statistics and leaderboards
+    usage: /<command> me | /<command> top [N]
+
+  eventstats:
+    description: Zeige Event-Statistiken und Top-Sieger
+    usage: /<command> me | /<command> top [N] | /<command> reset <player> | /<command> add <player> <wins|participations> <n>
+
+  event:
+    description: Event Hauptbefehl
+    usage: /<command> <join|leave|start|stop|forcestart|list>
+    aliases: [ev, events]
+
+  eventpvp:
+    description: Unified Event+PvP Plugin command
+    usage: /<command> reload
+    aliases: [epvp, eventpvpreload]
+    permission: eventpvp.admin
+
+  inventoryrestore:
+    description: Restore a saved inventory by its 4-digit ID
+    usage: /<command> [player] <InventoryID>
+    permission: eventpvp.inventory.restore
+
+permissions:
+  pvpwager.admin:
+    description: Access to admin commands
+    default: op
+    
+  pvpwager.bypass.betlimit:
+    description: Bypass bet limits
+    default: op
+    
+  pvpwager.use:
+    description: Use PvP wager system
+    default: true
+    
+  pvpwager.spectate:
+    description: Spectate matches
+    default: true
+    
+  pvpwager.command:
+    description: Use command-based PvP requests
+    default: true
+
+  eventplugin.admin:
+    description: Zugriff auf Event-Admin-Befehle
+    default: op
+  eventpvp.admin:
+    description: Zugriff auf Event+PvP Unified Admin-Befehle
+    default: op
+  eventplugin.join:
+    description: Erlaubt die Teilnahme an Events
+    default: true
+  eventpvp.opbypass:
+    description: OP-Bypass für Command-Restriktionen
+    default: op
+  eventpvp.inventory.restore:
+    description: Erlaubt das Wiederherstellen von Inventaren per ID
+    default: op
+  eventpvp.inventory.restore.any:
+    description: Erlaubt das Wiederherstellen fremder Inventare per ID
+    default: op
+  eventpvp.debug:
+    description: Erlaubt die Nutzung des Debug-Commands
+    default: op
+  eventpvp.debug.receive:
+    description: Erlaubt den Empfang von Debug-Nachrichten im Chat
+    default: op

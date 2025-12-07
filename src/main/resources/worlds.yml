@@ -1,0 +1,38 @@
+## Unified worlds configuration for Events & PvP
+
+worlds:
+  # Beispiel-Arena (PvP deaktiviert)
+  arena_world:
+    display-name: "&bBeispiel-Arena"
+    pvpwager-world-enable: false
+    build-allowed: false
+    regenerate-world: false
+    clone-source-world: "arena_template"
+    # PvP-Spawn-Definition (Beispiel – derzeit deaktiviert)
+    pvpwager-spawn:
+      spawn-type: FIXED_SPAWNS
+      spawns:
+        spectator: { x: 0, y: 80, z: 0, yaw: 0, pitch: 0 }
+        player1:   { x: 10, y: 64, z: 0, yaw: 90, pitch: 0 }
+        player2:   { x: -10, y: 64, z: 0, yaw: -90, pitch: 0 }
+
+  # EventLobby – reine Event-Welt (PvP deaktiviert)
+  EventLobby:
+    display-name: "&aEvent-Lobby"
+    pvpwager-world-enable: false
+
+  # AKTIVE EVENT-WELT: PvPArena (für Events genutzt, PvP deaktiviert)
+  PvPArena:
+    display-name: "&cPvP Arena (Event)"
+    pvpwager-world-enable: true
+    build-allowed: false
+    regenerate-world: true
+    Optional: Quelle für Klon/Reset
+    clone-source-world: "PvPArena_original"
+    Falls später für PvP genutzt werden soll:
+    pvpwager-spawn:
+      spawn-type: FIXED_SPAWNS
+      spawns:
+        spectator: { x: 0, y: 80, z: 0, yaw: 0, pitch: 0 }
+        player1:   { x: 10, y: 65, z: 0, yaw: 90, pitch: 0 }
+        player2:   { x: -10, y: 65, z: 0, yaw: -90, pitch: 0 }

@@ -1,0 +1,641 @@
+# ============================================
+# PvPWager - Nachrichten Konfiguration
+# ============================================
+
+messages:
+  prefix: "&6[PvP]&r"
+  
+  # ===== REQUEST SYSTEM =====
+  request:
+    sent: "&aDu hast &e{player} &aeine PvP-Anfrage gesendet!"
+    
+    header: |
+      
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+      §e§lPVP-ANFRAGE
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      §e{player} §amöchte gegen dich kämpfen!
+      
+    
+    accept-button: "§a§l[► ANNEHMEN ◄]"
+    accept-hover: "§aKlicke um die Anfrage anzunehmen!"
+    deny-button: " §c§l[✖ ABLEHNEN]"
+    deny-hover: "§cKlicke um die Anfrage abzulehnen"
+    footer: |
+      
+      
+      §7Die Anfrage läuft in §e60 Sekunden §7ab.
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+    
+    
+    received: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lPVP-ANFRAGE
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &e{player} &amöchte gegen dich kämpfen!
+      
+      &aKlicke hier zum Annehmen:
+      
+    received-clickable: "&a&l[► ANNEHMEN ◄]"
+    received-expire: "&7Die Anfrage läuft in &e60 Sekunden &7ab."
+    
+    accepted: "&aDu hast die Anfrage von &e{player} &aangenommen!"
+    denied: "&cDu hast die Anfrage von &e{player} &cabgelehnt!"
+    expired: "&cDie Anfrage von &e{player} &cist abgelaufen!"
+    cancelled: "&cDu hast die Anfrage an &e{player} &cabgebrochen!"
+    
+    no-request: "&cDu hast keine Anfrage von diesem Spieler!"
+    already-sent: "&cDu hast diesem Spieler bereits eine Anfrage gesendet!"
+    already-in-match: "&cDieser Spieler ist bereits in einem Match!"
+    self-request: "&cDu kannst dir selbst keine Anfrage senden!"
+    player-offline: "&cDieser Spieler ist nicht online!"
+    
+    # Command Request Messages
+    request-expired-sender: "&cDeine Anfrage an &e{target} &cist abgelaufen!"
+    request-expired-target: "&cAnfrage von &e{sender} &cist abgelaufen!"
+    challenge-header: "&e&lPVP CHALLENGE!"
+    challenge-message: "&e{player} &7has challenged you!"
+  
+  # ===== WAGER SETUP =====
+  wager:
+    setup-start: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lWETTEINSATZ EINRICHTEN
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Lege deine Items und/oder Geld
+      &7in die GUI ein!
+      
+      &7Drücke &a&lBESTÄTIGEN &7wenn fertig.
+      
+    
+    waiting-opponent: |
+      &e&lWarte auf {player}...
+      &7Der Gegner richtet seinen
+      &7Einsatz ein.
+    
+    both-ready: |
+      &a&lBEIDE SPIELER SIND BEREIT!
+      &7Wähle nun Arena und Equipment aus.
+    
+    item-added: "&aItem zum Einsatz hinzugefügt!"
+    item-removed: "&cItem aus dem Einsatz entfernt!"
+    money-set: "&aGeld-Einsatz gesetzt: &6${amount}"
+    money-increased: "&aGeld-Einsatz erhöht: &6${amount}"
+    money-decreased: "&cGeld-Einsatz verringert: &6${amount}"
+    
+    not-enough-money: "&cDu hast nicht genug Geld! (&6${amount} &cbenötigt)"
+    inventory-full-self: "&cDein Inventar muss mindestens &e{slots} &cfreie Plätze haben!"
+    inventory-full-opponent: "&cDein Gegner hat nicht genug Platz im Inventar!"
+    min-bet-required: "&cMindestens &e{amount} &cItems oder &6${money} &cerforderlich!"
+    
+    cancelled: "&cWetteinsatz-Setup abgebrochen!"
+  
+  # ===== ARENA & EQUIPMENT SELECTION =====
+  selection:
+    arena-select: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lARENA AUSWÄHLEN
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Wähle die Arena für
+      &7euer Match aus!
+      
+    
+    arena-selected: "&aArena gewählt: &e{arena}"
+    
+    equipment-select: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lEQUIPMENT AUSWÄHLEN
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Wähle dein Equipment-Set
+      &7für das Match!
+      
+    
+    equipment-selected: "&aEquipment gewählt: &e{equipment}"
+    
+    waiting-opponent-choice: |
+      &e&lWarte auf {player}...
+      &7Der Gegner wählt noch aus.
+    
+    both-selected: |
+      &a&lALLE AUSWAHLEN GETROFFEN!
+      &7Match startet gleich...
+
+  # ===== COMMANDS =====
+  command:
+    common:
+      player-only: "&cNur Spieler können diesen Befehl nutzen!"
+      player-offline: "&cSpieler nicht gefunden: {player}"
+      self-target: "&cDu kannst dich nicht selbst herausfordern!"
+      already-in-match: "&cDu bist bereits in einem Match!"
+      target-in-match: "&c{player} ist bereits in einem Match!"
+      pending-self: "&cDu hast bereits eine ausstehende Anfrage!"
+      pending-target: "&c{player} hat bereits eine ausstehende Anfrage!"
+      not-spectating: "&cDu beobachtest gerade kein Match!"
+      match-full: "&cDas Match hat die maximale Zuschauerzahl erreicht!"
+    pvpa:
+      player-only: "&cDieser Befehl kann nur von Spielern verwendet werden!"
+      player-not-found: "&cSpieler nicht gefunden: {player}"
+      self-challenge: "&cDu kannst dich nicht selbst herausfordern!"
+      arena-not-found: "&cArena nicht gefunden: {arena}"
+      equipment-not-found: "&cEquipment nicht gefunden: {equipment}"
+      amount-positive: "&cBetrag muss positiv sein!"
+      economy-disabled: "&cEconomy ist nicht aktiviert!"
+      not-enough-money: "&cDu hast nicht genug Geld! Dein Kontostand: ${balance}"
+      invalid-money: "&cUngültiger Geldbetrag: {amount}"
+      mismatch-items: "&cAnzahl von Items und Mengen passt nicht!"
+      not-enough-items: "&cDu hast nicht genug von: {item}"
+      invalid-item: "&cUngültiges Item: {item}"
+      wager-money: "&6${amount}"
+      wager-items: "&e{count} Item(s)"
+      request-sent: |
+        
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        &a&lANFRAGE GESENDET!
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7Ziel: &e{target}
+        &7Arena: &e{arena}
+        &7Equipment: &e{equipment}
+        &7Einsatz: {wager}
+        
+        &7Warte auf Antwort von &e{target}&7...
+        
+      usage: |
+        
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        &e&lPVPA BEFEHL
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7Nutzung:
+        &e/pvpa <spieler> <wette> <menge> <arena> <equipment>
+        
+        &7Beispiele:
+        &e/pvpa Steve DIAMOND_SWORD 1 desert diamond
+        &e/pvpa Steve MONEY 100 forest standard
+        &e/pvpa Steve DIAMOND_SWORD,GOLDEN_APPLE 1,5 colosseum netherite
+        
+        &7Nutze &e/pvpa arenas &7für eine Arenenliste
+        &7Nutze &e/pvpa equipment &7für eine Equipment-Liste
+        
+      available-arenas: "&7Verfügbare Arenen:"
+      available-equipment: "&7Verfügbare Equipment-Sets:"
+    pvpyes:
+      player-only: "&cDieser Befehl kann nur von Spielern verwendet werden!"
+      no-request: "&cKeine ausstehende Anfrage!"
+      waiting-response: "&cWarte auf Antwort von {player}!"
+      sender-no-money: "&cDu hast nicht mehr genug Geld!"
+      sender-no-items: "&cDu hast nicht mehr die benötigten Items!"
+      target-no-money-player: "&c{player} hat nicht mehr genug Geld!"
+      target-no-money-target: "&cDu hast nicht mehr genug Geld – Anfrage abgebrochen!"
+      target-no-items-player: "&c{player} hat nicht mehr die benötigten Items!"
+      target-no-items-target: "&cDu hast nicht mehr die benötigten Items – Anfrage abgebrochen!"
+    pvpadmin:
+      no-permission: "&cDu hast keine Berechtigung für diesen Befehl!"
+      reload-success: |
+        
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        &a&lKONFIGURATION NEU GELADEN!
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7✓ Hauptkonfiguration neu geladen
+        &7✓ Nachrichten neu geladen
+        &7✓ Arenen neu geladen: &e{arenaCount}
+        &7✓ Equipment-Sets neu geladen: &e{equipmentCount}
+        
+        &eHinweis: &7Aktive Matches sind nicht betroffen
+        
+      reload-error: "&cFehler beim Reload: {error}"
+      stopall: |
+        
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+        &e&lMATCHES GESTOPPT
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7Gestoppte aktive Matches: &e{count}
+        &7Alle Einsätze wurden zurückgegeben
+        
+      info: |
+        
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        &6&lPVPWAGER INFO
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7Version: &e{version}
+        &7Aktive Matches: &e{active}
+        &7Geladene Arenen: &e{arenas}
+        &7Geladenes Equipment: &e{equipment}
+        &7Economy: {economy}
+        
+      enabled: "&aAktiviert"
+      disabled: "&cDeaktiviert"
+      help: |
+        
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        &6&lPVPWAGER ADMIN
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &e/pvpadmin reload &8- &7Alle Konfigurationen neu laden
+        &e/pvpadmin stopall &8- &7Alle aktiven Matches stoppen
+        &e/pvpadmin info &8- &7Plugin-Informationen anzeigen
+
+    pvpanswer:
+      player-only: "&cNur Spieler können diesen Befehl nutzen!"
+      no-request: "&cKeine ausstehende Anfrage!"
+      usage: |
+        &cBenutzung: /pvpanswer <Einsatz> <Anzahl> [Arena] [Ausrüstung]
+        &7Beispiele: /pvpanswer DIAMOND_SWORD 1
+        &7Beispiele: /pvpanswer MONEY 50 desert diamond
+        &7Beispiele: /pvpanswer SKIP
+      arena-not-found: "&cArena nicht gefunden: {arena}"
+      equipment-not-found: "&cAusrüstung nicht gefunden: {equipment}"
+      missing-money: "&cBetrag für MONEY fehlt!"
+      amount-positive: "&cBetrag muss positiv sein!"
+      economy-disabled: "&cEconomy ist nicht aktiviert!"
+      not-enough-money: "&cDu hast nicht genug Geld!"
+      invalid-money: "&cUngültiger Geldbetrag: {amount}"
+      missing-items: "&cAnzahl für Item-Einsatz fehlt!"
+      mismatch-items: "&cAnzahl und Items passen nicht zusammen!"
+      not-enough-items: "&cDu hast nicht genug von: {item}"
+      invalid-item: "&cUngültiges Item: {item}"
+      response-sent: "&a&lANTWORT GESENDET!"
+      your-wager-money: "&7Dein Einsatz: &6${amount}"
+      your-wager-items: "&7Dein Einsatz: &e{items}"
+      arena-override: "&7Arena-Override: &e{arena}"
+      equipment-override: "&7Ausrüstungs-Override: &e{equipment}"
+      waiting-confirm: "&7Warte auf &e{player} &7zum Bestätigen..."
+      challenger-header: "&e&l{player} HAT GEANTWORTET!"
+      their-wager-money: "&7Ihr Einsatz: &6${amount}"
+      their-wager-items: "&7Ihr Einsatz: &e{items}"
+      arena-changed: "&7Arena geändert zu: &e{arena}"
+      equipment-changed: "&7Ausrüstung geändert zu: &e{equipment}"
+      next-steps: "&aTippe &e/pvpyes &aum anzunehmen\n&cTippe &e/pvpno &cum abzulehnen"
+
+    pvp:
+      help: |
+        &e&lPvPWager &8» &7Nutzung:
+        &e/pvpa <spieler> &8- &7Schickt eine PvP-Wette
+        &e/pvp accept <spieler> &8- &7Anfrage annehmen
+        &e/pvp deny <spieler> &8- &7Anfrage ablehnen
+        &e/pvp spectate <spieler> &8- &7Match zuschauen
+        &e/pvp leave &8- &7Zuschauermodus verlassen
+      accept:
+        success-self: "&aDu hast die PvP-Wette von &e{player} &aangenommen!"
+        success-other: "&e{player} &ahat deine PvP-Wette angenommen!"
+        no-request: "&cKeine ausstehende Anfrage von &e{player}&c!"
+        requires-skip: "&cAnnahme nicht möglich: Der Herausforderer hat keinen SKIP gewählt. Setze zuerst deinen Einsatz mit &e/pvpanswer <wager> <amount> &cund bestätige dann."
+      deny:
+        success-self: "&cDu hast die PvP-Wette von &e{player} &cabgelehnt!"
+        success-other: "&e{player} &chat deine PvP-Wette abgelehnt!"
+        usage: "&cBenutzung: /pvp deny <spieler>"
+      spectate:
+        usage: "&cBenutzung: /pvp spectate <spieler>"
+        no-match: "&c{player} ist in keinem Match!"
+        joined: "&aDu schaust jetzt &e{p1} &7vs &e{p2} &aan!"
+        announce: "&e{player} &7schaut nun das Match!"
+      leave:
+        left: "&aDu hast den Zuschauermodus verlassen!"
+        announce: "&e{player} &7hat den Zuschauermodus verlassen!"
+
+    pvprequest:
+      usage: "&cBenutzung: /pvpa <spieler>"
+      sent: "&aPvP-Wette an &e{player} &agesendet!"
+
+    pvpno:
+      no-request: "&cKeine ausstehende Anfrage!"
+      declined-self: "&cDu hast die Anfrage von/zu &e{player} &cabgelehnt"
+      declined-other: "&e{player} &chat die Anfrage abgelehnt!"
+
+    challenge:
+      usage: "&cBenutzung: /pvp challenge <spieler> [wette] [anzahl] [arena] [equipment]"
+      no-config: "&cKeine Arenen oder Equipment konfiguriert!"
+      sent: "&aPvP-Wette an &e{player} &agesendet!"
+
+    draw:
+      player-only: "&cNur Spieler können diesen Befehl nutzen!"
+      only-active: "&cDu kannst nur während eines laufenden Matches für ein Unentschieden stimmen!"
+      no-active-vote: "&cKeine aktive Unentschieden-Abstimmung!"
+      initiator-wait: "&cDu hast die Abstimmung gestartet, warte auf deinen Gegner!"
+      initiator-cannot-deny: "&cDu hast diese Abstimmung gestartet! Nutze &e/draw &cnoch einmal, um sie abzubrechen."
+      cancelled-self: "&cDu hast deine Unentschieden-Abstimmung abgebrochen."
+      cancelled-opponent: "&e{player} &chat die Unentschieden-Abstimmung abgebrochen."
+      already-active: "&e{opponent} &7hat bereits für ein Unentschieden gestimmt!\n&7Tippe &a/draw accept &7oder &c/draw deny"
+      accepted: "&a&l━━━━━━━━━━━━━━━━━━━━━━━\n&a&lUNENTSCHIEDEN AKZEPTIERT!\n&a&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&7Beide Spieler stimmen einem Unentschieden zu.\n&7Alle Einsätze werden zurückgegeben."
+      denied: "&c&l━━━━━━━━━━━━━━━━━━━━━━━\n&c&lUNENTSCHIEDEN ABGELEHNT!\n&c&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{player} &7hat die Abstimmung abgelehnt.\n&7Das Match geht weiter!"
+      started: "&e&l━━━━━━━━━━━━━━━━━━━━━━━\n&e&lUNENTSCHIEDEN-ABSTIMMUNG\n&e&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{initiator} &7möchte das Match als Unentschieden beenden.\n\n&e{opponent}&7, gib ein:\n  &a/draw accept &7- Unentschieden akzeptieren\n  &c/draw deny &7- Unentschieden ablehnen\n\n&7Zeitlimit: &e{time} Sekunden"
+      expired: "&c&lAbstimmung abgelaufen!\n&7Das Match geht weiter."
+
+    surrender:
+      player-only: "&cNur Spieler können diesen Befehl nutzen!"
+      only-active: "&cDu kannst nur während eines laufenden Matches aufgeben!"
+      confirm: "&c&l━━━━━━━━━━━━━━━━━━━━━━━\n&c&lWARNUNG: AUFGEBEN\n&c&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&7Bist du sicher, dass du aufgeben willst?\n&cDu verlierst deinen gesamten Einsatz!\n\n&7Tippe &e/surrender confirm &7zum Bestätigen\n&7oder warte {timeout} Sekunden zum Abbrechen"
+      confirm-expired: "&cBestätigung abgelaufen! Tippe &e/surrender &cnoch einmal."
+      surrendered: "&c&l━━━━━━━━━━━━━━━━━━━━━━━\n&c&l{player} HAT AUFGEGEBEN!\n&c&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{opponent} &agewinnt das Match!"
+        
+  
+  # ===== MATCH =====
+  match:
+    starting: "&eMatch startet in &6&l{time} &eSekunden!"
+    started: |
+      
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      &a&lMATCH GESTARTET!
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Viel Erfolg!
+      
+    
+    match-starting: "&a&lMATCH STARTET!"
+    match-starting-divider: "&e&l━━━━━━━━━━━━━━━━━━━━━━━"
+    arena-display: "&7Arena: &e{arena}"
+    equipment-display: "&7Equipment: &e{equipment}"
+    arena-countdown: "&eArena wird geladen... &7(5 Sekunden)"
+    fight-divider: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    fight: "&e&lKÄMPFT!"
+    
+    spectator-join-announce: "&7{player} &eschaut nun zu."
+    spectator-leave-announce: "&7{player} &eschaut nicht mehr zu."
+    
+    spectator-joined: "&aDu schaust nun bei &e{player1} &agegen &e{player2} &azu!"
+    spectator-left: "&7Du schaust nicht mehr zu."
+    
+    boundaries-warning: "&c&lACHTUNG: &cArena-Grenze erreicht!"
+  
+  # ===== MATCH ENDE =====
+  end:
+    winner: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &6&l{player} HAT GEWONNEN!
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+    
+    surrender: "&e{player} &chat aufgegeben!"
+    
+    draw: |
+      
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lUNENTSCHIEDEN!
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Alle Einsätze werden zurückgegeben.
+      
+    
+    timeout: |
+      
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      &c&lZEIT ABGELAUFEN!
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Unentschieden - Zeit überschritten.
+      
+    
+    items-returned: "&7Deine Einsätze wurden zurückgegeben."
+    items-won: |
+      
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      &a&lDU HAST GEWONNEN!
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Du hast alle Einsätze erhalten!
+      
+    
+    money-won: "&aDu hast &6&l${amount} &agewonnen!"
+    items-received: "&aDu hast &e{count} &aItem(s) erhalten!"
+  
+  # ===== SURRENDER & DRAW =====
+  surrender:
+    confirm-required: |
+      &c&lAUFGEBEN?
+      &7Bist du sicher? Gib ein:
+      &e/surrender confirm
+      
+      &cDu verlierst alle Einsätze!
+    
+    cancelled: "&7Aufgabe abgebrochen."
+    
+    success: |
+      
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      &c&lDU HAST AUFGEGEBEN!
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7Dein Gegner hat gewonnen.
+      
+  
+  draw:
+    vote-started: |
+      
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lUNENTSCHIEDEN-ABSTIMMUNG
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &e{player} &7möchte unentschieden!
+      
+      &aAkzeptieren: &e/draw accept
+      &cAblehnen: &e/draw deny
+      
+      &7Zeit: &e{time} Sekunden
+      
+    
+    vote-accept: "&a&lZugestimmt!"
+    vote-deny: "&c&lAbgelehnt!"
+    
+    accepted: "&aUnentschieden akzeptiert!"
+    denied: "&cUnentschieden abgelehnt - Kampf geht weiter!"
+    
+    timeout: "&cAbstimmung abgelaufen - Kampf geht weiter!"
+    already-voted: "&cDu hast bereits abgestimmt!"
+    no-active-vote: "&cKeine aktive Abstimmung!"
+  
+  # ===== SPECTATOR =====
+  spectator:
+    join-success: "&aDu schaust nun bei &e{player1} &avs &e{player2} &azu!"
+    leave-success: "&7Du hast den Spectator-Modus verlassen."
+    
+    no-match: "&cKein Match gefunden!"
+    match-full: "&cDieses Match hat bereits zu viele Zuschauer!"
+    already-spectating: "&cDu schaust bereits zu!"
+    permission-required: "&cDu brauchst die Berechtigung zum Zuschauen!"
+  
+  # ===== FEHLER =====
+  error:
+    no-permission: "&cKeine Berechtigung!"
+    player-not-found: "&cSpieler nicht gefunden oder offline!"
+    player-not-online: "&cDieser Spieler ist nicht online!"
+    
+    no-arena: "&cKeine Arena gefunden!"
+    no-equipment: "&cKein Equipment-Set gefunden!"
+    arena-not-available: "&cDiese Arena ist nicht verfügbar!"
+    equipment-not-available: "&cDieses Equipment-Set ist nicht verfügbar!"
+    
+    already-in-match: "&cDu bist bereits in einem Match!"
+    opponent-in-match: "&cDieser Spieler ist bereits in einem Match!"
+    not-in-match: "&cDu bist in keinem Match!"
+    
+    world-not-loaded: "&cDie Arena-Welt konnte nicht geladen werden!"
+    
+    command-blocked: "&cCommands sind im Match gesperrt! Nutze &e/surrender &coder &e/draw"
+  
+  # ===== HELP =====
+  help:
+    header: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lPVP WAGER BEFEHLE
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+  
+  # ===== PVP STATS =====
+  pvpstats:
+    usage: "&e/pvpstats me &7| &e/pvpstats top [N]"
+    admin-usage: "&7Admin: &e/pvpstats reset <player> &7| &e/pvpstats add <player> <wins|losses|draws> <n>"
+    me-player-only: "&cNur Spieler können &e/pvpstats me &cnutzen."
+    me-empty: "&7Noch keine Statistiken – spiele ein paar Matches!"
+    me-header: "&6&lDeine PvP-Statistiken"
+    me-wins: "&7Siege: &a{wins}"
+    me-losses: "&7Niederlagen: &c{losses}"
+    me-draws: "&7Unentschieden: &e{draws}"
+    top-header: "&6&lTop PvP-Spieler (Siege)"
+    top-line: "&e{rank}. &f{name} &7- Siege: &a{wins}, &7Niederlagen: &c{losses}, &7Unentschieden: &e{draws}"
+    top-empty: "&7Noch keine Statistiken vorhanden."
+    no-permission: "&cKeine Berechtigung."
+    reset-usage: "&cNutze: &e/pvpstats reset <player>"
+    add-usage: "&cNutze: &e/pvpstats add <player> <wins|losses|draws> <n>"
+    player-not-found: "&cSpieler nicht gefunden."
+    invalid-number: "&cUngültige Zahl."
+    invalid-amount: "&cZahl muss > 0 sein."
+    invalid-field: "&cFeld muss &ewins&c, &elosses&c oder &edraws &csein."
+    reset-success: "&aPvP-Stats zurückgesetzt für &f{name}"
+    add-success: "&aPvP-Stats aktualisiert für &f{name}"
+    unknown-subcommand: "&cUnbekannter Unterbefehl."
+
+  # ===== EVENT STATS =====
+  eventstats:
+    usage: "&e/eventstats me &7| &e/eventstats top [N]"
+    admin-usage: "&7Admin: &e/eventstats reset <player> &7| &e/eventstats add <player> <wins|participations> <n>"
+    me-player-only: "&cNur Spieler können &e/eventstats me &cnutzen."
+    me-empty: "&7Noch keine Event-Statistiken – nimm an Events teil!"
+    me-header: "&6&lDeine Event-Statistiken"
+    me-participations: "&7Teilnahmen: &e{participations}"
+    me-wins: "&7Siege: &a{wins}"
+    top-header: "&6&lTop Event-Spieler (Siege)"
+    top-line: "&e{rank}. &f{name} &7- Siege: &a{wins}, &7Teilnahmen: &e{participations}"
+    top-empty: "&7Noch keine Statistiken vorhanden."
+    no-permission: "&cKeine Berechtigung."
+    reset-usage: "&cNutze: &e/eventstats reset <player>"
+    add-usage: "&cNutze: &e/eventstats add <player> <wins|participations> <n>"
+    player-not-found: "&cSpieler nicht gefunden."
+    invalid-number: "&cUngültige Zahl."
+    invalid-amount: "&cZahl muss > 0 sein."
+    invalid-field: "&cFeld muss &ewins&c oder &eparticipations &csein."
+    reset-success: "&aEvent-Stats zurückgesetzt für &f{name}"
+    add-success: "&aEvent-Stats aktualisiert für &f{name}"
+    unknown-subcommand: "&cUnbekannter Unterbefehl."
+
+  # ===== EVENT-NACHRICHTEN =====
+  # Diese Schlüssel werden vom Event-System genutzt
+  general:
+    player-only: "&cNur Spieler können diesen Befehl nutzen!"
+    no-permission: "&cKeine Berechtigung!"
+    unknown-command: "&cUnbekannter Befehl. Nutze &e/event help"
+    event-not-found: "&cEvent nicht gefunden: &e{event}"
+
+  join:
+    already-joined: "&cDu bist bereits dem Event beigetreten."
+    event-running: "&cDas Event läuft bereits. Beitreten nicht möglich."
+    countdown-active: "&7Der Countdown läuft schon, du kannst noch beitreten."
+    success: "&aDu hast dich erfolgreich für das Event angemeldet!"
+    event-full: "&cDas Event ist voll!"
+
+  leave:
+    not-in-event: "&cDu bist in keinem Event."
+    success: "&7Du hast das Event verlassen."
+
+  lobby:
+    welcome: "&7Willkommen in der Event-Lobby! Bereite dich vor."
+
+  start:
+    already-running: "&cDieses Event läuft bereits."
+    join-phase-started: "&aJoin-Phase gestartet! Nutze &e/event join"
+    join-phase-ending: "&eJoin-Phase endet in &6{time} &eSekunden!"
+    join-phase-closed: "&cJoin-Phase beendet – Event startet!"
+    not-enough-players: "&cZu wenige Spieler. Mindestanzahl: &e{min}"
+    countdown: "&7Event startet in &e{time} &7Sekunden..."
+    auto-teleport: "&7Teleportiere Spieler in Lobby/Event-Welt..."
+    preparing-worlds: "&7Welten werden vorbereitet..."
+    regenerating: "&eEvent-Welt wird regeneriert – bitte warten..."
+
+  countdown:
+    preparing: "&7Vorbereiten..."
+    starting: "&eStartet..."
+    go: "&aLos!"
+
+  event:
+    started-subtitle: "&7Viel Erfolg!"
+    eliminated-spectator: "&7Du bist eliminiert und nun Zuschauer."
+
+  end:
+    eliminated: "&7{player} wurde eliminiert!"
+    winner: "&6&l{player} HAT GEWONNEN!"
+    all-eliminated: "&7Alle Spieler eliminiert."
+    no-winner: "&7Kein Gewinner ermittelt."
+    thanks: "&7Danke fürs Mitmachen!"
+
+  rewards:
+    winner-subtitle: "&aBelohnungen werden ausgezahlt"
+    item-received: "&aDu hast eine Belohnung erhalten!"
+    command-executed: "&7Belohnungs-Befehl ausgeführt."
+
+  admin:
+    event-stopped: "&cEvent gestoppt."
+    reloaded: "&aKonfiguration neu geladen."
+
+  help:
+    join: "&e/event join &7– Event beitreten"
+    leave: "&e/event leave &7– Event verlassen"
+    list: "&e/event list &7– verfügbare Events"
+    admin-header: "&eAdmin"
+    start: "&e/event start <event>"
+    stop: "&e/event stop <event>"
+    forcestart: "&e/event forcestart <event>"
+    reload: "&e/eventpvp reload"
+    footer: "&7Viel Spaß!"
+    
+    challenge: "&e/pvp <spieler> &7- Fordere jemanden heraus"
+    accept: "&e/pvp accept <spieler> &7- Akzeptiere Herausforderung"
+    deny: "&e/pvp deny <spieler> &7- Lehne Herausforderung ab"
+    spectate: "&e/pvp spectate <spieler> &7- Schaue einem Match zu"
+    
+    surrender: "&e/surrender &7- Gib auf (Bestätigung erforderlich)"
+    draw: "&e/draw &7- Stimme für Unentschieden"
+    
+    footer: |
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+
+  world:
+    loading: "&7Welt wird geladen... &e⏳"
+    loaded: "&aWelt geladen! ✓"
+    load-failed: "&cWelt konnte nicht geladen werden! ✗"
+  # ===== GUI NACHRICHTEN =====
+  gui:
+    wager-title: "&6&lWetteinsatz einrichten"
+    arena-title: "&e&lArena auswählen"
+    equipment-title: "&e&lEquipment auswählen"
+    
+    click-to-select: "&7Klicke zum Auswählen"
+    click-to-confirm: "&a&lKlicke zum Bestätigen"
+    click-to-cancel: "&c&lKlicke zum Abbrechen"
+    
+    ready: "&a&lBEREIT"
+    waiting: "&e&lWARTEND"
+    confirmed: "&a&l✔ BESTÄTIGT"

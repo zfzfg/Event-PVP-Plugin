@@ -1,0 +1,489 @@
+# ============================================
+# PvPWager - Equipment Konfiguration
+# ============================================
+
+equipment-sets:
+  # Minimal Starter-Set für Events/PvP – Aktiv
+  pvp_starter:
+    enabled: true
+    allowed-pvpwager-worlds: all
+    display-name: "&aStarter PvP"
+    description: "&7Einfaches Start-Equipment"
+    gui-item:
+      material: STONE_SWORD
+      slot: 10
+      name: "&a&lSTARTER"
+      lore:
+        - "&7Basic-Equipment für schnelle Matches"
+    armor:
+      helmet: LEATHER_HELMET
+      chestplate: LEATHER_CHESTPLATE
+      leggings: LEATHER_LEGGINGS
+      boots: LEATHER_BOOTS
+    inventory:
+      - slot: 0
+        item: STONE_SWORD
+        amount: 1
+      - slot: 1
+        item: BOW
+        amount: 1
+        enchantments:
+          - "POWER:2"
+          - "KNOCKBACK:1"
+      - slot: 8
+        item: ARROW
+        amount: 32
+      - slot: 2
+        item: GOLDEN_APPLE
+        amount: 2
+      - slot: 3
+        item: COOKED_BEEF
+        amount: 16
+
+  # Krasses Diamond PvP Set mit starken Enchants
+  diamond_pvp:
+    enabled: true
+    allowed-pvpwager-worlds: all
+    display-name: "&b&lDiamond PvP Set"
+    description: "&7Vollst�ndiges Diamond-Equipment mit Power-Enchants"
+    gui-item:
+      material: DIAMOND_SWORD
+      slot: 11
+      name: "&b&l? DIAMOND WARRIOR"
+      lore:
+        - "&7M�chtiges Diamond-Equipment"
+        - "&7mit starken Verzauberungen"
+        - ""
+        - "&b? &fDiamond Armor (Protection IV)"
+        - "&b? &fSharp V Sword"
+        - "&b? &fPower V Bow"
+        - "&b? &fGolden Apples & Steak"
+    
+    armor:
+      helmet: DIAMOND_HELMET
+      helmet-enchantments:
+        - "PROTECTION:4"
+        - "UNBREAKING:3"
+        - "RESPIRATION:3"
+        - "AQUA_AFFINITY:1"
+      
+      chestplate: DIAMOND_CHESTPLATE
+      chestplate-enchantments:
+        - "PROTECTION:4"
+        - "UNBREAKING:3"
+        - "THORNS:2"
+      
+      leggings: DIAMOND_LEGGINGS
+      leggings-enchantments:
+        - "PROTECTION:4"
+        - "UNBREAKING:3"
+      
+      boots: DIAMOND_BOOTS
+      boots-enchantments:
+        - "PROTECTION:4"
+        - "UNBREAKING:3"
+        - "FEATHER_FALLING:4"
+        - "DEPTH_STRIDER:3"
+    
+    inventory:
+      # Hauptwaffen
+      - slot: 0
+        item: DIAMOND_SWORD
+        amount: 1
+        enchantments:
+          - "SHARPNESS:5"
+          - "UNBREAKING:3"
+          - "FIRE_ASPECT:2"
+          - "LOOTING:3"
+        name: "&b&lDiamond Slayer"
+      
+      - slot: 1
+        item: BOW
+        amount: 1
+        enchantments:
+          - "POWER:5"
+          - "PUNCH:2"
+          - "FLAME:1"
+          - "UNBREAKING:3"
+          - "INFINITY:1"
+        name: "&b&lSniper Bow"
+      
+      # Zweitwaffe
+      - slot: 2
+        item: DIAMOND_AXE
+        amount: 1
+        enchantments:
+          - "SHARPNESS:4"
+          - "UNBREAKING:3"
+          - "EFFICIENCY:4"
+        name: "&b&lWar Axe"
+      
+      # Utility
+      - slot: 3
+        item: FISHING_ROD
+        amount: 1
+        enchantments:
+          - "UNBREAKING:3"
+        name: "&b&lGrappling Rod"
+      
+      - slot: 4
+        item: ENDER_PEARL
+        amount: 16
+      
+      # Heilung & Nahrung
+      - slot: 5
+        item: GOLDEN_APPLE
+        amount: 16
+      
+      - slot: 6
+        item: ENCHANTED_GOLDEN_APPLE
+        amount: 3
+      
+      - slot: 7
+        item: COOKED_BEEF
+        amount: 64
+      
+      # Pfeile f�r Bow
+      - slot: 8
+        item: ARROW
+        amount: 1
+
+  # Standard PvP Equipment
+  standard:
+    enabled: true
+    allowed-pvpwager-worlds: all
+    display-name: "&eStandard PvP"
+    description: "&7Klassisches PvP-Equipment"
+    
+    # GUI Item
+    gui-item:
+      material: IRON_CHESTPLATE
+      slot: 11
+      name: "&e&lSTANDARD PVP"
+      lore:
+        - "&7Eisenrüstung"
+        - "&7Eisenschwert & Bogen"
+        - ""
+        - "&aSchwierigkeit: &7Anfänger"
+        - "&aBalance: &7Ausgeglichen"
+    
+    # Rüstung
+    armor:
+      helmet: IRON_HELMET
+      chestplate: IRON_CHESTPLATE
+      leggings: IRON_LEGGINGS
+      boots: IRON_BOOTS
+    
+    # Inventar
+    inventory:
+      - slot: 0
+        item: IRON_SWORD
+        amount: 1
+        enchantments:
+          - "SHARPNESS:2"
+      
+      - slot: 1
+        item: BOW
+        amount: 1
+        enchantments:
+          - "POWER:2"
+      
+      - slot: 2
+        item: FISHING_ROD
+        amount: 1
+      
+      - slot: 7
+        item: GOLDEN_APPLE
+        amount: 3
+      
+      - slot: 8
+        item: COOKED_BEEF
+        amount: 16
+      
+      - slot: 9
+        item: ARROW
+        amount: 64
+  
+  
+  # OP Diamond Equipment
+  diamond:
+    enabled: true
+    allowed-pvpwager-worlds: all
+    display-name: "&bDiamond PvP"
+    description: "&7Diamant-Ausrüstung"
+    
+    gui-item:
+      material: DIAMOND_CHESTPLATE
+      slot: 13
+      name: "&b&lDIAMOND PVP"
+      lore:
+        - "&7Diamantrüstung"
+        - "&7Diamantschwert & Bogen"
+        - ""
+        - "&aSchwierigkeit: &7Mittel"
+        - "&aBalance: &7Offensiv"
+    
+    armor:
+      helmet: DIAMOND_HELMET
+      chestplate: DIAMOND_CHESTPLATE
+      leggings: DIAMOND_LEGGINGS
+      boots: DIAMOND_BOOTS
+    
+    inventory:
+      - slot: 0
+        item: DIAMOND_SWORD
+        amount: 1
+        enchantments:
+          - "SHARPNESS:3"
+          - "KNOCKBACK:1"
+      
+      - slot: 1
+        item: BOW
+        amount: 1
+        enchantments:
+          - "POWER:3"
+          - "PUNCH:1"
+      
+      - slot: 2
+        item: FISHING_ROD
+        amount: 1
+        enchantments:
+          - "UNBREAKING:2"
+      
+      - slot: 3
+        item: LAVA_BUCKET
+        amount: 1
+      
+      - slot: 4
+        item: WATER_BUCKET
+        amount: 1
+      
+      - slot: 7
+        item: GOLDEN_APPLE
+        amount: 5
+      
+      - slot: 8
+        item: COOKED_BEEF
+        amount: 32
+      
+      - slot: 9
+        item: ARROW
+        amount: 128
+  
+  
+  # Netherite Equipment (OP)
+  netherite:
+    enabled: true
+    allowed-pvpwager-worlds: all
+    display-name: "&4Netherite PvP"
+    description: "&7Die beste Ausrüstung"
+    
+    gui-item:
+      material: NETHERITE_CHESTPLATE
+      slot: 15
+      name: "&4&lNETHERITE PVP"
+      lore:
+        - "&7Netherit-Rüstung"
+        - "&7Netherit-Schwert & Bogen"
+        - ""
+        - "&aSchwierigkeit: &7Profi"
+        - "&aBalance: &7Sehr Stark"
+        - "&cNur für Experten!"
+    
+    armor:
+      helmet: NETHERITE_HELMET
+      chestplate: NETHERITE_CHESTPLATE
+      leggings: NETHERITE_LEGGINGS
+      boots: NETHERITE_BOOTS
+    
+    inventory:
+      - slot: 0
+        item: NETHERITE_SWORD
+        amount: 1
+        enchantments:
+          - "SHARPNESS:5"
+          - "KNOCKBACK:2"
+          - "FIRE_ASPECT:2"
+      
+      - slot: 1
+        item: BOW
+        amount: 1
+        enchantments:
+          - "POWER:5"
+          - "PUNCH:2"
+          - "FLAME:1"
+          - "INFINITY:1"
+      
+      - slot: 2
+        item: CROSSBOW
+        amount: 1
+        enchantments:
+          - "QUICK_CHARGE:3"
+          - "MULTISHOT:1"
+      
+      - slot: 3
+        item: FISHING_ROD
+        amount: 1
+        enchantments:
+          - "UNBREAKING:3"
+      
+      - slot: 4
+        item: LAVA_BUCKET
+        amount: 1
+      
+      - slot: 5
+        item: WATER_BUCKET
+        amount: 2
+      
+      - slot: 6
+        item: ENDER_PEARL
+        amount: 8
+      
+      - slot: 7
+        item: ENCHANTED_GOLDEN_APPLE
+        amount: 3
+      
+      - slot: 8
+        item: GOLDEN_APPLE
+        amount: 16
+      
+      - slot: 9
+        item: ARROW
+        amount: 1
+  
+  
+  # UHC Equipment
+  uhc:
+    enabled: true
+    allowed-pvpwager-worlds: all
+    display-name: "&6UHC PvP"
+    description: "&7Ultra Hardcore Modus"
+    
+    gui-item:
+      material: GOLDEN_APPLE
+      slot: 12
+      name: "&6&lUHC PVP"
+      lore:
+        - "&7Diamantrüstung"
+        - "&7UHC-Style Equipment"
+        - ""
+        - "&aSchwierigkeit: &7Schwer"
+        - "&aBalance: &7Skillbasiert"
+        - "&7Keine Regeneration!"
+    
+    armor:
+      helmet: DIAMOND_HELMET
+      chestplate: DIAMOND_CHESTPLATE
+      leggings: DIAMOND_LEGGINGS
+      boots: DIAMOND_BOOTS
+    
+    inventory:
+      - slot: 0
+        item: DIAMOND_SWORD
+        amount: 1
+        enchantments:
+          - "SHARPNESS:3"
+      
+      - slot: 1
+        item: BOW
+        amount: 1
+        enchantments:
+          - "POWER:3"
+          - "INFINITY:1"
+      
+      - slot: 2
+        item: FISHING_ROD
+        amount: 1
+      
+      - slot: 3
+        item: LAVA_BUCKET
+        amount: 1
+      
+      - slot: 4
+        item: WATER_BUCKET
+        amount: 1
+      
+      - slot: 5
+        item: COBBLESTONE
+        amount: 64
+      
+      - slot: 6
+        item: CRAFTING_TABLE
+        amount: 1
+      
+      - slot: 7
+        item: GOLDEN_APPLE
+        amount: 8
+      
+      - slot: 8
+        item: COOKED_BEEF
+        amount: 32
+      
+      - slot: 9
+        item: ARROW
+        amount: 1
+  
+  
+  # Crystal PvP (1.9+ Combat)
+  crystal:
+    enabled: true
+    allowed-pvpwager-worlds: PvPArena
+    display-name: "&dCrystal PvP"
+    description: "&7End Crystal Combat"
+    
+    gui-item:
+      material: END_CRYSTAL
+      slot: 14
+      name: "&d&lCRYSTAL PVP"
+      lore:
+        - "&7Netherit-Rüstung"
+        - "&7End Crystal Combat"
+        - ""
+        - "&aSchwierigkeit: &7Extrem"
+        - "&aBalance: &7Explosiv"
+        - "&c&lNur für Profis!"
+    
+    armor:
+      helmet: NETHERITE_HELMET
+      chestplate: NETHERITE_CHESTPLATE
+      leggings: NETHERITE_LEGGINGS
+      boots: NETHERITE_BOOTS
+    
+    inventory:
+      - slot: 0
+        item: NETHERITE_SWORD
+        amount: 1
+        enchantments:
+          - "SHARPNESS:5"
+      
+      - slot: 1
+        item: END_CRYSTAL
+        amount: 64
+      
+      - slot: 2
+        item: OBSIDIAN
+        amount: 64
+      
+      - slot: 3
+        item: RESPAWN_ANCHOR
+        amount: 1
+      
+      - slot: 4
+        item: GLOWSTONE
+        amount: 64
+      
+      - slot: 5
+        item: TOTEM_OF_UNDYING
+        amount: 1
+      
+      - slot: 7
+        item: ENCHANTED_GOLDEN_APPLE
+        amount: 5
+      
+      - slot: 8
+        item: GOLDEN_APPLE
+        amount: 32
+      
+      - slot: 9
+        item: ENDER_PEARL
+        amount: 16
