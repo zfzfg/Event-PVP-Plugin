@@ -2,10 +2,10 @@
 
 ## Übersicht
 
-Das Event-PVP Web Interface bietet eine intuitive, grafische Konfigurationsoberfläche für alle YAML-Dateien des Plugins (außer `plugin.yml` und `messages.yml`).
+Das Event-PVP Web Interface bietet eine intuitive, grafische Konfigurationsoberfläche für alle relevanten YAML-Dateien des Plugins.
 
 ### Verfügbare Konfigurationen
-- **config.yml** – Allgemeine Einstellungen, Events, Match-Einstellungen
+- **config.yml** – Allgemeine Einstellungen, Events, Match-Einstellungen, externe Integrationen
 - **worlds.yml** – Welten und PvP-Arenen mit Spawn-Konfigurationen
 - **equipment.yml** – Ausrüstungs-Sets mit Armor und Inventory
 - **web-config.yml** – Web-Server Einstellungen und Theme-Farben
@@ -14,23 +14,24 @@ Das Event-PVP Web Interface bietet eine intuitive, grafische Konfigurationsoberf
 
 ## Zugriff auf das Interface
 
+### Token-basierte Authentifizierung
+Das Interface nutzt ein sicheres Token-System für den Zugriff:
+1. Führe im Spiel `/eventpvp webtoken` aus
+2. Du erhältst einen einmaligen Token und die URL zum Interface
+3. Öffne die URL im Browser
+4. Gib den Token ein (oder klicke den Link in der Chat-Nachricht)
+5. Du bist eingeloggt!
+
 ### URL
-```
-http://localhost:8085
-```
+Standardmäßig: `http://localhost:8085`
+Der Port kann in `web-config.yml` angepasst werden.
 
-Der Port kann in `web-config.yml` angepasst werden:
-```yml
-web:
-  port: 8085
-```
-
-### Sicherheit
-Optional kann ein Passwort in `web-config.yml` aktiviert werden:
-```yml
-security:
-  password: "dein-passwort"
-```
+### Konfiguration der Authentifizierung
+In `web-config.yml` unter `security`:
+- `auth-enabled`: Aktiviert/deaktiviert die Authentifizierung (Standard: true)
+- `token-validity-minutes`: Wie lange ein Token gültig ist (Standard: 10)
+- `session-validity-minutes`: Wie lange eine Session gültig bleibt (Standard: 60)
+- `required-permission`: Erforderliche Permission (Standard: eventpvp.admin.web)
 
 ---
 
@@ -41,11 +42,12 @@ Die linke Sidebar bietet folgende Kategorien:
 
 | Icon | Bereich | Funktion |
 |------|---------|----------|
-| ⚙️ | Allgemeine Einstellungen | Globale Plugin-Konfiguration |
+| ⚙️ | Allgemeine Einstellungen | Globale Plugin-Konfiguration, Sprache, Integrationen |
 | 📅 | Events | Event-Definitionen verwalten |
 | 🌍 | Welten & Arenen | PvP-Welten konfigurieren |
 | 🛡️ | Equipment-Sets | Rüstungs- und Inventar-Konfigurationen |
 | 🎨 | Theme & Farben | Web-Interface Anpassung |
+| 📄 | YAML Preview | Zeigt die generierten YAML-Dateien |
 
 ### Statusanzahl (Badges)
 Neben Events, Welten und Equipment-Sets werden die Anzahl der konfigurierten Einträge angezeigt.
@@ -55,6 +57,8 @@ Neben Events, Welten und Equipment-Sets werden die Anzahl der konfigurierten Ein
 ## Funktionen
 
 ### 1. Allgemeine Einstellungen
+Hier findest du alle globalen Einstellungen:
+- **Sprache** – Wähle zwischen Deutsch, Englisch, Französisch, Spanisch, Russisch, Polnisch, Japanisch
 - **Prefix** – Nachrichten-Präfix (mit Farbcodes: `&6[Event]&r`)
 - **Hauptwelt** – Standard-Welt für Teleporte
 - **Beitrittsphase** – Countdown zum Beitreten (in Sekunden)
@@ -64,7 +68,13 @@ Neben Events, Welten und Equipment-Sets werden die Anzahl der konfigurierten Ein
 - **Zuschauer-System** – Erlaubt Spielern, Matches zuzuschauen
 - **Match-Einstellungen** – PvP-Match Countdown und Dauer
 - **Arena-Regeneration** – Backups und Wiederherstellung
-- **Sicherheitsprüfungen** – Inventarplatz und Wett-Limits
+- **Update-Check** – Automatische Prüfung auf neue Versionen
+- **Externe Integrationen** – Konfiguriere AJLeaderboards, DecentHolograms und PvPManager
+
+#### Integrationen (Neu in 1.0.8)
+- **AJLeaderboards** – Zeige Event- und PvP-Statistiken in Leaderboards
+- **DecentHolograms** – Zeige Statistiken in Hologrammen
+- **PvPManager** – Entferne Combat-Tags automatisch bei Event- oder Match-Ende
 
 ### 2. Events
 Hier können neue Event-Typen erstellt oder bearbeitet werden.
@@ -76,14 +86,10 @@ Hier können neue Event-Typen erstellt oder bearbeitet werden.
 - **Equipment** – Equipment-Gruppe und Lobby-Einstellungen
 - **Mechaniken** – Game Mode, PvP, Hunger, Friendly Fire
 - **Nachrichten** – Event-Messages (Start, Winner, Eliminated, Objective)
-- **Belohnungen** – Winner und Teilnahme-Belohnungen
+- **Belohnungen** – Winner, Team-Winner und Teilnahme-Belohnungen
 
 **Messages-Tab:**
-Editiere Event-spezifische Nachrichten mit Minecraft-Farbcodes (`&a`, `&e`, `&l`, etc.):
-- **Start Message** – Nachricht beim Event-Start
-- **Winner Message** – Nachricht für den Gewinner (Platzhalter: `{player}`)
-- **Eliminated Message** – Nachricht bei Eliminierung (Platzhalter: `{player}`)
-- **Objective Message** – Beschreibung des Event-Ziels
+Editiere Event-spezifische Nachrichten mit Minecraft-Farbcodes (`&a`, `&e`, `&l`, etc.)
 
 **Button-Funktionen:**
 - ➕ **Neues Event** – Erstellt einen neuen Event
@@ -91,7 +97,7 @@ Editiere Event-spezifische Nachrichten mit Minecraft-Farbcodes (`&a`, `&e`, `&l`
 - 🗑️ **Löschen** – Entfernt einen Event
 
 ### 3. Welten & Arenen
-Verwalte alle PvP-Welten und Event-Arenen.
+Verwaltet alle PvP-Welten und Event-Arenen.
 
 **Welten-Eigenschaften:**
 - Anzeigename und Welt-ID
@@ -108,7 +114,7 @@ Verwalte alle PvP-Welten und Event-Arenen.
 - `COMMAND` – Spawn via Befehl
 
 ### 4. Equipment-Sets
-Erstelle Rüstungs- und Inventar-Konfigurationen.
+Erstellt Rüstungs- und Inventar-Konfigurationen.
 
 **Eigenschaften:**
 - Anzeigename und Set-ID
@@ -121,7 +127,7 @@ Erstelle Rüstungs- und Inventar-Konfigurationen.
 Klicke auf einen Item-Slot und wähle ein Minecraft-Item aus der Picker-Liste aus. Alle Items haben Minecraft-Texturen-Vorschau.
 
 ### 5. Theme & Farben
-Passe das Aussehen des Web-Interface an.
+Passt das Aussehen des Web-Interface an.
 
 **Farboptionen:**
 - **Primärfarbe** – Akzentfarbe (Standard: `#4caf50` Grün)
@@ -168,8 +174,8 @@ Klicke auf die **×** Taste in der "Ungespeicherte Änderungen"-Leiste, um alle 
 - Kann später wieder hochgeladen werden
 
 ### 2. YAML Vorschau
-Klicke auf **📄 YAML Vorschau** in der Sidebar:
-- Zeigt die Generated YAML-Dateien an
+Klicke auf **📄 YAML Preview** in der Sidebar:
+- Zeigt die generierten YAML-Dateien an
 - Tabs für config.yml, worlds.yml, equipment.yml
 - **📋 Kopieren** – YAML in die Zwischenablage kopieren
 
@@ -200,7 +206,7 @@ Bei der Item-Auswahl:
 
 ### 5. Welten-Verwaltung
 - **clone-source-world** – Welt wird geklont statt direkt genutzt (besser für Regeneration)
-- **regenerate-world** – Setzt die Welt zurück nach jedem Event/Match
+- **regenerate-event-world** – Setzt die Welt zurück nach jedem Event/Match
 
 ---
 
@@ -221,26 +227,56 @@ Bei der Item-Auswahl:
 2. Offline-Modus: Items haben nur Text-Fallback
 3. Überprüfe Minecraft-Item-Namen
 
+### Token funktioniert nicht
+1. Stelle sicher, dass der Token nicht abgelaufen ist (Standard: 10 Minuten)
+2. Token kann nur einmal verwendet werden
+3. Generiere einen neuen Token mit `/eventpvp webtoken`
+
 ---
 
-## Konfiguration des Web-Server
+## Konfiguration des Web-Servers
 
 ### web-config.yml
-```yml
+```yaml
 web:
   enabled: true
   port: 8085
+  public-url: "http://localhost:{port}"
   title: "Event-PVP Konfigurator"
   
   theme:
     primary-color: "#4caf50"
+    secondary-color: "#66bb6a"
     background-color: "#1a1a1a"
-    # ... weitere Farben
-  
+    surface-color: "#2d2d2d"
+    card-color: "#3a3a3a"
+    text-color: "#e0e0e0"
+    text-secondary: "#b0b0b0"
+    error-color: "#f44336"
+    warning-color: "#ff9800"
+    success-color: "#4caf50"
+    info-color: "#2196f3"
+
 security:
-  password: ""  # Leer = keine Authentifizierung
-  session-timeout: 24  # Stunden
-  allowed-ips: []  # Leer = alle IPs erlaubt
+  auth-enabled: true
+  token-validity-minutes: 10
+  session-validity-minutes: 60
+  required-permission: "eventpvp.admin.web"
+  allowed-ips: []
+
+items:
+  enable-textures: true
+  local-texture-path: "minecraft_textures_item/"
+  texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/item/"
+  block-texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/block/"
+
+interface:
+  auto-refresh-interval: 0
+  auto-save: false
+  confirm-save: true
+  max-undo-steps: 20
+  compact-view: false
+  syntax-highlighting: true
 ```
 
 ---
@@ -265,6 +301,9 @@ POST /api/webconfig/save    – Speichert web-config.yml
 
 POST /api/reload            – Führt Plugin-Reload aus
 GET  /api/status            – Status-Information
+
+POST /api/auth/token        – Validiert einen Token und erstellt eine Session
+POST /api/auth/logout       – Beendet die aktuelle Session
 ```
 
 ### Statische Dateien
@@ -281,8 +320,11 @@ plugins/Event-PVP/web/
 
 ## Häufig gestellte Fragen
 
+**F: Wie erhalte ich Zugang zum Web-Interface?**
+A: Führe `/eventpvp webtoken` im Spiel aus.
+
 **F: Kann ich Passwort-Schutz aktivieren?**
-A: Ja, in `web-config.yml` unter `security.password` setzen.
+A: Ja, aber jetzt wird Token-basierte Authentifizierung empfohlen.
 
 **F: Welche Farben sind empfohlen?**
 A: Grün (`#4caf50`), Blau (`#2196f3`), Orange (`#ff9800`) - dunkle Themen.
@@ -295,18 +337,20 @@ A: Ja, aber es wird die letzte Speicherung verwendet (keine Konflikt-Erkennung).
 
 ---
 
-## Kontakt & Support
-Bei Fragen oder Fehlern: Logs prüfen oder Dokumentation lesen.
-
----
-
 ## Changelog
+
+### v1.0.8
+- ✨ **Integrationen** – Unterstützung für AJLeaderboards, DecentHolograms und PvPManager
+- ✨ **Token-Authentifizierung** – Sicheres Login-System statt einfaches Passwort
+- ✨ **Sprachauswahl** – 8 Sprachen im Interface verfügbar
+- ✨ **YAML Preview** – Zeigt generierte YAML-Dateien an
+- ✨ **Verbesserte Theme-Einstellungen** – Mehr Farboptionen
+- 📝 **Dokumentation aktualisiert**
 
 ### v0.9.86-Beta
 - ✨ Intuitives Web-Interface mit dunklem Theme
 - ✨ Alle YMLs außer plugin.yml und messages.yml editierbar
 - ✨ Undo/Redo Funktionalität
-- ✨ YAML Vorschau und Export
 - ✨ Item-Picker mit Minecraft-Texturen
 - ✨ Theme-Anpassung
 - ✨ Responsive Design (Desktop & Mobile)
