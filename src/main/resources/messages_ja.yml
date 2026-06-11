@@ -1,0 +1,1449 @@
+# ============================================
+# PvPWager - メッセージ設定（日本語）
+# ============================================
+
+messages:
+  prefix: "&6[PvP]&r"
+  
+  # ===== リクエストシステム =====
+  request:
+    sent: "&a&e{player} &aにPvPリクエストを送信しました！"
+    
+    received: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lPVPリクエスト
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &e{player} &aがあなたと戦いたがっています！
+      
+      &a承諾するにはここをクリック:
+      
+    received-clickable: "&a&l[► 承諾する ◄]"
+    received-expire: "&7リクエストは &e60秒 &7で期限切れになります。"
+    
+    accepted: "&a&e{player} &aのリクエストを承諾しました！"
+    denied: "&c&e{player} &cのリクエストを拒否しました！"
+    expired: "&c&e{player} &cからのリクエストが期限切れになりました！"
+    cancelled: "&c&e{player} &cへのリクエストをキャンセルしました！"
+    
+    no-request: "&cこのプレイヤーからのリクエストはありません！"
+    already-sent: "&c既にこのプレイヤーにリクエストを送信しています！"
+    already-in-match: "&cこのプレイヤーは既にマッチ中です！"
+    self-request: "&c自分自身にリクエストを送ることはできません！"
+    player-offline: "&cこのプレイヤーはオンラインではありません！"
+    
+    # Request Components
+    header: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lPVPリクエスト
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &e{player} &aがあなたと戦いたがっています！
+      
+    
+    accept-button: "&a&l[► 承試する ◄]"
+    accept-hover: "&aクリックしてリクエストを承試しましょう！"
+    deny-button: " &c&l[✖ 拒否]"
+    deny-hover: "&cクリックしてリクエストを拒否します"
+    footer: |
+      
+      
+      &7リクエストは &e60秒 &7で期限切れになります。
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+    
+    # Command Request Messages
+    request-expired-sender: "&c&e{target} &cへのリクエストが期限切れになりました！"
+    request-expired-target: "&c&e{sender} &cからのリクエストが期限切れになりました！"
+    challenge-header: "&e&lPVPチャレンジ！"
+    challenge-message: "&e{player} &7があなたに挑戦してきました！"
+  
+  # ===== 賭け設定 =====
+  wager:
+    setup-start: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&l賭けを設定
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7アイテムやお金を
+      &7GUIに入れてください！
+      
+      &7準備ができたら &a&l確認 &7を押してください。
+      
+    
+    waiting-opponent: |
+      &e&l{player}を待機中...
+      &7相手が賭けを
+      &7設定しています。
+    
+    both-ready: |
+      &a&l両プレイヤー準備完了！
+      &7アリーナと装備を選択してください。
+    
+    item-added: "&aアイテムを賭けに追加しました！"
+    item-removed: "&cアイテムを賭けから削除しました！"
+    money-set: "&aお金の賭けを設定: &6${amount}"
+    money-increased: "&aお金の賭けを増額: &6${amount}"
+    money-decreased: "&cお金の賭けを減額: &6${amount}"
+    
+    not-enough-money: "&cお金が足りません！（&6${amount} &c必要）"
+    inventory-full-self: "&cインベントリに少なくとも &e{slots} &cスロットの空きが必要です！"
+    inventory-full-opponent: "&c相手のインベントリに空きがありません！"
+    min-bet-required: "&c最低 &e{amount} &cアイテムまたは &6${money} &cが必要です！"
+    
+    cancelled: "&c賭けの設定がキャンセルされました！"
+  
+  # ===== アリーナ＆装備選択 =====
+  selection:
+    arena-select: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lアリーナを選択
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7マッチ用のアリーナを
+      &7選んでください！
+      
+    
+    arena-selected: "&aアリーナを選択: &e{arena}"
+    
+    equipment-select: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&l装備を選択
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7マッチ用の装備セットを
+      &7選んでください！
+      
+    
+    equipment-selected: "&a装備を選択: &e{equipment}"
+    
+    waiting-opponent-choice: |
+      &e&l{player}を待機中...
+      &7相手がまだ選択中です。
+    
+    both-selected: |
+      &a&l全ての選択が完了！
+      &7マッチがまもなく開始...
+
+  # ===== コマンド =====
+  command:
+    common:
+      player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+      player-offline: "&cプレイヤーが見つかりません: {player}"
+      self-target: "&c自分自身に挑戦することはできません！"
+      already-in-match: "&c既にマッチ中です！"
+      target-in-match: "&c{player}は既にマッチ中です！"
+      pending-self: "&c既に保留中のリクエストがあります！"
+      pending-target: "&c{player}は既に保留中のリクエストがあります！"
+      not-spectating: "&c現在マッチを観戦していません！"
+      match-full: "&cこのマッチは観戦者数上限に達しています！"
+    pvpa:
+      player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+      player-not-found: "&cプレイヤーが見つかりません: {player}"
+      self-challenge: "&c自分自身に挑戦することはできません！"
+      arena-not-found: "&cアリーナが見つかりません: {arena}"
+      equipment-not-found: "&c装備が見つかりません: {equipment}"
+      amount-positive: "&c金額は正の数である必要があります！"
+      economy-disabled: "&cエコノミーが有効になっていません！"
+      not-enough-money: "&cお金が足りません！残高: ${balance}"
+      invalid-money: "&c無効な金額: {amount}"
+      mismatch-items: "&cアイテム数と数量が一致しません！"
+      not-enough-items: "&c以下のアイテムが足りません: {item}"
+      invalid-item: "&c無効なアイテム: {item}"
+      wager-money: "&6${amount}"
+      wager-items: "&e{count}個のアイテム"
+      request-sent: |
+        
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        &a&lリクエスト送信完了！
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7対象: &e{target}
+        &7アリーナ: &e{arena}
+        &7装備: &e{equipment}
+        &7賭け: {wager}
+        
+        &e{target}&7の返答を待っています...
+        
+      usage: |
+        
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        &e&lPVPAコマンド
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7使用方法:
+        &e/pvpa <プレイヤー> <賭け> <数量> <アリーナ> <装備>
+        
+        &7例:
+        &e/pvpa Steve DIAMOND_SWORD 1 desert diamond
+        &e/pvpa Steve MONEY 100 forest standard
+        &e/pvpa Steve DIAMOND_SWORD,GOLDEN_APPLE 1,5 colosseum netherite
+        
+        &7アリーナ一覧: &e/pvpa arenas
+        &7装備一覧: &e/pvpa equipment
+        
+      available-arenas: "&7利用可能なアリーナ:"
+      available-equipment: "&7利用可能な装備セット:"
+    pvpyes:
+      player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+      no-request: "&c保留中のリクエストはありません！"
+      waiting-response: "&c{player}の返答を待っています！"
+      sender-no-money: "&cお金が足りなくなりました！"
+      sender-no-items: "&c必要なアイテムがなくなりました！"
+      target-no-money-player: "&c{player}のお金が足りなくなりました！"
+      target-no-money-target: "&cお金が足りなくなりました – リクエストがキャンセルされました！"
+      target-no-items-player: "&c{player}の必要なアイテムがなくなりました！"
+      target-no-items-target: "&c必要なアイテムがなくなりました – リクエストがキャンセルされました！"
+    pvpadmin:
+      no-permission: "&cこのコマンドの権限がありません！"
+      reload-success: |
+        
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        &a&l設定を再読み込みしました！
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7✓ メイン設定を再読み込み
+        &7✓ メッセージを再読み込み
+        &7✓ アリーナを再読み込み: &e{arenaCount}
+        &7✓ 装備セットを再読み込み: &e{equipmentCount}
+        
+        &e注意: &7進行中のマッチには影響しません
+        
+      reload-error: "&c再読み込みエラー: {error}"
+      stopall: |
+        
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+        &e&lマッチを停止しました
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7停止したアクティブマッチ: &e{count}
+        &7全ての賭けが返却されました
+        
+      info: |
+        
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        &6&lPVPWAGER情報
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &7バージョン: &e{version}
+        &7アクティブマッチ: &e{active}
+        &7読み込み済みアリーナ: &e{arenas}
+        &7読み込み済み装備: &e{equipment}
+        &7エコノミー: {economy}
+        
+      enabled: "&a有効"
+      disabled: "&c無効"
+      help: |
+        
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        &6&lPVPWAGER管理者
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+        
+        &e/pvpadmin reload &8- &7全ての設定を再読み込み
+        &e/pvpadmin stopall &8- &7全てのアクティブマッチを停止
+        &e/pvpadmin info &8- &7プラグイン情報を表示
+
+    pvpanswer:
+      player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+      no-request: "&c保留中のリクエストはありません！"
+      usage: |
+        &c使用方法: /pvpanswer <賭け> <数量> [アリーナ] [装備]
+        &7例: /pvpanswer DIAMOND_SWORD 1
+        &7例: /pvpanswer MONEY 50 desert diamond
+        &7例: /pvpanswer SKIP
+      arena-not-found: "&cアリーナが見つかりません: {arena}"
+      equipment-not-found: "&c装備が見つかりません: {equipment}"
+      missing-money: "&cMONEYの金額が指定されていません！"
+      amount-positive: "&c金額は正の数である必要があります！"
+      economy-disabled: "&cエコノミーが有効になっていません！"
+      not-enough-money: "&cお金が足りません！"
+      invalid-money: "&c無効な金額: {amount}"
+      missing-items: "&cアイテム賭けの数量が指定されていません！"
+      mismatch-items: "&c数量とアイテムが一致しません！"
+      not-enough-items: "&c以下のアイテムが足りません: {item}"
+      invalid-item: "&c無効なアイテム: {item}"
+      response-sent: "&a&l返答を送信しました！"
+      your-wager-money: "&7あなたの賭け: &6${amount}"
+      your-wager-items: "&7あなたの賭け: &e{items}"
+      arena-override: "&7アリーナ変更: &e{arena}"
+      equipment-override: "&7装備変更: &e{equipment}"
+      waiting-confirm: "&e{player} &7の確認を待っています..."
+      challenger-header: "&e&l{player}が返答しました！"
+      their-wager-money: "&7相手の賭け: &6${amount}"
+      their-wager-items: "&7相手の賭け: &e{items}"
+      arena-changed: "&7アリーナ変更: &e{arena}"
+      equipment-changed: "&7装備変更: &e{equipment}"
+      next-steps: "&a承諾: &e/pvpyes\n&c拒否: &e/pvpno"
+
+    pvp:
+      help: |
+        &e&lPvPWager &8» &7使用方法:
+        &e/pvpa <プレイヤー> &8- &7PvP賭けを送信
+        &e/pvp accept <プレイヤー> &8- &7リクエストを承諾
+        &e/pvp deny <プレイヤー> &8- &7リクエストを拒否
+        &e/pvp spectate <プレイヤー> &8- &7マッチを観戦
+        &e/pvp leave &8- &7観戦モードを終了
+      accept:
+        success-self: "&a&e{player} &aからのPvP賭けを承諾しました！"
+        success-other: "&e{player} &aがあなたのPvP賭けを承諾しました！"
+        no-request: "&c&e{player} &cからの保留中のリクエストはありません！"
+        requires-skip: "&c承諾できません: 挑戦者がSKIPを選択していません。まず &e/pvpanswer <賭け> <数量> &cで賭けを設定してから確認してください。"
+      deny:
+        success-self: "&c&e{player} &cからのPvP賭けを拒否しました！"
+        success-other: "&e{player} &cがあなたのPvP賭けを拒否しました！"
+        usage: "&c使用方法: /pvp deny <プレイヤー>"
+      spectate:
+        usage: "&c使用方法: /pvp spectate <プレイヤー>"
+        no-match: "&c{player}はマッチ中ではありません！"
+        joined: "&a&e{p1} &7vs &e{p2} &aを観戦中！"
+        announce: "&e{player} &7がマッチを観戦しています！"
+      leave:
+        left: "&a観戦モードを終了しました！"
+        announce: "&e{player} &7が観戦モードを終了しました！"
+
+    pvprequest:
+      usage: "&c使用方法: /pvpa <プレイヤー>"
+      sent: "&a&e{player} &aにPvP賭けを送信しました！"
+
+    pvpno:
+      no-request: "&c保留中のリクエストはありません！"
+      declined-self: "&c&e{player} &cへの/からのリクエストを拒否しました"
+      declined-other: "&e{player} &cがリクエストを拒否しました！"
+
+    challenge:
+      usage: "&c使用方法: /pvp challenge <プレイヤー> [賭け] [数量] [アリーナ] [装備]"
+      no-config: "&cアリーナまたは装備が設定されていません！"
+      sent: "&a&e{player} &aにPvP賭けを送信しました！"
+
+    draw:
+      player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+      only-active: "&c引き分け投票はマッチ中のみ可能です！"
+      no-active-vote: "&cアクティブな引き分け投票がありません！"
+      initiator-wait: "&c投票を開始しました、相手の返答を待ってください！"
+      initiator-cannot-deny: "&cあなたがこの投票を開始しました！キャンセルするには &e/draw &cをもう一度入力してください。"
+      cancelled-self: "&c引き分け投票をキャンセルしました。"
+      cancelled-opponent: "&e{player} &cが引き分け投票をキャンセルしました。"
+      already-active: "&e{opponent} &7が既に引き分けを提案しています！\n&7入力: &a/draw accept &7または &c/draw deny"
+      accepted: "&a&l━━━━━━━━━━━━━━━━━━━━━━━\n&a&l引き分け成立！\n&a&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&7両プレイヤーが引き分けに同意しました。\n&7全ての賭けが返却されます。"
+      denied: "&c&l━━━━━━━━━━━━━━━━━━━━━━━\n&c&l引き分け拒否！\n&c&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{player} &7が投票を拒否しました。\n&7マッチを続行！"
+      started: "&e&l━━━━━━━━━━━━━━━━━━━━━━━\n&e&l引き分け投票\n&e&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{initiator} &7がマッチを引き分けで終了したがっています。\n\n&e{opponent}&7、入力してください:\n  &a/draw accept &7- 引き分けを承諾\n  &c/draw deny &7- 引き分けを拒否\n\n&7制限時間: &e{time}秒"
+      expired: "&c&l投票期限切れ！\n&7マッチを続行。"
+
+    surrender:
+      player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+      only-active: "&c降参はマッチ中のみ可能です！"
+      confirm: "&c&l━━━━━━━━━━━━━━━━━━━━━━━\n&c&l警告: 降参\n&c&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&7本当に降参しますか？\n&c全ての賭けを失います！\n\n&7確認: &e/surrender confirm\n&7または {timeout}秒待ってキャンセル"
+      confirm-expired: "&c確認の期限が切れました！もう一度 &e/surrender &cを入力してください。"
+      surrendered: "&c&l━━━━━━━━━━━━━━━━━━━━━━━\n&c&l{player}が降参しました！\n&c&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{opponent} &aがマッチに勝利！"
+        
+  
+  # ===== マッチ =====
+  match-display:
+    starting: "&eマッチ開始まで &6&l{time} &e秒！"
+    started: |
+      
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      &a&lマッチ開始！
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7頑張ってください！
+      
+    
+    spectator-join-announce: "&7{player} &eが観戦を開始しました。"
+    spectator-leave-announce: "&7{player} &eが観戦を終了しました。"
+    
+    spectator-joined: "&a&e{player1} &avs &e{player2} &aを観戦中！"
+    spectator-left: "&7観戦を終了しました。"
+    
+    boundaries-warning: "&c&l警告: &cアリーナ境界に到達！"
+    you-won-header: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    you-won: "&a&l勝利しました！"
+    you-lost-header: "&c&l━━━━━━━━━━━━━━━━━━━━━━━"
+    you-lost: "&c&l敗北しました！"
+    
+    # Match Start Messages
+    match-starting: "&a&lマッチ開始！"
+    match-starting-divider: "&e&l━━━━━━━━━━━━━━━━━━━━━━━"
+    vs-display: "&e{player1} &7vs &e{player2}"
+    arena-display: "&7アリーナ: &e{arena}"
+    equipment-display: "&7装備: &e{equipment}"
+    arena-countdown: "&eアリーナを読み込み中... &7(5秒)"
+    fight-divider: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    fight: "&e&l戦え！"
+  
+  # ===== マッチ終了 =====
+  end:
+    winner: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &6&l{player}の勝利！
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+    
+    surrender: "&e{player} &cが降参しました！"
+    
+    draw: |
+      
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&l引き分け！
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7全ての賭けが返却されます。
+      
+    
+    timeout: |
+      
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      &c&l時間切れ！
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7引き分け - 時間超過。
+      
+    
+    items-returned: "&7賭けが返却されました。"
+    items-won: |
+      
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      &a&l勝利おめでとう！
+      &a&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7全ての賭けを獲得しました！
+      
+    
+    money-won: "&a&6&l${amount} &aを獲得しました！"
+    items-received: "&a&e{count} &aアイテムを獲得しました！"
+  
+  # ===== 降参＆引き分け =====
+  surrender:
+    confirm-required: |
+      &c&l降参しますか？
+      &7本当ですか？入力:
+      &e/surrender confirm
+      
+      &c全ての賭けを失います！
+    
+    cancelled: "&7降参をキャンセルしました。"
+    
+    success: |
+      
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      &c&l降参しました！
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &7相手が勝利しました。
+      
+  
+  draw:
+    vote-started: |
+      
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&l引き分け投票
+      &e&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+      &e{player} &7が引き分けを提案しています！
+      
+      &a承諾: &e/draw accept
+      &c拒否: &e/draw deny
+      
+      &7時間: &e{time}秒
+      
+    
+    vote-accept: "&a&l承諾！"
+    vote-deny: "&c&l拒否！"
+    
+    accepted: "&a引き分けが承諾されました！"
+    denied: "&c引き分けが拒否されました - 戦闘続行！"
+    
+    timeout: "&c投票が期限切れ - 戦闘続行！"
+    already-voted: "&c既に投票済みです！"
+    no-active-vote: "&cアクティブな投票がありません！"
+  
+  # ===== 観戦 =====
+  spectator:
+    join-success: "&a&e{player1} &avs &e{player2} &aを観戦中！"
+    leave-success: "&7観戦モードを終了しました。"
+    
+    no-match: "&cマッチが見つかりません！"
+    match-full: "&cこのマッチは観戦者数上限に達しています！"
+    already-spectating: "&c既に観戦中です！"
+    permission-required: "&c観戦するには権限が必要です！"
+  
+  # ===== エラー =====
+  error:
+    no-permission: "&c権限がありません！"
+    player-not-found: "&cプレイヤーが見つかりません！"
+    player-not-online: "&cこのプレイヤーはオンラインではありません！"
+    
+    no-arena: "&cアリーナが見つかりません！"
+    no-equipment: "&c装備セットが見つかりません！"
+    arena-not-available: "&cこのアリーナは利用できません！"
+    equipment-not-available: "&cこの装備セットは利用できません！"
+    
+    already-in-match: "&c既にマッチ中です！"
+    opponent-in-match: "&cこのプレイヤーは既にマッチ中です！"
+    not-in-match: "&cマッチに参加していません！"
+    
+    world-not-loaded: "&cアリーナワールドを読み込めませんでした！"
+    
+    command-blocked: "&cマッチ中はコマンドがブロックされています！&e/surrender &cまたは &e/draw &cを使用してください"
+  
+  # ===== ヘルプ =====
+  event-help:
+    header: |
+      
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      &e&lPVP WAGERコマンド
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+    join: "&e/event join <event> &7– イベントに参加"
+    leave: "&e/event leave &7– イベントから退出"
+    list: "&e/event list &7– 利用可能なイベントを表示"
+    admin-header: "&eAdmin"
+    start: "&e/event start <event>"
+    stop: "&e/event stop <event>"
+    forcestart: "&e/event forcestart <event>"
+    reload: "&e/eventpvp reload"
+    footer: "&7楽しんでください！"
+  
+  # ===== PVP統計 =====
+  pvpstats:
+    usage: "&e/pvpstats me &7| &e/pvpstats top [N]"
+    admin-usage: "&7管理者: &e/pvpstats reset <プレイヤー> &7| &e/pvpstats add <プレイヤー> <wins|losses|draws> <数>"
+    me-player-only: "&cプレイヤーのみ &e/pvpstats me &cを使用できます。"
+    me-empty: "&7まだ統計がありません – いくつかマッチをプレイしてください！"
+    me-header: "&6&lあなたのPvP統計"
+    me-wins: "&7勝利: &a{wins}"
+    me-losses: "&7敗北: &c{losses}"
+    me-draws: "&7引き分け: &e{draws}"
+    top-header: "&6&lトップPvPプレイヤー（勝利数）"
+    top-line: "&e{rank}. &f{name} &7- 勝利: &a{wins}, &7敗北: &c{losses}, &7引き分け: &e{draws}"
+    top-empty: "&7まだ統計がありません。"
+    no-permission: "&c権限がありません。"
+    reset-usage: "&c使用方法: &e/pvpstats reset <プレイヤー>"
+    add-usage: "&c使用方法: &e/pvpstats add <プレイヤー> <wins|losses|draws> <数>"
+    player-not-found: "&cプレイヤーが見つかりません。"
+    invalid-number: "&c無効な数値です。"
+    invalid-amount: "&c数値は0より大きくなければなりません。"
+    invalid-field: "&cフィールドは &ewins&c、&elosses&c、または &edraws &cである必要があります。"
+    reset-success: "&a&f{name}&aのPvP統計をリセットしました"
+    add-success: "&a&f{name}&aのPvP統計を更新しました"
+    unknown-subcommand: "&c不明なサブコマンドです。"
+
+  # ===== イベント統計 =====
+  eventstats:
+    usage: "&e/eventstats me &7| &e/eventstats top [N]"
+    admin-usage: "&7管理者: &e/eventstats reset <プレイヤー> &7| &e/eventstats add <プレイヤー> <wins|participations> <数>"
+    me-player-only: "&cプレイヤーのみ &e/eventstats me &cを使用できます。"
+    me-empty: "&7まだイベント統計がありません – イベントに参加してください！"
+    me-header: "&6&lあなたのイベント統計"
+    me-participations: "&7参加数: &e{participations}"
+    me-wins: "&7勝利: &a{wins}"
+    top-header: "&6&lトップイベントプレイヤー（勝利数）"
+    top-line: "&e{rank}. &f{name} &7- 勝利: &a{wins}, &7参加: &e{participations}"
+    top-empty: "&7まだ統計がありません。"
+    no-permission: "&c権限がありません。"
+    reset-usage: "&c使用方法: &e/eventstats reset <プレイヤー>"
+    add-usage: "&c使用方法: &e/eventstats add <プレイヤー> <wins|participations> <数>"
+    player-not-found: "&cプレイヤーが見つかりません。"
+    invalid-number: "&c無効な数値です。"
+    invalid-amount: "&c数値は0より大きくなければなりません。"
+    invalid-field: "&cフィールドは &ewins&c または &eparticipations &cである必要があります。"
+    reset-success: "&a&f{name}&aのイベント統計をリセットしました"
+    add-success: "&a&f{name}&aのイベント統計を更新しました"
+    unknown-subcommand: "&c不明なサブコマンドです。"
+
+  # ===== イベントメッセージ =====
+  # これらのキーはイベントシステムで使用されます
+  general:
+    player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+    no-permission: "&c権限がありません！"
+    unknown-command: "&c不明なコマンドです。&e/event help &cを使用してください"
+    event-not-found: "&cイベントが見つかりません: &e{event}"
+
+  join:
+    joined: "&aイベントに参加しました。頑張ってください！"
+    already-joined: "&c既にイベントに参加しています。"
+    event-running: "&cイベントは既に進行中です。参加できません。"
+    countdown-active: "&7カウントダウンが進行中ですが、まだ参加できます。"
+    success: "&aイベントに正常に登録されました！"
+    event-full: "&cイベントは満員です！"
+
+  leave:
+    not-in-event: "&cイベントに参加していません。"
+    success: "&7イベントから退出しました。"
+
+  lobby:
+    welcome: "&7イベントロビーへようこそ！準備してください。"
+
+  start:
+    already-running: "&cこのイベントは既に進行中です。"
+    join-phase-started: "&a参加フェーズ開始！&e/event join &aを使用"
+    join-phase-ending: "&e参加フェーズは &6{time} &e秒後に終了！"
+    join-phase-closed: "&c参加フェーズ終了 – イベント開始！"
+    not-enough-players: "&cプレイヤーが足りません。最小: &e{min}"
+    countdown: "&7イベント開始まで &e{time} &7秒..."
+    auto-teleport: "&7プレイヤーをロビー/イベントワールドにテレポート中..."
+    preparing-worlds: "&7ワールドを準備中..."
+    regenerating: "&eイベントワールドを再生成中 – お待ちください..."
+
+  countdown:
+    preparing: "&7準備中..."
+    starting: "&e開始中..."
+    go: "&aスタート！"
+
+  event:
+    started-title: "&a&lスタート！"
+    started-subtitle: "&7頑張ってください！"
+    eliminated-spectator: "&7脱落しました。観戦モードになりました。"
+    join-button: "&a&l[参加]"
+    join-hover: "クリックして参加！"
+    leave-button: "&c&l[✖ イベントを去る]"
+    leave-hover: "クリックしてメインワールドに戻る！"
+
+  end:
+    eliminated: "&7{player}が脱落しました！"
+    winner: "&6&l{player}の優勝！"
+    team-winner: "&6&lチーム{team}の優勝！"
+    all-eliminated: "&7全プレイヤーが脱落しました。"
+    no-winner: "&7勝者なし。"
+    thanks: "&7参加ありがとうございました！"
+
+  rewards:
+    winner-title: "&6&l勝利！"
+    winner-subtitle: "&a報酬を配布中"
+    team-winner-subtitle: "&aチームの勝利！"
+    item-received: "&a報酬を受け取りました！"
+    command-executed: "&7報酬コマンドを実行しました。"
+
+  admin:
+    event-stopped: "&cイベントを停止しました。"
+    force-start: "&aイベントを強制開始しました"
+    reloaded: "&a設定を再読み込みしました。"
+
+  pvp-help:
+    join: "&e/event join &7– イベントに参加"
+    leave: "&e/event leave &7– イベントから退出"
+    list: "&e/event list &7– 利用可能なイベント"
+    admin-header: "&e管理者"
+    start: "&e/event start <イベント>"
+    stop: "&e/event stop <イベント>"
+    forcestart: "&e/event forcestart <イベント>"
+    reload: "&e/eventpvp reload"
+    footer: "&7楽しんでください！"
+    
+    challenge: "&e/pvpask <プレイヤー> &7- 対戦を挑む (Wager-GUI付き)"
+    accept: "&e/pvp accept <プレイヤー> &7- 挑戦を承諾"
+    deny: "&e/pvp deny <プレイヤー> &7- 挑戦を拒否"
+    spectate: "&e/pvp spectate <プレイヤー> &7- マッチを観戦"
+    
+    surrender: "&e/surrender &7- 降参（確認が必要）"
+    draw: "&e/draw &7- 引き分けを提案"
+    
+    footer: |
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+      
+
+  world:
+    loading: "&7ワールドを読み込み中... &e⏳"
+    loaded: "&aワールドを読み込みました！ ✓"
+    load-failed: "&cワールドを読み込めませんでした！ ✗"
+
+  # ===== GUIメッセージ =====
+  gui:
+    wager-title: "&6&l賭けを設定"
+    arena-title: "&e&lアリーナを選択"
+    equipment-title: "&e&l装備を選択"
+    
+    click-to-select: "&7クリックして選択"
+    click-to-confirm: "&a&lクリックして確認"
+    click-to-cancel: "&c&lクリックしてキャンセル"
+    
+    your-balance: "&7残高: &6${balance}"
+    money-title: "&6&l💰 お金の賭け"
+    money-selection.choose-line1: "&7金額を選択"
+    money-selection.choose-line2: "&7または調整してください。"
+    money-selection.amount-select-line1: "&aこの金額を選択するにはクリック"
+    money-selection.amount-select-line2: "&aしてください。"
+    money-selection.amount-not-enough-money: "&cお金が足りません！"
+    money-selection.clear-title: "&c&l金額をクリア"
+    money-selection.clear-line: "&7賭け金を0に設定します。"
+    money-selection.adjust-plus-lore: "&7賭け金を増やします。"
+    money-selection.adjust-minus-lore: "&7賭け金を減らします。"
+    money-selection.current-title: "&a&l現在の賭け"
+    money-selection.current-label: "&7現在の賭け:"
+    money-selection.remaining-balance: "&7残りの残高:"
+    item-selection.clear-title: "&c&lすべて削除"
+    item-selection.clear-line1: "&7すべてのアイテムを削除します"
+    item-selection.clear-line2: "&7賭けから。"
+    item-selection.info-title: "&e&lガイド"
+    item-selection.info-line1: "&7下のアイテムをクリック"
+    item-selection.info-line2: "&7して追加します。"
+    item-selection.info-line3: "&7選択したアイテムをクリック"
+    item-selection.info-line4: "&7して削除します。"
+    item-selection.info-line5: "&e左クリック: &f1アイテム"
+    item-selection.info-line6: "&e右クリック: &fスタック全体"
+    item-selection.empty-slot-title: "&7空のスロット"
+    item-selection.empty-slot-lore: "&7ここにアイテムを追加してください！"
+    item-selection.remove-lore: "&c➤ 削除するにはクリック"
+    item-selection.add-lore: "&a➤ 追加するにはクリック"
+    item-selection.error-max-items: "&c最大7スタックのアイテムまでです！"
+    item-selection.cleared-message: "&eすべてのアイテムが削除されました。"
+    confirmation.target-title: "&e&l挑戦先:"
+    confirmation.target-player: "&f{player}"
+    confirmation.target-line1: "&7このリクエストは"
+    confirmation.target-line2: "&7プレイヤーに送信されます。"
+    confirmation.vs-player: "&7{player}"
+    confirmation.vs-against: "&7対"
+    confirmation.vs-target: "&7{target}"
+    confirmation.item-title: "&6&l📦 あなたのアイテム賭け"
+    confirmation.items-in-wager: "&a賭けにあるアイテム:"
+    confirmation.item-line: "&7- &f{item}"
+    confirmation.no-items: "&7賭けアイテムなし"
+    confirmation.money-title: "&6&l💰 あなたのお金の賭け"
+    confirmation.money-label: "&aお金の賭け:"
+    confirmation.money-warning: "&c⚠ 敗北すると失います！"
+    confirmation.no-money: "&7お金は賭けられていません"
+    confirmation.arena-title: "&6&l🗺 アリーナ"
+    confirmation.arena-label: "&aアリーナ: &f{arena}"
+    confirmation.arena-world: "&7ワールド: &f{world}"
+    confirmation.no-arena: "&c選択されたアリーナがありません！"
+    confirmation.equipment-title: "&6&l⚔ 装備"
+    confirmation.equipment-label: "&a装備: &f{equipment}"
+    confirmation.equipment-line1: "&7両方のプレイヤーが受け取ります"
+    confirmation.equipment-line2: "&7戦闘中にこの装備を。"
+    confirmation.no-equipment: "&c選択された装備がありません！"
+    confirmation.edit-title: "&e&l✎ 編集"
+    confirmation.edit-line1: "&7メインメニューに戻る"
+    confirmation.edit-line2: "&7変更を加えるため。"
+    confirmation.cancel-title: "&c&l✖ キャンセル"
+    confirmation.cancel-line1: "&7リクエストをキャンセルします。"
+    confirmation.cancel-line2: "&7すべてのアイテムが返却されます。"
+    confirmation.confirm-warning-title: "&c⚠ 注意:"
+    confirmation.confirm-warning-body: "&cあなたの賭けはロックされます！"
+    confirmation.click-to-send: "&aリクエストを送信するにはクリック!"
+    confirmation.confirm-send-line1: "&7リクエストを送信します:"
+    confirmation.confirm-send-target: "&f{target}"
+    confirmation.confirm-button-title: "&a&l✔ リクエストを送信"
+    confirmation.sent-line1: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    confirmation.sent-line2: "&a&lリクエストを送信しました！"
+    confirmation.sent-line3: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    confirmation.sent-waiting: "&7&e{target}&7からの返答を待っています..."
+    confirmation.sent-expire: "&7リクエストは&e60秒&7で期限切れになります。"
+    confirmation.error-player-offline: "&cプレイヤーはもうオンラインではありません！"
+    confirmation.error-already-in-match: "&cあなたは既に試合中です！"
+    confirmation.error-target-in-match: "&c{target}は既に試合中です！"
+    confirmation.error-already-pending-request: "&c既に保留中のリクエストがあります！"
+    confirmation.error-not-enough-money: "&cお金が足りません！必要: ${money}"
+    
+    your-balance: "&7残高: &6${balance}"
+    money-title: "&6&l💰 お金の賭け"
+    money-selection.choose-line1: "&7金額を選択"
+    money-selection.choose-line2: "&7または調整してください。"
+    money-selection.amount-select-line1: "&aこの金額を選択するにはクリック"
+    money-selection.amount-select-line2: "&aしてください。"
+    money-selection.amount-not-enough-money: "&cお金が足りません！"
+    money-selection.clear-title: "&c&l金額をクリア"
+    money-selection.clear-line: "&7賭け金を0に設定します。"
+    money-selection.adjust-plus-lore: "&7賭け金を増やします。"
+    money-selection.adjust-minus-lore: "&7賭け金を減らします。"
+    money-selection.current-title: "&a&l現在の賭け"
+    money-selection.current-label: "&7現在の賭け:"
+    money-selection.remaining-balance: "&7残りの残高:"
+    item-selection.clear-title: "&c&lすべて削除"
+    item-selection.clear-line1: "&7すべてのアイテムを削除します"
+    item-selection.clear-line2: "&7賭けから。"
+    item-selection.info-title: "&e&lガイド"
+    item-selection.info-line1: "&7下のアイテムをクリック"
+    item-selection.info-line2: "&7して追加します。"
+    item-selection.info-line3: "&7選択したアイテムをクリック"
+    item-selection.info-line4: "&7して削除します。"
+    item-selection.info-line5: "&e左クリック: &f1アイテム"
+    item-selection.info-line6: "&e右クリック: &fスタック全体"
+    item-selection.empty-slot-title: "&7空のスロット"
+    item-selection.empty-slot-lore: "&7ここにアイテムを追加してください！"
+    item-selection.remove-lore: "&c➤ 削除するにはクリック"
+    item-selection.add-lore: "&a➤ 追加するにはクリック"
+    item-selection.error-max-items: "&c最大7スタックのアイテムまでです！"
+    item-selection.cleared-message: "&eすべてのアイテムが削除されました。"
+    confirmation.target-title: "&e&l挑戦先:"
+    confirmation.target-player: "&f{player}"
+    confirmation.target-line1: "&7このリクエストは"
+    confirmation.target-line2: "&7プレイヤーに送信されます。"
+    confirmation.vs-player: "&7{player}"
+    confirmation.vs-against: "&7対"
+    confirmation.vs-target: "&7{target}"
+    confirmation.item-title: "&6&l📦 あなたのアイテム賭け"
+    confirmation.items-in-wager: "&a賭けにあるアイテム:"
+    confirmation.item-line: "&7- &f{item}"
+    confirmation.no-items: "&7賭けアイテムなし"
+    confirmation.money-title: "&6&l💰 あなたのお金の賭け"
+    confirmation.money-label: "&aお金の賭け:"
+    confirmation.money-warning: "&c⚠ 敗北すると失います！"
+    confirmation.no-money: "&7お金は賭けられていません"
+    confirmation.arena-title: "&6&l🗺 アリーナ"
+    confirmation.arena-label: "&aアリーナ: &f{arena}"
+    confirmation.arena-world: "&7ワールド: &f{world}"
+    confirmation.no-arena: "&c選択されたアリーナがありません！"
+    confirmation.equipment-title: "&6&l⚔ 装備"
+    confirmation.equipment-label: "&a装備: &f{equipment}"
+    confirmation.equipment-line1: "&7両方のプレイヤーが受け取ります"
+    confirmation.equipment-line2: "&7戦闘中にこの装備を。"
+    confirmation.no-equipment: "&c選択された装備がありません！"
+    confirmation.edit-title: "&e&l✎ 編集"
+    confirmation.edit-line1: "&7メインメニューに戻る"
+    confirmation.edit-line2: "&7変更を加えるため。"
+    confirmation.cancel-title: "&c&l✖ キャンセル"
+    confirmation.cancel-line1: "&7リクエストをキャンセルします。"
+    confirmation.cancel-line2: "&7すべてのアイテムが返却されます。"
+    confirmation.confirm-warning-title: "&c⚠ 注意:"
+    confirmation.confirm-warning-body: "&cあなたの賭けはロックされます！"
+    confirmation.click-to-send: "&aリクエストを送信するにはクリック!"
+    confirmation.confirm-send-line1: "&7リクエストを送信します:"
+    confirmation.confirm-send-target: "&f{target}"
+    confirmation.confirm-button-title: "&a&l✔ リクエストを送信"
+    confirmation.sent-line1: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    confirmation.sent-line2: "&a&lリクエストを送信しました！"
+    confirmation.sent-line3: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    confirmation.sent-waiting: "&7&e{target}&7からの返答を待っています..."
+    confirmation.sent-expire: "&7リクエストは&e60秒&7で期限切れになります。"
+    confirmation.error-player-offline: "&cプレイヤーはもうオンラインではありません！"
+    confirmation.error-already-in-match: "&cあなたは既に試合中です！"
+    confirmation.error-target-in-match: "&c{target}は既に試合中です！"
+    confirmation.error-already-pending-request: "&c既に保留中のリクエストがあります！"
+    confirmation.error-not-enough-money: "&cお金が足りません！必要: ${money}"
+    response.title: "&6&l依頼に返信"
+    response.challenge-from: "&e&l挑戦者:"
+    response.challenge-subtitle: "&7反対賭けを設定"
+    response.opponent-sets: "&7相手の賭け:"
+    response.no-items: "&8アイテムなし"
+    response.no-money: "&8お金なし"
+    response.match-details: "&6&l試合詳細"
+    response.your-items: "&aあなたのアイテム:"
+    response.more-items: "&7... ほか"
+    response.no-items-set: "&7アイテムは設定されていません"
+    response.click-to-edit: "&eクリックして編集"
+    response.your-items-title: "&a&lあなたのアイテム賭け"
+    response.your-money-label: "&aあなたの賭け:"
+    response.no-money-set: "&7お金は設定されていません"
+    response.your-money-title: "&a&lあなたのお金賭け"
+    response.edit-items-title: "&e✎ アイテム選択"
+    response.edit-items-lore: "&7アイテム選択画面を開く"
+    response.edit-money-title: "&e✎ 金額設定"
+    response.edit-money-lore: "&7お金設定画面を開く"
+    response.accept-title: "&a&l✔ 承諾"
+    response.accept-lore1: "&7依頼を承諾します"
+    response.accept-lore2: "&7反対賭けで。"
+    response.decline-title: "&c&l✖ 却下"
+    response.decline-lore1: "&7依頼を拒否します。"
+    response.player-offline: "&c挑戦者はもうオンラインではありません！"
+    response.not-enough-money: "&cお金が足りません！"
+    response.wager-chosen: "&a賭けを選択しました！ {target} の承認を待っています..."
+    response.other-chosen: "&e{player} &7が賭けを選びました!"
+    response.review-offer: "&7内容を確認..."
+    response.request-declined: "&c{player} が依頼を拒否しました!"
+    response.declined: "&c依頼を拒否しました。"
+    response-item-selection.title: "&6&lアイテムを選択"
+    response-item-selection.clear-title: "&c&lすべて削除"
+    response-item-selection.clear-line1: "&7すべてのアイテムを削除"
+    response-item-selection.clear-line2: "&7賭けから外します。"
+    response-item-selection.info-title: "&e&lガイド"
+    response-item-selection.info-line1: "&7下のアイテムをクリック"
+    response-item-selection.info-line2: "&7して追加します。"
+    response-item-selection.info-line3: "&7選択済みアイテムをクリック"
+    response-item-selection.info-line4: "&7して外します。"
+    response-item-selection.info-line5: "&e左クリック: &f1個"
+    response-item-selection.info-line6: "&e右クリック: &fスタック全体"
+    response-item-selection.empty-slot-title: "&7空スロット"
+    response-item-selection.empty-slot-lore: "&7ここにアイテムを追加!"
+    response-item-selection.remove-lore: "&c➤ クリックして削除"
+    response-item-selection.add-lore: "&a➤ クリックして追加"
+    response-item-selection.error-max-items: "&c最大7スタックまでです!"
+    response-item-selection.cleared-message: "&eすべてのアイテムを削除しました。"
+    response-money-selection.title: "&6&lあなたのお金賭け"
+    response-money-selection.clear-title: "&c&l金額をクリア"
+    response-money-selection.clear-lore: "&7賭け額を0にします。"
+    response-money-selection.info-title: "&e&l金額賭け"
+    response-money-selection.info-balance: "&7残高:"
+    response-money-selection.info-opponent: "&7相手の賭け:"
+    response-money-selection.not-enough-money: "&cお金が足りません!"
+    response-money-selection.match-sender-title: "&e&l相手に合わせる"
+    response-money-selection.match-sender-line1: "&7次の額に設定:"
+    response-money-selection.match-sender-line2: "&eクリックして相手の"
+    response-money-selection.match-sender-line3: "&e金額をコピーします。"
+    response-money-selection.current-title: "&a&l現在の賭け"
+    response-money-selection.current-label: "&7現在の賭け:"
+    response-money-selection.remaining-balance: "&7残り残高:"
+    negotiation.title-sender: "&6&l提案を確認"
+    negotiation.title-target: "&6&l依頼を確認"
+    negotiation.vs-title: "&c&l⚔ VS ⚔"
+    negotiation.vs-line1: "&7賭けを交渉"
+    negotiation.vs-line2: "&7してください!"
+    negotiation.arena-title: "&6&lアリーナ"
+    negotiation.equipment-title: "&6&l装備"
+    negotiation.opponent-title: "&c&l相手: {player}"
+    negotiation.opponent-lore1: "&7これは相手の"
+    negotiation.opponent-lore2: "&7賭けです。"
+    negotiation.opponent-items-title: "&c&l相手のアイテム"
+    negotiation.items-count: "&7個数: &f{count}"
+    negotiation.opponent-money-title: "&c&l相手のお金"
+    negotiation.you-title: "&a&lあなた: {player}"
+    negotiation.you-lore: "&7これはあなたの賭けです。"
+    negotiation.your-items-title: "&a&lあなたのアイテム"
+    negotiation.your-money-title: "&a&lあなたのお金"
+    negotiation.decline-title: "&c&l✖ 却下"
+    negotiation.decline-line1: "&7提案を拒否して"
+    negotiation.decline-line2: "&7交渉を終了します。"
+    negotiation.decline-line3: "&cアイテムは返却されます。"
+    negotiation.counter-offer-title: "&6&l↻ カウンターオファー"
+    negotiation.counter-offer-line1: "&7賭けを調整して"
+    negotiation.counter-offer-line2: "&7カウンターオファーを送る。"
+    negotiation.counter-offer-line3: "&e相手プレイヤーも"
+    negotiation.counter-offer-line4: "&eもう一度決定できます。"
+    negotiation.accept-title: "&a&l✔ 承諾"
+    negotiation.accept-line1: "&7両方の賭けを受け入れ"
+    negotiation.accept-line2: "&7戦闘を開始します!"
+    negotiation.accept-line3: "&a⚔ 試合開始!"
+    
+    ready: "&a&l準備完了"
+    waiting: "&e&l待機中"
+    confirmed: "&a&l✔ 確認済み"
+
+  # ===== アップデートメッセージ =====
+  update:
+    available: "&e&lアップデートあり！ &7新しいバージョン: &e{latest} &7(現在: &e{current}&7)"
+    download-link: "&7ダウンロード: &ehttps://modrinth.com/plugin/event-pvp-plugin"
+    check-failed: "&cアップデート確認に失敗: {error}"
+
+  # ===== ウェブインターフェースメッセージ =====
+  webtoken:
+    player-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+    no-permission: "&cウェブインターフェースへのアクセス権限がありません！"
+    not-enabled: "&cウェブインターフェースが有効になっていません！"
+    generation-failed: "&cトークンを生成できませんでした。権限を確認してください！"
+    header: "&6&l  ウェブインターフェース ログイン"
+    your-token: "&7  あなたのログイントークン："
+    click-to-copy: "&7（クリックしてコピー）"
+    hover-copy: "&aクリックしてトークンをコピー"
+    valid-for: "&e  ⚠ 有効期限：&f{minutes}分"
+    single-use: "&e  ⚠ 一度のみ使用可能"
+    click-to-open: "&7（クリックして開く）"
+    hover-open: "&bクリックしてウェブインターフェースを開く"
+    help-description: "&e/eventpvp webtoken &7- ウェブインターフェース用ログイントークンを生成"
+
+  # ===== 一般メッセージ =====
+  general:
+    player-only: "&cプレイヤーのみがこのコマンドを使用できます！"
+    no-permission: "&cこのコマンドの権限がありません！"
+    unknown-command: "&c不明なコマンド: &e{command}"
+    cooldown: "&cあと{seconds}秒お待ちください！"
+
+  # ===== コマンドヘルプ =====
+  command-help:
+    eventpvp:
+      header: "&8&m                    &r &6Event-PVP コマンド &8&m                    "
+      reload: "&e/eventpvp reload &8- &7全ての設定を再読み込み"
+      version: "&e/eventpvp version &8- &7プラグインのバージョンと更新を確認"
+      debug: "&e/eventpvp debug &8- &7デバッグモードを管理"
+    pvp:
+      usage: "&7使用方法: &e/pvpask <プレイヤー>"
+      header: "&6&l━━━━━━━━━━━━━━━━━━━━━━━"
+      title: "&e&lPVP WAGER - ライブトレード"
+      
+  # ===== PVP ASK メッセージ =====
+  pvpask:
+    not-online: "&cプレイヤー &e{player} &cはオンラインではありません！"
+    self-request: "&c自分自身にリクエストを送ることはできません！"
+    already-in-trade: "&cあなたは既にトレード中です！"
+    target-in-trade: "&c{player}は既にトレード中です！"
+    already-in-match: "&cあなたは既にマッチ中です！"
+    target-in-match: "&c{player}は既にマッチ中です！"
+    pending-request: "&c既に保留中のリクエストがあります！"
+    pending-request-hint: "&7&e/pvpno &7でキャンセルできます。"
+    target-pending: "&c{player}は既に保留中のリクエストがあります！"
+    no-arenas: "&cアリーナがありません！まず&e/pvpadmin createarena&cでアリーナを作成してください"
+    no-equipment: "&c装備がありません！まず&e/pvpadmin createequipment&cで装備を作成してください"
+    trade-error: "&cトレードを開始できませんでした。後でもう一度お試しください。"
+
+  # ===== トレード/ワージャーシステム =====
+  trade:
+    max-items: "&c最大{count}個のアイテムスタックが許可されています！"
+    items-cleared: "&e全てのアイテムを削除しました。"
+    wager-cancelled: "&cワージャーリクエストがキャンセルされました。"
+    select-arena-first: "&c先にアリーナを選択してください！"
+    select-equipment-first: "&c先に装備を選択してください！"
+    select-both-first: "&c先にアリーナと装備を選択してください！"
+    economy-not-available: "&cエコノミーが利用できません！"
+    
+  # ===== ネゴシエーションシステム =====
+  negotiation:
+    offer-declined: "&cあなたはオファーを断りました。"
+    offer-declined-other: "&c{player}がオファーを断りました！"
+    opponent-offline: "&c相手プレイヤーはもうオンラインではありません！"
+    already-in-fight: "&cあなたは既に戦闘中です！"
+    opponent-in-fight: "&c{player}は既に戦闘中です！"
+    offer-accepted: "&a&lオファーを承諾しました！マッチを開始します..."
+    offer-accepted-other: "&a&l{player}がオファーを承諾しました！マッチを開始します..."
+    not-enough-money-other: "&c{player}は十分なお金がありません！"
+    not-enough-money: "&c十分なお金がありません！"
+    not-all-items: "&c全てのアイテムを持っていません！"
+    counter-offer-sent: "&aカウンターオファーを送信しました！返答をお待ちください..."
+    counter-offer-received: "&e{player} &7が&6カウンターオファー&7を送信しました！"
+    
+  # ===== リクエスト/チャレンジシステム =====
+  challenge:
+    header: "&6&l━━━━━━━━━━━━━━━━━━━━━━━"
+    title: "&e&lPVPチャレンジ！"
+    challenged-by: "&e{player} &7があなたに挑戦しました！"
+    accept-command: "&a/pvp accept {player} &7- 承諾"
+    deny-command: "&c/pvp deny {player} &7- 拒否"
+    expires-in: "&7リクエストは&e{seconds}秒後&7に期限切れになります。"
+    respond-hint: "&7または以下で返答:"
+    
+  # ===== レスポンスシステム =====
+  response:
+    challenger-offline: "&c挑戦者はもうオンラインではありません！"
+    wager-chosen: "&aワージャーを選択しました！{player}からの確認をお待ちください..."
+    wager-chosen-other: "&e{player} &7がワージャーを選択しました！"
+    check-offer: "&7オファーを確認中..."
+    request-declined-other: "&c{player}があなたのリクエストを断りました！"
+    request-declined: "&cリクエストを断りました。"
+    no-pending-request: "&c保留中のワージャーリクエストがありません！"
+    request-expired: "&cワージャーリクエストは既に期限切れです！"
+    requester-offline: "&cリクエスト者はもうオンラインではありません！"
+    respond-usage: "&c使用方法: /pvprespond gui"
+
+  # ===== 確認システム =====
+  confirmation:
+    select-arena-equipment: "&cアリーナと装備を選択してください！"
+    player-offline: "&cプレイヤーはもうオンラインではありません！"
+    already-pending: "&c既に保留中のリクエストがあります！"
+    request-sent-header: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    request-sent-title: "&a&lリクエストを送信しました！"
+    waiting-for-response: "&7&e{player}&7からの返答をお待ちください..."
+    request-expires: "&7リクエストは&e{seconds}秒後&7に期限切れになります。"
+    
+  # ===== マッチシステム =====
+  match-system:
+    # エラー
+    arena-load-failed: "&cエラー: アリーナワールドをロードできませんでした！"
+    teleport-failed: "&cエラー: アリーナへのテレポートに失敗しました！"
+    arena-setup-failed: "&cエラー: アリーナのセットアップに失敗しました！"
+    no-arenas: "&c利用可能なアリーナがありません！"
+    not-enough-money: "&cお金が足りません！"
+    min-wager-not-met: "&c最低ベット額に達していません！最低{items}個のアイテムまたは${money}が必要です。"
+    not-enough-inventory: "&c相手のアイテムを受け取るインベントリスペースがありません！"
+    opponent-not-enough-inventory: "&c相手のインベントリスペースが足りません！"
+    
+    # マッチ開始
+    arena-loading: "&eアリーナを読み込み中... &7(5秒)"
+    match-starting-divider: "&e&l━━━━━━━━━━━━━━━━━━━━━━━"
+    match-starting: "&e&lマッチ開始！"
+    fight-divider: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    fight: "&e&l戦え！"
+    
+    # マッチ終了
+    no-wager: "&7ワージャーマッチではありません - 配布するアイテムがありません。"
+    you-won-header: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    you-won: "&a&l勝利しました！"
+    you-lost-header: "&c&l━━━━━━━━━━━━━━━━━━━━━━━"
+    you-lost: "&c&l敗北しました！"
+    better-luck: "&7次回はもっと運が良くなりますように！"
+    wager-returned: "&7あなたのワージャーが返却されました。"
+
+  # ===== デバッグシステム =====
+  debug:
+    no-permission: "&cこのコマンドの権限がありません。"
+    level-set: "&aデバッグレベルを設定しました: &e{level} ({number})"
+    unknown-command: "&c不明なコマンド: &e{command}"
+    use-help: "&7&e/{label} debug help &7でヘルプを表示。"
+    enabled: "&aデバッグをレベル &e{level} ({number}) &aで有効化しました"
+    active-categories: "&7アクティブなカテゴリ:"
+    disabled: "&cデバッグを無効化しました。"
+    current-level: "&7現在のレベル: &e{level} &7(&e{number}&7)"
+    use-level-change: "&7&e/{label} debug level <0|1|2|3> &7で変更。"
+    invalid-level: "&c無効なレベル: &e{level}"
+    valid-levels: "&7有効な値: &e0 (オフ), 1 (基本), 2 (拡張), 3 (完全)"
+    current-output: "&7現在の出力: &e{mode}"
+    use-output-change: "&7&e/{label} debug output <console|chat|both> &7で変更。"
+    invalid-output: "&c無効な出力モード: &e{mode}"
+    valid-outputs: "&7有効な値: &econsole, chat, both"
+    output-set: "&a出力モードを設定しました: &e{mode}"
+    not-enabled: "&cデバッグは無効です。&e/epvp debug on &cで有効化"
+    test-message: "&7カテゴリのテストメッセージを送信: &e{category}"
+    player-only: "&cこのコマンドはプレイヤー専用です。"
+    subscribed: "&aチャットでデバッグメッセージを受信します。"
+    unsubscribed: "&cチャットでデバッグメッセージを受信しなくなりました。"
+    level1-header: "&eレベル1 (基本):"
+    level2-header: "&eレベル2 (拡張):"
+    level3-header: "&eレベル3 (完全):"
+    status-enabled: "有効"
+    status-disabled: "無効"
+    status-label: "&7ステータス: {status}"
+    level-label: "&7レベル: &e{level} &7(&e{number}&7)"
+    use-debug-help: "&7&e/epvp debug help &7で全コマンドを表示。"
+    help-status: "&e/{label} debug &8- &7現在のステータスを表示"
+    help-on: "&e/{label} debug on [level] &8- &7デバッグを有効化 (デフォルト: レベル1)"
+    help-off: "&e/{label} debug off &8- &7デバッグを無効化"
+    help-level: "&e/{label} debug level <0-3> &8- &7デバッグレベルを設定"
+    help-output: "&e/{label} debug output <mode> &8- &7出力を設定 (console/chat/both)"
+    help-test: "&e/{label} debug test [category] &8- &7テストメッセージを送信"
+    help-subscribe: "&e/{label} debug subscribe &8- &7チャットでデバッグを受信"
+    help-unsubscribe: "&e/{label} debug unsubscribe &8- &7チャット受信を停止"
+    help-categories: "&e/{label} debug categories &8- &7全カテゴリを表示"
+    level-overview: "&7レベル概要:"
+    level-values: "  &70 = オフ, &a1 = 基本, &e2 = 拡張, &c3 = 完全"
+
+  # ===== ライブトレードGUI =====
+  livetrade:
+    # GUIタイトル
+    gui-title: "&6&lPVP Wager &8| &e{opponent}"
+    
+    # セッションメッセージ
+    started: "&a&lPVP Wagerが&e{player}&a&lと開始されました"
+    cancelled: "&c&lPVP Wagerがキャンセルされました！"
+    both-ready: "&e&l両者準備完了！"
+    match-starting: "&e&lマッチを開始します！"
+    change-detected: "&c&l変更を検出 - 確認をリセット！"
+    
+    # プレイヤーヘッド情報
+    items-label: "&7アイテム: &e{count}"
+    money-label: "&7お金: &6${amount}"
+    status-ready: "&a✔ 準備完了"
+    status-waiting: "&c✗ 待機中..."
+    
+    # 概要
+    overview-title: "&6&l概要"
+    arena-selected: "&a✔ &fアリーナ: &e{arena}"
+    arena-not-selected: "&c✗ &fアリーナ: &c未選択"
+    equipment-selected: "&a✔ &f装備: &e{equipment}"
+    equipment-not-selected: "&c✗ &f装備: &c未選択"
+    ready-to-confirm: "&a✔ 確認準備完了！"
+    select-arena-equipment: "&c⚠ アリーナと装備を選択"
+    
+    # アリーナ選択
+    arena-select-title: "&e&l🗺 アリーナを選択"
+    arena-current: "&a現在: &f{arena}"
+    arena-none-selected: "&cアリーナ未選択"
+    arena-left-click: "&e▶ 左クリック: &7次のアリーナ"
+    arena-right-click: "&e▶ 右クリック: &7前のアリーナ"
+    arena-none-available: "&cアリーナがありません！"
+    
+    # 装備選択
+    equipment-select-title: "&b&l⚔ 装備を選択"
+    equipment-current: "&a現在: &f{equipment}"
+    equipment-none-selected: "&c装備未選択"
+    equipment-left-click: "&e▶ 左クリック: &7次の装備"
+    equipment-right-click: "&e▶ 右クリック: &7前の装備"
+    equipment-none-available: "&c装備がありません！"
+    
+    # カウントダウン/ステータス
+    countdown-title: "&a&l⏱ カウントダウン: {seconds}"
+    countdown-match-starts: "&e&lマッチ開始まで:"
+    countdown-seconds: "&6&l{seconds} &e秒"
+    countdown-both-ready: "&a&l両者準備完了！"
+    countdown-fight-soon: "&7間もなく戦闘開始..."
+    status-title: "&7&lステータス"
+    status-both-must-confirm: "&7両プレイヤーの確認が必要"
+    status-ready: "&a✔ 準備完了"
+    status-waiting-short: "&c✗ 待機中"
+    countdown-bar-info: "&7確認でカウントダウン開始"
+    
+    # お金
+    money-stake: "&7ステーク: &6${amount}"
+    money-left-click: "&e▶ 左クリック: &7+$10"
+    money-right-click: "&e▶ 右クリック: &7-$10"
+    money-shift-left: "&e▶ Shift+左: &7+$100"
+    money-shift-right: "&e▶ Shift+右: &7-$100"
+    money-q-key: "&e▶ Qキー: &7+$1 / Shift+Q: +$1000"
+    economy-not-available: "&cエコノミーが利用できません！"
+    
+    # 確認
+    confirm-title-ready: "&a&l✔ {player} 準備完了"
+    confirm-title-wait: "&e&l⬆ 確認"
+    confirm-title-disabled: "&7&l⬆ 確認"
+    confirm-click-to-withdraw: "&7クリックで取り消し"
+    confirm-click-to-confirm: "&eクリックで確認！"
+    confirm-waiting-for: "&7{player}を待っています"
+    confirm-select-first: "&c先にアリーナと装備を選択！"
+    
+    # キャンセル
+    cancel-title: "&c&l✖ キャンセル"
+    cancel-click: "&7クリックでワージャーをキャンセル"
+    cancel-items-returned: "&7全アイテムが返却されます。"
+    
+    # アイテム
+    max-items-reached: "&c最大アイテム数に達しました (12)！"
+    not-enough-money: "&cお金が足りません！残高: $%balance%"
+    select-arena-equipment-first: "&c先にアリーナと装備を選択してください！"
+    
+    # エラー
+    error-match-start: "&cマッチ開始エラー。アイテムは返却されました。"
+    
+    # セッション通知
+    session-started: "&a&lPVP賭けが &e%player% &a&lと開始しました"
+    broadcast-divider: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    broadcast-both-ready: "&e&l両者準備完了！"
+    broadcast-match-starting: "&e&lマッチ開始！"
+    broadcast-change-detected: "&c&l変更検出 - 確認がリセットされました！"
+    broadcast-cancelled: "&c&lPVP賭けがキャンセルされました！"
+    broadcast-error-match-start: "&cマッチ開始エラー。アイテムは返却されました。"
+
+  # ===== システムメッセージ =====
+  system:
+    spectator-mode-only: "&c観戦者はスペクテイターモードのみ使用できます。"
+    cooldown-wait: "&cあと {seconds} 秒お待ちください！"
+    players-only: "&cプレイヤーのみがこのコマンドを使用できます！"
+    unknown-subcommand: "&c不明なサブコマンド: {command}"
+    
+  # ===== PVPヘルプ =====
+  pvp-help:
+    header: "&6&l━━━━━━━━━━━━━━━━━━━"
+    title: "&e&lPVP ヘルプ"
+    usage: "&7使用方法:"
+    wager-info: "&7賭け: アイテム、MONEY または &eSKIP&7 (賭けなし)"
+    commands:
+      challenge: "&e/pvp challenge <player> [wager] [amount] [arena] [equipment]"
+      accept: "&e/pvp accept [player]"
+      deny: "&e/pvp deny [player]"
+      spectate: "&e/pvp spectate <player>"
+      leave: "&e/pvp leave"
+      surrender: "&e/pvp surrender [confirm]"
+      draw: "&e/pvp draw [accept|deny]"
+  
+  # PvP Info Help Text
+  info:
+    header: "&6&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    title: "&e&lPVP WAGER - コマンド概要"
+    players-only: "&cこのコマンドはプレイヤーのみ使用できます！"
+    
+    basic-commands:
+      header: "&e&l⚔ 基本コマンド:"
+      pvp: "&7/pvp <プレイヤー> &8- &7戦いを挑む"
+      accept: "&7/pvp accept <プレイヤー> &8- &7挑戦を受け入れる"
+      deny: "&7/pvp deny <プレイヤー> &8- &7挑戦を拒否する"
+      spectate: "&7/pvp spectate <プレイヤー> &8- &7試合を観戦する"
+    
+    match-commands:
+      header: "&c&l⚔ 試合コマンド:"
+      surrender: "&7/surrender &8- &7現在の試合を諦める"
+      draw: "&7/draw &8- &7引き分けを提案する（両者が同意必要）"
+    
+    answer-commands:
+      header: "&a&l📋 応答コマンド:"
+      pvpanswer: "&7/pvpanswer <賭け> <金額> <アリーナ> <装備> &8- &7挑戦に応答する"
+      pvpyes: "&7/pvpyes &8- &7現在の賭けを確認する"
+      pvpno: "&7/pvpno &8- &7現在の賭けを拒否する"
+    
+    examples:
+      header: "&b&l💡 /pvpanswerの例:"
+      money: "&7/pvpanswer money 100 &8- &7$100を賭ける"
+      items: "&7/pvpanswer items &8- &7インベントリのアイテムを賭ける"
+      money-arena: "&7/pvpanswer money 50 nether &8- &7$50を賭けてネザーアリーナを選ぶ"
+      items-full: "&7/pvpanswer items forest diamond &8- &7アイテム＋森アリーナ＋ダイヤ装備"
+    
+    notices:
+      header: "&6&l⚠ 重要な注意事項:"
+      world-loading: "&7• &eワールド読み込み &7- 一部のアリーナは事前に読み込みが必要"
+      confirmation: "&7• &e確認 &7- 両プレイヤーが選択を確認する必要がある"
+      safety: "&7• &e安全性 &7- 中断時にすべてのアイテムが返却される"
+    
+    admin:
+      header: "&4&l🔧 管理者コマンド:"
+      reload: "&7/pvpadmin reload &8- &7すべての設定を再読み込み"
+      stop: "&7/pvpadmin stop <プレイヤー> &8- &7プレイヤーの試合を停止"
+      arenas: "&7/pvpadmin arenas &8- &7すべてのアリーナを表示"
+      equipment: "&7/pvpadmin equipment &8- &7すべての装備セットを表示"
+    
+    footer: "&eさらにヘルプが必要？管理者に尋ねるか /help と入力してください"
+  
+  # PvPAskCommand Help Text
+  pvpask:
+    help:
+      header: "&6&l━━━━━━━━━━━━━━━━━━━━━━━"
+      title: "&e&lPVP WAGER"
+      usage: "&e/pvpask <プレイヤー>"
+      description1: "&7両プレイヤーが同時に"
+      description2: "&7アイテム、お金、アリーナ、装備を"
+      description3: "&7選択できるライブトレードGUIを開きます。"
+      countdown1: "&7両者が確認すると、"
+      countdown2: "&7&l5秒のカウントダウン&7が始まり試合開始！"
+  
+  # PvPWagerGuiCommand Help Text
+  pvpwager:
+    help:
+      title: "&e&lPVP WAGER"
+      usage: "&e/pvpask <プレイヤー>"
+      description1: "&7プレイヤーに賭けリクエストを送信します。"
+      description2: "&7プレイヤーはチャットでリクエストをクリック"
+      description3: "&7するか &e/pvpaccept &7で受け入れることができます。"
+      gui-description1: "&7受け入れるとGUIが開き、"
+      gui-description2: "&7&l両プレイヤーが同時に&7以下を見ることができます:"
+      feature1: "&8• &f各プレイヤーが設定するアイテム"
+      feature2: "&8• &f各プレイヤーが設定するお金"
+      feature3: "&8• &f共有アリーナ選択"
+      feature4: "&8• &f共有装備選択"
+      countdown1: "&7両者が確認すると、"
+      countdown2: "&a&l5秒のカウントダウン &7が始まり試合開始！"
+  
+  # Command Request Manager Messages
+  command-request:
+    expired-sender: "&e{player} &cへのリクエストが期限切れです！"
+    expired-target: "&e{player} &cからのリクエストが期限切れです！"
+    arena: "&7アリーナ: &e{arena}"
+    equipment: "&7装備: &e{equipment}"
+    their-wager-money: "&7相手の賭け金: &e${amount}"
+    their-wager-items: "&7相手の賭けアイテム: &e{items}"
+    expires-in: "&7リクエストは &e60秒 &7で期限切れです"
+    accept-command: "承諾する"
+    deny-command: "拒否"
+    alternative-response: "&7または以下のコマンドで返答:"
+    alternative-command: "&a/pvpanswer <your_wager> <amount> &8[オプション: arena] [equipment]"
+  
+  # Command Messages
+  commands:
+    pvpdeny:
+      no-permission: "&cこのコマンドの権限がありません！"
+      no-pending-requests: "&c保留中の賭けリクエストがありません！"
+      request-removed-offline: "&7リクエストを削除しました（プレイヤーオフライン）。"
+    
+    pvpaccept:
+      no-permission: "&cこのコマンドの権限がありません！"
+      no-pending-requests: "&c保留中の賭けリクエストがありません！"
+      usage-hint: "&7&e/pvpaccept <プレイヤー> &7で特定のリクエストを承諾できます。"
+      player-offline: "&cプレイヤーはオンラインではありません！"
+    
+    pvprespond:
+      request-expired: "&c賭けリクエストは既に期限切れです！"
+      requester-offline: "&cリクエスト送信者はオンラインではありません！"
+  
+  # PvP Wager GUI Command Messages
+  pvp-wager-gui:
+    no-permission: "&cこのコマンドの権限がありません！"
+    player-offline: "&cプレイヤー &e{player} &cはオンラインではありません！"
+    cannot-challenge-self: "&c自分自身に挑戦することはできません！"
+    already-in-session: "&c既に賭けセッション中です！"
+    target-in-session: "&c{player}は既に賭けセッション中です！"
+    already-in-match: "&c既に戦闘中です！"
+    target-in-match: "&c{player}は既に戦闘中です！"
+    request-pending: "&c既に保留中の賭けリクエストがあります！"
+    request-pending-hint: "&7期限切れまたは拒否されるまでお待ちください。"
+    no-arenas: "&c利用可能なアリーナがありません！"
+    create-arenas-first: "&7まず &e/pvpadmin createarena &7でアリーナを作成してください"
+    no-equipment: "&c利用可能な装備セットがありません！"
+    create-equipment-first: "&7まず &e/pvpadmin createequipment &7で装備を作成してください"
+    request-sent-header: "&e&l賭けリクエスト送信"
+    challenge-sent: "&7&e{player} &7に挑戦しました！"
+    waiting-response: "&7返答を待っています..."
+    request-header: "§e§lPVP賭けリクエスト"
+    challenge-message: "§e{player} §aがあなたと賭けたがっています！"
+    accept-button: "§a§l[► 承諾する ◄]"
+    accept-hover: "§aクリックして賭けGUIを開く！\n§7アイテム、お金、\n§7アリーナ、装備を一緒に選べます。"
+    deny-button: " §c§l[✖ 拒否]"
+    deny-hover: "§cクリックしてリクエストを拒否"
+    request-footer: "\n\n§7リクエストは §e60秒 §7で期限切れになります。\n§6§l━━━━━━━━━━━━━━━━━━━━━━━\n"
+    accept-command: "承諾する"
+    deny-command: "拒否"
+    request-expired-sender: "&c&e{player} &cへの賭けリクエストが期限切れになりました。"
+    request-expired-target: "&c&e{player} &cからの賭けリクエストが期限切れになりました。"
+    both-in-session: "&cプレイヤーの一人が既に賭けセッション中です！"
+    both-in-match: "&cプレイヤーの一人が既に戦闘中です！"
+    session-start-failed: "&c賭けセッションを開始できませんでした！"
+    request-declined-other: "&c{player}があなたの賭けリクエストを拒否しました。"
+    request-declined-self: "&c{player}からの賭けリクエストを拒否しました。"
+
+  # Debug Command Messages
+  debug:
+    help:
+      header: "&8&m                    &r &bデバッグコマンド &8&m                    "
+      status: "&e/debug &8- &7現在のステータスを表示"
+      on: "&e/debug on [level] &8- &7デバッグを有効化（デフォルト: レベル1）"
+      off: "&e/debug off &8- &7デバッグを無効化"
+      level: "&e/debug level <0-3> &8- &7デバッグレベルを設定"
+      output: "&e/debug output <mode> &8- &7出力を設定 (console/chat/both)"
+      test: "&e/debug test [category] &8- &7テストメッセージを送信"
+      subscribe: "&e/debug subscribe &8- &7チャットでデバッグを受信"
+      unsubscribe: "&e/debug unsubscribe &8- &7チャット受信を停止"
+      categories: "&e/debug categories &8- &7すべてのカテゴリを表示"
+      levels: "&7レベル概要:"
+      level-overview: "  &70 = オフ, &a1 = 基本, &e2 = 拡張, &c3 = 完全"
+    
+    messages:
+      enabled: "デバッグをレベル{level}で有効化しました"
+      disabled: "デバッグを無効化しました。"
+      level-set: "デバッグレベルを設定: {level}"
+      unknown-command: "不明なコマンド: {command}"
+      use-help: "/{label} help でヘルプを表示します。"
+      current-level: "現在のレベル: {level}"
+      level-usage: "/debug level <0|1|2|3> で変更してください。"
+      invalid-level: "無効なレベル: {level}"
+      valid-levels: "有効な値: 0 (オフ), 1 (基本), 2 (拡張), 3 (完全)"
+      current-output: "現在の出力: {mode}"
+      output-usage: "/debug output <console|chat|both> で変更してください。"
+      active-categories: "アクティブなカテゴリ:"
+  
+  # Utility Messages  
+  utility:
+    no-items: "アイテムなし"
+    
+  # Match Manager Messages
+  match-manager:
+    no-wager: "&7賭けのない試合 - 配布するアイテムはありません。"
+    
+    # Arena Loading
+    arena-loading: "&6&lアリーナ世界読み込み中..."
+    arena-loaded: "&2&l世界の読み込みが成功しました！"
+    
+    # Error Messages
+    arena-load-failed: "&cエラー: アリーナ世界を読み込めませんでした！"
+    arena-teleport-failed: "&cエラー: アリーナへのテレポートに失敗しました！"
+    arena-setup-failed: "&cエラー: アリーナセットアップに失敗しました！"
+    arena-not-exists: "&cエラー: 選択されたアリーナはもう存在しません。"
+    
+    # Match Countdown
+    teleport-countdown: "&eアリーナへのテレポートまで &6&l{seconds} &e秒..."
+    match-countdown: "&eマッチ開始まで &6&l{seconds} &e秒！"
+    
+    # Match Spectating
+    spectate-header: "\n§6§l━━━━━━━━━━━━━━━━━━━━━━━\n§e§lマッチ: §f{player1} §7vs §f{player2}\n§6§l━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+    spectate-button: "§b§l[► 観戦 ◄]"
+    spectate-footer: "\n\n§7または §e/pvp spectate <プレイヤー>§7 も使用できます。\n§6§l━━━━━━━━━━━━━━━━━━━━━━━\n"
+    spectate-simple: "&e新しいマッチ: &f{player1} &7vs &f{player2} &8- &7使用: &e/pvp spectate {player1}"
+    
+    # Match Status
+    no-wager-mode: "&7モード: &e賭けなし - お楽しみだけ！"
+    vs-display: "&e{player1} &7vs &e{player2}"
+    match-starting: "&a&lマッチ開始！"
+    match-starting-divider: "&e&l━━━━━━━━━━━━━━━━━━━━━━━"
+    arena-display: "&7アリーナ: &e{arena}"
+    equipment-display: "&7装備: &e{equipment}"
+    fight-divider: "&a&l━━━━━━━━━━━━━━━━━━━━━━━"
+    fight: "&e&l戦え！"
+    
+    # Match End
+    timeout-draw: "&7タイムアウトによりマッチは引き分けで終了しました。"
+    server-shutdown: "&cサーバーシャットダウン！マッチをキャンセルしました。"
+    
+  # PvP Listener Messages
+  pvp-listener:
+    spectator-no-attack: "&c観戦者として攻撃することはできません！"
+    match-not-started: "&c試合はまだ始まっていないか、既に終了しています！"
+  
+  # PvP Accept Command Messages
+  pvp-accept:
+    player-offline: "&cプレイヤー &e{player} &cはオンラインではありません！"
+    no-request: "&e{player}&cからの賭けリクエストはありません！"
+  
+  # PvP Deny Command Messages
+  pvp-deny:
+    request-denied: "&e{player}&cからのリクエストを拒否しました。"
+    player-offline: "&cプレイヤー &e{player} &cはオンラインではありません！"
+    no-request: "&e{player}&cからの賭けリクエストはありません！"
+  
+  # PvP Respond Command Messages
+  pvp-respond:
+    usage: "&c使用法: /pvprespond gui"
+    no-permission: "&cこのコマンドの権限がありません！"
+    no-pending-request: "&c保留中の賭けリクエストはありません！"

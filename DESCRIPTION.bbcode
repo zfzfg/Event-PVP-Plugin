@@ -1,0 +1,193 @@
+[size=6][b]Event-PVP-Plugin - Quick Description[/b][/size]
+
+A comprehensive Minecraft plugin that combines [b]custom event management[/b] and [b]PvP wager system[/b] into one unified solution.
+
+[b]🌍 Multilingual Support: Available in 8 Languages[/b] (English, German, French, Spanish, Russian, Polish, Japanese, Chinese)
+
+[size=5][b]What Does This Plugin Do?[/b][/size]
+
+[size=4][b]Event System[/b][/size]
+Host custom server events with:
+[list]
+[*]Multiple event types (PvP Arena, Capture the Flag, Free-for-All, etc.)
+[*]Automated event scheduling
+[*]Configurable spawn systems (single point, random, team-based)
+[*]Custom rewards for winners and participants
+[*]Statistics tracking and leaderboards
+[/list]
+
+[size=4][b]PvP Wager System[/b][/size]
+Let players bet on PvP matches:
+[list]
+[*]Challenge other players with item or money wagers
+[*]Multiple arena configurations
+[*]Pre-configured equipment sets
+[*]Spectator mode for watching matches
+[*]Match management (draw votes, surrender, timeouts)
+[/list]
+
+[size=4][b]Web Interface[/b][/size]
+Configure everything through a modern browser interface:
+[list]
+[*]Edit all YAML configurations visually
+[*]Create events and equipment sets with live preview
+[*]Token-based secure access
+[*][b]Multi-language support: 8 languages[/b] (EN, DE, FR, ES, RU, PL, JA, ZH)
+[/list]
+
+[size=5][b]Important Dependencies[/b][/size]
+
+[size=4][b]⚠️ Multiverse-Core (REQUIRED)[/b][/size]
+[b]This plugin fundamentally requires Multiverse-Core[/b] for proper operation:
+[list]
+[*][b]World Loading[/b]: Loads event/arena worlds when matches start
+[*][b]World Cloning[/b]: Creates temporary world copies from templates
+[*][b]World Regeneration[/b]: Resets worlds after events/matches
+[*][b]World Unloading[/b]: Unloads worlds to save server resources
+[/list]
+
+[b]Without Multiverse-Core[/b], the plugin will have limited functionality and may not work correctly.
+
+[size=4][b]⚠️ Multiverse-Inventories (STRONGLY RECOMMENDED)[/b][/size]
+[b]Multiverse-Inventories is essential for proper inventory restoration[/b]. Here's why:
+
+[b]The Problem:[/b]
+[list]
+[*]When players join an event or PvP match, they are teleported to a different world
+[*]Their inventory is cleared and replaced with event/match equipment
+[*]When returning to the main world, they need their original inventory back
+[/list]
+
+[b]The Solution:[/b]
+Multiverse-Inventories handles this automatically:
+[list]
+[*][b]Separate Inventories[/b]: Each world group (main, event, pvp) has its own inventory
+[*][b]Automatic Switching[/b]: When players change worlds, their inventory is automatically restored
+[*][b]No Data Loss[/b]: Player inventories are preserved by Multiverse-Inventories
+[/list]
+
+[b]Without Multiverse-Inventories:[/b]
+[list]
+[*]The plugin has a fallback inventory backup system, but it's still [b]experimental and buggy[/b]
+[*]Players may lose items or experience inventory issues
+[*]Inventory restoration is not guaranteed to work correctly
+[/list]
+
+[b]Recommended Setup:[/b]
+[list=1]
+[*]Install Multiverse-Core
+[*]Install Multiverse-Inventories
+[*]Configure world groups in Multiverse-Inventories:
+[list]
+[*][font=courier new]default[/font] group: Main/survival worlds
+[*][font=courier new]event[/font] group: Event worlds
+[*][font=courier new]pvp[/font] group: PvP arena worlds
+[/list]
+[/list]
+
+[size=4][b]Other Dependencies[/b][/size]
+[list]
+[*][b]Vault[/b] (Required): For economy integration (money wagers)
+[/list]
+
+[size=5][b]Essential Commands[/b][/size]
+
+[size=4][b]For Players[/b][/size]
+
+[b]Events:[/b]
+[code]
+/event <name> join          - Join an event
+/event <name> leave         - Leave an event
+/event list                 - Show available events
+/eventstats me              - View your event statistics
+[/code]
+
+[b]PvP Wagers:[/b]
+[code]
+/pvpask <player>                                      - Challenge a player (GUI)
+/pvpa <player> <wager> <amount> <arena> <equipment>  - Challenge with full setup
+/pvpaccept [player]                                   - Accept a challenge
+/pvpdeny [player]                                     - Deny a challenge
+/surrender                                            - Surrender current match
+/draw                                                 - Vote for a draw
+/pvp spectate <player>                                - Spectate a match
+/pvpstats me                                          - View your PvP statistics
+[/code]
+
+[b]Examples:[/b]
+[code]
+/pvpa Steve DIAMOND_SWORD 1 PvPArena diamond_pvp    - Challenge Steve with item wager
+/pvpa Alex MONEY 100 desert standard                - Challenge Alex with $100 wager
+/pvpa Mike SKIP 0 forest pvp_starter                - Challenge Mike without wager
+[/code]
+
+[size=4][b]For Admins[/b][/size]
+
+[code]
+/eventpvp reload            - Reload all configurations
+/eventpvp webtoken          - Generate web interface access token
+/event <name> start         - Start an event
+/event <name> stop          - Stop an event
+/event <name> forcestart    - Force start without minimum players
+/pvpadmin reload            - Reload PvP configuration
+/pvpadmin stopall           - Stop all active matches
+/inventoryrestore <player> <ID>  - Restore player inventory (fallback)
+[/code]
+
+[size=5][b]Quick Start[/b][/size]
+
+[list=1]
+[*][b]Install Dependencies:[/b]
+[list]
+[*]Vault
+[*]Multiverse-Core
+[*]Multiverse-Inventories
+[/list]
+
+[*][b]Configure World Groups[/b] (in Multiverse-Inventories):
+[code]
+/mvinv group default
+/mvinv group event
+/mvinv group pvp
+[/code]
+
+[*][b]Assign Worlds to Groups:[/b]
+[code]
+/mvinv world <world_name> event
+/mvinv world <arena_name> pvp
+[/code]
+
+[*][b]Configure the Plugin:[/b]
+[list]
+[*]Edit [font=courier new]config.yml[/font], [font=courier new]worlds.yml[/font], [font=courier new]equipment.yml[/font]
+[*]Or use the web interface: [font=courier new]/eventpvp webtoken[/font]
+[/list]
+
+[*][b]Reload and Test:[/b]
+[code]
+/eventpvp reload
+/event pvparena start
+[/code]
+[/list]
+
+[size=5][b]Server Requirements[/b][/size]
+
+[list]
+[*][b]Platform[/b]: Paper/Spigot 1.19+
+[*][b]RAM[/b]: 4GB+ recommended (depending on world size)
+[*][b]Multiverse-Core[/b]: Latest version
+[*][b]Multiverse-Inventories[/b]: Latest version (strongly recommended)
+[*][b]Vault[/b]: Latest version
+[/list]
+
+[size=5][b]Need Help?[/b][/size]
+
+[list]
+[*]Check the full [font=courier new]README.md[/font] for detailed documentation
+[*]Review configuration examples in [font=courier new]CONFIG_EXAMPLES.md[/font]
+[*]Test spawn configurations using [font=courier new]SpawnExamples.md[/font]
+[/list]
+
+[hr]
+
+[b]Remember[/b]: Multiverse-Core and Multiverse-Inventories are not just optional - they are [b]essential[/b] for this plugin to work properly!

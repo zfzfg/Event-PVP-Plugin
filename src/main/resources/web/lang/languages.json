@@ -1,0 +1,40 @@
+{
+  "available": [
+    {
+      "code": "en",
+      "name": "English",
+      "nativeName": "English"
+    },
+    {
+      "code": "fr",
+      "name": "French",
+      "nativeName": "Français"
+    },
+    {
+      "code": "ru",
+      "name": "Russian",
+      "nativeName": "Русский"
+    },
+    {
+      "code": "de",
+      "name": "German",
+      "nativeName": "Deutsch"
+    },
+    {
+      "code": "ja",
+      "name": "Japanese",
+      "nativeName": "日本語"
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "nativeName": "Español (España)"
+    },
+    {
+      "code": "pl",
+      "name": "Polish",
+      "nativeName": "Polski"
+    }
+  ],
+  "default": "en"
+}
