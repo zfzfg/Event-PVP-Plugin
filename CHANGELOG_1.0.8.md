@@ -10,13 +10,25 @@ Version 1.0.8 focuses on four areas: full localization of the PvP wager GUI flow
 
 You **do not need to replace your entire config.yml**! The plugin will automatically add missing settings with default values.
 
+### Important Notes
+- **Config Files**: No manual config editing required! New options are automatically added to your existing config files with default values.
+- **Web Interface**: After upgrading, all new features (including optional integrations) will appear in the web interface where you can easily enable/disable them.
+- **Language Files**: These are NOT automatically overwritten! To get the new GUI localization keys, you need to update your language files.
+
 ### Step-by-Step Upgrade:
 
 1. **Back up your existing files** (config.yml, worlds.yml, equipment.yml, messages_*.yml)
 2. **Stop your server**
 3. **Replace the plugin JAR file** with version 1.0.8
-4. **Start your server** - the plugin will handle the rest!
-5. **Optional: Enable new features** in config.yml (see details below)
+4. **Update Language Files** (IMPORTANT!):
+   - Option 1: Delete your old `messages_*.yml` files and restart the server to regenerate them with all new keys. Then manually reapply any customizations.
+   - Option 2: Manually merge the new `messages.gui.*` keys from the updated language files into your existing customized files.
+5. **Start your server** - the plugin will handle the rest!
+6. **Enable New Features** (optional):
+   - Open the web interface
+   - Navigate to the integrations section
+   - Enable/disable the new features (PvPManager, AJLeaderboards, DecentHolograms) as desired
+   - Save your changes
 
 ---
 
@@ -107,14 +119,14 @@ You **do not need to replace your entire config.yml**! The plugin will automatic
 ## How to Verify Changes In-Game
 
 ### Language Changes
-1. **Prepare language files:** Language files in the plugin data folder are **not** automatically overwritten on update. To get the new `messages.gui.*` keys, either delete old language files (after backing up) or manually merge the new sections.
-2. **Switch language** in config.yml and run `/eventpvp reload`
+1. **Prepare language files**: Language files in the plugin data folder are **not** automatically overwritten on update. To get the new `messages.gui.*` keys, either delete old language files (after backing up) or manually merge the new sections.
+2. **Switch language** in config.yml (or via web interface) and run `/eventpvp reload`
 3. **Test all GUI screens** using two test accounts (Player A challenges Player B)
 
 ### Integration Checks
-- **PlaceholderAPI:** Run `/papi list` and verify `eventpvp` expansion is present, test with `/papi parse me %eventpvp_pvp_wins%`
-- **PvPManager:** Check server logs for integration activation message, test by getting in combat during an event/match then leaving/finishing
-- **AJLeaderboards/DecentHolograms:** Create a board/hologram using the placeholders and verify stats update
+- **PlaceholderAPI**: Run `/papi list` and verify `eventpvp` expansion is present, test with `/papi parse me %eventpvp_pvp_wins%`
+- **PvPManager**: Check server logs for integration activation message, test by getting in combat during an event/match then leaving/finishing
+- **AJLeaderboards/DecentHolograms**: Enable the integrations via web interface, then create a board/hologram using the placeholders and verify stats update
 
 ---
 
