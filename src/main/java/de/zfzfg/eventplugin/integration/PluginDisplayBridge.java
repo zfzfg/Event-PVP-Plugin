@@ -37,7 +37,7 @@ public class PluginDisplayBridge implements ExternalDisplayBridge {
         }
 
         if (!this.active) {
-            plugin.getLogger().warning("Unable to initialize external display bridge for " + pluginName + ".");
+            plugin.getLogger().warning("Unable to initialize external display bridge for " + pluginName + ".");  // i18n-ignore: technical reflection integration warning
         }
     }
 
@@ -48,12 +48,12 @@ public class PluginDisplayBridge implements ExternalDisplayBridge {
 
     @Override
     public void refreshPvpBoard() {
-        invokeFirstAvailable(pvpMethodNames, "PvP board");
+        invokeFirstAvailable(pvpMethodNames, "PvP board");  // i18n-ignore: Log-Label der Reflection-Diagnose
     }
 
     @Override
     public void refreshEventBoard() {
-        invokeFirstAvailable(eventMethodNames, "Event board");
+        invokeFirstAvailable(eventMethodNames, "Event board");  // i18n-ignore: Log-Label der Reflection-Diagnose
     }
 
     @Override
@@ -100,7 +100,7 @@ public class PluginDisplayBridge implements ExternalDisplayBridge {
                     method.invoke(target);
                     return;
                 } catch (Exception e) {
-                    getLogger().warning("Error invoking method '" + methodName + "' on " + pluginName + ": " + e.getMessage());
+                    getLogger().warning("Error invoking method '" + methodName + "' on " + pluginName + ": " + e.getMessage());  // i18n-ignore: technical reflection integration warning
                     return;
                 }
             }
@@ -108,7 +108,7 @@ public class PluginDisplayBridge implements ExternalDisplayBridge {
 
         String key = pluginName + ":" + description;
         if (!loggedWarnings.contains(key)) {
-            getLogger().warning("Could not find any supported method for " + description + " on " + pluginName + " (checked: " + String.join(", ", methodNames) + ").");
+            getLogger().warning("Could not find any supported method for " + description + " on " + pluginName + " (checked: " + String.join(", ", methodNames) + ").");  // i18n-ignore: technical reflection integration warning
             loggedWarnings.add(key);
         }
     }

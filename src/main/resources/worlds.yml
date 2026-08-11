@@ -27,9 +27,9 @@ worlds:
     pvpwager-world-enable: true
     build-allowed: false
     regenerate-world: true
-    Optional: Quelle für Klon/Reset
+    # Optional: Quelle für Klon/Reset
     clone-source-world: "PvPArena_original"
-    Falls später für PvP genutzt werden soll:
+    # Falls später für PvP genutzt werden soll:
     pvpwager-spawn:
       spawn-type: FIXED_SPAWNS
       spawns:

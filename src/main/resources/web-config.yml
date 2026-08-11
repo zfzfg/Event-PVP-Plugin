@@ -8,7 +8,12 @@ web:
   
   # Port für den Web-Server
   port: 8085
-  
+
+  # Netzwerkadresse, an die der Web-Server gebunden wird.
+  # Leer = alle Interfaces. "127.0.0.1" beschränkt das Panel auf den Server selbst,
+  # was bei einem vorgeschalteten Reverse-Proxy die richtige Wahl ist.
+  bind-address: ""
+
   # Öffentliche URL für das Web-Interface
   # Diese URL wird in der /eventpvp webtoken Nachricht angezeigt
   # Beispiele:
@@ -75,36 +80,62 @@ security:
   allowed-ips: []
 
 # Item-Texturen
+#
+# Die Icons für alle rund 1650 Items liegen im Plugin selbst (64x64 PNG). Das Panel
+# braucht dafür keine Internetverbindung und zeigt auch Blöcke korrekt an.
 items:
-  # Texturen aktivieren
+  # Icons anzeigen. Auf false zeigt das Panel nur Buchstaben-Platzhalter -
+  # sinnvoll bei sehr langsamen Verbindungen.
   enable-textures: true
-  
-  # Lokale Textur-Quelle (Plugin-Ordner)
-  local-texture-path: "minecraft_textures_item/"
-  
-  # Fallback: Remote Textur-Quelle (wenn lokal nicht verfügbar)
+
+  # Nur als Ausweg für Items, zu denen das Plugin kein Icon mitbringt (etwa Items
+  # einer neueren Minecraft-Version als das Plugin). Leer lassen, wenn das Panel
+  # niemals nach außen verbinden soll.
   texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/item/"
-  
-  # Block-Texturen Fallback
-  block-texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/block/"
+
+  # Texturen aus dem Resourcepack des Servers übernehmen
+  #
+  # Ist unter resource-pack in der server.properties ein Pack hinterlegt, lädt das
+  # Plugin es beim Start einmalig herunter, entpackt die Item-Texturen und zeigt sie
+  # im Equipment-Editor statt der Vanilla-Icons. Damit sieht man beim Bauen eines Sets
+  # dieselben Schwerter und Rüstungen wie die Spieler im Spiel.
+  #
+  # Übernommen werden ausschließlich direkte Ersetzungen unter
+  # assets/minecraft/textures/item/. Texturen, die im Pack über CustomModelData an ein
+  # Modell gebunden sind, werden bewusst nicht ausgewertet - dafür wäre ein vollständiger
+  # Modell-Interpreter nötig, und der Vorteil stünde nicht im Verhältnis zum Risiko.
+  #
+  # Standardmäßig aus, weil dabei eine externe Datei heruntergeladen wird.
+  resource-pack:
+    enabled: false
+    # Obergrenze für den Download in Megabyte. Größere Packs werden abgebrochen.
+    max-size-mb: 50
 
 # Interface-Einstellungen
+#
+# @loose-end(dead-config): der gesamte interface-Block wird von keiner Zeile Java oder JavaScript gelesen
+#
+# Diese Schalter beschreiben Verhalten, das das Panel fest verdrahtet hat: es speichert nie
+# automatisch, fragt vor dem Speichern immer nach, hat keinen Auto-Refresh und eine feste
+# Anzahl Undo-Schritte. Der Block bleibt vorerst stehen, damit bestehende Konfigurationen
+# nicht mit Warnungen auffallen - entweder werden die Schalter noch angebunden oder sie
+# entfallen in einer spaeteren Version.
 interface:
   # Auto-Refresh Intervall in Sekunden (0 = deaktiviert)
   auto-refresh-interval: 0
-  
+
   # Änderungen automatisch speichern
   auto-save: false
-  
+
   # Bestätigung vor Speichern anzeigen
   confirm-save: true
-  
+
   # Anzahl der Undo-Schritte
   max-undo-steps: 20
-  
+
   # Kompakte Ansicht als Standard
   compact-view: false
-  
+
   # Syntax-Highlighting aktivieren
   syntax-highlighting: true
 

@@ -1,20 +1,48 @@
 # ============================================
-# PvPWager - Equipment Konfiguration
+# Equipment-Konfiguration (Events & PvPWager)
 # ============================================
+#
+# Alle Sets stehen unter 'equipment:'. Frueher gab es dafuer drei Sektionen
+# ('equipment', 'equipment-sets', 'equipment-groups'), die von PvP und Events in
+# entgegengesetzter Reihenfolge gelesen wurden - waren zwei belegt, sahen die beiden
+# Systeme verschiedene Sets unter derselben ID. Bestehende Dateien werden beim Start
+# automatisch zusammengefuehrt; eine Sicherungskopie liegt dann als
+# equipment.yml.bak-<zeitstempel> daneben.
+#
+# Der fruehere Block 'gui-item' fuehrte Titel und Lore ein zweites Mal, neben
+# 'display-name' und 'description'. Uebrig geblieben sind daraus 'icon' und 'order';
+# alte Dateien werden weiter gelesen ('gui-item.material' -> icon, 'gui-item.slot' ->
+# order), 'gui-item.name' und 'gui-item.lore' gelten nicht mehr.
+#
+# Je Set:
+#   pvpwager-equip-enable / event-equip-enable  Aktiv-Schalter, getrennt je System
+#   allowed-pvpwager-worlds                     'all', 'none' oder eine Weltenliste
+#   display-name                                Titel im Auswahlmenue und im Web-Panel
+#   description                                 Lore im Auswahlmenue; mehrere Zeilen mit '|-'
+#                                               (leer = automatische Ruestungsuebersicht)
+#   icon                                        Material im Auswahlmenue
+#                                               (weglassen = aus dem Brustpanzer abgeleitet)
+#   order                                       Position im Auswahlmenue, kleinere Werte zuerst
+#                                               (im Web-Panel per Hoch/Runter in der Uebersicht)
+#   armor.<slot> + <slot>-enchantments/-name/-lore/-unbreakable
+#   offhand + offhand-enchantments/-name/-lore/-unbreakable
+#   inventory[]                                 slot, item, amount und die Item-Felder
+#                                               (lore, unbreakable, custom-model-data,
+#                                                item-flags, potion, damage)
 
-equipment-sets:
+equipment:
   # Minimal Starter-Set für Events/PvP – Aktiv
   pvp_starter:
-    enabled: true
+    # Getrennte Schalter je System - ein Set kann nur im PvP oder nur in Events aktiv sein.
+    pvpwager-equip-enable: true
+    event-equip-enable: true
     allowed-pvpwager-worlds: all
     display-name: "&aStarter PvP"
-    description: "&7Einfaches Start-Equipment"
-    gui-item:
-      material: STONE_SWORD
-      slot: 10
-      name: "&a&lSTARTER"
-      lore:
-        - "&7Basic-Equipment für schnelle Matches"
+    description: |-
+      &7Einfaches Start-Equipment
+      &7für schnelle Matches
+    icon: STONE_SWORD
+    order: 0
     armor:
       helmet: LEATHER_HELMET
       chestplate: LEATHER_CHESTPLATE
@@ -42,23 +70,22 @@ equipment-sets:
 
   # Krasses Diamond PvP Set mit starken Enchants
   diamond_pvp:
-    enabled: true
+    # Getrennte Schalter je System - ein Set kann nur im PvP oder nur in Events aktiv sein.
+    pvpwager-equip-enable: true
+    event-equip-enable: true
     allowed-pvpwager-worlds: all
     display-name: "&b&lDiamond PvP Set"
-    description: "&7Vollst�ndiges Diamond-Equipment mit Power-Enchants"
-    gui-item:
-      material: DIAMOND_SWORD
-      slot: 11
-      name: "&b&l? DIAMOND WARRIOR"
-      lore:
-        - "&7M�chtiges Diamond-Equipment"
-        - "&7mit starken Verzauberungen"
-        - ""
-        - "&b? &fDiamond Armor (Protection IV)"
-        - "&b? &fSharp V Sword"
-        - "&b? &fPower V Bow"
-        - "&b? &fGolden Apples & Steak"
-    
+    description: |-
+      &7Mächtiges Diamond-Equipment
+      &7mit starken Verzauberungen
+      &r
+      &b• &fDiamond Armor (Protection IV)
+      &b• &fSharp V Sword
+      &b• &fPower V Bow
+      &b• &fGolden Apples & Steak
+    icon: DIAMOND_SWORD
+    order: 1
+
     armor:
       helmet: DIAMOND_HELMET
       helmet-enchantments:
@@ -150,23 +177,20 @@ equipment-sets:
 
   # Standard PvP Equipment
   standard:
-    enabled: true
+    # Getrennte Schalter je System - ein Set kann nur im PvP oder nur in Events aktiv sein.
+    pvpwager-equip-enable: true
+    event-equip-enable: true
     allowed-pvpwager-worlds: all
     display-name: "&eStandard PvP"
-    description: "&7Klassisches PvP-Equipment"
-    
-    # GUI Item
-    gui-item:
-      material: IRON_CHESTPLATE
-      slot: 11
-      name: "&e&lSTANDARD PVP"
-      lore:
-        - "&7Eisenrüstung"
-        - "&7Eisenschwert & Bogen"
-        - ""
-        - "&aSchwierigkeit: &7Anfänger"
-        - "&aBalance: &7Ausgeglichen"
-    
+    description: |-
+      &7Eisenrüstung
+      &7Eisenschwert & Bogen
+      &r
+      &aSchwierigkeit: &7Anfänger
+      &aBalance: &7Ausgeglichen
+    icon: IRON_CHESTPLATE
+    order: 2
+
     # Rüstung
     armor:
       helmet: IRON_HELMET
@@ -207,22 +231,20 @@ equipment-sets:
   
   # OP Diamond Equipment
   diamond:
-    enabled: true
+    # Getrennte Schalter je System - ein Set kann nur im PvP oder nur in Events aktiv sein.
+    pvpwager-equip-enable: true
+    event-equip-enable: true
     allowed-pvpwager-worlds: all
     display-name: "&bDiamond PvP"
-    description: "&7Diamant-Ausrüstung"
-    
-    gui-item:
-      material: DIAMOND_CHESTPLATE
-      slot: 13
-      name: "&b&lDIAMOND PVP"
-      lore:
-        - "&7Diamantrüstung"
-        - "&7Diamantschwert & Bogen"
-        - ""
-        - "&aSchwierigkeit: &7Mittel"
-        - "&aBalance: &7Offensiv"
-    
+    description: |-
+      &7Diamantrüstung
+      &7Diamantschwert & Bogen
+      &r
+      &aSchwierigkeit: &7Mittel
+      &aBalance: &7Offensiv
+    icon: DIAMOND_CHESTPLATE
+    order: 4
+
     armor:
       helmet: DIAMOND_HELMET
       chestplate: DIAMOND_CHESTPLATE
@@ -273,23 +295,21 @@ equipment-sets:
   
   # Netherite Equipment (OP)
   netherite:
-    enabled: true
+    # Getrennte Schalter je System - ein Set kann nur im PvP oder nur in Events aktiv sein.
+    pvpwager-equip-enable: true
+    event-equip-enable: true
     allowed-pvpwager-worlds: all
     display-name: "&4Netherite PvP"
-    description: "&7Die beste Ausrüstung"
-    
-    gui-item:
-      material: NETHERITE_CHESTPLATE
-      slot: 15
-      name: "&4&lNETHERITE PVP"
-      lore:
-        - "&7Netherit-Rüstung"
-        - "&7Netherit-Schwert & Bogen"
-        - ""
-        - "&aSchwierigkeit: &7Profi"
-        - "&aBalance: &7Sehr Stark"
-        - "&cNur für Experten!"
-    
+    description: |-
+      &7Netherit-Rüstung
+      &7Netherit-Schwert & Bogen
+      &r
+      &aSchwierigkeit: &7Profi
+      &aBalance: &7Sehr Stark
+      &cNur für Experten!
+    icon: NETHERITE_CHESTPLATE
+    order: 6
+
     armor:
       helmet: NETHERITE_HELMET
       chestplate: NETHERITE_CHESTPLATE
@@ -354,23 +374,21 @@ equipment-sets:
   
   # UHC Equipment
   uhc:
-    enabled: true
+    # Getrennte Schalter je System - ein Set kann nur im PvP oder nur in Events aktiv sein.
+    pvpwager-equip-enable: true
+    event-equip-enable: true
     allowed-pvpwager-worlds: all
     display-name: "&6UHC PvP"
-    description: "&7Ultra Hardcore Modus"
-    
-    gui-item:
-      material: GOLDEN_APPLE
-      slot: 12
-      name: "&6&lUHC PVP"
-      lore:
-        - "&7Diamantrüstung"
-        - "&7UHC-Style Equipment"
-        - ""
-        - "&aSchwierigkeit: &7Schwer"
-        - "&aBalance: &7Skillbasiert"
-        - "&7Keine Regeneration!"
-    
+    description: |-
+      &7Diamantrüstung
+      &7UHC-Style Equipment
+      &r
+      &aSchwierigkeit: &7Schwer
+      &aBalance: &7Skillbasiert
+      &7Keine Regeneration!
+    icon: GOLDEN_APPLE
+    order: 3
+
     armor:
       helmet: DIAMOND_HELMET
       chestplate: DIAMOND_CHESTPLATE
@@ -426,23 +444,21 @@ equipment-sets:
   
   # Crystal PvP (1.9+ Combat)
   crystal:
-    enabled: true
+    # Getrennte Schalter je System - ein Set kann nur im PvP oder nur in Events aktiv sein.
+    pvpwager-equip-enable: true
+    event-equip-enable: true
     allowed-pvpwager-worlds: PvPArena
     display-name: "&dCrystal PvP"
-    description: "&7End Crystal Combat"
-    
-    gui-item:
-      material: END_CRYSTAL
-      slot: 14
-      name: "&d&lCRYSTAL PVP"
-      lore:
-        - "&7Netherit-Rüstung"
-        - "&7End Crystal Combat"
-        - ""
-        - "&aSchwierigkeit: &7Extrem"
-        - "&aBalance: &7Explosiv"
-        - "&c&lNur für Profis!"
-    
+    description: |-
+      &7Netherit-Rüstung
+      &7End Crystal Combat
+      &r
+      &aSchwierigkeit: &7Extrem
+      &aBalance: &7Explosiv
+      &c&lNur für Profis!
+    icon: END_CRYSTAL
+    order: 5
+
     armor:
       helmet: NETHERITE_HELMET
       chestplate: NETHERITE_CHESTPLATE

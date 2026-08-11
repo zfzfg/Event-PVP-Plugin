@@ -15,12 +15,15 @@ import org.bukkit.entity.Player;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * SubCommand: /eventpvp webtoken
  * Generiert einen Token für den Web-Interface Login
  */
 public class WebTokenSubCommand extends SubCommand {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     public WebTokenSubCommand(EventPlugin plugin) {
         super(plugin);
@@ -45,18 +48,32 @@ public class WebTokenSubCommand extends SubCommand {
     public List<String> getAliases() {
         return Collections.singletonList("wt");
     }
+
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");  // i18n-ignore: i18n system warning
+        }
+    }
     
     private String msg(String key) {
         FileConfiguration messages = plugin.getCoreConfigManager().getMessages();
-        return ChatColor.translateAlternateColorCodes('&', 
-            messages.getString("messages.webtoken." + key, key));
+        String val = messages.getString("messages.webtoken." + key, null);
+        if (val != null) {
+            return ChatColor.translateAlternateColorCodes('&', val);
+        }
+        warnMissingKey("messages.webtoken." + key);
+        return "&c[missing: " + key + "]";
     }
     
     private String msg(String key, String placeholder, String value) {
-        FileConfiguration messages = plugin.getCoreConfigManager().getMessages();
-        String message = messages.getString("messages.webtoken." + key, key);
-        return ChatColor.translateAlternateColorCodes('&', 
-            message.replace("{" + placeholder + "}", value));
+        String msg = msg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
     }
     
     @Override
@@ -92,7 +109,7 @@ public class WebTokenSubCommand extends SubCommand {
         player.sendMessage(msg("your-token"));
         
         // Klickbarer Token
-        TextComponent tokenComponent = new TextComponent("  §a§l➤ " + token + " " + msg("click-to-copy"));
+        TextComponent tokenComponent = new TextComponent("  §a§l➤ " + token + " " + msg("click-to-copy")); // i18n-ignore
         tokenComponent.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, token));
         tokenComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
             new Text(msg("hover-copy"))));
@@ -107,9 +124,9 @@ public class WebTokenSubCommand extends SubCommand {
         String url = plugin.getWebPublicUrl();
         
         // Debug-Log
-        plugin.getLogger().info("WebToken Command - URL from config: " + url);
+        plugin.getDebugManager().log("WebToken Command - URL from config: " + url);  // i18n-ignore: technical debug trace
         
-        TextComponent urlComponent = new TextComponent("  §b§l➤ " + url + " " + msg("click-to-open"));
+        TextComponent urlComponent = new TextComponent("  §b§l➤ " + url + " " + msg("click-to-open")); // i18n-ignore
         urlComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         urlComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
             new Text(msg("hover-open"))));

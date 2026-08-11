@@ -252,7 +252,12 @@ public class Arena {
                     String key = entry.getKey();
                     String value = entry.getValue();
                     if (key != null && value != null) {
-                        formatted = formatted.replace("{" + key + "}", value);
+                        String raw = key.replaceAll("^[{%]+|[%}]+$", "");
+                        if (!raw.isEmpty()) {
+                            formatted = formatted.replace("{" + raw + "}", value)
+                                                 .replace("%" + raw + "%", value);
+                        }
+                        formatted = formatted.replace(key, value);
                     }
                 }
             }

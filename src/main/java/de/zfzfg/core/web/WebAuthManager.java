@@ -58,7 +58,7 @@ public class WebAuthManager {
         
         activeTokens.put(token, authToken);
         
-        plugin.getLogger().log(Level.INFO, "Web-Token generiert für " + player.getName());
+        plugin.getLogger().log(Level.INFO, "Web token generated for " + player.getName());  // i18n-ignore: technical auth log
         return token;
     }
     
@@ -72,13 +72,13 @@ public class WebAuthManager {
         AuthToken authToken = activeTokens.get(token);
         
         if (authToken == null) {
-            plugin.getLogger().log(Level.WARNING, "Ungültiger Web-Token Versuch von " + clientIp);
+            plugin.getLogger().log(Level.WARNING, "Invalid web token attempt from " + clientIp);  // i18n-ignore: technical auth log
             return null;
         }
         
         if (System.currentTimeMillis() > authToken.expiresAt) {
             activeTokens.remove(token);
-            plugin.getLogger().log(Level.WARNING, "Abgelaufener Web-Token Versuch von " + clientIp);
+            plugin.getLogger().log(Level.WARNING, "Expired web token attempt from " + clientIp);  // i18n-ignore: technical auth log
             return null;
         }
         
@@ -95,7 +95,7 @@ public class WebAuthManager {
         
         activeSessions.put(sessionId, session);
         
-        plugin.getLogger().log(Level.INFO, "Web-Session erstellt für " + authToken.playerName + " von " + clientIp);
+        plugin.getLogger().log(Level.INFO, "Web session created for " + authToken.playerName + " from " + clientIp);  // i18n-ignore: technical auth log
         return sessionId;
     }
     
@@ -138,7 +138,7 @@ public class WebAuthManager {
     public void invalidateSession(String sessionId) {
         AuthSession removed = activeSessions.remove(sessionId);
         if (removed != null) {
-            plugin.getLogger().log(Level.INFO, "Web-Session beendet für " + removed.playerName);
+            plugin.getLogger().log(Level.INFO, "Web session ended for " + removed.playerName);  // i18n-ignore: technical auth log
         }
     }
     
@@ -176,7 +176,7 @@ public class WebAuthManager {
         }
         
         if (tokensRemoved > 0 || sessionsRemoved > 0) {
-            plugin.getLogger().log(Level.FINE, "Cleanup: " + tokensRemoved + " Tokens, " + sessionsRemoved + " Sessions entfernt");
+            plugin.getLogger().log(Level.FINE, "Cleanup: " + tokensRemoved + " tokens, " + sessionsRemoved + " sessions removed");  // i18n-ignore: technical auth cleanup log
         }
     }
     

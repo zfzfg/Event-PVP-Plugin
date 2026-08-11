@@ -128,7 +128,7 @@ public class LiveTradeManager {
         cleanupTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             for (LiveTradeSession session : sessions.values()) {
                 if (session.isExpired() && !session.isEnded()) {
-                    plugin.getLogger().info("PVP Wager Session expired: " + session.getSessionId());
+                    plugin.getLogger().info(plugin.getConsoleMsg("livetrade-session-expired", "session", String.valueOf(session.getSessionId())));
                     session.abort();
                     removeSession(session);
                 }

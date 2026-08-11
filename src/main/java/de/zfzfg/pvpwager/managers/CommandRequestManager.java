@@ -4,6 +4,7 @@ import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.core.util.Time;
 import de.zfzfg.pvpwager.models.CommandRequest;
 import de.zfzfg.pvpwager.utils.MessageUtil;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -25,11 +26,46 @@ public class CommandRequestManager {
     }
     
     private String getMsg(String key) {
-        return plugin.getPvpConfigManager().getMessage(key);
+        if (key == null || key.isEmpty()) return "";
+        String msg = null;
+        if (key.startsWith("messages.")) {
+            msg = plugin.getCoreConfigManager().getMessages().getString(key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.command-request." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.request." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString(key, null);
+        }
+        if (msg == null) {
+            return "&c[missing: " + key + "]";
+        }
+        return ChatColor.translateAlternateColorCodes('&', msg);
     }
     
     private String getMsg(String key, String placeholder, String value) {
-        return getMsg(key).replace(placeholder, value);
+        return getMsg(key, new String[]{placeholder, value});
+    }
+
+    private String getMsg(String key, String... replacements) {
+        String msg = getMsg(key);
+        if (replacements != null && replacements.length > 0) {
+            for (int i = 0; i < replacements.length - 1; i += 2) {
+                String raw = replacements[i] != null ? replacements[i].replaceAll("^[{%]+|[%}]+$", "") : "";
+                String val = replacements[i + 1] != null ? replacements[i + 1] : "";
+                if (!raw.isEmpty()) {
+                    msg = msg.replace("{" + raw + "}", val)
+                             .replace("%" + raw + "%", val);
+                }
+            }
+        }
+        return msg;
     }
     
     public void addRequest(CommandRequest request) {
@@ -93,9 +129,9 @@ public class CommandRequestManager {
         MessageUtil.sendMessage(target, getMsg("equipment-display", "{equipment}", request.getEquipmentId()));
         
         if (request.getMoney() > 0) {
-            MessageUtil.sendMessage(target, getMsg("messages.command-request.their-wager-money", "{amount}", String.format("%.2f", request.getMoney())));
+            MessageUtil.sendMessage(target, getMsg("their-wager-money", "amount", String.format("%.2f", request.getMoney())));
         } else {
-            MessageUtil.sendMessage(target, getMsg("messages.command-request.their-wager-items", "{items}", MessageUtil.formatItemList(request.getWagerItems())));
+            MessageUtil.sendMessage(target, getMsg("their-wager-items", "items", MessageUtil.formatItemList(request.getWagerItems())));
         }
         
         MessageUtil.sendMessage(target, "");
@@ -103,59 +139,59 @@ public class CommandRequestManager {
         if (isSkip) {
             // Show clickable accept/deny buttons for SKIP
             try {
-                net.md_5.bungee.api.chat.TextComponent accept = new net.md_5.bungee.api.chat.TextComponent(de.zfzfg.pvpwager.utils.MessageUtil.color("§a§l[► ANNEHMEN ◄]"));
+                net.md_5.bungee.api.chat.TextComponent accept = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-accept")));
                 accept.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
                     net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
                     "/pvp accept " + request.getSender().getName()
                 ));
                 accept.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
                     net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(de.zfzfg.pvpwager.utils.MessageUtil.color("§aKlicke um die Anfrage (SKIP) anzunehmen! ")).create()
+                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-accept-hover"))).create()
                 ));
 
-                net.md_5.bungee.api.chat.TextComponent deny = new net.md_5.bungee.api.chat.TextComponent(de.zfzfg.pvpwager.utils.MessageUtil.color(" §c§l[✖ ABLEHNEN]"));
+                net.md_5.bungee.api.chat.TextComponent deny = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-deny")));
                 deny.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
                     net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
                     "/pvp deny " + request.getSender().getName()
                 ));
                 deny.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
                     net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(de.zfzfg.pvpwager.utils.MessageUtil.color("§cKlicke um abzulehnen")).create()
+                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-deny-hover"))).create()
                 ));
 
                 target.spigot().sendMessage(accept, deny);
             } catch (Exception ignored) {
                 // Fallback to plain text
-                MessageUtil.sendMessage(target, "&a/pvp accept " + request.getSender().getName() + " &7- " + getMsg("messages.command-request.accept-command"));
-                MessageUtil.sendMessage(target, "&c/pvp deny " + request.getSender().getName() + " &7- " + getMsg("messages.command-request.deny-command"));
+                MessageUtil.sendMessage(target, "&a/pvp accept " + request.getSender().getName() + " &7- " + getMsg("accept-command")); // i18n-ignore
+                MessageUtil.sendMessage(target, "&c/pvp deny " + request.getSender().getName() + " &7- " + getMsg("deny-command")); // i18n-ignore
             }
             MessageUtil.sendMessage(target, "");
-            MessageUtil.sendMessage(target, getMsg("messages.command-request.expires-in"));
+            MessageUtil.sendMessage(target, getMsg("expires-in"));
             MessageUtil.sendMessage(target, "");
         } else {
             // Show clickable buttons for responding with GUI or command
             try {
                 // GUI Button
-                net.md_5.bungee.api.chat.TextComponent guiBtn = new net.md_5.bungee.api.chat.TextComponent(de.zfzfg.pvpwager.utils.MessageUtil.color("§b§l[📋 GUI ÖFFNEN]"));
+                net.md_5.bungee.api.chat.TextComponent guiBtn = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-open-gui")));
                 guiBtn.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
                     net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
                     "/pvprespond gui"
                 ));
                 guiBtn.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
                     net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(de.zfzfg.pvpwager.utils.MessageUtil.color("§aKlicke um das Antwort-GUI zu öffnen")).create()
+                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-open-gui-hover"))).create()
                 ));
                 
                 net.md_5.bungee.api.chat.TextComponent space = new net.md_5.bungee.api.chat.TextComponent(" ");
                 
-                net.md_5.bungee.api.chat.TextComponent denyBtn = new net.md_5.bungee.api.chat.TextComponent(de.zfzfg.pvpwager.utils.MessageUtil.color("§c§l[✖ ABLEHNEN]"));
+                net.md_5.bungee.api.chat.TextComponent denyBtn = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-deny")));
                 denyBtn.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
                     net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
                     "/pvp deny " + request.getSender().getName()
                 ));
                 denyBtn.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
                     net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(de.zfzfg.pvpwager.utils.MessageUtil.color("§cKlicke um abzulehnen")).create()
+                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-deny-hover"))).create()
                 ));
                 
                 target.spigot().sendMessage(guiBtn, space, denyBtn);
@@ -163,9 +199,9 @@ public class CommandRequestManager {
                 // Fallback
             }
             MessageUtil.sendMessage(target, "");
-            MessageUtil.sendMessage(target, getMsg("messages.command-request.alternative-response"));
-            MessageUtil.sendMessage(target, getMsg("messages.command-request.alternative-command"));
-            MessageUtil.sendMessage(target, getMsg("messages.command-request.expires-in"));
+            MessageUtil.sendMessage(target, getMsg("alternative-response"));
+            MessageUtil.sendMessage(target, getMsg("alternative-command"));
+            MessageUtil.sendMessage(target, getMsg("expires-in"));
             MessageUtil.sendMessage(target, "");
         }
     }
@@ -193,7 +229,7 @@ public class CommandRequestManager {
     public void cleanup() {
         for (BukkitTask t : expirationTasks.values()) {
             try { t.cancel(); } catch (Exception e) {
-                plugin.getLogger().warning("Failed to cancel expiration task during cleanup: " + e.getMessage());
+                plugin.getLogger().warning("Failed to cancel expiration task during cleanup: " + e.getMessage());  // i18n-ignore: technical task exception log
             }
         }
         expirationTasks.clear();
@@ -215,7 +251,7 @@ public class CommandRequestManager {
         }
         BukkitTask task = expirationTasks.remove(playerId);
         if (task != null) { try { task.cancel(); } catch (Exception e) {
-            plugin.getLogger().warning("Failed to cancel expiration task: " + e.getMessage());
+            plugin.getLogger().warning("Failed to cancel expiration task: " + e.getMessage());  // i18n-ignore: technical task exception log
         } }
 
         // Remove any request where player is target
@@ -230,7 +266,7 @@ public class CommandRequestManager {
                 }
                 BukkitTask t = expirationTasks.remove(e.getKey());
                 if (t != null) { try { t.cancel(); } catch (Exception ex) {
-                    plugin.getLogger().warning("Failed to cancel expiration task: " + ex.getMessage());
+                    plugin.getLogger().warning("Failed to cancel expiration task: " + ex.getMessage());  // i18n-ignore: technical task exception log
                 } }
             }
         }

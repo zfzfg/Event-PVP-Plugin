@@ -110,9 +110,9 @@ public class RequestManager {
             MessageUtil.sendMessage(target, 
                 plugin.getPvpConfigManager().getMessage("request.received", "player", sender.getName()));
             MessageUtil.sendMessage(target, 
-                "&a/pvp accept " + sender.getName() + " &7- " + getMsg("request.accept-command"));
+                "&a/pvp accept " + sender.getName() + " &7- " + getMsg("accept-command")); // i18n-ignore
             MessageUtil.sendMessage(target, 
-                "&c/pvp deny " + sender.getName() + " &7- " + getMsg("request.deny-command"));
+                "&c/pvp deny " + sender.getName() + " &7- " + getMsg("deny-command")); // i18n-ignore
         }
     }
     
@@ -182,7 +182,7 @@ public class RequestManager {
         if (senderReq != null) {
             BukkitTask task = expirationTasks.remove(playerId);
             if (task != null) { try { task.cancel(); } catch (Exception e) {
-                plugin.getLogger().warning("Failed to cancel expiration task: " + e.getMessage());
+                plugin.getLogger().warning("Failed to cancel expiration task: " + e.getMessage());  // i18n-ignore: technical task exception log
             } }
         }
         // Remove any requests where player is target
@@ -192,7 +192,7 @@ public class RequestManager {
                 requests.remove(e.getKey());
                 BukkitTask task = expirationTasks.remove(e.getKey());
                 if (task != null) { try { task.cancel(); } catch (Exception ex) {
-                    plugin.getLogger().warning("Failed to cancel expiration task: " + ex.getMessage());
+                    plugin.getLogger().warning("Failed to cancel expiration task: " + ex.getMessage());  // i18n-ignore: technical task exception log
                 } }
             }
         }

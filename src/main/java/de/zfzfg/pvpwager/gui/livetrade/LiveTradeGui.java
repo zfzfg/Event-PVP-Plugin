@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Live Trade GUI - Wird von beiden Spielern gleichzeitig gesehen.
@@ -37,6 +38,7 @@ import java.util.*;
  * Items können per Shift-Klick ODER Drag & Drop hinzugefügt werden
  */
 public class LiveTradeGui {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     private final LiveTradeSession session;
     private final LiveTradePlayer tradePlayer;
@@ -45,16 +47,30 @@ public class LiveTradeGui {
     private Inventory inventory;
     private boolean opened = false;
     
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");  // i18n-ignore: i18n system warning
+        }
+    }
+
     // Hilfsmethode für LiveTrade-Nachrichten
     private String getMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.livetrade." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.livetrade." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.livetrade." + key);
+        return "&c[missing: " + key + "]";
     }
     
     private String getMsg(String key, String placeholder, String value) {
-        String message = plugin.getCoreConfigManager().getMessages()
-            .getString("messages.livetrade." + key, key);
-        return message.replace("{" + placeholder + "}", value);
+        String msg = getMsg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
     }
     
     // === Slot-Definitionen ===

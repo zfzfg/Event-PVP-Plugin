@@ -111,7 +111,7 @@ public class ResponseGui extends AbstractWagerGui {
         }
         
         inventory.setItem(SENDER_WAGER_SLOT, createButton(Material.CHEST,
-            "&6&lGegner Items", lore));
+            t("response.opponent-items-title"), lore));
     }
     
     private void createSenderMoneyDisplay() {
@@ -128,14 +128,14 @@ public class ResponseGui extends AbstractWagerGui {
         
         Material material = money > 0 ? Material.GOLD_BLOCK : Material.COAL_BLOCK;
         inventory.setItem(SENDER_MONEY_SLOT, createButton(material,
-            "&6&lGegner Geld", lore));
+            t("response.opponent-money-title"), lore));
     }
     
     private void createArenaDisplay() {
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.add(MessageUtil.color("&7Arena: &f" + incomingRequest.getArenaId()));
-        lore.add(MessageUtil.color("&7Ausrüstung: &f" + incomingRequest.getEquipmentId()));
+        lore.add(t("response.arena-label", "arena", incomingRequest.getArenaId()));
+        lore.add(t("response.equipment-label", "equipment", incomingRequest.getEquipmentId()));
         
         inventory.setItem(ARENA_SLOT, createButton(Material.GRASS_BLOCK,
             t("response.match-details"), lore));

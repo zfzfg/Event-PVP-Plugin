@@ -1,0 +1,21 @@
+# Build output
+target/
+*.jar
+
+# IDE & Editor files
+.vscode/
+.idea/
+*.iml
+
+# Test / Python cache
+.pytest_cache/
+**/__pycache__/
+*.pyc
+
+# Local backup reports & debug dumps
+reports/backup_*/
+all_logger_calls.txt
+
+# Local automation scripts (do not push to github)
+Push-To-GitHub.ps1
+Push-To-GitHub.bat

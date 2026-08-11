@@ -6,7 +6,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -14,6 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Verwaltet Items, Geld und Bestätigungsstatus.
  */
 public class LiveTradePlayer {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     private final LiveTradeSession session;
     private final Player player;
@@ -43,18 +46,34 @@ public class LiveTradePlayer {
         this.otherPlayer = otherPlayer;
     }
     
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            session.getPlugin().getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");  // i18n-ignore: i18n system warning
+        }
+    }
+
     /**
      * Holt eine Nachricht aus der Config.
      */
     private String getMsg(String key) {
-        return session.getPlugin().getCoreConfigManager().getMessages().getString("messages.livetrade." + key, key);
+        String val = session.getPlugin().getCoreConfigManager().getMessages().getString("messages.livetrade." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.livetrade." + key);
+        return "&c[missing: " + key + "]";
     }
     
     /**
      * Holt eine Nachricht aus der Config mit Platzhalter-Ersetzung.
      */
     private String getMsg(String key, String placeholder, String value) {
-        return getMsg(key).replace(placeholder, value);
+        String msg = getMsg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
     }
     
     /**

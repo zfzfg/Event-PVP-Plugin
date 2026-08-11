@@ -22,6 +22,11 @@ public class WorldChangeListener implements Listener {
         this.plugin = plugin;
     }
     
+    private String getMsg(String key) {
+        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, "");
+        return de.zfzfg.pvpwager.utils.MessageUtil.color(msg);
+    }
+    
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
@@ -95,7 +100,7 @@ public class WorldChangeListener implements Listener {
                     !command.startsWith("/events leave")) {
                     
                     event.setCancelled(true);
-                    player.sendMessage(org.bukkit.ChatColor.RED + "Commands sind während des Events gesperrt! Nutze /event leave um das Event zu verlassen.");
+                    player.sendMessage(getMsg("commands-disabled-event"));
                 }
             }
         }
@@ -153,7 +158,7 @@ public class WorldChangeListener implements Listener {
                 org.bukkit.World mainWorld = org.bukkit.Bukkit.getWorld(plugin.getConfigManager().getMainWorld());
                 org.bukkit.Location target = (mainWorld != null) ? mainWorld.getSpawnLocation() : org.bukkit.Bukkit.getWorlds().get(0).getSpawnLocation();
                 event.setTo(target);
-                player.sendMessage(org.bukkit.ChatColor.RED + "Du darfst diese Welt derzeit nicht betreten. Du wurdest zum Spawn teleportiert.");
+                player.sendMessage(getMsg("world-access-denied"));
             }
             return;
         }
@@ -199,7 +204,7 @@ public class WorldChangeListener implements Listener {
                 org.bukkit.World mainWorld = org.bukkit.Bukkit.getWorld(plugin.getConfigManager().getMainWorld());
                 org.bukkit.Location target = (mainWorld != null) ? mainWorld.getSpawnLocation() : org.bukkit.Bukkit.getWorlds().get(0).getSpawnLocation();
                 player.teleport(target);
-                player.sendMessage(org.bukkit.ChatColor.RED + "Du darfst diese Welt derzeit nicht betreten. Du wurdest zum Spawn teleportiert.");
+                player.sendMessage(getMsg("world-access-denied"));
             }
             return;
         }

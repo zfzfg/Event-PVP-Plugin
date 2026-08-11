@@ -15,7 +15,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import de.zfzfg.core.world.MultiverseHelper;
-import de.zfzfg.eventplugin.storage.InventorySnapshotStorage;
 
 import java.util.*;
 
@@ -38,7 +37,16 @@ public class EventSession {
     private final Set<UUID> eliminatedPlayers;
     private final Set<UUID> spectators;
     private final Set<UUID> leftSpectators;
-    
+
+    /**
+     * Zugesagte, aber noch nicht uebergebene Belohnungen.
+     *
+     * <p>Sie warten, bis das Survival-Inventar wieder da ist - andernfalls landeten sie im
+     * Kit-Inventar und wuerden von der Wiederherstellung geloescht.</p>
+     */
+    private final Map<UUID, EventConfig.RewardConfig> pendingRewards = new java.util.concurrent.ConcurrentHashMap<>();
+
+
     private TeamManager teamManager;
     // 5-stellige Kurz-ID zur Verknüpfung von Vor/Nach-Inventarsnapshots des Events
     private final String eventSessionIdShort;
@@ -69,7 +77,7 @@ public class EventSession {
             try {
                 if (task != null && !task.isCancelled()) { task.cancel(); }
             } catch (Exception e) {
-                plugin.getLogger().warning("Failed to cancel task during cleanup: " + e.getMessage());
+                plugin.getLogger().warning("Failed to cancel task during cleanup: " + e.getMessage()); // i18n-ignore: technical session task log
             }
         }
         activeTasks.clear();
@@ -122,18 +130,22 @@ public class EventSession {
             plugin.getEventManager().savePlayerLocation(player.getUniqueId(), player.getLocation());
         }
         
-        String joinMsg = config.getMessage("join");
+        String joinMsg = config.getMessage("join"); // i18n-ignore per-event custom message override from events.yml
         if (joinMsg.isEmpty()) {
             joinMsg = plugin.getConfigManager().getMessage("join.success");
         }
         broadcast(joinMsg.replace("{player}", player.getName()));
         
         if (state == EventState.JOIN_PHASE) {
-            teleportToLobby(player);
-            player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("start.auto-teleport")));
-            // Give lobby equipment immediately on join if configured
-            if (config.shouldGiveEquipmentInLobby()) {
-                giveLobbyEquipmentToPlayer(player);
+            if (config.isUseLobby() && config.getLobbyWorld() != null && !config.getLobbyWorld().trim().isEmpty()) {
+                teleportToLobby(player);
+                player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("start.auto-teleport")));
+                // Give lobby equipment immediately on join if configured
+                if (config.shouldGiveEquipmentInLobby()) {
+                    giveLobbyEquipmentToPlayer(player);
+                }
+            } else {
+                player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("join.success")));
             }
         }
         
@@ -164,7 +176,7 @@ public class EventSession {
         
         teleportBack(player);
         
-        String leaveMsg = config.getMessage("leave");
+        String leaveMsg = config.getMessage("leave"); // i18n-ignore per-event custom message override from events.yml
         if (leaveMsg.isEmpty()) {
             leaveMsg = plugin.getConfigManager().getMessage("leave.success");
         }
@@ -215,9 +227,6 @@ public class EventSession {
     private void sendJoinPhaseAnnouncement() {
         String message = plugin.getConfigManager().getMessage("start.join-phase-started")
             .replace("{event}", config.getDisplayName())
-            .replace("{description}", config.getDescription())
-            .replace("{min}", String.valueOf(config.getMinPlayers()))
-            .replace("{max}", String.valueOf(config.getMaxPlayers()))
             .replace("{time}", String.valueOf(plugin.getConfigManager().getJoinPhaseDuration()));
         
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -225,7 +234,7 @@ public class EventSession {
             onlinePlayer.sendMessage(ColorUtil.color(message));
             
             net.md_5.bungee.api.chat.TextComponent component = new net.md_5.bungee.api.chat.TextComponent(
-                ColorUtil.color(plugin.getConfigManager().getMessage("event.join-button"))
+                ColorUtil.color(plugin.getConfigManager().getMessage("start.join-button"))
             );
             component.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
                 net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
@@ -233,7 +242,7 @@ public class EventSession {
             ));
             component.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
                 net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                new net.md_5.bungee.api.chat.ComponentBuilder(plugin.getConfigManager().getMessage("event.join-hover")).create()
+                new net.md_5.bungee.api.chat.ComponentBuilder(plugin.getConfigManager().getMessage("start.join-hover")).create()
             ));
             
             onlinePlayer.spigot().sendMessage(component);
@@ -264,8 +273,8 @@ public class EventSession {
                 Player player = Bukkit.getPlayer(playerId);
                 if (player != null) {
                     teleportBack(player);
-                    player.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + 
-                        " &cDas Event wurde abgebrochen - nicht genug Spieler!"));
+                    player.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + 
+                        plugin.getConfigManager().getMessage("start.cancelled-not-enough-players")));
                 }
             }
             
@@ -310,8 +319,8 @@ public class EventSession {
                 Player player = Bukkit.getPlayer(playerId);
                 if (player != null) {
                     excludedPlayers.add(playerId);
-                    player.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + 
-                        " &cDu wurdest aussortiert, da die TeamgrÃƒÂ¶ÃƒÅ¸e nicht passt!"));
+                    player.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + 
+                        plugin.getConfigManager().getMessage("start.team-size-mismatch")));
                     teleportBack(player);
                 }
             }
@@ -325,7 +334,7 @@ public class EventSession {
                 if (player != null) {
                     TeamManager.Team team = teamManager.getPlayerTeam(playerId);
                     if (team != null) {
-                        String teamMsg = config.getMessage("team-assignment")
+                        String teamMsg = config.getMessage("team-assignment") // i18n-ignore per-event custom message override from events.yml
                             .replace("{team}", ColorUtil.color(team.getDisplayName()));
                         player.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + teamMsg));
                         
@@ -369,23 +378,27 @@ public class EventSession {
                 }
                 
                 if (java.util.Arrays.stream(LOBBY_COUNTDOWN_ANNOUNCE_SECONDS).anyMatch(s -> s == countdown)) {
-                    broadcast(plugin.getConfigManager().getMessage("start.countdown")
-                        .replace("{time}", String.valueOf(countdown)));
+                    broadcastCountdownTime(countdown);
                     
                     playSound(Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 }
                 
                 if (countdown == 3) {
-                    sendTitle("&c3", plugin.getConfigManager().getMessage("countdown.preparing"));
+                    sendTitle("&c3", plugin.getCoreConfigManager().getMessages().getString("messages.countdown.preparing", "&7Preparing..."));
                 } else if (countdown == 2) {
-                    sendTitle("&e2", plugin.getConfigManager().getMessage("countdown.starting"));
+                    sendTitle("&e2", plugin.getCoreConfigManager().getMessages().getString("messages.countdown.starting", "&eStarting..."));
                 } else if (countdown == 1) {
-                    sendTitle("&a1", plugin.getConfigManager().getMessage("countdown.go"));
+                    sendTitle("&a1", plugin.getCoreConfigManager().getMessages().getString("messages.countdown.go", "&aGo!"));
                 }
                 
                 countdown--;
             }
         }.runTaskTimer(plugin, 0L, de.zfzfg.core.util.Time.TICKS_PER_SECOND));
+    }
+    
+    private void broadcastCountdownTime(int seconds) {
+        broadcast(plugin.getConfigManager().getMessage("start.countdown")
+            .replace("{time}", String.valueOf(seconds)));
     }
     
     public void forceStartCountdown() {
@@ -394,102 +407,103 @@ public class EventSession {
         broadcast(plugin.getConfigManager().getMessage("admin.force-start"));
     }
     
-    // NEU: Lade Welten basierend auf world-loading Einstellung
+    /**
+     * Lädt die Welten des Events, sofern die automatische Weltenverwaltung an ist.
+     * Ob eine Lobbywelt dazugehört, entscheidet 'use-lobby' des Events.
+     */
     private void loadWorlds() {
-        String worldLoading = plugin.getConfigManager().getWorldLoading().toLowerCase();
-        
-        boolean loadLobby = false;
-        boolean loadEvent = false;
-        
-        switch (worldLoading) {
-            case "both":
-                loadLobby = true;
-                loadEvent = true;
-                break;
-            case "lobby":
-                loadLobby = true;
-                break;
-            case "event":
-                loadEvent = true;
-                break;
-            case "none":
-                return;
+        if (!plugin.getConfigManager().isManageEventWorlds()) {
+            return;
         }
-        
+
         MultiverseHelper mv = new MultiverseHelper(plugin);
-        
-        if (loadLobby) {
+
+        if (usesLobbyWorld()) {
             String lobbyWorld = config.getLobbyWorld();
-            plugin.getLogger().info("Lade Lobby-Welt (asynchron): " + lobbyWorld);
+            plugin.getLogger().info(plugin.getConsoleMsg("world-loading", "world", lobbyWorld));
             broadcast(plugin.getConfigManager().getMessage("world.loading"));
             mv.loadWorld(lobbyWorld, (success, message) -> {
                 if (success) {
                     broadcast(plugin.getConfigManager().getMessage("world.loaded"));
-                    plugin.getLogger().info("Lobby-Welt geladen: " + lobbyWorld + " - " + message);
+                    plugin.getLogger().info(plugin.getConsoleMsg("world-loaded", "world", lobbyWorld, "msg", message));
                 } else {
                     broadcast(plugin.getConfigManager().getMessage("world.load-failed"));
-                    plugin.getLogger().warning("Lobby-Welt Laden fehlgeschlagen: " + lobbyWorld + " - " + message);
+                    plugin.getLogger().warning(plugin.getConsoleMsg("world-load-failed", "world", lobbyWorld, "msg", message));
                 }
             });
         }
 
-        if (loadEvent) {
-            String eventWorld = config.getEventWorld();
-            plugin.getLogger().info("Lade Event-Welt (asynchron): " + eventWorld);
-            broadcast(plugin.getConfigManager().getMessage("world.loading"));
-            mv.loadWorld(eventWorld, (success, message) -> {
-                if (success) {
-                    broadcast(plugin.getConfigManager().getMessage("world.loaded"));
-                    plugin.getLogger().info("Event-Welt geladen: " + eventWorld + " - " + message);
-                } else {
-                    broadcast(plugin.getConfigManager().getMessage("world.load-failed"));
-                    // Standardisierte Fehlermeldung an alle bisherigen Teilnehmer
-                    String err = plugin.getConfigManager().getMessage("error.world-not-loaded");
-                    for (UUID uuid : new java.util.HashSet<>(participants)) {
-                        Player p = Bukkit.getPlayer(uuid);
-                        if (p != null) {
-                            de.zfzfg.pvpwager.utils.MessageUtil.error(p, err);
-                        }
+        String eventWorld = config.getEventWorld();
+        plugin.getLogger().info(plugin.getConsoleMsg("world-loading", "world", eventWorld));
+        broadcast(plugin.getConfigManager().getMessage("world.loading"));
+        mv.loadWorld(eventWorld, (success, message) -> {
+            if (success) {
+                broadcast(plugin.getConfigManager().getMessage("world.loaded"));
+                plugin.getLogger().info(plugin.getConsoleMsg("world-loaded", "world", eventWorld, "msg", message));
+            } else {
+                broadcast(plugin.getConfigManager().getMessage("world.load-failed"));
+                // Standardisierte Fehlermeldung an alle bisherigen Teilnehmer
+                String err = plugin.getConfigManager().getMessage("error.world-not-loaded");
+                for (UUID uuid : new java.util.HashSet<>(participants)) {
+                    Player p = Bukkit.getPlayer(uuid);
+                    if (p != null) {
+                        de.zfzfg.pvpwager.utils.MessageUtil.error(p, err);
                     }
-                    plugin.getLogger().warning("Event-Welt Laden fehlgeschlagen: " + eventWorld + " - " + message);
                 }
-            });
+                plugin.getLogger().warning(plugin.getConsoleMsg("world-load-failed", "world", eventWorld, "msg", message));
+            }
+        });
+    }
+
+    /**
+     * Entlädt die Welten nach dem Event-Ende - spiegelbildlich zu {@link #loadWorlds()}.
+     * Die Lobbywelt wird nur angefasst, wenn dieses Event überhaupt eine hatte.
+     *
+     * @param skipEventWorld true, wenn die Eventwelt bereits über den Clone- bzw.
+     *                       Regenerations-Pfad behandelt wurde und hier nicht
+     *                       noch einmal angefasst werden darf
+     */
+    private void unloadWorlds(boolean skipEventWorld) {
+        if (!plugin.getConfigManager().isManageEventWorlds()) {
+            return;
+        }
+
+        MultiverseHelper mv = new MultiverseHelper(plugin);
+
+        if (usesLobbyWorld()) {
+            unloadIfNotMainWorld(mv, config.getLobbyWorld());
+        }
+
+        if (!skipEventWorld) {
+            unloadIfNotMainWorld(mv, config.getEventWorld());
         }
     }
-    
-    // NEU: Entlade Welten nach Event-Ende
-    private void unloadWorlds() {
-        String worldLoading = plugin.getConfigManager().getWorldLoading().toLowerCase();
-        
-        boolean unloadLobby = false;
-        boolean unloadEvent = false;
-        
-        switch (worldLoading) {
-            case "both":
-                unloadLobby = true;
-                unloadEvent = true;
-                break;
-            case "lobby":
-                unloadLobby = true;
-                break;
-            case "event":
-                unloadEvent = true;
-                break;
-            case "none":
-                return;
+
+    /**
+     * Entlädt eine Welt, lässt die Hauptwelt des Servers aber in Ruhe - sie als
+     * Lobby einzutragen ist eine plausible Konfiguration, und ein Unload wäre
+     * dort in jedem Fall die falsche Antwort.
+     */
+    private void unloadIfNotMainWorld(MultiverseHelper mv, String worldName) {
+        if (worldName == null || worldName.trim().isEmpty()) {
+            return;
         }
-        
-        if (unloadLobby) {
-            plugin.getLogger().info("Entlade Lobby-Welt: " + config.getLobbyWorld());
-            MultiverseHelper mv = new MultiverseHelper(plugin);
-            mv.unloadWorld(config.getLobbyWorld());
+        if (worldName.equalsIgnoreCase(plugin.getConfigManager().getMainWorld())) {
+            return;
         }
-        
-        if (unloadEvent) {
-            plugin.getLogger().info("Entlade Event-Welt: " + config.getEventWorld());
-            MultiverseHelper mv = new MultiverseHelper(plugin);
-            mv.unloadWorld(config.getEventWorld());
-        }
+
+        plugin.getLogger().info(plugin.getConsoleMsg("world-unloading", "world", worldName));
+        mv.unloadWorld(worldName);
+    }
+
+    /**
+     * Ob dieses Event eine eigene Lobbywelt nutzt: Lobby-Phase aktiviert und eine
+     * Welt hinterlegt. Lade- und Entladepfad müssen dieselbe Antwort bekommen.
+     */
+    private boolean usesLobbyWorld() {
+        return config.isUseLobby()
+            && config.getLobbyWorld() != null
+            && !config.getLobbyWorld().trim().isEmpty();
     }
     
     private void prepareWorlds() {
@@ -498,17 +512,17 @@ public class EventSession {
         // Lade Event-Welt
         World eventWorld = Bukkit.getWorld(config.getEventWorld());
         if (eventWorld == null) {
-            plugin.getLogger().warning("Event-Welt wird geladen: " + config.getEventWorld());
+            plugin.getLogger().warning(plugin.getConsoleMsg("world-loading", "world", config.getEventWorld()));
         } else {
-            plugin.getLogger().info("Event-Welt gefunden: " + config.getEventWorld());
+            plugin.getLogger().info(plugin.getConsoleMsg("world-loaded", "world", config.getEventWorld(), "msg", "OK"));
         }
         
         // Lade Lobby-Welt
         World lobbyWorld = Bukkit.getWorld(config.getLobbyWorld());
         if (lobbyWorld == null) {
-            plugin.getLogger().warning("Lobby-Welt wird geladen: " + config.getLobbyWorld());
+            plugin.getLogger().warning(plugin.getConsoleMsg("world-loading", "world", config.getLobbyWorld()));
         } else {
-            plugin.getLogger().info("Lobby-Welt gefunden: " + config.getLobbyWorld());
+            plugin.getLogger().info(plugin.getConsoleMsg("world-loaded", "world", config.getLobbyWorld(), "msg", "OK"));
         }
         
         if (config.shouldRegenerateEventWorld()) {
@@ -519,52 +533,159 @@ public class EventSession {
     private void teleportToLobby(Player player) {
         World lobbyWorld = Bukkit.getWorld(config.getLobbyWorld());
         if (lobbyWorld != null) {
-            Location lobbySpawn = config.getLobbySpawn().clone();
-            lobbySpawn.setWorld(lobbyWorld);
-            // Einmalige Sicherung des Default-Inventars vor dem Event (asynchrones Speichern)
-            // Jetzt VOR dem Teleport ausführen, damit die Welt im Snapshot die ursprüngliche Welt ist.
-            try {
-                InventorySnapshotStorage.saveSnapshotAsync(plugin, player, "default", "event");
-            } catch (Exception e) {
-                plugin.getLogger().warning("Konnte Pre-Event Inventory-Snapshot nicht einreihen für " + player.getName() + ": " + e.getMessage());
-            }
-            // Danach Teleport und Event-Setup
-            player.teleport(lobbySpawn);
-            player.setGameMode(GameMode.ADVENTURE);
-            player.getInventory().clear();
-            plugin.getLogger().info("Spieler " + player.getName() + " zur Lobby teleportiert: " + lobbySpawn);
+            moveIntoLobby(player, lobbyWorld);
         } else {
-            plugin.getLogger().warning("Lobby-Welt nicht geladen: " + config.getLobbyWorld() + " – versuche zu laden...");
+            plugin.getLogger().warning(plugin.getConsoleMsg("world-load-failed", "world", config.getLobbyWorld(), "msg", "..."));
             MultiverseHelper mv = new MultiverseHelper(plugin);
             mv.loadWorld(config.getLobbyWorld(), (success, message) -> {
                 World loaded = Bukkit.getWorld(config.getLobbyWorld());
                 if (loaded != null) {
-                    Location lobbySpawn = config.getLobbySpawn().clone();
-                    lobbySpawn.setWorld(loaded);
-                    try { InventorySnapshotStorage.saveSnapshotAsync(plugin, player, "default", "event"); } catch (Exception e) {
-                        plugin.getLogger().warning("Failed to save inventory snapshot: " + e.getMessage());
-                    }
-                    player.teleport(lobbySpawn);
-                    player.setGameMode(GameMode.ADVENTURE);
-                    player.getInventory().clear();
-                    plugin.getLogger().info("Spieler " + player.getName() + " zur Lobby teleportiert (nach Laden): " + lobbySpawn);
+                    moveIntoLobby(player, loaded);
                 } else {
-                    plugin.getLogger().severe("Lobby-Welt weiterhin nicht verfügbar: " + config.getLobbyWorld());
-                    player.sendMessage(ColorUtil.color("&cFehler: Lobby-Welt nicht gefunden!"));
+                    plugin.getLogger().severe(plugin.getConsoleMsg("world-load-failed", "world", config.getLobbyWorld(), "msg", "world is null"));
+                    player.sendMessage(ColorUtil.color(plugin.getCoreConfigManager().getMessages().getString("messages.system.lobby-world-not-found", "&c[missing: messages.system.lobby-world-not-found]")));
                 }
             });
         }
+    }
+
+    /**
+     * Sichert das Inventar und bringt den Spieler danach in die Lobby.
+     *
+     * <p>Frueher stand dieser Ablauf zweimal im Code - einmal fuer die bereits geladene Welt
+     * und einmal fuer den Multiverse-Nachladepfad. Zwei Kopien bedeuten hier zwei Stellen,
+     * an denen die Sicherung vergessen werden kann, deshalb jetzt eine gemeinsame Methode.</p>
+     *
+     * <p>Die Reihenfolge ist entscheidend: erst sichern, dann teleportieren. Nach dem
+     * Weltwechsel haette Multiverse-Inventories das Inventar bereits ausgetauscht.</p>
+     */
+    private void moveIntoLobby(Player player, World lobbyWorld) {
+        Location lobbySpawn = config.getLobbySpawn().clone();
+        lobbySpawn.setWorld(lobbyWorld);
+
+        if (!beginInventorySession(player)) {
+            return;
+        }
+
+        player.teleport(lobbySpawn);
+        player.setGameMode(GameMode.ADVENTURE);
+        player.getInventory().clear();
+        markInventorySessionActive(player);
+        plugin.getDebugManager().logFull(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", lobbyWorld.getName(), "coords", String.format("%.0f, %.0f, %.0f", lobbySpawn.getX(), lobbySpawn.getY(), lobbySpawn.getZ())));
+    }
+
+    /**
+     * Oeffnet die Inventar-Sitzung eines Teilnehmers.
+     *
+     * @return false, wenn der Spieler nicht in die Lobby darf - dann haengt er noch in einer
+     *         anderen Sitzung (etwa einem laufenden PvP-Match) und ein zweites Backup wuerde
+     *         das erste entwerten
+     */
+    private boolean beginInventorySession(Player player) {
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()) {
+            return true;
+        }
+        de.zfzfg.core.inventory.BackupContext context = de.zfzfg.core.inventory.BackupContext
+                .builder(de.zfzfg.core.inventory.BackupContext.TYPE_EVENT_PRE_JOIN)
+                .meta("event_id", config.getId())
+                .meta("event_name", config.getDisplayName())
+                .meta("origin_world", player.getWorld() == null ? "" : player.getWorld().getName())
+                .build();
+
+        de.zfzfg.core.inventory.InventorySessionManager.BeginResult result = sessions.begin(
+                player, de.zfzfg.core.inventory.guard.GuardContext.EVENT, config.getId(), context,
+                persisted -> {
+                    if (persisted) {
+                        return;
+                    }
+                    boolean abort = plugin.getInventoryConfig().failurePolicy()
+                            == de.zfzfg.core.inventory.InventoryManagementConfig.FailurePolicy.ABORT;
+                    plugin.getLogger().severe(plugin.getConsoleMsg("inventory-backup-not-persisted",
+                            "player", player.getName()));
+                    if (abort) {
+                        player.sendMessage(ColorUtil.color(
+                                plugin.getConfigManager().getMessage("inventory.backup-failed-abort")));
+                        removePlayer(player);
+                    } else {
+                        player.sendMessage(ColorUtil.color(
+                                plugin.getConfigManager().getMessage("inventory.backup-degraded")));
+                    }
+                });
+
+        if (result == de.zfzfg.core.inventory.InventorySessionManager.BeginResult.ALREADY_OPEN) {
+            plugin.getLogger().warning(plugin.getConsoleMsg("inventory-session-conflict",
+                    "player", player.getName()));
+            player.sendMessage(ColorUtil.color(
+                    plugin.getConfigManager().getMessage("inventory.session-conflict")));
+            removePlayer(player);
+            return false;
+        }
+        if (result == de.zfzfg.core.inventory.InventorySessionManager.BeginResult.UNAVAILABLE) {
+            // Ohne Provider gaebe es keine Absicherung; der Lobby-Teleport leert das Inventar
+            // und es waere endgueltig weg.
+            plugin.getLogger().severe(plugin.getConsoleMsg("inventory-provider-unavailable"));
+            player.sendMessage(ColorUtil.color(
+                    plugin.getConfigManager().getMessage("inventory.backup-failed-abort")));
+            removePlayer(player);
+            return false;
+        }
+        return true;
+    }
+
+    private void markInventorySessionActive(Player player) {
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions != null && sessions.isManaged()) {
+            sessions.markActive(player.getUniqueId());
+        }
+    }
+
+    /**
+     * Stellt das Survival-Inventar eines Teilnehmers nach dem Event wieder her.
+     *
+     * @param onRestored laeuft <b>immer</b>, sobald feststeht, wie es ausgegangen ist. Der
+     *                   Parameter sagt, ob der Spieler die Items jetzt schon traegt. Bei
+     *                   {@code false} darf nichts direkt ins Inventar gegeben werden - die
+     *                   Belohnung gehoert dann in den Auffangspeicher.
+     */
+    private void restoreInventoryAfterEvent(Player player, java.util.function.Consumer<Boolean> onRestored) {
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()
+                || !plugin.getInventoryConfig().restoreOnEventEnd()) {
+            if (onRestored != null) {
+                onRestored.accept(player.isOnline());
+            }
+            return;
+        }
+        java.util.UUID playerId = player.getUniqueId();
+        if (!plugin.getInventoryGuard().hasOpenSession(playerId)) {
+            if (onRestored != null) {
+                onRestored.accept(player.isOnline());
+            }
+            return;
+        }
+        sessions.finish(playerId, outcome -> {
+            if (outcome == de.zfzfg.core.inventory.RestoreOutcome.QUEUED_FOR_JOIN) {
+                plugin.getLogger().info(plugin.getConsoleMsg("inventory-restore-queued",
+                        "player", player.getName()));
+            }
+            // Frueher kehrte dieser Zweig bei allem ausser APPLIED ohne Aufruf zurueck - die
+            // vorgemerkte Belohnung blieb dann in einer Map liegen, die mit dem Event endete.
+            if (onRestored != null) {
+                onRestored.accept(outcome.isApplied() && player.isOnline());
+            }
+        });
     }
     
     private void startEvent() {
         synchronized (stateMutex) { state = EventState.RUNNING; }
         
-        broadcast(config.getMessage("start"));
-        broadcast(config.getMessage("objective"));
+        broadcast(config.getMessage("start")); // i18n-ignore per-event custom message override from events.yml
+        broadcast(config.getMessage("objective")); // i18n-ignore per-event custom message override from events.yml
         
         World eventWorld = Bukkit.getWorld(config.getEventWorld());
         if (eventWorld == null) {
-            plugin.getLogger().severe("Event-Welt nicht gefunden: " + config.getEventWorld());
+            plugin.getLogger().severe(plugin.getConsoleMsg("world-load-failed", "world", config.getEventWorld(), "msg", "not found"));
             // Standardisierte Fehlermeldung an alle Teilnehmer
             String err = plugin.getConfigManager().getMessage("error.world-not-loaded");
             for (UUID uuid : new java.util.HashSet<>(validParticipants)) {
@@ -593,12 +714,13 @@ public class EventSession {
                 excludedPlayers.add(uuid);
                 validParticipants.remove(uuid);
                 participants.remove(uuid);
-                p.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " &cDu wurdest aus dem Event entfernt (nicht in Lobby/Event-Welt)."));
+                String msg = plugin.getCoreConfigManager().getMessages().getString("messages.system.removed-from-event", "&c[missing: messages.system.removed-from-event]");
+                p.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + msg));
             }
         }
         
-        plugin.getLogger().info("Teleportiere Spieler zur Event-Welt: " + config.getEventWorld());
-        plugin.getLogger().info("Spawn-Type: " + config.getSpawnType());
+        plugin.getLogger().info(plugin.getConsoleMsg("world-loading", "world", config.getEventWorld()));
+        plugin.getDebugManager().logFull("Spawn-Type: " + config.getSpawnType()); // i18n-ignore: technical session trace
         
         // NEU: COMMAND spawn-type
         if (config.getSpawnType() == EventConfig.SpawnType.COMMAND) {
@@ -631,7 +753,7 @@ public class EventSession {
                     plugin.getEventStatsManager().recordParticipation(p);
                     participationChanged = true;
                 } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to record participation: " + e.getMessage());
+                    plugin.getLogger().warning("Failed to record participation: " + e.getMessage()); // i18n-ignore: technical session stats log
                 }
             }
         }
@@ -639,15 +761,15 @@ public class EventSession {
             plugin.markExternalDisplayDirty();
         }
 
-        sendTitle(plugin.getConfigManager().getMessage("event.started-title"), plugin.getConfigManager().getMessage("event.started-subtitle"));
+        sendTitle(plugin.getConfigManager().getMessage("start.started-title"), plugin.getConfigManager().getMessage("start.started-subtitle"));
         playSound(Sound.ENTITY_ENDER_DRAGON_GROWL, 1.0f, 2.0f);
     }
     
-    // NEU: FÃƒÂ¼hre Spawn-Command aus
+    // NEU: Führe Spawn-Command aus
     private void executeSpawnCommand() {
         String command = config.getSpawnConfig().getSpawnCommand();
         if (command == null || command.isEmpty()) {
-            plugin.getLogger().warning("Spawn-Command ist leer!");
+            plugin.getLogger().warning("Spawn-Command ist leer!"); // i18n-ignore: technical session config check
             return;
         }
         
@@ -656,7 +778,7 @@ public class EventSession {
             if (player == null) continue;
             
             String finalCommand = command.replace("{player}", player.getName());
-            plugin.getLogger().info("FÃƒÂ¼hre Spawn-Command aus: " + finalCommand);
+            plugin.getDebugManager().logFull("Führe Spawn-Command aus: " + finalCommand); // i18n-ignore: technical session trace
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCommand);
             
             player.setGameMode(GameMode.SURVIVAL);
@@ -686,8 +808,8 @@ public class EventSession {
                 player.teleport(spawn);
                 player.setGameMode(GameMode.SURVIVAL);
                 try { player.setHealth(20.0); player.setFoodLevel(20); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
-                    }
+                    plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage()); // i18n-ignore: technical health reset log
+                }
             }
         }
     }
@@ -705,9 +827,9 @@ public class EventSession {
                         player.teleport(spawn);
                         player.setGameMode(GameMode.SURVIVAL);
                         try { player.setHealth(20.0); player.setFoodLevel(20); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
-                    }
-                        plugin.getLogger().info("Spieler " + player.getName() + " zu SINGLE_POINT teleportiert: " + spawn);
+                            plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage()); // i18n-ignore: technical health reset log
+                        }
+                        plugin.getDebugManager().logFull(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", spawn.getWorld().getName(), "coords", String.format("%.0f, %.0f, %.0f", spawn.getX(), spawn.getY(), spawn.getZ())));
                     }
                 }
                 break;
@@ -724,9 +846,9 @@ public class EventSession {
                     player.teleport(spawnLoc);
                     player.setGameMode(GameMode.SURVIVAL);
                     try { player.setHealth(20.0); player.setFoodLevel(20); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
+                        plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage()); // i18n-ignore: technical health reset log
                     }
-                    plugin.getLogger().info("Spieler " + player.getName() + " zu MULTIPLE_SPAWNS teleportiert: " + spawnLoc);
+                    plugin.getDebugManager().logFull(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", spawnLoc.getWorld().getName(), "coords", String.format("%.0f, %.0f, %.0f", spawnLoc.getX(), spawnLoc.getY(), spawnLoc.getZ())));
                 }
                 break;
                 
@@ -744,11 +866,11 @@ public class EventSession {
                         player.teleport(randomLoc);
                         player.setGameMode(GameMode.SURVIVAL);
                         try { player.setHealth(20.0); player.setFoodLevel(20); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
-                    }
-                        plugin.getLogger().info("Spieler " + player.getName() + " zu RANDOM_CUBE teleportiert: " + randomLoc);
+                            plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage()); // i18n-ignore: technical health reset log
+                        }
+                        plugin.getDebugManager().logFull(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", randomLoc.getWorld().getName(), "coords", String.format("%.0f, %.0f, %.0f", randomLoc.getX(), randomLoc.getY(), randomLoc.getZ())));
                     } else {
-                        plugin.getLogger().warning("Konnte keinen Spawn fÃƒÂ¼r " + player.getName() + " finden!");
+                        plugin.getLogger().warning(plugin.getConsoleMsg("safe-teleport-no-location", "player", player.getName()));
                     }
                 }
                 break;
@@ -767,9 +889,9 @@ public class EventSession {
                         player.teleport(randomLoc);
                         player.setGameMode(GameMode.SURVIVAL);
                         try { player.setHealth(20.0); player.setFoodLevel(20); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
-                    }
-                        plugin.getLogger().info("Spieler " + player.getName() + " zu RANDOM_RADIUS teleportiert: " + randomLoc);
+                            plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage()); // i18n-ignore: technical health reset log
+                        }
+                        plugin.getDebugManager().logFull(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", randomLoc.getWorld().getName(), "coords", String.format("%.0f, %.0f, %.0f", randomLoc.getX(), randomLoc.getY(), randomLoc.getZ())));
                     }
                 }
                 break;
@@ -788,9 +910,9 @@ public class EventSession {
                         player.teleport(randomLoc);
                         player.setGameMode(GameMode.SURVIVAL);
                         try { player.setHealth(20.0); player.setFoodLevel(20); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
-                    }
-                        plugin.getLogger().info("Spieler " + player.getName() + " zu RANDOM_AREA teleportiert: " + randomLoc);
+                            plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage()); // i18n-ignore: technical health reset log
+                        }
+                        plugin.getDebugManager().logFull(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", randomLoc.getWorld().getName(), "coords", String.format("%.0f, %.0f, %.0f", randomLoc.getX(), randomLoc.getY(), randomLoc.getZ())));
                     }
                 }
                 break;
@@ -813,7 +935,7 @@ public class EventSession {
             
             Location candidate = new Location(world, x, y, z);
             
-            // PrÃƒÂ¼fe Mindestabstand zu anderen Spielern
+            // Prüfe Mindestabstand zu anderen Spielern
             boolean validLocation = true;
             for (Location usedLoc : usedLocations) {
                 if (candidate.distance(usedLoc) < config.getMinDistance()) {
@@ -827,8 +949,8 @@ public class EventSession {
             }
         }
         
-        plugin.getLogger().warning("Konnte keine gÃƒÂ¼ltige RANDOM_CUBE Location finden!");
-        // Fallback: Gebe trotzdem eine Position zurÃƒÂ¼ck
+        plugin.getLogger().warning(plugin.getConsoleMsg("safe-teleport-no-location", "player", "RANDOM_CUBE"));
+        // Fallback: Gebe trotzdem eine Position zurück
         double x = config.getMinX() + random.nextDouble() * (config.getMaxX() - config.getMinX());
         double y = config.getMinY();
         double z = config.getMinZ() + random.nextDouble() * (config.getMaxZ() - config.getMinZ());
@@ -895,7 +1017,7 @@ public class EventSession {
     private void giveEquipment() {
         EquipmentGroup equipment = plugin.getConfigManager().getEquipmentGroup(config.getEquipmentGroup());
         if (equipment == null) {
-            plugin.getLogger().warning("Keine Ausrüstungsgruppe gefunden für ID '" + config.getEquipmentGroup() + "'. Prüfe equipment.yml und config.yml.");
+            plugin.getLogger().warning(plugin.getConsoleMsg("equipment-event-not-found", "group", String.valueOf(config.getEquipmentGroup())));
             return;
         }
         
@@ -911,7 +1033,9 @@ public class EventSession {
             if (armor.getChestplate() != null) player.getInventory().setChestplate(armor.getChestplate().clone());
             if (armor.getLeggings() != null) player.getInventory().setLeggings(armor.getLeggings().clone());
             if (armor.getBoots() != null) player.getInventory().setBoots(armor.getBoots().clone());
-            
+            // Nebenhand: bis 1.0.9 wurde das Feld aus der Konfiguration nie angewendet.
+            if (armor.getOffhand() != null) player.getInventory().setItemInOffHand(armor.getOffhand().clone());
+
             for (EquipmentGroup.InventoryItem item : equipment.getInventory()) {
                 player.getInventory().setItem(item.getSlot(), item.getItemStack().clone());
             }
@@ -937,8 +1061,9 @@ public class EventSession {
     private void giveLobbyEquipmentToPlayer(Player player) {
         EquipmentGroup equipment = plugin.getConfigManager().getEquipmentGroup(config.getEquipmentGroup());
         if (equipment == null) {
-            plugin.getLogger().warning("Keine Ausrüstungsgruppe gefunden für ID '" + config.getEquipmentGroup() + "' (Lobby). Prüfe equipment.yml und config.yml.");
-            player.sendMessage(ColorUtil.color("&c[Debug] Keine gültige Ausrüstungsgruppe konfiguriert: &e" + config.getEquipmentGroup()));
+            plugin.getLogger().warning(plugin.getConsoleMsg("equipment-lobby-not-found", "group", String.valueOf(config.getEquipmentGroup())));
+            player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-no-group")
+                .replace("{group}", String.valueOf(config.getEquipmentGroup()))));
             return;
         }
 
@@ -950,6 +1075,8 @@ public class EventSession {
         if (armor.getChestplate() != null) player.getInventory().setChestplate(armor.getChestplate().clone());
         if (armor.getLeggings() != null) player.getInventory().setLeggings(armor.getLeggings().clone());
         if (armor.getBoots() != null) player.getInventory().setBoots(armor.getBoots().clone());
+        // Nebenhand: bis 1.0.9 wurde das Feld aus der Konfiguration nie angewendet.
+        if (armor.getOffhand() != null) player.getInventory().setItemInOffHand(armor.getOffhand().clone());
 
         for (EquipmentGroup.InventoryItem item : equipment.getInventory()) {
             player.getInventory().setItem(item.getSlot(), item.getItemStack().clone());
@@ -960,8 +1087,8 @@ public class EventSession {
 
         // Verify equipment applied; retry once if not
         if (!isEquipmentApplied(player, equipment)) {
-            plugin.getLogger().warning("[DEBUG] Ausrüstung in Lobby nicht vollständig angewendet für " + player.getName() + ", versuche erneut...");
-            player.sendMessage(ColorUtil.color("&7[Debug] Ausrüstung nicht vollständig angewendet, versuche erneut..."));
+            plugin.getLogger().warning(plugin.getConsoleMsg("equipment-lobby-retry", "player", player.getName()));
+            player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-retrying")));
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -974,15 +1101,16 @@ public class EventSession {
                     if (armor2.getChestplate() != null) player.getInventory().setChestplate(armor2.getChestplate().clone());
                     if (armor2.getLeggings() != null) player.getInventory().setLeggings(armor2.getLeggings().clone());
                     if (armor2.getBoots() != null) player.getInventory().setBoots(armor2.getBoots().clone());
+                    if (armor2.getOffhand() != null) player.getInventory().setItemInOffHand(armor2.getOffhand().clone());
                     for (EquipmentGroup.InventoryItem item2 : eq.getInventory()) {
                         player.getInventory().setItem(item2.getSlot(), item2.getItemStack().clone());
                     }
                     if (!isEquipmentApplied(player, eq)) {
-                        plugin.getLogger().warning("[DEBUG] Ausrüstung in Lobby weiterhin nicht vollständig für " + player.getName() + ".");
-                        player.sendMessage(ColorUtil.color("&c[Debug] Ausrüstung weiterhin nicht vollständig angewendet."));
+                        plugin.getLogger().warning(plugin.getConsoleMsg("equipment-lobby-still-incomplete", "player", player.getName()));
+                        player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-still-incomplete")));
                     } else {
-                        plugin.getLogger().info("[DEBUG] Ausrüstung in Lobby erfolgreich nach erneutem Versuch angewendet für " + player.getName() + ".");
-                        player.sendMessage(ColorUtil.color("&a[Debug] Ausrüstung erfolgreich angewendet."));
+                        plugin.getDebugManager().log(plugin.getConsoleMsg("equipment-lobby-applied", "player", player.getName()));
+                        player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-applied")));
                     }
                 }
             }.runTaskLater(plugin, 1L);
@@ -992,8 +1120,9 @@ public class EventSession {
     private void giveEquipmentToPlayer(Player player, TeamManager.Team team) {
         EquipmentGroup equipment = plugin.getConfigManager().getEquipmentGroup(config.getEquipmentGroup());
         if (equipment == null) {
-            plugin.getLogger().warning("Keine Ausrüstungsgruppe gefunden für ID '" + config.getEquipmentGroup() + "' (Team). Prüfe equipment.yml und config.yml.");
-            player.sendMessage(ColorUtil.color("&c[Debug] Keine gültige Ausrüstungsgruppe konfiguriert: &e" + config.getEquipmentGroup()));
+            plugin.getLogger().warning(plugin.getConsoleMsg("equipment-event-not-found", "group", String.valueOf(config.getEquipmentGroup())));
+            player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-no-group")
+                .replace("{group}", String.valueOf(config.getEquipmentGroup()))));
             return;
         }
         
@@ -1053,8 +1182,8 @@ public class EventSession {
 
         // Verify equipment applied; retry once if not
         if (!isEquipmentApplied(player, equipment)) {
-            plugin.getLogger().warning("[DEBUG] Ausrüstung im Event nicht vollständig angewendet für " + player.getName() + ", versuche erneut...");
-            player.sendMessage(ColorUtil.color("&7[Debug] Ausrüstung nicht vollständig angewendet, versuche erneut..."));
+            plugin.getLogger().warning(plugin.getConsoleMsg("equipment-event-retry", "player", player.getName()));
+            player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-retrying")));
             new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -1101,11 +1230,11 @@ public class EventSession {
                         player.getInventory().setItem(item2.getSlot(), item2.getItemStack().clone());
                     }
                     if (!isEquipmentApplied(player, eq)) {
-                        plugin.getLogger().warning("[DEBUG] Ausrüstung im Event weiterhin nicht vollständig für " + player.getName() + ".");
-                        player.sendMessage(ColorUtil.color("&c[Debug] Ausrüstung weiterhin nicht vollständig angewendet."));
+                        plugin.getLogger().warning(plugin.getConsoleMsg("equipment-event-still-incomplete", "player", player.getName()));
+                        player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-still-incomplete")));
                     } else {
-                        plugin.getLogger().info("[DEBUG] Ausrüstung im Event erfolgreich nach erneutem Versuch angewendet für " + player.getName() + ".");
-                        player.sendMessage(ColorUtil.color("&a[Debug] Ausrüstung erfolgreich angewendet."));
+                        plugin.getDebugManager().log(plugin.getConsoleMsg("equipment-event-applied", "player", player.getName()));
+                        player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("equipment.debug-applied")));
                     }
                 }
             }.runTaskLater(plugin, 1L);
@@ -1139,7 +1268,7 @@ public class EventSession {
         eliminatedPlayers.add(player.getUniqueId());
         spectators.add(player.getUniqueId());
         
-        String eliminatedMsg = config.getMessage("eliminated");
+        String eliminatedMsg = config.getMessage("eliminated"); // i18n-ignore per-event custom message override from events.yml
         if (eliminatedMsg.isEmpty()) {
             eliminatedMsg = plugin.getConfigManager().getMessage("end.eliminated");
         }
@@ -1209,13 +1338,13 @@ public class EventSession {
         if (config.getGameMode() == EventConfig.GameMode.SOLO) {
             winner = player.getUniqueId();
             
-            String winnerMsg = config.getMessage("winner");
+            String winnerMsg = config.getMessage("winner"); // i18n-ignore per-event custom message override from events.yml
             if (winnerMsg.isEmpty()) {
                 winnerMsg = plugin.getConfigManager().getMessage("end.winner");
             }
             broadcast(winnerMsg.replace("{player}", player.getName()));
             
-            giveRewards(player, config.getWinnerRewards());
+            scheduleRewards(player, config.getWinnerRewards());
             
             spawnFirework(player.getLocation());
             
@@ -1231,7 +1360,7 @@ public class EventSession {
                 plugin.getEventStatsManager().recordWin(player);
                 plugin.markExternalDisplayDirty();
             } catch (Exception e) {
-                plugin.getLogger().warning("Failed to record win statistics: " + e.getMessage());
+                plugin.getLogger().warning("Failed to record win statistics: " + e.getMessage()); // i18n-ignore: technical session stats log
             }
         }
         
@@ -1246,11 +1375,11 @@ public class EventSession {
     private void declareTeamWinner(TeamManager.Team team) {
         winningTeam = team;
         
-        String winnerMsg = config.getMessage("team-winner");
+        String winnerMsg = config.getMessage("team-winner"); // i18n-ignore per-event custom message override from events.yml
         if (winnerMsg.isEmpty()) {
             winnerMsg = plugin.getConfigManager().getMessage("end.team-winner");
             if (winnerMsg == null || winnerMsg.isEmpty()) {
-                winnerMsg = "&6&lTEAM {team} HAT GEWONNEN!";
+                winnerMsg = "&6&lTEAM {team} WON!";  // i18n-ignore: englischer Fallback, spiegelt bewusst den Wert des Master-Bundles
             }
         }
         broadcast(winnerMsg.replace("{team}", ColorUtil.color(team.getDisplayName())));
@@ -1259,16 +1388,16 @@ public class EventSession {
         Set<UUID> teamMembers = teamManager.getTeamMembers(team);
         String teamWinnerTitle = plugin.getConfigManager().getMessage("rewards.winner-title");
         if (teamWinnerTitle == null || teamWinnerTitle.isEmpty()) {
-            teamWinnerTitle = "&6&lGEWONNEN!";
+            teamWinnerTitle = "&6&lVICTORY!";
         }
         String teamWinnerSubtitle = plugin.getConfigManager().getMessage("rewards.team-winner-subtitle");
         if (teamWinnerSubtitle == null || teamWinnerSubtitle.isEmpty()) {
-            teamWinnerSubtitle = "&aDein Team hat gewonnen!";
+            teamWinnerSubtitle = "&aYour team won!";  // i18n-ignore: englischer Fallback, spiegelt bewusst den Wert des Master-Bundles
         }
         for (UUID memberId : teamMembers) {
             Player member = Bukkit.getPlayer(memberId);
             if (member != null && validParticipants.contains(memberId)) {
-                giveRewards(member, config.getTeamWinnerRewards());
+                scheduleRewards(member, config.getTeamWinnerRewards());
                 spawnFirework(member.getLocation());
                 sendTitleToPlayer(member, teamWinnerTitle, teamWinnerSubtitle);
                 // Team-Sieg für Statistiken erfassen
@@ -1276,7 +1405,7 @@ public class EventSession {
                     plugin.getEventStatsManager().recordWin(member);
                     plugin.markExternalDisplayDirty();
                 } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to record team win statistics: " + e.getMessage());
+                    plugin.getLogger().warning("Failed to record team win statistics: " + e.getMessage()); // i18n-ignore: technical session stats log
                 }
             }
         }
@@ -1299,7 +1428,7 @@ public class EventSession {
         }
         String drawMsg = plugin.getConfigManager().getMessage("end.draw");
         if (drawMsg == null || drawMsg.isEmpty()) {
-            drawMsg = "&eEs ist ein Unentschieden!";
+            drawMsg = "&eIt's a draw!";  // i18n-ignore: englischer Fallback, spiegelt bewusst den Wert des Master-Bundles
         }
         broadcast(drawMsg);
         registerTask(new BukkitRunnable() {
@@ -1315,7 +1444,7 @@ public class EventSession {
         if (config.getGameMode() == EventConfig.GameMode.TEAM_2 || 
             config.getGameMode() == EventConfig.GameMode.TEAM_3) {
             
-            // Team-Modus: PrÃƒÂ¼fe ob nur noch ein Team lebt
+            // Team-Modus: Prüfe ob nur noch ein Team lebt
             int aliveTeams = teamManager.getAliveTeamCount(alivePlayers);
             
             if (aliveTeams == 1 && winningTeam == null) {
@@ -1391,33 +1520,108 @@ public class EventSession {
         }
     }
     
+    /**
+     * Nimmt eine Belohnung entgegen und entscheidet, wann sie ausgegeben wird.
+     *
+     * <p>Verwaltet das Plugin die Inventare selbst, darf die Belohnung <b>nicht</b> sofort
+     * ins Kit-Inventar wandern: der Rueckweg aus dem Event stellt das Survival-Inventar
+     * wieder her und wuerde sie im selben Moment wieder loeschen. Sie wird deshalb
+     * vorgemerkt und im Erfolgs-Callback der Wiederherstellung uebergeben.</p>
+     */
+    private void scheduleRewards(Player player, EventConfig.RewardConfig rewards) {
+        if (rewards == null) {
+            return;
+        }
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()
+                || !plugin.getInventoryConfig().restoreOnEventEnd()) {
+            giveRewards(player, rewards);
+            return;
+        }
+        pendingRewards.put(player.getUniqueId(), rewards);
+        player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("rewards.pending")));
+    }
+
+    /**
+     * Uebergibt eine vorgemerkte Belohnung nach der Wiederherstellung.
+     *
+     * <p>Genau einmal: Belohnungsbefehle sind nicht idempotent, ein zweiter Durchlauf wuerde
+     * doppelt auszahlen. Die Tuer dafuer ist der Guard.</p>
+     *
+     * @param inventoryReady ob das Survival-Inventar bereits zurueck ist. Bei {@code false}
+     *                       gehen die Item-Belohnungen in den persistenten Auffangspeicher;
+     *                       vorher lagen sie nur in einer Map, die mit dem Event verschwand.
+     */
+    private void deliverPendingRewards(Player player, boolean inventoryReady) {
+        EventConfig.RewardConfig rewards = pendingRewards.remove(player.getUniqueId());
+        if (rewards == null) {
+            return;
+        }
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions != null && !sessions.claimPayout(player.getUniqueId())) {
+            return;
+        }
+
+        if (inventoryReady) {
+            giveRewards(player, rewards);
+            return;
+        }
+
+        // Items vormerken. Befehlsbelohnungen laufen weiter ueber die Konsole - sie treffen
+        // meist den Spielernamen und funktionieren auch offline; sie hier zurueckzuhalten
+        // wuerde mehr Faelle verschlechtern als verbessern.
+        if (rewards.areItemsEnabled()) {
+            plugin.getPendingPayouts().queue(player.getUniqueId(), parseRewardItems(rewards), 0,
+                    "event-reward:" + config.getId());  // i18n-ignore: internal payout reason id, not display text
+        }
+        if (rewards.areCommandsEnabled()) {
+            runRewardCommands(player, rewards);
+        }
+    }
+
+    /**
+     * Liest die Item-Belohnungen aus ihrer Textform ({@code "MATERIAL ANZAHL"}).
+     *
+     * <p>Wird sowohl fuer die sofortige Ausgabe als auch fuer das Vormerken gebraucht -
+     * beide Wege muessen dieselbe Liste erzeugen.</p>
+     */
+    private java.util.List<ItemStack> parseRewardItems(EventConfig.RewardConfig rewards) {
+        java.util.List<ItemStack> items = new java.util.ArrayList<>();
+        for (String itemStr : rewards.getItems()) {
+            String[] parts = itemStr.split(" ");
+            if (parts.length < 2) {
+                continue;
+            }
+            try {
+                Material material = Material.valueOf(parts[0].toUpperCase());
+                items.add(new ItemStack(material, Integer.parseInt(parts[1])));
+            } catch (Exception e) {
+                plugin.getLogger().warning("Invalid reward item: " + itemStr); // i18n-ignore: technical reward parse log
+            }
+        }
+        return items;
+    }
+
+    /** Fuehrt die Befehlsbelohnungen auf der Konsole aus. */
+    private void runRewardCommands(Player player, EventConfig.RewardConfig rewards) {
+        for (String cmd : rewards.getCommands()) {
+            String finalCmd = cmd.replace("{player}", player.getName());
+            Bukkit.getScheduler().runTask(plugin, () -> Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCmd));
+        }
+    }
+
     private void giveRewards(Player player, EventConfig.RewardConfig rewards) {
         if (rewards == null) return;
-        
+
         if (rewards.areItemsEnabled()) {
-            for (String itemStr : rewards.getItems()) {
-                String[] parts = itemStr.split(" ");
-                if (parts.length >= 2) {
-                    try {
-                        Material material = Material.valueOf(parts[0].toUpperCase());
-                        int amount = Integer.parseInt(parts[1]);
-                        ItemStack item = new ItemStack(material, amount);
-                        player.getInventory().addItem(item);
-                    } catch (Exception e) {
-                        plugin.getLogger().warning("UngÃƒÂ¼ltiges Item: " + itemStr);
-                    }
-                }
-            }
+            // Ueber giveItems statt addItem: was nicht ins Inventar passt, faellt dem
+            // Spieler vor die Fuesse, statt stillschweigend zu verschwinden.
+            de.zfzfg.pvpwager.utils.InventoryUtil.giveItems(player, parseRewardItems(rewards));
             player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("rewards.item-received")));
         }
-        
+
         if (rewards.areCommandsEnabled()) {
-            for (String cmd : rewards.getCommands()) {
-                String finalCmd = cmd.replace("{player}", player.getName());
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCmd);
-                });
-            }
+            runRewardCommands(player, rewards);
             player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("rewards.command-executed")));
         }
     }
@@ -1451,14 +1655,20 @@ public class EventSession {
         try {
             de.zfzfg.eventplugin.storage.EventStatsStorage.saveAsync(plugin, plugin.getEventStatsManager().toMap());
         } catch (Exception e) {
-            plugin.getLogger().warning("Konnte Event-Statistiken nach Event nicht einreihen: " + e.getMessage());
+            plugin.getLogger().warning(plugin.getConsoleMsg("stats-queue-error", "error", e.getMessage()));
         }
         
-        // NEU: Entlade Welten nach Event
+        // Welten aufräumen. Läuft verzögert, damit die Rückteleportation oben
+        // abgeschlossen ist, bevor eine Welt angefasst wird.
         registerTask(new BukkitRunnable() {
             @Override
             public void run() {
                 String cloneSrcFS = config.getCloneSourceEventWorld();
+
+                // Clone- und Regenerations-Pfad behandeln die Eventwelt selbst;
+                // unloadWorlds() kümmert sich dann nur noch um die Lobby.
+                boolean eventWorldHandled = true;
+
                 if (cloneSrcFS != null && !cloneSrcFS.isEmpty()) {
                     MultiverseHelper mv = new MultiverseHelper(plugin);
                     mv.deleteWorld(config.getEventWorld(), null);
@@ -1467,7 +1677,11 @@ public class EventSession {
                 } else if (config.shouldRegenerateEventWorld()) {
                     MultiverseHelper mv = new MultiverseHelper(plugin);
                     mv.regenerateWorld(config.getEventWorld());
+                } else {
+                    eventWorldHandled = false;
                 }
+
+                unloadWorlds(eventWorldHandled);
             }
         }.runTaskLater(plugin, de.zfzfg.core.util.Time.seconds(2)));
         
@@ -1509,8 +1723,8 @@ public class EventSession {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
                 // Nicht zurÃƒÂ¼ckteleportieren - Spieler bleiben fÃƒÂ¼r Fallback-Event
-                player.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + 
-                    " &eEvent wird gewechselt - bitte warten..."));
+                player.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + 
+                    plugin.getConfigManager().getMessage("start.event-changing")));
             }
         }
         
@@ -1571,23 +1785,21 @@ plugin.getEventManager().removeSession(config.getId());
                 }
                 
                 player.teleport(safeLoc);
-                plugin.getLogger().info("[SafeTeleport] " + player.getName() + " zurück zu: " + 
-                    targetWorld.getName() + " @ " + safeLoc.getBlockX() + ", " + safeLoc.getBlockY() + ", " + safeLoc.getBlockZ());
+                plugin.getDebugManager().logFull(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", targetWorld.getName(), "coords", String.format("%d, %d, %d", safeLoc.getBlockX(), safeLoc.getBlockY(), safeLoc.getBlockZ())));
             } else {
                 // Welt nicht mehr geladen - Fallback zu Hauptwelt
-                plugin.getLogger().warning("[SafeTeleport] Gespeicherte Welt für " + player.getName() + 
-                    " nicht mehr geladen (" + savedLoc.getWorld().getName() + "), nutze Hauptwelt.");
+                plugin.getLogger().warning(plugin.getConsoleMsg("safe-teleport-fallback", "player", player.getName()));
                 teleportToMainWorld(player);
             }
         } else {
             // Keine gespeicherte Location - Hauptwelt
-            plugin.getLogger().warning("[SafeTeleport] Keine gespeicherte Location für " + player.getName() + ", nutze Hauptwelt.");
+            plugin.getLogger().warning(plugin.getConsoleMsg("safe-teleport-no-location", "player", player.getName()));
             teleportToMainWorld(player);
         }
         
         // Clear global saved location after teleport
         plugin.getEventManager().clearSavedLocation(player.getUniqueId());
-        
+
         // Entferne Spectator-Status aus der Event-Session, damit Schutz nicht mehr greift
         spectators.remove(player.getUniqueId());
         leftSpectators.add(player.getUniqueId());
@@ -1596,6 +1808,24 @@ plugin.getEventManager().removeSession(config.getId());
         player.removePotionEffect(org.bukkit.potion.PotionEffectType.INVISIBILITY);
 
         plugin.getCombatBridge().untagPlayer(player);
+
+        // Survival-Inventar zurueckspielen. Der zentrale Ausgang aller Wege aus dem Event
+        // (Ende, Abbruch, Ausscheiden, Verlassen) - deshalb genau hier und nicht in jedem
+        // Aufrufer einzeln.
+        //
+        // Beim Herunterfahren des Servers laeuft der Scheduler nicht mehr und ein Future
+        // wuerde nie komplettieren; die offene Sitzung steht im Guard-Journal und wird beim
+        // naechsten Start abgearbeitet.
+        //
+        // Die Verzoegerung kommt aus der Multiverse-Bridge und ist ohne
+        // Multiverse-Inventories 0. Dass am Ende der richtige Zustand steht, sichert nicht
+        // sie, sondern die Nachkontrolle in InventorySessionManager.finish().
+        if (plugin.isEnabled()) {
+            final Player target = player;
+            Bukkit.getScheduler().runTaskLater(plugin,
+                    () -> restoreInventoryAfterEvent(target, ready -> deliverPendingRewards(target, ready)),
+                    plugin.getInventoryRestoreDelayTicks());
+        }
     }
     
     /**
@@ -1612,7 +1842,7 @@ plugin.getEventManager().removeSession(config.getId());
         if (mainWorld != null) {
             player.teleport(mainWorld.getSpawnLocation());
         } else {
-            plugin.getLogger().severe("[SafeTeleport] KRITISCH: Keine Hauptwelt verfügbar für " + player.getName());
+            plugin.getLogger().severe(plugin.getConsoleMsg("safe-teleport-critical", "player", player.getName()));
         }
     }
     

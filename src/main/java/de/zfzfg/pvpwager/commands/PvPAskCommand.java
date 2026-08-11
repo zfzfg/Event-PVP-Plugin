@@ -5,6 +5,7 @@ import de.zfzfg.pvpwager.gui.livetrade.LiveTradeManager;
 import de.zfzfg.pvpwager.gui.livetrade.LiveTradeSession;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -13,6 +14,8 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -25,6 +28,7 @@ import java.util.stream.Collectors;
  */
 @Deprecated
 public class PvPAskCommand implements CommandExecutor, TabCompleter {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     private final EventPlugin plugin;
     
@@ -32,25 +36,75 @@ public class PvPAskCommand implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
     }
     
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");  // i18n-ignore: i18n system warning
+        }
+    }
+
     private String getMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.pvpask." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages().getString("messages.pvpask." + key, null);
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.pvp-wager-gui." + key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.request." + key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.general." + key, null);
+        }
+        if (val != null) return ChatColor.translateAlternateColorCodes('&', val);
+        warnMissingKey("messages.pvpask." + key);
+        return "&c[missing: " + key + "]";
     }
     
     private String getMsg(String key, String placeholder, String value) {
-        String message = plugin.getCoreConfigManager().getMessages()
-            .getString("messages.pvpask." + key, key);
-        return message.replace("{" + placeholder + "}", value);
+        String msg = getMsg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
     }
     
     private String getGeneralMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.general." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.general." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.general." + key);
+        return "&c[missing: " + key + "]";
     }
     
     private String getHelpMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.help.pvp." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages().getString("messages.pvpwager.help." + key, null);
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.help.pvp." + key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.info." + key, null);
+        }
+        if (val != null) return val;
+        warnMissingKey("messages.pvpwager.help." + key);
+        return "&c[missing: " + key + "]";
+    }
+
+    private void sendUsage(Player player) {
+        MessageUtil.sendMessage(player, "");
+        MessageUtil.sendMessage(player, getHelpMsg("title"));
+        MessageUtil.sendMessage(player, getHelpMsg("usage"));
+        MessageUtil.sendMessage(player, "");
+        MessageUtil.sendMessage(player, getHelpMsg("description1"));
+        MessageUtil.sendMessage(player, getHelpMsg("description2"));
+        MessageUtil.sendMessage(player, getHelpMsg("description3"));
+        MessageUtil.sendMessage(player, "");
+        MessageUtil.sendMessage(player, getHelpMsg("countdown1"));
+        MessageUtil.sendMessage(player, getHelpMsg("countdown2"));
+        MessageUtil.sendMessage(player, "");
     }
     
     @Override
@@ -147,23 +201,6 @@ public class PvPAskCommand implements CommandExecutor, TabCompleter {
         session.start();
         
         return true;
-    }
-    
-    private void sendUsage(Player player) {
-        MessageUtil.sendMessage(player, "");
-        MessageUtil.sendMessage(player, getHelpMsg("header"));
-        MessageUtil.sendMessage(player, getHelpMsg("title"));
-        MessageUtil.sendMessage(player, getHelpMsg("header"));
-        MessageUtil.sendMessage(player, "");
-        MessageUtil.sendMessage(player, getHelpMsg("usage"));
-        MessageUtil.sendMessage(player, "");
-        MessageUtil.sendMessage(player, getMsg("pvpask.help.description1"));
-        MessageUtil.sendMessage(player, getMsg("pvpask.help.description2"));
-        MessageUtil.sendMessage(player, getMsg("pvpask.help.description3"));
-        MessageUtil.sendMessage(player, "");
-        MessageUtil.sendMessage(player, getMsg("pvpask.help.countdown1"));
-        MessageUtil.sendMessage(player, getMsg("pvpask.help.countdown2"));
-        MessageUtil.sendMessage(player, "");
     }
     
     @Override

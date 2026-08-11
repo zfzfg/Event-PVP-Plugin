@@ -72,7 +72,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
     @Override
     public void open() {
         inventory = Bukkit.createInventory(null, SIZE,
-            MessageUtil.color("&6&lGegenangebot erstellen"));
+            MessageUtil.color(plugin.getCoreConfigManager().getMessages().getString("messages.pvp-wager-gui.counter-offer-title", "&6&lCreate Counter Offer")));
         
         buildLayout();
         openInventory();
@@ -101,24 +101,24 @@ public class CounterOfferItemGui extends AbstractWagerGui {
     private void createInfoSection() {
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.add(MessageUtil.color("&7Passe deinen Einsatz an,"));
-        lore.add(MessageUtil.color("&7um ein Gegenangebot zu senden."));
+        lore.add(t("counter-offer-info-line1"));
+        lore.add(t("counter-offer-info-line2"));
         lore.add("");
-        lore.add(MessageUtil.color("&eKlicke Items in deinem"));
-        lore.add(MessageUtil.color("&eInventar um sie hinzuzufügen."));
-        
+        lore.add(t("counter-offer-info-line3"));
+        lore.add(t("counter-offer-info-line4"));
+
         inventory.setItem(INFO_SLOT, createButton(Material.PAPER,
-            "&e&lGegenangebot", lore));
-        
+            t("counter-offer-info-title"), lore));
+
         // Clear Items Button
         inventory.setItem(CLEAR_ITEMS_SLOT, createButton(Material.BARRIER,
-            "&c&l✖ Items leeren",
-            "&7Entfernt alle ausgewählten Items"));
-        
+            t("counter-offer-clear-items-title"),
+            t("counter-offer-clear-items-lore")));
+
         // Clear Money Button
         inventory.setItem(CLEAR_MONEY_SLOT, createButton(Material.COAL_BLOCK,
-            "&c&l✖ Geld auf 0",
-            "&7Setzt den Geldbetrag auf 0"));
+            t("counter-offer-clear-money-title"),
+            t("counter-offer-clear-money-lore")));
     }
     
     private void updateSelectedItems() {
@@ -132,7 +132,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
                 if (meta != null) {
                     List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
                     lore.add("");
-                    lore.add(MessageUtil.color("&cRechtsklick zum Entfernen"));
+                    lore.add(t("counter-offer-remove-hint"));
                     meta.setLore(lore);
                     display.setItemMeta(meta);
                 }
@@ -158,24 +158,24 @@ public class CounterOfferItemGui extends AbstractWagerGui {
             String prefix = MONEY_AMOUNTS[i] < 0 ? "&c" : "&a";
             inventory.setItem(MONEY_BUTTONS[i], createButton(buttonMats[i],
                 prefix + buttonNames[i] + "$",
-                "&7Klicke zum Ändern"));
+                t("counter-offer-money-button-lore")));
         }
     }
     
     private void updateMoneyDisplay() {
         List<String> lore = new ArrayList<>();
         lore.add("");
-        lore.add(MessageUtil.color("&7Aktueller Einsatz:"));
+        lore.add(t("counter-offer-current-stake-label"));
         lore.add(MessageUtil.color("&6&l$" + String.format("%,.2f", counterMoney)));
         lore.add("");
         if (plugin.hasEconomy()) {
             double balance = plugin.getEconomy().getBalance(player);
-            lore.add(MessageUtil.color("&7Dein Guthaben: &f$" + String.format("%,.2f", balance)));
+            lore.add(t("counter-offer-balance-label", "amount", String.format("%,.2f", balance)));
         }
-        
+
         Material mat = counterMoney > 0 ? Material.GOLD_BLOCK : Material.COAL_BLOCK;
         inventory.setItem(MONEY_DISPLAY_SLOT, createButton(mat,
-            "&6&lGeld-Einsatz", lore));
+            t("counter-offer-money-title"), lore));
     }
     
     private void createPlayerInventoryPreview() {
@@ -194,7 +194,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
                     if (meta != null) {
                         List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
                         lore.add("");
-                        lore.add(MessageUtil.color("&a✓ Bereits ausgewählt"));
+                        lore.add(t("counter-offer-already-selected"));
                         meta.setLore(lore);
                         display.setItemMeta(meta);
                     }
@@ -220,19 +220,19 @@ public class CounterOfferItemGui extends AbstractWagerGui {
     private void createNavigationButtons() {
         // Zurück zum Verhandlungs-GUI
         inventory.setItem(BACK_SLOT, createButton(Material.ARROW,
-            "&c&l← Abbrechen",
-            "&7Zurück ohne Änderungen"));
-        
+            t("counter-offer-back-title"),
+            t("counter-offer-back-lore")));
+
         // Gegenangebot senden
         List<String> sendLore = new ArrayList<>();
         sendLore.add("");
-        sendLore.add(MessageUtil.color("&7Items: &f" + counterItems.size()));
-        sendLore.add(MessageUtil.color("&7Geld: &6$" + String.format("%,.2f", counterMoney)));
+        sendLore.add(t("counter-offer-send-items-label", "count", String.valueOf(counterItems.size())));
+        sendLore.add(t("counter-offer-send-money-label", "amount", String.format("%,.2f", counterMoney)));
         sendLore.add("");
-        sendLore.add(MessageUtil.color("&aSendet das Gegenangebot!"));
-        
+        sendLore.add(t("counter-offer-send-hint"));
+
         inventory.setItem(SEND_SLOT, createButton(Material.EMERALD,
-            "&a&l➤ SENDEN", sendLore));
+            t("counter-offer-send-title"), sendLore));
     }
     
     @Override
@@ -308,7 +308,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
         // Item hinzufügen (mit Stacking)
         if (!tryAddItem(clicked.clone())) {
             playErrorSound();
-            MessageUtil.sendMessage(player, "&cMaximal 7 verschiedene Items!");
+            MessageUtil.sendMessage(player, t("max-different-items"));
         } else {
             updateSelectedItems();
             createNavigationButtons();
@@ -326,7 +326,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
         
         if (!tryAddItem(clicked.clone())) {
             playErrorSound();
-            MessageUtil.sendMessage(player, "&cMaximal 7 verschiedene Items!");
+            MessageUtil.sendMessage(player, t("max-different-items"));
         } else {
             updateSelectedItems();
             createPlayerInventoryPreview();
@@ -427,7 +427,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
         
         if (opponent == null || !opponent.isOnline()) {
             playErrorSound();
-            MessageUtil.sendMessage(player, "&cDer andere Spieler ist nicht mehr online!");
+            MessageUtil.sendMessage(player, t("opponent-offline"));
             return;
         }
         
@@ -435,7 +435,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
         if (counterMoney > 0 && plugin.hasEconomy()) {
             if (!plugin.getEconomy().has(player, counterMoney)) {
                 playErrorSound();
-                MessageUtil.sendMessage(player, "&cNicht genug Geld!");
+                MessageUtil.sendMessage(player, t("not-enough-money-self"));
                 return;
             }
         }
@@ -450,7 +450,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
                     player.getInventory().addItem(removed);
                 }
                 playErrorSound();
-                MessageUtil.sendMessage(player, "&cDu hast nicht alle Items!");
+                MessageUtil.sendMessage(player, t("missing-items-self"));
                 return;
             }
             
@@ -483,12 +483,12 @@ public class CounterOfferItemGui extends AbstractWagerGui {
         request.setLastOfferer(player.getUniqueId());
         
         playSuccessSound();
-        MessageUtil.sendMessage(player, "&aGegenangebot gesendet! Warte auf Antwort...");
+        MessageUtil.sendMessage(player, t("counter-offer-sent"));
         
         // Öffne Verhandlungs-GUI beim anderen Spieler
         MessageUtil.sendMessage(opponent, "");
         MessageUtil.sendMessage(opponent, "&6&l━━━━━━━━━━━━━━━━━━━━━━━");
-        MessageUtil.sendMessage(opponent, "&e" + player.getName() + " &7hat ein &6Gegenangebot &7gesendet!");
+        MessageUtil.sendMessage(opponent, t("counter-offer-received", "player", player.getName()));
         MessageUtil.sendMessage(opponent, "&6&l━━━━━━━━━━━━━━━━━━━━━━━");
         MessageUtil.sendMessage(opponent, "");
         

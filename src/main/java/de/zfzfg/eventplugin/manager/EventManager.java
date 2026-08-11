@@ -63,6 +63,18 @@ public class EventManager {
     public boolean isEventActive(String eventId) {
         return activeSessions.containsKey(eventId);
     }
+
+    /**
+     * Ob dieser Spieler gerade an einem laufenden Event teilnimmt.
+     *
+     * <p>Arbeitet ueber den Index statt ueber {@code getPlayerSession}, damit die Frage auch
+     * fuer offline stehende Spieler beantwortbar bleibt - genau das braucht der
+     * Inventar-Guard beim Wiederanlauf und beim Join.</p>
+     */
+    public boolean isPlayerInEvent(java.util.UUID playerId) {
+        String eventId = playerToEventId.get(playerId);
+        return eventId != null && activeSessions.containsKey(eventId);
+    }
     
     public void stopAllEvents() {
         for (EventSession session : activeSessions.values()) {
@@ -70,6 +82,8 @@ public class EventManager {
         }
         activeSessions.clear();
         playerToEventId.clear();
+        // Nur der Zwischenspeicher. Der ReturnLocationStore bleibt bewusst stehen: wer beim
+        // Herunterfahren noch eine offene Position hat, braucht sie beim naechsten Start.
         globalSavedLocations.clear();
     }
     
@@ -87,17 +101,44 @@ public class EventManager {
     }
 
     // Global saved locations API
+    //
+    // Die Map im Arbeitsspeicher bleibt der schnelle Weg; parallel dazu haelt der
+    // ReturnLocationStore dieselbe Position auf der Platte. Ein Absturz warf frueher genau
+    // diese Zuordnung weg - das Inventar kam ueber das Guard-Journal zurueck, die Position
+    // war verloren. Alle bestehenden Aufrufer bekommen die Persistenz hier mit, ohne selbst
+    // etwas zu aendern.
+
     public void savePlayerLocation(java.util.UUID playerId, Location location) {
-        if (location != null) {
-            globalSavedLocations.put(playerId, location.clone());
+        if (location == null) {
+            return;
+        }
+        globalSavedLocations.put(playerId, location.clone());
+        if (plugin.getReturnLocations() != null) {
+            plugin.getReturnLocations().remember(playerId, location,
+                    de.zfzfg.core.location.ReturnReason.EVENT);
         }
     }
 
+    /**
+     * Die gemerkte Position. Faellt auf den persistenten Speicher zurueck, wenn die Map sie
+     * nicht mehr hat - genau der Fall nach einem Serverneustart.
+     */
     public Location getSavedLocation(java.util.UUID playerId) {
-        return globalSavedLocations.get(playerId);
+        Location inMemory = globalSavedLocations.get(playerId);
+        if (inMemory != null) {
+            return inMemory;
+        }
+        if (plugin.getReturnLocations() == null) {
+            return null;
+        }
+        de.zfzfg.core.location.StoredReturn stored = plugin.getReturnLocations().peek(playerId);
+        return stored == null ? null : stored.toLocation();
     }
 
     public void clearSavedLocation(java.util.UUID playerId) {
         globalSavedLocations.remove(playerId);
+        if (plugin.getReturnLocations() != null) {
+            plugin.getReturnLocations().forget(playerId);
+        }
     }
 }

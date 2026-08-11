@@ -10,6 +10,7 @@ import java.util.List;
 public class InventoryUtil {
     
     public static boolean hasSpaceForItems(Player player, List<ItemStack> items) {
+        if (player == null || !player.isOnline() || items == null) return false;
         Inventory inventory = player.getInventory();
         int emptySlots = 0;
         
@@ -25,6 +26,7 @@ public class InventoryUtil {
     }
     
     public static boolean canFitItems(Player player, List<ItemStack> items) {
+        if (player == null || !player.isOnline() || items == null) return false;
         Inventory inventory = player.getInventory();
         
         for (ItemStack item : items) {
@@ -70,19 +72,28 @@ public class InventoryUtil {
     }
     
     public static void giveItems(Player player, List<ItemStack> items) {
+        if (player == null || !player.isOnline() || items == null) return;
         for (ItemStack item : items) {
             if (item != null && item.getType() != Material.AIR) {
-                player.getInventory().addItem(item);
+                java.util.Map<Integer, ItemStack> leftover = player.getInventory().addItem(item);
+                if (!leftover.isEmpty()) {
+                    for (ItemStack drop : leftover.values()) {
+                        player.getWorld().dropItemNaturally(player.getLocation(), drop);
+                    }
+                }
             }
         }
     }
     
     public static void clearInventory(Player player) {
-        player.getInventory().clear();
+        if (player != null && player.isOnline()) {
+            player.getInventory().clear();
+        }
     }
     
     public static List<ItemStack> getNonEmptyItems(Inventory inventory) {
         List<ItemStack> items = new ArrayList<>();
+        if (inventory == null) return items;
         for (ItemStack item : inventory.getContents()) {
             if (item != null && item.getType() != Material.AIR) {
                 items.add(item);

@@ -4,6 +4,7 @@ import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.models.Match;
 import de.zfzfg.pvpwager.models.MatchState;
 import de.zfzfg.pvpwager.utils.MessageUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,10 +19,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PvPListener implements Listener {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     private final EventPlugin plugin;
     
@@ -34,8 +37,50 @@ public class PvPListener implements Listener {
         this.plugin = plugin;
     }
     
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)"); // i18n-ignore: i18n system warning
+        }
+    }
+
     private String getMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages().getString("messages.pvp-listener." + key, key);
+        if (key == null || key.isEmpty()) return "";
+        String val = null;
+        if (key.startsWith("messages.")) {
+            val = plugin.getCoreConfigManager().getMessages().getString(key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.pvp-listener." + key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString(key, null);
+        }
+        if (val != null) return val;
+        warnMissingKey("messages.pvp-listener." + key);
+        return "&c[missing: " + key + "]";
+    }
+    
+    private String getMsg(String key, String p1, String v1, String p2, String v2) {
+        return getMsg(key, new String[]{p1, v1, p2, v2});
+    }
+    
+    private String getMsg(String key, String p1, String v1) {
+        return getMsg(key, new String[]{p1, v1});
+    }
+
+    private String getMsg(String key, String... replacements) {
+        String msg = getMsg(key);
+        if (replacements != null && replacements.length > 0) {
+            for (int i = 0; i < replacements.length - 1; i += 2) {
+                String raw = replacements[i] != null ? replacements[i].replaceAll("^[{%]+|[%}]+$", "") : "";
+                String val = replacements[i + 1] != null ? replacements[i + 1] : "";
+                if (!raw.isEmpty()) {
+                    msg = msg.replace("{" + raw + "}", val)
+                             .replace("%" + raw + "%", val);
+                }
+            }
+        }
+        return msg;
     }
     
     @EventHandler
@@ -106,11 +151,9 @@ public class PvPListener implements Listener {
             Location originalLocation = match.getOriginalLocations().get(player.getUniqueId());
             if (originalLocation != null) {
                 pendingRespawnLocations.put(player.getUniqueId(), originalLocation.clone());
-                plugin.getLogger().info("[PvPDeath] Original-Location für " + player.getName() + " gespeichert: " +
-                    originalLocation.getWorld().getName() + " @ " + 
-                    String.format("%.2f, %.2f, %.2f", originalLocation.getX(), originalLocation.getY(), originalLocation.getZ()));
+                plugin.getLogger().info(plugin.getConsoleMsg("pvp-death-saved", "player", player.getName(), "location", String.format("%s @ %.2f, %.2f, %.2f", (originalLocation.getWorld() != null ? originalLocation.getWorld().getName() : "NULL"), originalLocation.getX(), originalLocation.getY(), originalLocation.getZ())));
             } else {
-                plugin.getLogger().warning("[PvPDeath] WARNUNG: Keine Original-Location für " + player.getName() + " gefunden!");
+                plugin.getLogger().warning(plugin.getConsoleMsg("pvp-death-no-location", "player", player.getName()));
             }
             
             Player killer = player.getKiller();
@@ -129,10 +172,10 @@ public class PvPListener implements Listener {
                 if (p1Dead && p2Dead) {
                     match.broadcast("");
                     match.broadcast("&a&l━━━━━━━━━━━━━━━━━━━━━━━");
-                    match.broadcast("&a&lDRAW (double-death)!");
+                    match.broadcast(getMsg("draw-double-death"));
                     match.broadcast("&a&l━━━━━━━━━━━━━━━━━━━━━━━");
                     match.broadcast("");
-                    match.broadcast("&7Both players died nearly simultaneously.");
+                    match.broadcast(getMsg("both-died-simultaneously"));
                     plugin.getMatchManager().endMatch(match, null, true);
                     return;
                 }
@@ -141,8 +184,7 @@ public class PvPListener implements Listener {
                 if (killer != null && (killer.equals(match.getPlayer1()) || killer.equals(match.getPlayer2()))) {
                     plugin.getMatchManager().endMatch(match, killer, false);
                     match.broadcast(MessageUtil.color(
-                        "&c" + player.getName() + " &7wurde von &c" + killer.getName() +
-                        " &7im PvP-Match besiegt!"
+                        getMsg("defeated-by", "player", player.getName(), "killer", killer.getName())
                     ));
                 } else {
                     Player opponent = match.getOpponent(player);
@@ -150,7 +192,7 @@ public class PvPListener implements Listener {
                         plugin.getMatchManager().endMatch(match, opponent, false);
                         String deathCause = getDeathCause(event.getEntity().getLastDamageCause());
                         match.broadcast(MessageUtil.color(
-                            "&c" + player.getName() + " &7ist " + deathCause + " &7im PvP-Match gestorben!"
+                            getMsg("died-in-match", "player", player.getName(), "cause", deathCause)
                         ));
                     }
                 }
@@ -161,8 +203,9 @@ public class PvPListener implements Listener {
             event.setDroppedExp(0);
             
             // WICHTIG: Inventar NICHT behalten!
-            // Das Arena-Equipment soll nicht beim Respawn da sein.
-            // Per-World-Inventory kümmert sich um das richtige Inventar beim Weltenwechsel.
+            // Das Arena-Equipment soll nicht beim Respawn da sein. Das Survival-Inventar
+            // kommt beim Respawn aus dem Pre-Match-Backup zurueck (onPlayerRespawn); im
+            // Legacy-Betrieb uebernimmt das weiterhin Multiverse-Inventories.
             event.setKeepInventory(false);
             
             // Equipment sofort aus dem Inventar löschen (verhindert Drop und Behalten)
@@ -179,11 +222,42 @@ public class PvPListener implements Listener {
      * WICHTIG: Verwendet die beim Tod gespeicherte Location aus pendingRespawnLocations,
      * da das Match möglicherweise schon beendet ist wenn der Spieler respawnt!
      */
+    /**
+     * Spielt das Pre-Match-Backup nach einem Tod zurueck.
+     *
+     * <p>Ohne das steht der Spieler nach dem Respawn mit leerem Inventar da, sobald kein
+     * Multiverse-Inventories den Weltwechsel abfaengt. Der Aufruf ist idempotent: laeuft
+     * gleichzeitig schon ein Restore aus {@code endMatch}, gewinnt genau einer von beiden.</p>
+     */
+    private void restoreAfterRespawn(UUID playerId) {
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()
+                || !plugin.getInventoryConfig().restoreOnRespawn()) {
+            return;
+        }
+        de.zfzfg.core.inventory.guard.GuardEntry entry = plugin.getInventoryGuard().get(playerId);
+        if (entry == null
+                || entry.context() != de.zfzfg.core.inventory.guard.GuardContext.PVP_MATCH) {
+            return;
+        }
+        Bukkit.getScheduler().runTaskLater(plugin, () -> sessions.finish(playerId, outcome -> {
+            if (!outcome.isSuccess()) {
+                plugin.getLogger().warning(plugin.getConsoleMsg("inventory-respawn-restore-failed",
+                        "player", playerId.toString(), "reason", outcome.name()));
+            }
+        }), Time.ticks(15));
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         UUID playerId = player.getUniqueId();
-        
+
+        // Survival-Inventar zurueckspielen, sobald der Respawn durch ist. Der Respawn selbst
+        // ist zum Zeitpunkt dieses Events noch nicht abgeschlossen - deshalb erst danach,
+        // und mit etwas Abstand zum Teleport in die Ursprungswelt.
+        restoreAfterRespawn(playerId);
+
         // ZUERST: Prüfe ob wir eine gespeicherte Respawn-Location haben (vom Death-Event)
         Location savedLocation = pendingRespawnLocations.remove(playerId);
         
@@ -196,8 +270,7 @@ public class PvPListener implements Listener {
                     safeLocation.getX(), safeLocation.getY(), safeLocation.getZ());
                 String targetWorld = safeLocation.getWorld() != null ? safeLocation.getWorld().getName() : "NULL";
                 
-                plugin.getLogger().info("[Respawn] " + player.getName() + " verwendet gespeicherte Location: " + 
-                    targetWorld + " @ " + targetCoords);
+                plugin.getLogger().info(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", targetWorld, "coords", targetCoords));
                 
                 event.setRespawnLocation(safeLocation);
                 verifySingleTeleport(player, safeLocation.clone());
@@ -211,13 +284,12 @@ public class PvPListener implements Listener {
             Location safeLocation = determineSafeRespawnLocation(player, match);
             
             if (safeLocation != null) {
-                String targetCoords = String.format("%.2f, %.2f, %.2f (Yaw: %.1f, Pitch: %.1f)", 
+                String targetCoords = String.format("%.2f, %.2f, %.2f (Yaw: %.1f, Pitch: %.1f)",  // i18n-ignore: nur Log-Diagnose (SafeRespawn)
                     safeLocation.getX(), safeLocation.getY(), safeLocation.getZ(),
                     safeLocation.getYaw(), safeLocation.getPitch());
                 String targetWorld = safeLocation.getWorld() != null ? safeLocation.getWorld().getName() : "NULL";
                 
-                plugin.getLogger().info("[Respawn] " + player.getName() + " (aus Match) soll zu " + 
-                    targetWorld + " @ " + targetCoords + " teleportiert werden");
+                plugin.getLogger().info(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", targetWorld, "coords", targetCoords));
                 
                 event.setRespawnLocation(safeLocation);
                 verifySingleTeleport(player, safeLocation.clone());
@@ -225,13 +297,15 @@ public class PvPListener implements Listener {
         }
     }
     
+    // === SICHERES RESPAWN SYSTEM ===
+    
     /**
      * Bereitet eine gespeicherte Location für den Respawn vor.
      * Prüft ob die Welt noch geladen ist und gibt einen Fallback zurück falls nötig.
      */
     private Location prepareSafeLocation(Location savedLocation, String playerName) {
         if (savedLocation == null || savedLocation.getWorld() == null) {
-            plugin.getLogger().warning("[Respawn] Gespeicherte Location für " + playerName + " ist ungültig!");
+            plugin.getLogger().warning(plugin.getConsoleMsg("safe-respawn-invalid-loc", "player", playerName));
             return getMainWorldSpawn();
         }
         
@@ -239,8 +313,7 @@ public class PvPListener implements Listener {
         org.bukkit.World world = org.bukkit.Bukkit.getWorld(worldName);
         
         if (world == null) {
-            plugin.getLogger().warning("[Respawn] Welt " + worldName + " für " + playerName + 
-                " nicht mehr geladen - verwende Hauptwelt-Spawn");
+            plugin.getLogger().warning(plugin.getConsoleMsg("safe-respawn-unloaded-world", "world", worldName, "player", playerName));
             return getMainWorldSpawn();
         }
         
@@ -279,10 +352,7 @@ public class PvPListener implements Listener {
             
             if (wrongWorld) {
                 // KRITISCH: Spieler in falscher Welt - MUSS teleportiert werden!
-                plugin.getLogger().warning("[Respawn-Verify] KRITISCH: " + player.getName() + " ist in FALSCHER WELT!");
-                plugin.getLogger().warning("  Erwartet: " + expectedWorld + " @ " + expectedCoords);
-                plugin.getLogger().warning("  Aktuell:  " + currentWorld + " @ " + currentCoords);
-                plugin.getLogger().info("[Respawn-Verify] Teleportiere " + player.getName() + " zur korrekten Welt...");
+                plugin.getLogger().warning(plugin.getConsoleMsg("safe-respawn-wrong-world", "player", player.getName()));
                 
                 // Teleportieren und nochmal prüfen
                 player.teleport(expected);
@@ -290,20 +360,14 @@ public class PvPListener implements Listener {
                 
             } else if (criticallyFar) {
                 // Spieler ist sehr weit weg (>50 Blöcke) - wahrscheinlich falsch gespawnt
-                plugin.getLogger().warning("[Respawn-Verify] " + player.getName() + " ist " + 
-                    String.format("%.1f", distance) + " Blöcke von der erwarteten Position entfernt!");
-                plugin.getLogger().warning("  Erwartet: " + expectedWorld + " @ " + expectedCoords);
-                plugin.getLogger().warning("  Aktuell:  " + currentWorld + " @ " + currentCoords);
-                plugin.getLogger().info("[Respawn-Verify] Teleportiere " + player.getName() + " zur korrekten Position...");
+                plugin.getLogger().warning(plugin.getConsoleMsg("safe-respawn-distance-warn", "player", player.getName(), "distance", String.format("%.1f", distance)));
                 
                 player.teleport(expected);
                 verifyFinalTeleport(player, expected);
                 
             } else {
                 // Alles OK - Spieler ist in richtiger Welt und nah genug
-                plugin.getLogger().info("[Respawn-Verify] ✓ " + player.getName() + 
-                    " korrekt in " + currentWorld + " @ " + currentCoords + 
-                    " (Distanz: " + String.format("%.1f", distance) + " Blöcke - OK)");
+                plugin.getLogger().info(plugin.getConsoleMsg("safe-respawn-correct", "player", player.getName(), "world", currentWorld, "coords", currentCoords, "distance", String.format("%.1f", distance)));
             }
         }, 5L); // 5 Ticks = 0.25 Sekunden nach Respawn
     }
@@ -323,15 +387,11 @@ public class PvPListener implements Listener {
             double distance = wrongWorld ? Double.MAX_VALUE : current.distance(expected);
             
             if (wrongWorld || distance > 50.0) {
-                plugin.getLogger().severe("[Respawn-Verify] FEHLER: Korrektur-Teleport für " + player.getName() + 
-                    " fehlgeschlagen! Spieler ist immer noch am falschen Ort.");
-                plugin.getLogger().severe("  Erwartet: " + expectedWorld);
-                plugin.getLogger().severe("  Aktuell:  " + currentWorld);
+                plugin.getLogger().severe(plugin.getConsoleMsg("safe-respawn-correction-failed", "player", player.getName()));
                 // Letzter Versuch
                 player.teleport(expected);
             } else {
-                plugin.getLogger().info("[Respawn-Verify] ✓ Korrektur erfolgreich - " + player.getName() + 
-                    " jetzt in " + currentWorld);
+                plugin.getLogger().info(plugin.getConsoleMsg("safe-respawn-correction-success", "player", player.getName(), "world", currentWorld));
             }
         }, 3L);
     }
@@ -340,9 +400,34 @@ public class PvPListener implements Listener {
      * Prüft ob die Arena-Welt entladen ist.
      */
     private boolean isArenaWorldUnloaded(Match match) {
-        if (match.getArena() == null) return true;
+        if (match == null || match.getArena() == null) return false;
+        
         String arenaWorldName = match.getArena().getArenaWorld();
-        return arenaWorldName == null || org.bukkit.Bukkit.getWorld(arenaWorldName) == null;
+        if (arenaWorldName == null || arenaWorldName.isEmpty()) return false;
+        
+        return org.bukkit.Bukkit.getWorld(arenaWorldName) == null;
+    }
+    
+    /**
+     * Holt die Original-Location oder gibt den Fallback zurück.
+     */
+    private Location getOriginalLocationOrFallback(Player player, Location originalLocation, String reason) {
+        if (originalLocation != null && originalLocation.getWorld() != null) {
+            org.bukkit.World originWorld = org.bukkit.Bukkit.getWorld(originalLocation.getWorld().getName());
+            if (originWorld != null) {
+                plugin.getLogger().info(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", originalLocation.getWorld().getName(), "coords", String.format("%.1f, %.1f, %.1f", originalLocation.getX(), originalLocation.getY(), originalLocation.getZ())));
+                Location safeOrigin = originalLocation.clone();
+                safeOrigin.setWorld(originWorld);
+                return safeOrigin;
+            } else {
+                plugin.getLogger().warning(plugin.getConsoleMsg("pvp-respawn-unloaded", "world", originalLocation.getWorld().getName()));
+            }
+        } else {
+            plugin.getLogger().warning(plugin.getConsoleMsg("pvp-respawn-no-location", "player", player.getName()));
+        }
+        
+        // Fallback zur Hauptwelt
+        return getMainWorldSpawn();
     }
     
     /**
@@ -366,129 +451,85 @@ public class PvPListener implements Listener {
         // Wenn ein Spieler stirbt, ist das Match effektiv vorbei. Kein Respawn in Arena.
         // Das Per-World-Inventory Plugin kümmert sich um das richtige Inventar beim Weltenwechsel.
         if (isActivePlayer) {
-            return getOriginalLocationOrFallback(player, originalLocation, "Spieler-Tod im Match");
+            return getOriginalLocationOrFallback(player, originalLocation, "player death in match");  // i18n-ignore: debug log trace (SafeRespawn)
         }
         
         // Für Spectators: Auch zum Original-Standort (Spectator sollte sowieso nicht sterben)
         if (match.getSpectators().contains(player.getUniqueId())) {
-            return getOriginalLocationOrFallback(player, originalLocation, "Spectator-Tod");
+            return getOriginalLocationOrFallback(player, originalLocation, "spectator death");  // i18n-ignore: debug log trace (SafeRespawn)
         }
         
         // Fallback für alle anderen Fälle
-        return getOriginalLocationOrFallback(player, originalLocation, "Unbekannter Fall");
+        return getOriginalLocationOrFallback(player, originalLocation, "unknown fallback");  // i18n-ignore: debug log trace (SafeRespawn)
     }
     
     /**
-     * Gibt den Original-Standort zurück oder einen Fallback.
-     */
-    private Location getOriginalLocationOrFallback(Player player, Location originalLocation, String reason) {
-        if (originalLocation != null && originalLocation.getWorld() != null) {
-            org.bukkit.World originWorld = org.bukkit.Bukkit.getWorld(originalLocation.getWorld().getName());
-            if (originWorld != null) {
-                plugin.getLogger().info("[SafeRespawn-PvP] " + reason + " - " + 
-                    player.getName() + " wird zu Original-Standort teleportiert: " + 
-                    originalLocation.getWorld().getName() + " (" + 
-                    String.format("%.1f, %.1f, %.1f", originalLocation.getX(), originalLocation.getY(), originalLocation.getZ()) + ")");
-                Location safeOrigin = originalLocation.clone();
-                safeOrigin.setWorld(originWorld);
-                return safeOrigin;
-            } else {
-                plugin.getLogger().warning("[SafeRespawn-PvP] Original-Welt nicht geladen: " + 
-                    originalLocation.getWorld().getName() + " - verwende Hauptwelt-Spawn");
-            }
-        } else {
-            plugin.getLogger().warning("[SafeRespawn-PvP] Kein Original-Standort für " + player.getName() + 
-                " gefunden - verwende Hauptwelt-Spawn");
-        }
-        
-        // Fallback zur Hauptwelt
-        return getMainWorldSpawn();
-    }
-    
-    /**
-     * Prüft, ob eine Location sicher ist.
-     */
-    private boolean isSafeLocation(Location loc) {
-        if (loc == null || loc.getWorld() == null) return false;
-        
-        // Prüfe ob Welt noch geladen ist
-        if (org.bukkit.Bukkit.getWorld(loc.getWorld().getName()) == null) return false;
-        
-        // Prüfe Y-Koordinate (Void-Schutz)
-        double minY = loc.getWorld().getMinHeight();
-        if (loc.getY() < minY + 5) return false;
-        
-        return true;
-    }
-    
-    /**
-     * Prüft, ob eine Location unsicher ist (Void, ungeladene Welt).
-     */
-    private boolean isUnsafeLocation(Location loc) {
-        if (loc == null || loc.getWorld() == null) return true;
-        
-        // Prüfe ob Welt noch geladen ist
-        if (org.bukkit.Bukkit.getWorld(loc.getWorld().getName()) == null) return true;
-        
-        // Prüfe Y-Koordinate (Void-Schutz)
-        double minY = loc.getWorld().getMinHeight();
-        if (loc.getY() < minY + 2) return true;
-        
-        return false;
-    }
-    
-    /**
-     * Gibt den Spawn der Hauptwelt zurück.
+     * Spawn der Hauptwelt, ersatzweise der ersten geladenen Welt.
+     *
+     * <p>Delegiert an den gemeinsamen {@link de.zfzfg.core.location.SafeLocationResolver};
+     * hier stand vorher eine eigene Kopie, ebenso wie zwei nie aufgerufene
+     * Location-Pruefungen.</p>
      */
     private Location getMainWorldSpawn() {
-        String mainWorldName = plugin.getConfigManager().getMainWorld();
-        org.bukkit.World mainWorld = mainWorldName != null ? org.bukkit.Bukkit.getWorld(mainWorldName) : null;
-        
-        if (mainWorld == null && !org.bukkit.Bukkit.getWorlds().isEmpty()) {
-            mainWorld = org.bukkit.Bukkit.getWorlds().get(0);
-        }
-        
-        if (mainWorld != null) {
-            return mainWorld.getSpawnLocation();
-        }
-        
-        return null;
+        return plugin.getSafeLocations().fallbackSpawn();
     }
-    
+
     private String getDeathCause(EntityDamageEvent damageEvent) {
-        if (damageEvent == null) return "&7unbekannt";
+        if (damageEvent == null) return MessageUtil.color(getMsg("cause.unknown"));
         
         DamageCause cause = damageEvent.getCause();
         
         if (cause == DamageCause.FALL) {
-            return "&7beim Fallen";
+            return MessageUtil.color(getMsg("cause.fall"));
         } else if (cause == DamageCause.FIRE || cause == DamageCause.FIRE_TICK) {
-            return "&7im Feuer";
+            return MessageUtil.color(getMsg("cause.fire"));
         } else if (cause == DamageCause.LAVA) {
-            return "&7in Lava";
+            return MessageUtil.color(getMsg("cause.lava"));
         } else if (cause == DamageCause.DROWNING) {
-            return "&7beim Ertrinken";
+            return MessageUtil.color(getMsg("cause.drowning"));
         } else if (cause == DamageCause.SUFFOCATION) {
-            return "&7am Ersticken";
+            return MessageUtil.color(getMsg("cause.suffocation"));
         } else if (cause == DamageCause.STARVATION) {
-            return "&7am Verhungern";
+            return MessageUtil.color(getMsg("cause.starvation"));
         } else if (cause == DamageCause.VOID) {
-            return "&7in der Void";
+            return MessageUtil.color(getMsg("cause.void"));
         } else if (cause == DamageCause.LIGHTNING) {
-            return "&7durch einen Blitz";
+            return MessageUtil.color(getMsg("cause.lightning"));
         } else if (cause == DamageCause.BLOCK_EXPLOSION || cause == DamageCause.ENTITY_EXPLOSION) {
-            return "&7in einer Explosion";
+            return MessageUtil.color(getMsg("cause.explosion"));
         } else if (cause == DamageCause.MAGIC) {
-            return "&7durch Magie";
+            return MessageUtil.color(getMsg("cause.magic"));
         } else if (cause == DamageCause.WITHER) {
-            return "&7am Verwelken";
+            return MessageUtil.color(getMsg("cause.wither"));
         } else if (cause == DamageCause.CONTACT) {
-            return "&7an einem Kaktus";
+            return MessageUtil.color(getMsg("cause.contact"));
         } else {
-            return "&7durch Umweltschaden";
+            return MessageUtil.color(getMsg("cause.unknown"));
         }
     }
     
+    /**
+     * Reiht die Wiederherstellung eines Aussteigers fuer seinen naechsten Join ein.
+     *
+     * <p>Persistent: der Eintrag ueberlebt einen Serverneustart. Damit kostet ein Ragequit
+     * mitten im Kampf hoechstens einen Login und nicht mehr das ganze Survival-Inventar.</p>
+     */
+    private void queueRestoreForQuit(Player player) {
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()
+                || !plugin.getInventoryConfig().restoreOnRejoin()) {
+            return;
+        }
+        de.zfzfg.core.inventory.guard.GuardEntry entry =
+                plugin.getInventoryGuard().get(player.getUniqueId());
+        if (entry == null
+                || entry.context() != de.zfzfg.core.inventory.guard.GuardContext.PVP_MATCH) {
+            return;
+        }
+        sessions.queueForJoin(player.getUniqueId());
+        plugin.getLogger().info(plugin.getConsoleMsg("inventory-quit-queued", "player", player.getName()));
+    }
+
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
@@ -502,7 +543,7 @@ public class PvPListener implements Listener {
             // Check if player is spectator
             if (match.getSpectators().contains(player.getUniqueId())) {
                 plugin.getMatchManager().removeSpectator(match, player);
-                match.broadcast("&e" + player.getName() + " &7hat das Zuschauen beendet.");
+                match.broadcast("&e" + player.getName() + " " + getMsg("stopped-spectating"));
                 return;
             }
 
@@ -510,6 +551,11 @@ public class PvPListener implements Listener {
             try {
                 match.cancelDrawVoteIfInitiator(player.getUniqueId());
             } catch (Exception ignored) {}
+
+            // Inventar des Aussteigers fuer den naechsten Join einreihen, BEVOR das Match
+            // beendet wird: endMatch versucht sonst einen Restore auf einen Spieler, der
+            // bereits offline ist, und beansprucht damit die Sitzung fuer sich.
+            queueRestoreForQuit(player);
 
             // Player disconnected during match setup or fighting
             if (match.getState() == MatchState.SETUP || match.getState() == MatchState.STARTING) {
@@ -532,7 +578,7 @@ public class PvPListener implements Listener {
                 Player opponent = match.getOpponent(player);
                 if (opponent != null) {
                     MessageUtil.sendMessage(opponent, 
-                        "&e" + player.getName() + " &chat die Verbindung getrennt! Match abgebrochen.");
+                        getMsg("disconnected-cancelled", "player", player.getName()));
                 }
                 plugin.getMatchManager().endMatch(match, null, true);
             } else if (match.getState() == MatchState.FIGHTING) {
@@ -541,7 +587,7 @@ public class PvPListener implements Listener {
                 if (opponent != null) {
                     plugin.getMatchManager().endMatch(match, opponent, false);
                     MessageUtil.sendMessage(opponent, 
-                        "&e" + player.getName() + " &chat die Verbindung getrennt! Du gewinnst das Match!");
+                        getMsg("disconnected-win", "player", player.getName()));
                 }
             }
         }

@@ -9,11 +9,12 @@ Configure your entire plugin through an intuitive browser-based interface! No ne
 ### 🌐 Key Features
 - **🎨 Visual Configuration**: Edit all plugin settings through a modern, user-friendly web interface
 - **🔒 Secure Access**: Token-based authentication with configurable expiration times
-- **🌍 Multi-language**: Full support for 8 languages (EN, DE, FR, ES, RU, PL, JA)
+- **🌍 Multi-language**: Full support for 7 languages (EN, DE, FR, ES, RU, PL, JA)
 - **📝 Live YAML Editor**: Edit config, worlds, equipment, and events with syntax highlighting
 - **🖼️ Item Textures**: Visual item preview with Minecraft textures for equipment creation
 - **💾 Real-time Validation**: Instant syntax checking before saving changes
 - **🎯 Theme Customization**: Customize colors and appearance to match your server
+- **🌍 World Management**: Pick world IDs from a dropdown of the worlds that actually exist on the server, see at a glance whether each one is loaded, unloaded or just a placeholder, load/unload them, and create new worlds through Multiverse without leaving the browser
 
 ### Quick Start
 1. Enable the web interface in `web-config.yml`:
@@ -51,43 +52,91 @@ The web interface automatically loads all current configurations and allows you 
 - **World Cloning**: Clone template worlds for events and arenas
 - **Regeneration**: Automatic world reset after events/matches with backup support
 - **Build Protection**: Per-world build permission control
+- **Web Panel Control**: Create, load, unload and delete worlds from the web interface — see
+  [Managing worlds from the web interface](#managing-worlds-from-the-web-interface)
 
-#### About Multiverse-Core
-**Multiverse-Core** is used for advanced world operations:
+#### About Multiverse-Core (Required)
+**Multiverse-Core** is a required dependency for world operations:
 - **World Loading/Unloading**: Automatically loads event and arena worlds when needed and unloads them after use to save resources
 - **World Cloning**: Creates copies of template worlds (e.g., `PvPArena_original` → `PvPArena`) for each event/match
 - **World Regeneration**: Resets worlds to their original state after events/matches, with optional backup creation
 - **Environment Detection**: Automatically detects world type (NORMAL, NETHER, THE_END) for proper loading
+- **World Creation & Deletion**: Creates and removes worlds on request from the web interface
 
-The plugin works without Multiverse-Core but with limited functionality (no auto-loading, cloning, or regeneration).
+Both Multiverse-Core 4 and 5 are supported. On version 5 the plugin talks to the typed API; on
+version 4 it uses console commands. Without Multiverse-Core installed and enabled, the plugin refuses to start.
 
-#### About Multiverse-Inventories (Strongly Recommended)
-**Multiverse-Inventories** is strongly recommended for proper inventory restoration:
-- **Inventory Groups**: Define groups like "event", "pvp", "survival" to keep inventories separate
-- **Automatic Restoration**: When players return to the main world, Multiverse-Inventories automatically restores their original inventory
-- **World-specific Inventories**: Players have different inventories in event/PvP worlds vs. main world
-- **Reliable**: Proven, stable inventory management system
+> **Note for Multiverse-Core 5 users:** deleting a world used to fail silently. MV5 protects
+> `mv delete` with a one-time confirmation code that no external plugin can read, so the queued
+> deletion simply expired. Since 1.0.9 the plugin uses the API, which needs no confirmation.
 
-**⚠️ Important:** The plugin includes a fallback inventory backup/restore system, but it is **experimental and may have bugs**. For reliable inventory restoration, especially when players switch between worlds, Multiverse-Inventories is essential. Without it, players may experience inventory loss or restoration issues.
+#### Managing worlds from the web interface
 
-**Setup Recommendation:**
-1. Install Multiverse-Inventories
-2. Create world groups: `/mvinv group default`, `/mvinv group event`, `/mvinv group pvp`
-3. Assign worlds to groups: `/mvinv world <world> <group>`
-4. Configure `inventory-snapshots.default-group` in `config.yml`
+In **Worlds & Arenas** the world ID is a dropdown of the worlds that really exist on the server.
+Each entry shows its environment, whether it is loaded, and which preset or event already uses it;
+worlds that already back another preset are disabled, because the preset key *is* the world name.
+Choosing *"Enter a custom world ID…"* lets you create a preset with no world behind it — the card
+then marks it ⚪ *Placeholder*.
+
+The editor's **Multiverse** tab creates the world on the server. Every setting is optional:
+
+| Setting | Values | Notes |
+|---|---|---|
+| Environment | `NORMAL`, `NETHER`, `THE_END` | |
+| World type | `NORMAL`, `FLAT`, `LARGE_BIOMES`, `AMPLIFIED` | |
+| Seed | any text or number | empty = random |
+| Generator | `Plugin` or `Plugin:id` | e.g. a void generator |
+| Generator settings | JSON | Multiverse-Core 5 only |
+| Biome | biome name | single-biome world, Multiverse-Core 5 only |
+| Generate structures | on/off | villages, temples, strongholds |
+| Adjust spawn | on/off | Multiverse looks for a safe spawn |
+
+World creation runs in the background and the panel shows its progress, so large worlds cannot run
+into a request timeout.
+
+Every world card shows 🟢 *Loaded*, 🟡 *Unloaded* or ⚪ *Placeholder* together with a load/unload
+button, and the collapsible **Server worlds** panel lists all Multiverse worlds — including those
+without a preset.
+
+**Deleting.** Removing a preset does not touch the world unless you say so. The delete dialog has a
+separate *"also delete the world on the server"* checkbox that is **off by default**; switching it on
+reveals a *"create a backup first"* option (**on by default**, zips into `plugins/<plugin>/backups/`)
+and requires you to type the world ID before the delete button unlocks. The editor also offers
+*"Delete world only"*, which removes the world but keeps the preset as a placeholder. The server's
+main world can never be deleted or unloaded this way.
+
+If the backup cannot be written, **the world is not deleted** — the panel reports why instead of
+leaving you with neither the world nor a backup.
+
+**Restoring backups.** The collapsible **Backup worlds** panel (below *Server worlds*) lists every
+backup zip with world name, date and size. *Restore* brings a backup back as a world — the name is
+prefilled with the original and can be changed; an existing world is never overwritten. Restoring
+runs in the background and the world is imported and loaded through Multiverse when it finishes.
+Backups can also be deleted from the panel (only the zip file — never a world).
+
+Worlds stored as dimensions inside the main world (`world/dimensions/minecraft/<name>`, the layout
+modern servers use) are fully supported for status display, backup and deletion.
+
+#### About Inventory Management (via InventoryBackup)
+**Inventory management** is handled automatically by the plugin using the required backend plugin **InventoryBackup** (from the InventoryRestore project):
+- **Pre-teleport Backups**: Backups are taken before a player is teleported to an arena or lobby world.
+- **Automatic Restoration**: Inventories are automatically restored after matches, events, deaths, and reconnects.
+- **Persistent Offline Queue & Crash Recovery**: If a player disconnects mid-match or the server restarts unexpectedly, open sessions in `inventory-guard.yml` and return locations in `player-return-locations.yml` guarantee items and positions are safely restored on the next login.
+- **No Multiverse-Inventories Needed**: In default mode (`settings.inventory-management.provider: "auto"`), Multiverse-Inventories is not required.
+- **Legacy Mode**: If you intentionally want Multiverse-Inventories to handle inventory swaps, set `settings.inventory-management.provider: "none"`.
 
 ### 🎨 Web Interface
 - **Real-time Configuration**: Edit config, worlds, equipment, and events through web browser
 - **Token Authentication**: Secure access with time-limited tokens
 - **Live Preview**: See changes instantly with syntax validation
-- **Multi-language**: Support for 8 languages (EN, DE, FR, ES, RU, PL, JA)
+- **Multi-language**: Support for 7 languages (EN, DE, FR, ES, RU, PL, JA)
 - **Item Textures**: Visual item selection with Minecraft textures
 
 ### 🔧 Advanced Features
-- **Inventory Snapshots**: Automatic backup and restore of player inventories
-- **Multi-language Support**: Built-in translations for 8 languages
+- **Inventory Management**: Automated backup, restore, and crash recovery via InventoryBackup
+- **Multi-language Support**: Built-in translations for 7 languages
 - **Performance Optimized**: Async operations for backups and world operations
-- **Command Restriction**: Configurable command blocking during events/matches
+- **Command Restriction**: Configurable command blocking during events
 - **Tab Completion**: Smart tab completion for all commands
 - **Update Checking**: Automatic update notifications via Modrinth API
   - Checks for newer versions on server startup
@@ -98,18 +147,21 @@ The plugin works without Multiverse-Core but with limited functionality (no auto
 ## Requirements
 
 - **Server**: Paper/Spigot 1.19+ compatible
-- **Required**: 
+- **Required Dependencies**: 
+  - **Multiverse-Core** (v4 or v5): Essential for world management (loading, unloading, cloning, regeneration)
   - **Vault**: Economy integration for money wagers
-  - **Multiverse-Core**: Essential for world management (loading, unloading, cloning, regeneration)
-- **Strongly Recommended**: 
-  - **Multiverse-Inventories**: Handles automatic inventory restoration when players switch between worlds. The plugin has a fallback inventory system, but it's experimental and may be buggy. For reliable inventory restoration, Multiverse-Inventories is essential.
+  - **InventoryBackup** (from InventoryRestore project): Storage backend for player inventory backups and auto-restore
+- **Optional Integrations**: 
+  - **PlaceholderAPI**: Numeric statistics placeholders
+  - **AJLeaderboards / DecentHolograms**: Statistics displays on leaderboards and holograms
+  - **PvPManager**: Automatic combat tag removal
 
 ## Installation
 
 1. **Install Required Dependencies:**
-   - Download and install **Vault**
    - Download and install **Multiverse-Core**
-   - Download and install **Multiverse-Inventories** (strongly recommended)
+   - Download and install **Vault**
+   - Download and install **InventoryBackup** (InventoryRestore project)
 
 2. **Install the Plugin:**
    - Download the plugin JAR file
@@ -117,23 +169,13 @@ The plugin works without Multiverse-Core but with limited functionality (no auto
 
 3. **Start the Server:**
    - Start the server to generate configuration files
-   - The plugin will detect Multiverse-Core and Multiverse-Inventories
+   - The plugin will verify dependencies and initialize language and configuration files
 
-4. **Configure Multiverse-Inventories:**
-   ```
-   /mvinv group default
-   /mvinv group event
-   /mvinv group pvp
-   /mvinv world <your_main_world> default
-   /mvinv world <event_world> event
-   /mvinv world <pvp_arena> pvp
-   ```
-
-5. **Configure the Plugin:**
+4. **Configure the Plugin:**
    - Edit configuration files (see Configuration section)
    - Or use the web interface: `/eventpvp webtoken`
 
-6. **Reload and Test:**
+5. **Reload and Test:**
    ```
    /eventpvp reload
    /event list
@@ -156,7 +198,7 @@ The plugin uses centralized configuration files in the plugin folder:
 | `config.yml` | General settings, event definitions, auto-events |
 | `worlds.yml` | World definitions with spawn points and flags |
 | `equipment.yml` | Shared equipment sets for events and PvP |
-| `messages.yml` | Multilingual message configurations |
+| `messages_<lang>.yml` | Message configuration, one file per language (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) |
 | `web-config.yml` | Web interface settings and theming |
 
 ### config.yml Structure
@@ -166,17 +208,33 @@ settings:
   language: "en"                    # en, de, fr, es, ru, pl, ja
   prefix: "&6[Event]&r"
   main-world: "world"
+  debug: "off"                      # off, on, full
   save-player-location: true
   join-phase-duration: 30
   lobby-countdown: 10
-  world-loading: "both"             # none, event, arena, both
+
+  # Inventory management (InventoryBackup backend)
+  inventory-management:
+    provider: "auto"                # auto (recommended), inventoryrestore, none (legacy)
+    legacy-safety-backups: true
+    auto-restore-on-match-end: true
+    auto-restore-on-event-end: true
+    auto-restore-on-respawn: true
+    auto-restore-on-rejoin: true
+    on-backup-failure: "abort"      # abort (safest), warn
+    cleanup-backups-after-match: false
+    guard:
+      enabled: true
+      restore-orphans-on-start: true
+    warn-on-multiverse-inventories: true
+
+  # World management via Multiverse
+  world-management:
+    events: true                    # Load/unload event worlds
+    arenas: true                    # Unload arena worlds after match
+
+  # Command restrictions during events (both, event, lobby, none)
   command-restriction: "both"
-  
-  # Inventory backup system
-  inventory-snapshots:
-    enabled: true
-    default-group: "default"
-    retain-days: 30
   
   # World regeneration settings
   arena-regeneration:
@@ -189,9 +247,10 @@ settings:
     interval-min: 1800              # 30 minutes
     interval-max: 3600              # 60 minutes
     random-selection: true
+    check-online-players: true
     selected-events:
-      - "pvparena"
-      - "ctf"
+      # - "pvparena"
+      # - "ctf"
   
   # PvP settings
   match:
@@ -204,6 +263,17 @@ settings:
     enabled: true
     max-spectators: 10
     announce-join: true
+    announce-leave: true
+
+  # External integrations
+  integrations:
+    ajleaderboards:
+      enabled: false
+    decentholograms:
+      enabled: false
+    pvpmanager:
+      enabled: true
+    refresh-interval-ticks: 20
 
 events:
   pvparena:
@@ -478,7 +548,9 @@ Configure in `worlds.<world>.pvpwager-spawn`:
 | `/eventpvp reload` | Reload all configurations | `eventpvp.admin` |
 | `/eventpvp version` | Check plugin version and update status | `eventpvp.admin` |
 | `/eventpvp webtoken` | Generate web interface token | `eventpvp.admin.web` |
-| `/inventoryrestore <player> <ID>` | Restore player inventory | `eventpvp.inventory.restore` |
+| `/eventpvp debug` | Toggle debug logging (`on`, `on full`, `off`, `status`) | `eventpvp.debug` |
+| `/eventpvp rescue` | Manage stuck sessions (`list`, `<player>`, `clean`) | `eventpvp.admin` |
+| `/inv <player>` | Inspect and restore inventory backups via InventoryBackup | `inventoryrestore.admin` |
 
 ### Command Examples
 
@@ -506,10 +578,12 @@ Configure in `worlds.<world>.pvpwager-spawn`:
 ## Permissions
 
 ### Core Permissions
-- `eventpvp.admin` - Access to unified reload and version commands
+- `eventpvp.admin` - Access to unified admin commands (reload, version, rescue)
 - `eventpvp.admin.web` - Access to web interface
 - `eventpvp.admin.updatenotify` - Receive update notifications on join
-- `eventpvp.inventory.restore` - Restore player inventories
+- `eventpvp.debug` - Toggle debug mode (`/eventpvp debug`)
+- `eventpvp.debug.receive` - Receive debug log output in chat
+- `eventpvp.opbypass` - Bypass event command restrictions
 
 ### Event Permissions
 - `eventplugin.admin` - Event administration
@@ -529,42 +603,47 @@ Configure in `worlds.<world>.pvpwager-spawn`:
 
 ### Access the Web Interface
 
-1. Enable in `web-config.yml`:
+1. Configure in `web-config.yml`:
    ```yml
-   web:
-     enabled: true
+   server:
      port: 8085
+     bind-address: ""              # "" for all interfaces, or "127.0.0.1" behind a reverse proxy
      public-url: "http://localhost:8085"
+
+   auth:
+     enabled: true
+     token-expiration: 300         # 5 minutes token validity
+     session-expiration: 86400     # 24 hours session validity
+
+   items:
+     enable-textures: true
+     resource-pack:
+       enabled: false              # Extract textures from server.properties resource-pack
+       max-size-mb: 50
    ```
 
-2. Generate an access token:
+2. Generate an access token in-game or via console:
    ```
    /eventpvp webtoken
    ```
+   *(Requires permission `eventpvp.admin.web` or `eventpvp.admin`)*
 
 3. Open the URL and enter the token
 
 4. Configure your plugin through the web interface!
 
 ### Features
-- **Live Config Editor**: Edit all YAML files with syntax highlighting
-- **Visual Equipment Builder**: Create equipment sets with item preview
-- **World Manager**: Configure worlds and spawn points
-- **Event Creator**: Design events with visual spawn configuration
-- **Multi-language**: Switch between 8 supported languages
+- **Live Config Editor**: Edit `config.yml`, `worlds.yml`, `equipment.yml`, and `web-config.yml` with syntax highlighting
+- **Dedicated 3-Tab Inventory Manager**: Search player backups, inspect authentic Minecraft Canvas inventory layout with XP bar, execute 2-step restores with rate limiting (10/min), export to equipment sets, and monitor active guard sessions
+- **Multiverse World Management**: Create, import, load, unload, delete, and backup/restore worlds directly in the browser
+- **Dynamic Material Catalog**: Loads item IDs, max stack sizes, and valid enchantments directly from the running server version (`/api/materials`)
+- **Server Resource Pack Textures**: Automatically pulls custom item textures from your server resource pack
+- **Visual Equipment Builder**: Create equipment sets with live item previews and server material validation
+- **Event Creator**: Design events with visual spawn configuration and optional lobby phase
+- **Multi-language**: Seamlessly switch between 7 supported languages (EN, DE, FR, ES, RU, PL, JA)
+- **Live Sync Badge**: Color-coded top-bar status (`🟢 Synced`, `🟡 Unsaved`, `🔵 Saving`, `🔴 Out of Sync`)
 - **Theme Customization**: Adjust colors and appearance
-- **Token Security**: Time-limited access tokens (configurable)
-
-### Security Settings
-
-```yml
-security:
-  auth-enabled: true                # Enable token authentication
-  token-validity-minutes: 10        # Token expiration time
-  session-validity-minutes: 60      # Session duration
-  required-permission: "eventpvp.admin.web"
-  allowed-ips: []                   # IP whitelist (empty = all)
-```
+- **Token Security**: Time-limited access tokens with rate-limited restore operations
 
 ## Workflows
 
@@ -708,41 +787,41 @@ Auto-events will now start automatically based on the configured interval!
 - Check `security.auth-enabled` setting
 
 ### Inventory Not Restored
-- Check `inventory-snapshots.enabled: true`
-- Verify player has permission `eventpvp.inventory.restore`
-- Use `/inventoryrestore <player> <ID>` with correct 4-digit ID
-- Check retention period: `inventory-snapshots.retain-days`
+- Verify the backend plugin **InventoryBackup** is active on the server
+- Check `/eventpvp rescue list` to inspect stuck sessions or pending return locations
+- Use `/eventpvp rescue <player>` to manually restore an inventory and return location
+- Inspect stored player backups via `/inv <player>` or in the web panel under *Expert Settings* -> *Inventory Management*
 
 ### Performance Issues
 - Enable async backups: `arena-regeneration.backup-async: true`
 - Reduce auto-event frequency
 - Limit max players in events
-- Use `world-loading: arena` to only load when needed
+- Use `world-management.arenas: true` to unload arena worlds after matches
 
 ## Advanced Features
 
-### Inventory Snapshot System
-**⚠️ Experimental Feature - Use Multiverse-Inventories Instead**
-
-The plugin includes a basic inventory backup/restore system, but it is **experimental and may be buggy**:
+### Inventory Management System
+Inventories are managed reliably through the `InventoryBackup` API with persistent crash protection:
 
 ```yml
 settings:
-  inventory-snapshots:
-    enabled: true
-    default-group: "default"
-    retain-days: 30
-    ids:
-      inventory-id-digits: 4
-      eventmatch-id-digits: 5
+  inventory-management:
+    provider: "auto"              # auto (recommended), inventoryrestore, none (legacy)
+    legacy-safety-backups: true
+    auto-restore-on-match-end: true
+    auto-restore-on-event-end: true
+    auto-restore-on-respawn: true
+    auto-restore-on-rejoin: true
+    on-backup-failure: "abort"
+    cleanup-backups-after-match: false
+    guard:
+      enabled: true
+      restore-orphans-on-start: true
 ```
 
-**Known Issues:**
-- May not restore inventories correctly in all cases
-- Can cause inventory loss if not used with Multiverse-Inventories
-- Manual restoration required with `/inventoryrestore <player> <ID>`
-
-**Recommended:** Install **Multiverse-Inventories** for automatic, reliable inventory restoration. The plugin's inventory system works best as a fallback alongside Multiverse-Inventories.
+- **Crash recovery & Offline Safety:** Open sessions are tracked in `inventory-guard.yml`, original return locations in `player-return-locations.yml`, and offline wager rewards in `pending-payouts.yml`.
+- **Diagnostic command:** `/eventpvp rescue list|<player>|clean` for emergency inspection and recovery.
+- **Legacy mode:** Setting `provider: "none"` delegates inventory switching to Multiverse-Inventories while still taking safety backups.
 
 ### World Regeneration with Backups
 
@@ -755,7 +834,7 @@ settings:
 
 Backups are stored in `plugins/Event-PVP-Plugin/backups/`
 
-### Multi-language Support
+### Multi-language & Console i18n Support
 
 Set language in `config.yml`:
 ```yml
@@ -763,16 +842,16 @@ settings:
   language: "en"  # en, de, fr, es, ru, pl, ja
 ```
 
-Supported languages:
-- English (en)
-- German (de)
-- French (fr)
-- Spanish (es)
-- Russian (ru)
-- Polish (pl)
-- Japanese (ja)
+Supported languages with 100% key parity across in-game messages, web interface, and server console output:
+- **English (en)** – `messages_en.yml` (Master)
+- **German (de)** – `messages_de.yml`
+- **French (fr)** – `messages_fr.yml`
+- **Spanish (es)** – `messages_es.yml`
+- **Russian (ru)** – `messages_ru.yml`
+- **Polish (pl)** – `messages_pl.yml`
+- **Japanese (ja)** – `messages_ja.yml`
 
-Each language has its own `messages_<lang>.yml` file.
+All server console loggers and diagnostic traces (`messages.console.*`) dynamically adapt to the selected language, complete with color formatting and placeholder resolution.
 
 ### Statistics System
 
@@ -784,28 +863,27 @@ Track player performance:
 
 ### Command Restrictions
 
-Control command access during events/matches:
+Control command access during events:
 ```yml
 settings:
-  command-restriction: "both"  # none, event, pvp, both
+  command-restriction: "both"  # both (event+lobby), event, lobby, none
 ```
 
-Prevents teleportation and other exploits during gameplay.
+Blocks commands for event participants (except `/event leave`). OPs and players with `eventpvp.opbypass` are exempt. PvP matches block commands unconditionally.
 
 ## Performance Tips
 
 1. **Enable async backups** for large worlds
 2. **Use world cloning** instead of full regeneration when possible
-3. **Set retention period** for inventory snapshots to avoid database bloat
-4. **Limit spectators** per match to reduce entity processing
-5. **Use fixed spawns** instead of random when possible (faster)
-6. **Configure auto-events** with reasonable intervals
-7. **Enable world-loading: arena** to only load worlds when needed
+3. **Limit spectators** per match to reduce entity processing
+4. **Use fixed spawns** instead of random when possible (faster)
+5. **Configure auto-events** with reasonable intervals
+6. **Enable world-management.arenas: true** to unload worlds when not in use
 
 ## Support & Development
 
 ### Plugin Version
-Check version: `/pvpadmin info` or see `plugin.yml`
+Check version: `/pvpadmin info`, `/eventpvp version`, or see `plugin.yml`
 
 ### Reporting Issues
 When reporting issues, provide:
@@ -828,7 +906,7 @@ Use this to track performance changes after configuration updates.
 **Author**: zfzfg  
 **Version**: See `plugin.yml`  
 **API**: 1.19+  
-**Dependencies**: Vault, Multiverse-Core (soft)
+**Dependencies**: Multiverse-Core (required), Vault (required), InventoryBackup (required)
 
 ---
 

@@ -48,8 +48,11 @@ public class ConfigManager {
         File legacyArenas = new File(plugin.getDataFolder(), "arenas.yml");
         arenaFile = unifiedWorlds.exists() ? unifiedWorlds : legacyArenas;
         if (!arenaFile.exists()) {
-            plugin.saveResource("arenas.yml", false);
-            arenaFile = legacyArenas;
+            // arenas.yml gibt es im Jar nicht mehr - saveResource() würde dafür eine
+            // IllegalArgumentException werfen. Angelegt wird immer die vereinheitlichte
+            // worlds.yml; der Legacy-Name wird oben nur noch gelesen, nie erzeugt.
+            plugin.saveResource("worlds.yml", false);
+            arenaFile = unifiedWorlds;
         }
         arenaConfig = YamlConfiguration.loadConfiguration(arenaFile);
         
@@ -67,14 +70,14 @@ public class ConfigManager {
         arenaConfig = YamlConfiguration.loadConfiguration(arenaFile);
         equipmentConfig = YamlConfiguration.loadConfiguration(equipmentFile);
 
-        plugin.getLogger().info("All configurations reloaded!");
+        plugin.getLogger().info(plugin.getConsoleMsg("core-reload-all"));
     }
     
     public void saveConfig(FileConfiguration config, File file) {
         try {
             config.save(file);
         } catch (IOException e) {
-            plugin.getLogger().log(java.util.logging.Level.SEVERE, "Could not save config to " + file.getName(), e);
+            plugin.getLogger().log(java.util.logging.Level.SEVERE, plugin.getConsoleMsg("config-save-error", "file", file.getName(), "error", e.getMessage()), e);
         }
     }
     
@@ -95,17 +98,81 @@ public class ConfigManager {
     }
     
     public String getMessage(String path, String... replacements) {
-        String message = messages.getString(path);
-        if (message == null && defaultMessages != null) {
-            message = defaultMessages.getString(path);
+        String message = messages.getString(path, null);
+        if (message == null) {
+            message = messages.getString("messages." + path, null);
         }
         if (message == null) {
-            message = "&cMessage not found: " + path;
+            message = messages.getString("messages.match-manager." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.match-display." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.match-system." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.command-request." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.system." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.general." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.pvpwager.help." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.pvpask." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.gui." + path, null);
+        }
+        if (message == null) {
+            message = messages.getString("messages.request." + path, null);
+        }
+        if (message == null && defaultMessages != null) {
+            message = defaultMessages.getString(path, null);
+            if (message == null) {
+                message = defaultMessages.getString("messages." + path, null);
+            }
+            if (message == null) {
+                message = defaultMessages.getString("messages.match-manager." + path, null);
+            }
+            if (message == null) {
+                message = defaultMessages.getString("messages.match-display." + path, null);
+            }
+            if (message == null) {
+                message = defaultMessages.getString("messages.match-system." + path, null);
+            }
+            if (message == null) {
+                message = defaultMessages.getString("messages.command-request." + path, null);
+            }
+            if (message == null) {
+                message = defaultMessages.getString("messages.system." + path, null);
+            }
+            if (message == null) {
+                message = defaultMessages.getString("messages.general." + path, null);
+            }
+        }
+        
+        if (message == null) {
+            // Einheitlicher Marker wie im restlichen Code -- bewusst unlokalisiert,
+            // damit im Fehlerfall der Key-Pfad lesbar bleibt.
+            message = "&c[missing: " + path + "]";
         }
         
         // Apply replacements in pairs (key, value)
-        for (int i = 0; i < replacements.length - 1; i += 2) {
-            message = message.replace("{" + replacements[i] + "}", replacements[i + 1]);
+        if (replacements != null && replacements.length > 0) {
+            for (int i = 0; i < replacements.length - 1; i += 2) {
+                String raw = replacements[i] != null ? replacements[i].replaceAll("^[{%]+|[%}]+$", "") : "";
+                String val = replacements[i + 1] != null ? replacements[i + 1] : "";
+                if (!raw.isEmpty()) {
+                    message = message.replace("{" + raw + "}", val)
+                                     .replace("%" + raw + "%", val);
+                }
+            }
         }
         
         return message;

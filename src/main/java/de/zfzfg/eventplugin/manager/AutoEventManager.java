@@ -27,7 +27,7 @@ public class AutoEventManager {
             autoEventTask.cancel();
         }
         scheduleNextEvent();
-        plugin.getLogger().info("Auto-Event System gestartet!");
+        plugin.getLogger().info(plugin.getConsoleMsg("event-auto-started"));
     }
     
     public void stop() {
@@ -35,7 +35,7 @@ public class AutoEventManager {
             autoEventTask.cancel();
             autoEventTask = null;
         }
-        plugin.getLogger().info("Auto-Event System gestoppt!");
+        plugin.getLogger().info(plugin.getConsoleMsg("event-auto-stopped"));
     }
     
     private void scheduleNextEvent() {
@@ -43,7 +43,7 @@ public class AutoEventManager {
         int maxInterval = plugin.getConfigManager().getAutoEventIntervalMax();
         int interval = minInterval + random.nextInt(maxInterval - minInterval + 1);
         
-        plugin.getLogger().info("Nächstes Auto-Event in " + interval + " Sekunden");
+        plugin.getLogger().info(plugin.getConsoleMsg("event-auto-next", "time", String.valueOf(interval)));
         
         autoEventTask = new BukkitRunnable() {
             @Override
@@ -62,34 +62,36 @@ public class AutoEventManager {
         List<EventConfig> availableEvents = getAvailableEvents(selectedEventIds);
         
         if (availableEvents.isEmpty()) {
-            plugin.getLogger().warning("Keine verfügbaren Events für Auto-Start!");
+            plugin.getLogger().warning(plugin.getConsoleMsg("event-auto-no-events"));
             return;
         }
         
         EventConfig selectedEvent = selectEvent(availableEvents, selectedEventIds, useRandomSelection);
         
         if (selectedEvent == null) {
-            plugin.getLogger().warning("Kein Event konnte ausgewählt werden!");
+            plugin.getLogger().warning(plugin.getConsoleMsg("event-auto-no-events"));
             return;
         }
         
         if (checkPlayers) {
             int onlinePlayers = Bukkit.getOnlinePlayers().size();
             if (onlinePlayers < selectedEvent.getMinPlayers()) {
-                plugin.getLogger().info("Nicht genug Spieler online für " + selectedEvent.getDisplayName() + 
-                    " (" + onlinePlayers + "/" + selectedEvent.getMinPlayers() + ")");
+                plugin.getLogger().info(plugin.getConsoleMsg("event-auto-not-enough-players",
+                    "event", selectedEvent.getDisplayName(),
+                    "online", String.valueOf(onlinePlayers),
+                    "min", String.valueOf(selectedEvent.getMinPlayers())));
                 
                 EventConfig fallback = findFallbackEvent(availableEvents, onlinePlayers);
                 if (fallback != null) {
                     selectedEvent = fallback;
-                    plugin.getLogger().info("Verwende Fallback-Event: " + selectedEvent.getDisplayName());
+                    plugin.getLogger().info(plugin.getConsoleMsg("event-auto-starting", "event", selectedEvent.getDisplayName()));
                 } else {
                     return;
                 }
             }
         }
         
-        plugin.getLogger().info("Starte Auto-Event: " + selectedEvent.getDisplayName());
+        plugin.getLogger().info(plugin.getConsoleMsg("event-auto-starting", "event", selectedEvent.getDisplayName()));
         if (plugin.getEventManager().createEvent(selectedEvent.getId())) {
             plugin.getEventManager().getSession(selectedEvent.getId())
                 .ifPresent(session -> session.startJoinPhase());

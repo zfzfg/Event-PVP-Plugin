@@ -46,8 +46,27 @@ public class WorldStateManager {
             boolean loaded = world != null;
             boolean exists = doesWorldFolderExist(eventWorld);
             cache.put(eventWorld, new CacheEntry(loaded, exists));
-            mvHelper.ensureWorldReady(eventWorld, cloneSource, config.shouldRegenerateEventWorld(), backupEnabled, backupAsync);
+            
+            boolean shouldRegen = config.shouldRegenerateEventWorld();
+            if (!shouldRegen && isWorldRegenerationGloballyEnabled(eventWorld)) {
+                shouldRegen = true;
+            }
+            mvHelper.ensureWorldReady(eventWorld, cloneSource, shouldRegen, backupEnabled, backupAsync);
         }
+    }
+
+    private boolean isWorldRegenerationGloballyEnabled(String worldName) {
+        if (worldName == null || worldName.trim().isEmpty()) return false;
+        try {
+            if (plugin.getArenaManager() != null && plugin.getArenaManager().getArenas() != null) {
+                for (de.zfzfg.pvpwager.models.Arena a : plugin.getArenaManager().getArenas().values()) {
+                    if (worldName.equalsIgnoreCase(a.getArenaWorld()) && a.isRegenerateWorld()) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
     }
 
     public void clearCache() {
@@ -76,7 +95,7 @@ public class WorldStateManager {
             File container = Bukkit.getWorldContainer();
             File worldFolder = new File(container, worldName);
             if (!worldFolder.exists()) {
-                plugin.getLogger().warning("Backup übersprungen: Weltordner nicht gefunden: " + worldName);
+                plugin.getLogger().warning(plugin.getConsoleMsg("backup-skipped", "world", worldName));
                 return;
             }
 
@@ -87,9 +106,9 @@ public class WorldStateManager {
             File zipFile = new File(backupsDir, worldName + "_" + timestamp + ".zip");
 
             zipFolder(worldFolder.toPath(), zipFile.toPath());
-            plugin.getLogger().info("Backup erstellt: " + zipFile.getName());
+            plugin.getLogger().info(plugin.getConsoleMsg("backup-created", "file", zipFile.getName()));
         } catch (Exception e) {
-            plugin.getLogger().log(java.util.logging.Level.SEVERE, "Backup fehlgeschlagen", e);
+            plugin.getLogger().log(java.util.logging.Level.SEVERE, plugin.getConsoleMsg("backup-failed", "error", e.getMessage()), e);
         }
     }
 
@@ -104,7 +123,7 @@ public class WorldStateManager {
                         Files.copy(path, zs);
                         zs.closeEntry();
                     } catch (IOException e) {
-                        plugin.getLogger().severe("Fehler beim Zippen: " + e.getMessage());
+                        plugin.getLogger().severe(plugin.getConsoleMsg("zip-error", "error", e.getMessage()));
                     }
                 });
         }

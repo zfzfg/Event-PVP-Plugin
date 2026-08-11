@@ -42,7 +42,7 @@ public class ArenaManager {
 
                     boolean pvpEnabled = worldSection.getBoolean("pvpwager-world-enable", false);
                     if (!pvpEnabled) {
-                        plugin.getLogger().info("World '" + worldId + "' not enabled for PvPWager, skipping...");
+                        plugin.getLogger().info("World '" + worldId + "' not enabled for PvPWager, skipping...");  // i18n-ignore: technical arena config log
                         continue;
                     }
 
@@ -200,13 +200,11 @@ public class ArenaManager {
                         arena.setCloneSourceWorld(cloneSourceWorld.trim());
                     }
                     arenas.put(worldId, arena);
-                    plugin.getLogger().info("Loaded PvP arena from worlds.yml: " + worldId + " (" + displayName + ") - SpawnType: " + spawnType);
+                    plugin.getLogger().info("Loaded PvP arena from worlds.yml: " + worldId + " (" + displayName + ") - SpawnType: " + spawnType);  // i18n-ignore: technical arena loader log
 
                 } catch (Exception e) {
-                    plugin.getLogger().severe("Error loading PvP world '" + worldId + "': " + e.getMessage());
-                    if (plugin.getConfig() != null && plugin.getConfig().getBoolean("debug", false)) {
-                        e.printStackTrace();
-                    }
+                    plugin.getLogger().severe("Error loading PvP world '" + worldId + "': " + e.getMessage());  // i18n-ignore: technical arena loader log
+                    plugin.getDebugManager().logException("Error loading PvP world '" + worldId + "'", e);  // i18n-ignore: technical arena loader log
                 }
             }
         }
@@ -220,7 +218,7 @@ public class ArenaManager {
             }
         }
         if (worldsSection == null && arenasSection == null) {
-            plugin.getLogger().warning("No arenas/worlds found in worlds.yml (worlds.* or pvp.arenas) or arenas.yml (arenas)!");
+            plugin.getLogger().warning("No arenas/worlds found in worlds.yml (worlds.* or pvp.arenas) or arenas.yml (arenas)!");  // i18n-ignore: technical arena config log
             return;
         }
 
@@ -232,7 +230,7 @@ public class ArenaManager {
                 
                 boolean enabled = arenaSection.getBoolean("enabled", true);
                 if (!enabled) {
-                    plugin.getLogger().info("Arena '" + arenaId + "' is disabled, skipping...");
+                    plugin.getLogger().info("Arena '" + arenaId + "' is disabled, skipping...");  // i18n-ignore: technical arena config log
                     continue;
                 }
                 
@@ -391,17 +389,17 @@ public class ArenaManager {
                 }
                 arenas.put(arenaId, arena);
                 
-                plugin.getLogger().info("Loaded arena: " + arenaId + " (" + displayName + ") - SpawnType: " + spawnType);
+                plugin.getLogger().info("Loaded arena: " + arenaId + " (" + displayName + ") - SpawnType: " + spawnType);  // i18n-ignore: technical arena loader log
                 
             } catch (Exception e) {
-                plugin.getLogger().severe("Error loading arena '" + arenaId + "': " + e.getMessage());
+                plugin.getLogger().severe("Error loading arena '" + arenaId + "': " + e.getMessage());  // i18n-ignore: technical arena loader log
                 e.printStackTrace();
             }
         }
         }
         
         if (arenas.isEmpty()) {
-            plugin.getLogger().warning("No arenas loaded! Plugin may not work correctly.");
+            plugin.getLogger().warning("No arenas loaded! Plugin may not work correctly.");  // i18n-ignore: technical arena config log
         }
     }
     
@@ -411,7 +409,7 @@ public class ArenaManager {
         try {
             World world = worldCache.computeIfAbsent(worldName, Bukkit::getWorld);
             if (world == null) {
-                plugin.getLogger().warning("World '" + worldName + "' not found for arena spawn!");
+                plugin.getLogger().warning("World '" + worldName + "' not found for arena spawn!");  // i18n-ignore: technical arena config log
                 world = Bukkit.getWorlds().get(0); // Fallback
             }
             
@@ -424,7 +422,7 @@ public class ArenaManager {
             return new Location(world, x, y, z, yaw, pitch);
             
         } catch (Exception e) {
-            plugin.getLogger().severe("Error parsing location: " + e.getMessage());
+            plugin.getLogger().severe("Error parsing location: " + e.getMessage());  // i18n-ignore: technical arena parse log
             return null;
         }
     }
@@ -436,10 +434,15 @@ public class ArenaManager {
         multiverseHelper.regenerateWorld(worldName, null);
     }
     
+    /**
+     * Lädt eine Arena-Welt. Bewusst ohne Rücksicht auf
+     * settings.world-management.arenas: ohne geladene Welt kann kein Match
+     * starten. Die Einstellung steuert nur das Entladen danach.
+     */
     public void loadArenaWorld(String worldName) {
         loadArenaWorld(worldName, null);
     }
-    
+
     public void loadArenaWorld(String worldName, Runnable callback) {
         int refreshTaskId = -1;
         for (Match match : plugin.getMatchManager().getMatches().values()) {
@@ -470,9 +473,9 @@ public class ArenaManager {
                     }
                 }
                 if (success) {
-                    plugin.getLogger().info("Welt-Ladung erfolgreich: " + worldName + " - " + message);
+                    plugin.getLogger().info(plugin.getConsoleMsg("arena-world-loaded", "world", worldName, "msg", message));
                 } else {
-                    plugin.getLogger().warning("Welt-Ladung fehlgeschlagen: " + worldName + " - " + message);
+                    plugin.getLogger().warning(plugin.getConsoleMsg("world-load-failed", "world", worldName, "msg", message));
                 }
                 if (callback != null) {
                     callback.run();
@@ -483,22 +486,25 @@ public class ArenaManager {
         doLoad.run();
     }
     
+    /**
+     * Entlädt eine Arena-Welt nach dem Match, sofern
+     * settings.world-management.arenas das erlaubt.
+     */
     public void unloadArenaWorld(String worldName) {
-        String worldLoading = plugin.getPvpConfigManager().getConfig().getString("settings.world-loading", "both");
-        
-        if (worldLoading.equalsIgnoreCase("none")) {
+        boolean manageArenaWorlds = plugin.getPvpConfigManager().getConfig()
+            .getBoolean("settings.world-management.arenas", true);
+
+        if (!manageArenaWorlds) {
             return;
         }
-        
-        if (worldLoading.equalsIgnoreCase("arena") || worldLoading.equalsIgnoreCase("both")) {
-            // Check if world is loaded
-            if (Bukkit.getWorld(worldName) == null) {
-                return;
-            }
-            
-            plugin.getLogger().info("Unloading arena world via Multiverse: " + worldName);
-            multiverseHelper.unloadWorld(worldName);
+
+        // Check if world is loaded
+        if (Bukkit.getWorld(worldName) == null) {
+            return;
         }
+
+        plugin.getLogger().info(plugin.getConsoleMsg("world-unloading", "world", worldName));
+        multiverseHelper.unloadWorld(worldName);
     }
 
     /**
@@ -506,7 +512,6 @@ public class ArenaManager {
     */
     public void resetArenaWorldByClone(String sourceWorld, String targetWorld) {
         if (sourceWorld == null || sourceWorld.isEmpty() || targetWorld == null || targetWorld.isEmpty()) {
-            plugin.getLogger().warning("Clone-Reset übersprungen: ungültige Weltangaben.");
             return;
         }
 
@@ -516,7 +521,7 @@ public class ArenaManager {
         // Löschen, danach klonen
         multiverseHelper.deleteWorld(targetWorld, () -> {
             multiverseHelper.cloneWorld(sourceWorld, targetWorld, () -> {
-                plugin.getLogger().info("Clone-Reset abgeschlossen für Arena-Welt: " + targetWorld);
+                plugin.getLogger().info(plugin.getConsoleMsg("arena-clone-reset", "world", targetWorld));
             });
         });
     }

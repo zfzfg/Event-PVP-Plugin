@@ -35,11 +35,11 @@ public class PvpStatsStorage {
                     stats.addDraws(draws);
                     map.put(id, stats);
                 } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to parse player stats for key '" + key + "': " + e.getMessage());
+                    plugin.getLogger().warning("Failed to parse player stats for key '" + key + "': " + e.getMessage());  // i18n-ignore: technical storage exception log
                 }
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to load PvP stats: " + e.getMessage());
+            plugin.getLogger().warning("Failed to load PvP stats: " + e.getMessage());  // i18n-ignore: technical storage exception log
         }
         return map;
     }
@@ -58,7 +58,7 @@ public class PvpStatsStorage {
             }
             saveYamlAtomic(cfg, file);
         } catch (IOException e) {
-            plugin.getLogger().warning("Failed to save PvP stats: " + e.getMessage());
+            plugin.getLogger().warning("Failed to save PvP stats: " + e.getMessage());  // i18n-ignore: technical storage exception log
         }
     }
 
@@ -68,7 +68,7 @@ public class PvpStatsStorage {
             try {
                 save(plugin, stats);
             } catch (Exception e) {
-                plugin.getLogger().warning("Async save PvP stats failed: " + e.getMessage());
+                plugin.getLogger().warning("Async save PvP stats failed: " + e.getMessage());  // i18n-ignore: technical storage exception log
             }
         });
     }

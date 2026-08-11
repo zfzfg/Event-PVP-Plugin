@@ -29,7 +29,7 @@ public class ConfigManager {
     private int joinPhaseDuration;
     private int lobbyCountdown;
     private String commandRestriction;
-    private String worldLoading;  // NEU
+    private boolean manageEventWorlds;
     private boolean autoEventsEnabled;
     private int autoEventIntervalMin;
     private int autoEventIntervalMax;
@@ -38,11 +38,15 @@ public class ConfigManager {
     private List<String> selectedAutoEvents;
     
     // Update-Check Settings
+    /** Kontakt fuer den User-Agent -- Modrinth verlangt eine erreichbare Adresse. */
+    private static final String DEFAULT_UPDATE_CONTACT = "https://modrinth.com/plugin/pqJQdZ6R";
     private boolean updateCheckEnabled;
     private boolean checkOnStartup;
     private boolean notifyAdminsOnJoin;
     private String modrinthProjectId;
     private int startupDelayTicks;
+    private boolean updateStableOnly;
+    private String updateContact;
 
     // External integrations
     private boolean ajLeaderboardsEnabled;
@@ -88,15 +92,14 @@ public class ConfigManager {
         joinPhaseDuration = config.getInt("settings.join-phase-duration", 30);
         lobbyCountdown = config.getInt("settings.lobby-countdown", 30);
         commandRestriction = config.getString("settings.command-restriction", "both");
-        worldLoading = config.getString("settings.world-loading", "both");  // NEU
+        manageEventWorlds = config.getBoolean("settings.world-management.events", true);
 
         // Validierung und Begrenzung der Settings-Werte
         joinPhaseDuration = validateRange("settings.join-phase-duration", joinPhaseDuration, 5, 600);
         lobbyCountdown = validateRange("settings.lobby-countdown", lobbyCountdown, 3, 300);
+        // Exakt die Werte, die WorldChangeListener.onCommandPreprocess auswertet
         commandRestriction = validateEnum("settings.command-restriction", commandRestriction, "both",
-                new String[]{"join", "lobby", "both"});
-        worldLoading = validateEnum("settings.world-loading", worldLoading, "both",
-                new String[]{"both", "clone", "load"});
+                new String[]{"both", "event", "lobby", "none"});
         
         ConfigurationSection autoEvents = config.getConfigurationSection("settings.auto-events");
         if (autoEvents != null) {
@@ -116,7 +119,7 @@ public class ConfigManager {
             autoEventIntervalMin = validateRange("settings.auto-events.interval-min", autoEventIntervalMin, 60, 86400);
             autoEventIntervalMax = validateRange("settings.auto-events.interval-max", autoEventIntervalMax, 60, 86400);
             if (autoEventIntervalMax < autoEventIntervalMin) {
-                plugin.getLogger().warning("Einstellung 'settings.auto-events.interval-max' ist kleiner als 'interval-min'. Setze max = min.");
+                plugin.getLogger().warning("Einstellung 'settings.auto-events.interval-max' ist kleiner als 'interval-min'. Setze max = min."); // i18n-ignore: technical config validation log
                 autoEventIntervalMax = autoEventIntervalMin;
             }
         }
@@ -129,6 +132,8 @@ public class ConfigManager {
             notifyAdminsOnJoin = updateCheck.getBoolean("notify-admins-on-join", true);
             modrinthProjectId = updateCheck.getString("modrinth-project-id", "pqJQdZ6R");
             startupDelayTicks = updateCheck.getInt("startup-delay-ticks", 20);
+            updateStableOnly = updateCheck.getBoolean("stable-only", true);
+            updateContact = updateCheck.getString("contact", DEFAULT_UPDATE_CONTACT);
         } else {
             // Default-Werte wenn Sektion fehlt
             updateCheckEnabled = true;
@@ -136,6 +141,8 @@ public class ConfigManager {
             notifyAdminsOnJoin = true;
             modrinthProjectId = "pqJQdZ6R";
             startupDelayTicks = 20;
+            updateStableOnly = true;
+            updateContact = DEFAULT_UPDATE_CONTACT;
         }
 
         ConfigurationSection integrations = config.getConfigurationSection("settings.integrations");
@@ -167,18 +174,25 @@ public class ConfigManager {
         equipmentFilePath = unified.getAbsolutePath();
 
         // Validierung: hat die Datei überhaupt eine der erwarteten Sektionen?
+        //
+        // Die beiden Alt-Sektionen werden hier weiterhin akzeptiert, obwohl der Loader unten
+        // nur noch 'equipment' liest. Grund: dieser Zweig überschreibt die Datei des Nutzers
+        // mit der mitgelieferten Vorlage. Konnte die Migration in CoreConfigManager nicht
+        // laufen - etwa weil sich keine Sicherungskopie anlegen ließ -, stünden hier noch die
+        // alten Sektionen, und ein strengerer Test würde die Konfiguration wegwerfen statt sie
+        // beim nächsten Start erneut zu migrieren.
         boolean hasUnified = equipmentConfig.getConfigurationSection("equipment") != null;
         boolean hasLegacyGroups = equipmentConfig.getConfigurationSection("equipment-groups") != null;
         boolean hasLegacySets = equipmentConfig.getConfigurationSection("equipment-sets") != null;
         if (!hasUnified && !hasLegacyGroups && !hasLegacySets) {
-            plugin.getLogger().warning("equipment.yml enthält keine gültigen Sektionen. Ersetze mit der Paket-Standarddatei.");
+            plugin.getLogger().warning("equipment.yml does not contain valid sections. Replacing with default package file."); // i18n-ignore: technical config validation log
             // Überschreibe die existierende Datei mit der eingebetteten Ressource
             try {
                 plugin.saveResource("equipment.yml", true);
                 equipmentConfig = YamlConfiguration.loadConfiguration(unified);
                 equipmentFilePath = unified.getAbsolutePath();
             } catch (IllegalArgumentException ex) {
-                plugin.getLogger().severe("Konnte Standard 'equipment.yml' nicht bereitstellen: " + ex.getMessage());
+                plugin.getLogger().severe("Could not deploy default 'equipment.yml': " + ex.getMessage()); // i18n-ignore: technical exception log
             }
         }
     }
@@ -217,72 +231,40 @@ public class ConfigManager {
             EventConfig eventConfig = new EventConfig(eventId, eventSection);
             events.put(eventId, eventConfig);
             
-            plugin.getLogger().info("Event geladen: " + eventId);
+            plugin.getLogger().info(plugin.getConsoleMsg("event-loaded", "event", eventId));
         }
     }
     
     private void parseEquipment() {
         equipmentGroups.clear();
-        plugin.getLogger().info("Lade Ausrüstungen aus: " + (equipmentFilePath != null ? equipmentFilePath : "<unbekannt>"));
 
-        // Primär: PvPWager-Format 'equipment-sets' (aktuelles Standardformat)
-        ConfigurationSection setsSection = equipmentConfig.getConfigurationSection("equipment-sets");
-        if (setsSection != null) {
-            for (String groupId : setsSection.getKeys(false)) {
-                ConfigurationSection groupSection = setsSection.getConfigurationSection(groupId);
+        // Genau eine Sektion. Frueher standen hier drei Zweige - 'equipment-sets' zuerst,
+        // dann 'equipment', dann 'equipment-groups' -, waehrend der PvP-Loader die umgekehrte
+        // Reihenfolge hatte. Bei zwei belegten Sektionen sahen Events und PvP dadurch
+        // verschiedene Definitionen unter derselben Set-ID. Alte Dateien werden beim Start von
+        // EquipmentSchemaMigration zusammengefuehrt.
+        ConfigurationSection section = equipmentConfig.getConfigurationSection(
+                de.zfzfg.core.config.EquipmentSchemaMigration.TARGET);
+        if (section != null) {
+            for (String groupId : section.getKeys(false)) {
+                ConfigurationSection groupSection = section.getConfigurationSection(groupId);
                 if (groupSection == null) continue;
-                boolean enabled = groupSection.getBoolean("enabled", true);
-                if (!enabled) {
-                    plugin.getLogger().info("Equipment-Set '" + groupId + "' ist deaktiviert, überspringe...");
+
+                if (!groupSection.getBoolean("event-equip-enable", true)) {
                     continue;
                 }
+
                 EquipmentGroup group = new EquipmentGroup(groupId, groupSection);
                 equipmentGroups.put(groupId, group);
-                plugin.getLogger().info("Equipment-Set geladen: " + groupId);
-            }
-        }
-
-        // Fallback: vereinheitlichte Sektion 'equipment' mit event-equip-enable Flag
-        if (equipmentGroups.isEmpty()) {
-            ConfigurationSection unifiedSection = equipmentConfig.getConfigurationSection("equipment");
-            if (unifiedSection != null) {
-                for (String groupId : unifiedSection.getKeys(false)) {
-                    ConfigurationSection groupSection = unifiedSection.getConfigurationSection(groupId);
-                    if (groupSection == null) continue;
-
-                    boolean eventEnabled = groupSection.getBoolean("event-equip-enable", true);
-                    if (!eventEnabled) {
-                        plugin.getLogger().info("Equipment '" + groupId + "' nicht für Events aktiviert, überspringe...");
-                        continue;
-                    }
-
-                    EquipmentGroup group = new EquipmentGroup(groupId, groupSection);
-                    equipmentGroups.put(groupId, group);
-                    plugin.getLogger().info("Equipment für Events geladen: " + groupId);
-                }
-            }
-        }
-
-        // Fallback: legacy 'equipment-groups'
-        if (equipmentGroups.isEmpty()) {
-            ConfigurationSection groupsSection = equipmentConfig.getConfigurationSection("equipment-groups");
-            if (groupsSection != null) {
-                for (String groupId : groupsSection.getKeys(false)) {
-                    ConfigurationSection groupSection = groupsSection.getConfigurationSection(groupId);
-                    if (groupSection == null) continue;
-
-                    EquipmentGroup group = new EquipmentGroup(groupId, groupSection);
-                    equipmentGroups.put(groupId, group);
-                    plugin.getLogger().info("Legacy Equipment-Gruppe geladen: " + groupId);
-                }
+                plugin.getLogger().info(plugin.getConsoleMsg("equipment-loaded", "set", groupId));
             }
         }
 
         if (equipmentGroups.isEmpty()) {
-            plugin.getLogger().severe("Keine Ausrüstungs-Gruppen gefunden. Prüfe Inhalt von '" + (equipmentFilePath != null ? equipmentFilePath : "unbekannt") + "'. Erwartete Sektionen: 'equipment-sets' (primär), 'equipment' oder 'equipment-groups'.");
+            plugin.getLogger().severe(plugin.getConsoleMsg("equipment-empty-error"));
         } else {
             String ids = String.join(", ", equipmentGroups.keySet());
-            plugin.getLogger().info("Ausrüstungen geladen: " + ids);
+            plugin.getLogger().info(plugin.getConsoleMsg("equipment-all-loaded", "sets", ids));
         }
     }
     
@@ -300,13 +282,13 @@ public class ConfigManager {
             String id = entry.getKey();
             EventConfig ec = entry.getValue();
             if (ec.getMinPlayers() < 2) {
-                plugin.getLogger().warning("Event '" + id + "': min-players < 2. Empfohlen: mindestens 2.");
+                plugin.getLogger().warning("Event '" + id + "': min-players < 2. Empfohlen: mindestens 2."); // i18n-ignore: technical config validation log
             }
             if (ec.getMaxPlayers() < ec.getMinPlayers()) {
-                plugin.getLogger().warning("Event '" + id + "': max-players < min-players. Bitte anpassen.");
+                plugin.getLogger().warning("Event '" + id + "': max-players < min-players. Bitte anpassen."); // i18n-ignore: technical config validation log
             }
             if (ec.getCountdownTime() < 1) {
-                plugin.getLogger().warning("Event '" + id + "': countdown-time < 1 Sekunde. Bitte erhöhen.");
+                plugin.getLogger().warning("Event '" + id + "': countdown-time < 1 Sekunde. Bitte erhöhen."); // i18n-ignore: technical config validation log
             }
         }
     }
@@ -314,11 +296,11 @@ public class ConfigManager {
     // Hilfsmethoden für Config-Validierung
     private int validateRange(String key, int value, int min, int max) {
         if (value < min) {
-            plugin.getLogger().warning("Einstellung '" + key + "' war " + value + ", setze auf Mindestwert " + min + ".");
+            plugin.getLogger().warning("Einstellung '" + key + "' war " + value + ", setze auf Mindestwert " + min + "."); // i18n-ignore: technical config validation log
             return min;
         }
         if (value > max) {
-            plugin.getLogger().warning("Einstellung '" + key + "' war " + value + ", begrenze auf Maximalwert " + max + ".");
+            plugin.getLogger().warning("Einstellung '" + key + "' war " + value + ", begrenze auf Maximalwert " + max + "."); // i18n-ignore: technical config validation log
             return max;
         }
         return value;
@@ -326,7 +308,7 @@ public class ConfigManager {
 
     private String validateEnum(String key, String value, String defaultValue, String[] allowed) {
         if (value == null) {
-            plugin.getLogger().warning("Einstellung '" + key + "' fehlt oder ist null. Verwende Standard '" + defaultValue + "'.");
+            plugin.getLogger().warning("Einstellung '" + key + "' fehlt oder ist null. Verwende Standard '" + defaultValue + "'."); // i18n-ignore: technical config validation log
             return defaultValue;
         }
         for (String a : allowed) {
@@ -334,7 +316,7 @@ public class ConfigManager {
                 return a; // normalisiere ggf. auf erlaubte Schreibweise
             }
         }
-        plugin.getLogger().warning("Einstellung '" + key + "' hat ungültigen Wert '" + value + "'. Erlaubt: " + String.join(", ", allowed) + ". Verwende '" + defaultValue + "'.");
+        plugin.getLogger().warning("Einstellung '" + key + "' hat ungültigen Wert '" + value + "'. Erlaubt: " + String.join(", ", allowed) + ". Verwende '" + defaultValue + "'."); // i18n-ignore: technical config validation log
         return defaultValue;
     }
     
@@ -348,7 +330,7 @@ public class ConfigManager {
     
     public EquipmentGroup getEquipmentGroup(String groupId) {
         if (groupId == null) {
-            plugin.getLogger().severe("Equipment group ID ist null. Bitte 'equipment-group' im Event-Config setzen.");
+            plugin.getLogger().severe("Equipment group ID ist null. Bitte 'equipment-group' im Event-Config setzen."); // i18n-ignore: technical config validation log
             return null;
         }
 
@@ -362,7 +344,7 @@ public class ConfigManager {
         }
 
         // Strikte Fehlerbehandlung statt Provisorien
-        plugin.getLogger().severe("Equipment group '" + groupId + "' nicht gefunden. Verfügbare IDs: " + String.join(", ", equipmentGroups.keySet()));
+        plugin.getLogger().severe(plugin.getConsoleMsg("equipment-not-found", "group", groupId, "available", String.join(", ", equipmentGroups.keySet())));
         return null;
     }
     
@@ -390,8 +372,12 @@ public class ConfigManager {
         return commandRestriction;
     }
     
-    public String getWorldLoading() {  // NEU
-        return worldLoading;
+    /**
+     * Ob das Plugin Lobby- und Eventwelten automatisch laden und entladen darf.
+     * Welche der beiden Welten ein Event braucht, entscheidet dessen 'use-lobby'.
+     */
+    public boolean isManageEventWorlds() {
+        return manageEventWorlds;
     }
     
     public boolean isAutoEventsEnabled() {
@@ -419,14 +405,37 @@ public class ConfigManager {
     }
     
     public String getMessage(String path) {
-        return messagesConfig.getString("messages." + path, "&cMissing message: " + path);
+        String msg = messagesConfig.getString("messages." + path, null);
+        if (msg == null) {
+            msg = messagesConfig.getString("messages.general." + path, null);
+        }
+        if (msg == null) {
+            msg = messagesConfig.getString("messages.end." + path, null);
+        }
+        if (msg == null) {
+            msg = messagesConfig.getString("messages.system." + path, null);
+        }
+        if (msg == null) {
+            msg = messagesConfig.getString(path, null);
+        }
+        if (msg == null) {
+            // Einheitlicher Marker wie im restlichen Code -- bewusst unlokalisiert,
+            // damit im Fehlerfall der Key-Pfad lesbar bleibt.
+            return "&c[missing: " + path + "]";
+        }
+        return msg;
     }
     
     public String getMessage(String path, String... replacements) {
         String message = getMessage(path);
-        for (int i = 0; i < replacements.length; i += 2) {
-            if (i + 1 < replacements.length) {
-                message = message.replace("{" + replacements[i] + "}", replacements[i + 1]);
+        if (replacements != null && replacements.length > 0) {
+            for (int i = 0; i < replacements.length - 1; i += 2) {
+                String raw = replacements[i] != null ? replacements[i].replaceAll("^[{%]+|[%}]+$", "") : "";
+                String val = replacements[i + 1] != null ? replacements[i + 1] : "";
+                if (!raw.isEmpty()) {
+                    message = message.replace("{" + raw + "}", val)
+                                     .replace("%" + raw + "%", val);
+                }
             }
         }
         return message;
@@ -463,6 +472,16 @@ public class ConfigManager {
     
     public String getModrinthProjectId() {
         return modrinthProjectId;
+    }
+
+    /** true = Vorabversionen (beta/alpha) werden beim Update-Check ignoriert. */
+    public boolean isUpdateStableOnly() {
+        return updateStableOnly;
+    }
+
+    /** Kontaktangabe fuer den User-Agent der Modrinth-Anfrage. */
+    public String getUpdateContact() {
+        return updateContact;
     }
     
     public int getStartupDelayTicks() {

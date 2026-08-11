@@ -21,8 +21,9 @@ public class EventConfig {
     
     private final String lobbyWorld;
     private final Location lobbySpawn;
+    private final boolean useLobby;
 
-        private final String eventWorld;
+    private final String eventWorld;
     private final String cloneSourceEventWorld;
     private final boolean regenerateEventWorld;
     private final boolean regenerateLobbyWorld;
@@ -62,10 +63,11 @@ public class EventConfig {
         if (worlds == null) {
             worlds = section.createSection("worlds");
         }
-        this.lobbyWorld = worlds.getString("lobby-world", "EventLobby");
+        this.lobbyWorld = worlds.getString("lobby-world", "");
         ConfigurationSection lobbySpawnSection = worlds.getConfigurationSection("lobby-spawn");
         this.lobbySpawn = parseLobbySpawn(lobbySpawnSection);
-        this.eventWorld = worlds.getString("event-world", "Event");
+        this.useLobby = worlds.getBoolean("use-lobby", !worlds.getBoolean("skip-lobby", false));
+        this.eventWorld = worlds.getString("event-world", "");
         this.cloneSourceEventWorld = worlds.getString("clone-source-event-world", null);
         this.regenerateEventWorld = worlds.getBoolean("regenerate-event-world", false);
         this.regenerateLobbyWorld = worlds.getBoolean("regenerate-lobby-world", false);
@@ -152,6 +154,7 @@ public class EventConfig {
     public int getCountdownTime() { return countdownTime; }
     public String getLobbyWorld() { return lobbyWorld; }
     public Location getLobbySpawn() { return lobbySpawn; }
+    public boolean isUseLobby() { return useLobby; }
     
     public String getEventWorld() { return eventWorld; }
 public String getCloneSourceEventWorld() { return cloneSourceEventWorld; }

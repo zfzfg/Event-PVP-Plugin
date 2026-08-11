@@ -165,7 +165,7 @@ public class NegotiationGui extends AbstractWagerGui {
         // Geld
         Material moneyMat = opponentMoney > 0 ? Material.GOLD_BLOCK : Material.COAL_BLOCK;
         String moneyText = opponentMoney > 0 ? 
-            "&6$" + String.format("%,.2f", opponentMoney) : "&8Kein Geld";
+            "&6$" + String.format("%,.2f", opponentMoney) : t("negotiation.no-money");
         inventory.setItem(OPPONENT_MONEY_SLOT, createButton(moneyMat,
             t("negotiation.opponent-money-title"),
             moneyText));
@@ -208,7 +208,7 @@ public class NegotiationGui extends AbstractWagerGui {
         // Geld
         Material moneyMat = yourMoney > 0 ? Material.EMERALD_BLOCK : Material.COAL_BLOCK;
         String moneyText = yourMoney > 0 ? 
-            "&6$" + String.format("%,.2f", yourMoney) : "&8Kein Geld";
+            "&6$" + String.format("%,.2f", yourMoney) : t("negotiation.no-money");
         inventory.setItem(YOUR_MONEY_SLOT, createButton(moneyMat,
             t("negotiation.your-money-title"),
             moneyText));
@@ -288,9 +288,9 @@ public class NegotiationGui extends AbstractWagerGui {
         returnAllItems();
         
         // Benachrichtigungen
-        MessageUtil.sendMessage(player, "&cDu hast das Angebot abgelehnt.");
+        MessageUtil.sendMessage(player, t("offer-declined-self"));
         if (opponent != null && opponent.isOnline()) {
-            MessageUtil.sendMessage(opponent, "&c" + player.getName() + " hat das Angebot abgelehnt!");
+            MessageUtil.sendMessage(opponent, t("offer-declined-other", "player", player.getName()));
             // Opponent's GUI schließen falls offen
             opponent.closeInventory();
         }
@@ -317,7 +317,7 @@ public class NegotiationGui extends AbstractWagerGui {
         // Prüfungen
         if (opponent == null || !opponent.isOnline()) {
             playErrorSound();
-            MessageUtil.sendMessage(player, "&cDer andere Spieler ist nicht mehr online!");
+            MessageUtil.sendMessage(player, t("opponent-offline"));
             returnAllItems();
             cleanupNegotiation();
             closeInventory();
@@ -327,13 +327,13 @@ public class NegotiationGui extends AbstractWagerGui {
         // Prüfe ob Spieler in Match
         if (plugin.getMatchManager().isPlayerInMatch(player)) {
             playErrorSound();
-            MessageUtil.sendMessage(player, "&cDu bist bereits in einem Kampf!");
+            MessageUtil.sendMessage(player, t("already-in-match-self"));
             return;
         }
         
         if (plugin.getMatchManager().isPlayerInMatch(opponent)) {
             playErrorSound();
-            MessageUtil.sendMessage(player, "&c" + opponent.getName() + " ist bereits in einem Kampf!");
+            MessageUtil.sendMessage(player, t("already-in-match-other", "player", opponent.getName()));
             return;
         }
         
@@ -346,8 +346,8 @@ public class NegotiationGui extends AbstractWagerGui {
         playSuccessSound();
         player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0f, 1.0f);
         
-        MessageUtil.sendMessage(player, "&a&lAngebot angenommen! Match wird gestartet...");
-        MessageUtil.sendMessage(opponent, "&a&l" + player.getName() + " hat das Angebot angenommen! Match startet...");
+        MessageUtil.sendMessage(player, t("offer-accepted-self"));
+        MessageUtil.sendMessage(opponent, t("offer-accepted-other", "player", player.getName()));
         
         // Opponent's GUI schließen
         opponent.closeInventory();
@@ -379,13 +379,13 @@ public class NegotiationGui extends AbstractWagerGui {
             
             if (senderMoney > 0 && !plugin.getEconomy().has(sender, senderMoney)) {
                 playErrorSound();
-                MessageUtil.sendMessage(player, "&c" + sender.getName() + " hat nicht genug Geld!");
+                MessageUtil.sendMessage(player, t("not-enough-money-other", "player", sender.getName()));
                 return false;
             }
             
             if (targetMoney > 0 && !plugin.getEconomy().has(target, targetMoney)) {
                 playErrorSound();
-                MessageUtil.sendMessage(player, "&c" + target.getName() + " hat nicht genug Geld!");
+                MessageUtil.sendMessage(player, t("not-enough-money-other", "player", target.getName()));
                 return false;
             }
         }

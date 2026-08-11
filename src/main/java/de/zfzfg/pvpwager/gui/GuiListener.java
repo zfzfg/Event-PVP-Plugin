@@ -91,7 +91,8 @@ public class GuiListener implements Listener {
                 // Spieler informieren (verzögert, damit nicht während GUI-Close)
                 plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
                     if (player.isOnline()) {
-                        de.zfzfg.pvpwager.utils.MessageUtil.sendMessage(player, "&cWager-Anfrage abgebrochen.");
+                        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.pvp-wager-gui.request-cancelled", "&cWager request cancelled.");
+                        de.zfzfg.pvpwager.utils.MessageUtil.sendMessage(player, msg);
                     }
                 }, 1L);
             }

@@ -5,10 +5,14 @@ import com.google.gson.GsonBuilder;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.plugin.java.JavaPlugin;
+import de.zfzfg.core.config.ConfigMigrationService;
+import de.zfzfg.eventplugin.EventPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -18,13 +22,13 @@ import java.util.logging.Level;
  */
 public class WebConfigManager {
 
-    private final JavaPlugin plugin;
+    private final EventPlugin plugin;
     private final Gson gson;
     
     private FileConfiguration webConfig;
     private File webConfigFile;
 
-    public WebConfigManager(JavaPlugin plugin) {
+    public WebConfigManager(EventPlugin plugin) {
         this.plugin = plugin;
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         loadWebConfig();
@@ -36,15 +40,49 @@ public class WebConfigManager {
     private void loadWebConfig() {
         webConfigFile = new File(plugin.getDataFolder(), "web-config.yml");
         if (!webConfigFile.exists()) {
-            plugin.getLogger().info("web-config.yml nicht gefunden, erstelle neue Datei...");
+            plugin.getLogger().info("web-config.yml not found, creating default file...");  // i18n-ignore: initial setup trace
             plugin.saveResource("web-config.yml", false);
         }
         webConfig = YamlConfiguration.loadConfiguration(webConfigFile);
-        
-        // Debug: Zeige geladene Werte
-        plugin.getLogger().info("WebConfig geladen: enabled=" + webConfig.getBoolean("web.enabled", true) 
-            + ", port=" + webConfig.getInt("web.port", 8085)
-            + ", public-url=" + webConfig.getString("web.public-url", "NICHT GEFUNDEN"));
+
+        // Abgelöste Schlüssel umschreiben und neue aus der Jar-Vorlage nachtragen. Die
+        // Versionsnummer kommt vom CoreConfigManager, weil der Stempel in der config.yml
+        // steht und dort am Ende von dessen load() bereits hochgesetzt wurde - diese
+        // Klasse entsteht erst danach und würde sonst nie erfahren, dass sie migrieren muss.
+        int fromVersion = plugin.getCoreConfigManager() != null
+                ? plugin.getCoreConfigManager().getDetectedConfigVersion()
+                : ConfigMigrationService.CURRENT_VERSION;
+
+        ConfigMigrationService.Result result =
+                ConfigMigrationService.rewriteWebConfig(webConfig, fromVersion);
+        result.absorb(ConfigMigrationService.mergeMissing(
+                webConfig, jarDefaults(), ConfigMigrationService.ID_SECTIONS));
+
+        if (result.isChanged()) {
+            ConfigMigrationService.save(webConfig, webConfigFile, plugin.getLogger());
+        }
+
+        // Debug: Show loaded values
+        plugin.getDebugManager().log("WebConfig loaded: enabled=" + webConfig.getBoolean("web.enabled", true) + ", port=" + webConfig.getInt("web.port", 8085) + ", public-url=" + webConfig.getString("web.public-url", "NOT FOUND")); // i18n-ignore: debug trace
+    }
+
+    /**
+     * Lädt die mitgelieferte web-config.yml aus dem Jar als Sollstand für den Merge.
+     *
+     * @return {@code null}, wenn die Resource fehlt - dann wird nichts ergänzt
+     */
+    private FileConfiguration jarDefaults() {
+        try (InputStream stream = plugin.getResource("web-config.yml")) {
+            if (stream == null) {
+                return null;
+            }
+            return YamlConfiguration.loadConfiguration(
+                    new InputStreamReader(stream, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            plugin.getLogger().warning("Could not read the bundled web-config.yml ("  // i18n-ignore: technical config log
+                    + e.getMessage() + ") - skipping the merge of new keys.");
+            return null;
+        }
     }
 
     /**
@@ -54,7 +92,7 @@ public class WebConfigManager {
         try {
             webConfig.save(webConfigFile);
         } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Fehler beim Speichern der web-config.yml", e);
+            plugin.getLogger().log(Level.SEVERE, "Error saving web-config.yml", e);  // i18n-ignore: technical exception log
         }
     }
 
@@ -77,6 +115,21 @@ public class WebConfigManager {
      */
     public String getBindAddress() {
         return webConfig.getString("web.bind-address", "");
+    }
+
+    /**
+     * Prüft, ob Item-Texturen aus dem Server-Resourcepack übernommen werden sollen.
+     *
+     * <p>Standardmäßig aus: die Übernahme lädt beim Start eine externe Datei herunter,
+     * das soll niemand ungefragt bekommen.</p>
+     */
+    public boolean isResourcePackTexturesEnabled() {
+        return webConfig.getBoolean("items.resource-pack.enabled", false);
+    }
+
+    /** Obergrenze für das heruntergeladene Resourcepack in Megabyte. */
+    public int getResourcePackMaxSizeMb() {
+        return webConfig.getInt("items.resource-pack.max-size-mb", 50);
     }
 
     /**
@@ -110,7 +163,7 @@ public class WebConfigManager {
         String finalUrl = url.replace("{port}", String.valueOf(port));
         
         // Debug-Log
-        plugin.getLogger().info("WebConfig - Loading public-url: '" + url + "' -> '" + finalUrl + "'");
+        plugin.getDebugManager().log("WebConfig - Loading public-url: '" + url + "' -> '" + finalUrl + "'");  // i18n-ignore: debug trace
         
         return finalUrl;
     }
@@ -159,7 +212,7 @@ public class WebConfigManager {
         try {
             worldsConfig.save(worldsFile);
         } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Fehler beim Speichern der worlds.yml", e);
+            plugin.getLogger().log(Level.SEVERE, "Error saving worlds.yml", e);  // i18n-ignore: technical exception log
         }
     }
 
@@ -182,17 +235,17 @@ public class WebConfigManager {
      */
     public void saveEquipmentFromMap(Map<String, Object> data) {
         File equipmentFile = new File(plugin.getDataFolder(), "equipment.yml");
-        plugin.getLogger().info("[Web-Config] Speichere equipment.yml nach: " + equipmentFile.getAbsolutePath());
-        plugin.getLogger().info("[Web-Config] Daten-Keys: " + data.keySet());
+        plugin.getLogger().info("[Web-Config] Saving equipment.yml to: " + equipmentFile.getAbsolutePath());  // i18n-ignore: web config diagnostic trace
+        plugin.getLogger().info("[Web-Config] Data keys: " + data.keySet());  // i18n-ignore: web config diagnostic trace
         
         FileConfiguration equipmentConfig = new YamlConfiguration();
         setConfigFromMap(equipmentConfig, data);
         
         try {
             equipmentConfig.save(equipmentFile);
-            plugin.getLogger().info("[Web-Config] equipment.yml erfolgreich gespeichert!");
+            plugin.getLogger().info("[Web-Config] equipment.yml saved successfully!");  // i18n-ignore: web config diagnostic trace
         } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Fehler beim Speichern der equipment.yml", e);
+            plugin.getLogger().log(Level.SEVERE, "Error saving equipment.yml", e);  // i18n-ignore: technical exception log
         }
     }
 

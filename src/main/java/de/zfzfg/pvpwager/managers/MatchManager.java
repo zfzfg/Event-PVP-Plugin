@@ -9,6 +9,7 @@ import de.zfzfg.pvpwager.utils.MessageUtil;
 import de.zfzfg.pvpwager.utils.InventoryUtil;
 import de.zfzfg.pvpwager.models.CommandRequest;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -56,28 +57,52 @@ public class MatchManager {
      * Holt eine Nachricht aus der Config.
      */
     private String getMsg(String key) {
-        // Determine which section to use based on the key
-        String section;
-        if (key.equals("you-won-header") || key.equals("you-won") || key.equals("you-lost-header") || key.equals("you-lost")) {
-            section = "messages.match-display.";
-        } else if (key.equals("no-arenas") || key.equals("not-enough-money") || key.equals("min-wager-not-met") || 
-                   key.equals("not-enough-inventory") || key.equals("opponent-not-enough-inventory") ||
-                   key.equals("arena-load-failed") || key.equals("teleport-failed") || key.equals("arena-setup-failed") ||
-                   key.equals("arena-loading") || key.equals("match-starting-divider") || key.equals("match-starting") ||
-                   key.equals("fight-divider") || key.equals("fight") || key.equals("no-wager") ||
-                   key.equals("better-luck") || key.equals("wager-returned")) {
-            section = "messages.match-system.";
-        } else {
-            section = "messages.match-manager.";
+        if (key == null || key.isEmpty()) return "";
+        String msg = null;
+        if (key.startsWith("messages.")) {
+            msg = plugin.getCoreConfigManager().getMessages().getString(key, null);
         }
-        return plugin.getCoreConfigManager().getMessages().getString(section + key, key);
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.match-manager." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.match-display." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.match-system." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString(key, null);
+        }
+        if (msg == null) {
+            return "&c[missing: " + key + "]";
+        }
+        return ChatColor.translateAlternateColorCodes('&', msg);
     }
     
     /**
      * Holt eine Nachricht mit Platzhalter-Ersetzung.
      */
     private String getMsg(String key, String placeholder, String value) {
-        return getMsg(key).replace(placeholder, value);
+        return getMsg(key, new String[]{placeholder, value});
+    }
+
+    private String getMsg(String key, String... replacements) {
+        String msg = getMsg(key);
+        if (replacements != null && replacements.length > 0) {
+            for (int i = 0; i < replacements.length - 1; i += 2) {
+                String raw = replacements[i] != null ? replacements[i].replaceAll("^[{%]+|[%}]+$", "") : "";
+                String val = replacements[i + 1] != null ? replacements[i + 1] : "";
+                if (!raw.isEmpty()) {
+                    msg = msg.replace("{" + raw + "}", val)
+                             .replace("%" + raw + "%", val);
+                }
+            }
+        }
+        return msg;
     }
     
     /**
@@ -116,8 +141,8 @@ public class MatchManager {
             playerToMatchId.put(player1.getUniqueId(), match.getMatchId());
             playerToMatchId.put(player2.getUniqueId(), match.getMatchId());
             // Store original locations
-            match.getOriginalLocations().put(player1.getUniqueId(), player1.getLocation());
-            match.getOriginalLocations().put(player2.getUniqueId(), player2.getLocation());
+            rememberOrigin(match, player1.getUniqueId(), player1.getLocation());
+            rememberOrigin(match, player2.getUniqueId(), player2.getLocation());
         }
     }
     
@@ -220,10 +245,10 @@ public class MatchManager {
         match.broadcast(getMsg("arena-loading"));
         match.broadcast("&e&l━━━━━━━━━━━━━━━━━━━━━━━");
         match.broadcast("");
-        match.broadcast(getMsg("arena-display", "{arena}", arena.getDisplayName()));
-        match.broadcast("&7Welt: &e" + arena.getArenaWorld());
+        match.broadcast(getMsg("arena-display", "arena", arena.getDisplayName()));
+        match.broadcast(getMsg("world-announcement", "world", arena.getArenaWorld()));
         match.broadcast("");
-        match.broadcast("&7Bitte warte einen Moment...");
+        match.broadcast(getMsg("please-wait"));
         
         // Load arena world with callback
         plugin.getArenaManager().loadArenaWorld(arena.getArenaWorld(), () -> {
@@ -254,8 +279,13 @@ public class MatchManager {
         Player player2 = match.getPlayer2();
         Arena arena = match.getArena();
         
-        plugin.getLogger().info("Starting DIRECT match in world: " + arenaWorld.getName());
-        
+        plugin.getLogger().info("Starting DIRECT match in world: " + arenaWorld.getName());  // i18n-ignore: technical match trace
+
+        // Inventare sichern, solange die Spieler noch in ihrer Ursprungswelt stehen
+        if (!beginInventorySessions(match)) {
+            return;
+        }
+
         // Teleport players
         spawnManager.teleportPlayers(player1, player2, arena, arenaWorld);
         teleportedPlayers.add(player1.getUniqueId());
@@ -265,18 +295,11 @@ public class MatchManager {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             // Verify in correct world
             if (!player1.getWorld().equals(arenaWorld) || !player2.getWorld().equals(arenaWorld)) {
-                plugin.getLogger().warning("Players not in arena world after teleport!");
+                plugin.getLogger().warning("Players not in arena world after teleport!");  // i18n-ignore: technical match verification log
             }
             
-            // Backups handled in continueMatchSetup with 5-digit Match ID
-
-            // Save inventory snapshots BEFORE clearing (per player, prefixed MATCH)
-            try {
-                de.zfzfg.eventplugin.storage.InventorySnapshotStorage.saveSnapshotWithIdsAsync(plugin, player1, "PVP_MATCH_PRE", match.getMatchId().toString(), false, "MATCH");
-                de.zfzfg.eventplugin.storage.InventorySnapshotStorage.saveSnapshotWithIdsAsync(plugin, player2, "PVP_MATCH_PRE", match.getMatchId().toString(), false, "MATCH");
-            } catch (Exception e) {
-                plugin.getLogger().warning("Failed to save inventory snapshot for match " + match.getMatchId() + ": " + e.getMessage());
-            }
+            // Inventare wurden vor dem Teleport gesichert (beginInventorySessions).
+            markInventorySessionsActive(match);
 
             // Clear inventories
             player1.getInventory().clear();
@@ -330,6 +353,161 @@ public class MatchManager {
         startMatch(match);
     }
     
+    /**
+     * Sichert die Survival-Inventare beider Spieler, bevor sie in die Arena teleportiert werden.
+     *
+     * <p>Der Zeitpunkt ist entscheidend: nach dem Weltwechsel haette Multiverse-Inventories das
+     * Inventar bereits getauscht, und der Abzug enthielte den (meist leeren) Stand der
+     * Arena-Welt. Ein Restore daraus wuerde das echte Inventar loeschen statt es zu retten.
+     * Der Aufruf gehoert deshalb unmittelbar vor jeden {@code teleportPlayers}-Aufruf.</p>
+     *
+     * <p>Ebenso wichtig ist, dass der Wetteinsatz zu diesem Zeitpunkt bereits abgezogen ist
+     * (das erledigt {@code handleWagerConfirmation} vor dem Arena-Teleport). Nur dann bildet
+     * der Abzug den Stand ab, den der Verlierer korrekt zurueckbekommt.</p>
+     *
+     * @return false, wenn das Match nicht starten darf - dann wurde es bereits beendet
+     */
+    private boolean beginInventorySessions(Match match) {
+        Player player1 = match.getPlayer1();
+        Player player2 = match.getPlayer2();
+
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()) {
+            return true;
+        }
+
+        for (Player player : new Player[]{player1, player2}) {
+            Player opponent = match.getOpponent(player);
+            de.zfzfg.core.inventory.BackupContext context =
+                    de.zfzfg.core.inventory.BackupContext
+                            .builder(de.zfzfg.core.inventory.BackupContext.TYPE_PVP_PRE_MATCH)
+                            .meta("match_id", match.getMatchId().toString())
+                            .meta("match_short_id", match.getEventMatchIdShort())
+                            .meta("opponent", opponent == null ? "" : opponent.getName())
+                            .meta("arena", match.getArena() == null ? "" : match.getArena().getId())
+                            .meta("origin_world", player.getWorld() == null ? "" : player.getWorld().getName())
+                            .build();
+
+            de.zfzfg.core.inventory.InventorySessionManager.BeginResult result =
+                    sessions.begin(player, de.zfzfg.core.inventory.guard.GuardContext.PVP_MATCH,
+                            match.getMatchId().toString(), context,
+                            persisted -> onPreMatchBackupWritten(match, player, persisted));
+
+            if (result == de.zfzfg.core.inventory.InventorySessionManager.BeginResult.ALREADY_OPEN) {
+                // Der Spieler haengt noch in einer anderen Sitzung (Event oder altes Match).
+                // Ein zweites Backup entstuende ueber dem Kit-Zustand und machte das erste
+                // wertlos - deshalb hier abbrechen statt ueberschreiben.
+                plugin.getLogger().warning(plugin.getConsoleMsg("inventory-session-conflict",
+                        "player", player.getName()));
+                abortForInventory(match, player1, player2, sessions, "inventory-session-conflict");
+                return false;
+            }
+            if (result == de.zfzfg.core.inventory.InventorySessionManager.BeginResult.UNAVAILABLE) {
+                // Verwaltung eingeschaltet, aber kein Provider da. Das Kit anzulegen hiesse,
+                // das Survival-Inventar ohne jede Absicherung zu loeschen.
+                plugin.getLogger().severe(plugin.getConsoleMsg("inventory-provider-unavailable"));
+                abortForInventory(match, player1, player2, sessions, "inventory-backup-failed-abort");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /** Bricht ein Match ab, weil die Inventare nicht sicher gesichert werden konnten. */
+    private void abortForInventory(Match match, Player player1, Player player2,
+                                   de.zfzfg.core.inventory.InventorySessionManager sessions,
+                                   String messageKey) {
+        MessageUtil.sendMessage(player1, getMsg(messageKey));
+        MessageUtil.sendMessage(player2, getMsg(messageKey));
+        sessions.discard(player1.getUniqueId());
+        sessions.discard(player2.getUniqueId());
+        endMatch(match, null, true);
+    }
+
+    /**
+     * Reaktion darauf, ob das Pre-Match-Backup tatsaechlich auf der Platte gelandet ist.
+     *
+     * <p>Bei {@code on-backup-failure: abort} wird das Match beendet: ohne persistiertes Backup
+     * ueberlebt die Sitzung keinen Serverabsturz, und genau davor soll die Umstellung schuetzen.
+     * Bei {@code warn} laeuft das Match mit dem Abzug im Arbeitsspeicher weiter.</p>
+     */
+    private void onPreMatchBackupWritten(Match match, Player player, boolean persisted) {
+        if (persisted) {
+            return;
+        }
+        boolean abort = plugin.getInventoryConfig().failurePolicy()
+                == de.zfzfg.core.inventory.InventoryManagementConfig.FailurePolicy.ABORT;
+        if (!abort) {
+            MessageUtil.sendMessage(player, getMsg("inventory-backup-degraded"));
+            return;
+        }
+        if (match.getState() == MatchState.ENDED) {
+            return;
+        }
+        plugin.getLogger().severe(plugin.getConsoleMsg("inventory-match-aborted", "player", player.getName()));
+        MessageUtil.sendMessage(match.getPlayer1(), getMsg("inventory-backup-failed-abort"));
+        MessageUtil.sendMessage(match.getPlayer2(), getMsg("inventory-backup-failed-abort"));
+        endMatch(match, null, true);
+    }
+
+    /** Meldet dem Guard, dass die Spieler jetzt das Kit tragen und das Match laeuft. */
+    private void markInventorySessionsActive(Match match) {
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()) {
+            return;
+        }
+        sessions.markActive(match.getPlayer1().getUniqueId());
+        sessions.markActive(match.getPlayer2().getUniqueId());
+    }
+
+    /**
+     * Stellt das Survival-Inventar eines Spielers nach dem Match wieder her.
+     *
+     * <p>Muss nach dem Rueckteleport laufen: waehrend eines Weltwechsels wuerde ein aktives
+     * Multiverse-Inventories das gerade Wiederhergestellte sofort wieder ueberschreiben.
+     * Den Abstand liefert {@code EventPlugin.getInventoryRestoreDelayTicks()} - ohne
+     * Multiverse-Inventories ist er 0. Er ist aber nur Puffer; die eigentliche Zusage gibt
+     * die Nachkontrolle in {@code InventorySessionManager.finish()}, die einen Tick spaeter
+     * prueft, ob noch der gewollte Zustand steht.</p>
+     *
+     * @param onRestored laeuft <b>immer</b>, sobald feststeht, wie es ausgegangen ist. Der
+     *                   Parameter sagt, ob der Spieler die Items jetzt schon traegt. Bei
+     *                   {@code false} darf nichts direkt ins Inventar gegeben werden - der
+     *                   Gewinn gehoert dann in {@code PendingPayoutStore}.
+     */
+    private void restoreInventoryAfterMatch(Player player, java.util.function.Consumer<Boolean> onRestored) {
+        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
+        if (sessions == null || !sessions.isManaged()
+                || !plugin.getInventoryConfig().restoreOnMatchEnd()) {
+            // Keine Inventarverwaltung aktiv: das Inventar wurde nie angetastet, der Gewinn
+            // kann direkt hinein.
+            if (onRestored != null) {
+                onRestored.accept(player.isOnline());
+            }
+            return;
+        }
+        final java.util.UUID playerId = player.getUniqueId();
+        if (!plugin.getInventoryGuard().hasOpenSession(playerId)) {
+            if (onRestored != null) {
+                onRestored.accept(player.isOnline());
+            }
+            return;
+        }
+        sessions.finish(playerId, outcome -> {
+            if (outcome == de.zfzfg.core.inventory.RestoreOutcome.QUEUED_FOR_JOIN) {
+                plugin.getLogger().info(plugin.getConsoleMsg("inventory-restore-queued",
+                        "player", player.getName()));
+            }
+            // Frueher endete dieser Zweig bei allem ausser APPLIED ohne Aufruf - der Gewinn
+            // war damit weg, sobald der Spieler beim Match-Ende offline war oder die
+            // Wiederherstellung fehlschlug. Jetzt entscheidet der Aufrufer anhand des Flags,
+            // ob direkt ausgegeben oder vorgemerkt wird.
+            if (onRestored != null) {
+                onRestored.accept(outcome.isApplied() && player.isOnline());
+            }
+        });
+    }
+
     private void startMatch(Match match) {
         Player player1 = match.getPlayer1();
         Player player2 = match.getPlayer2();
@@ -347,7 +525,7 @@ public class MatchManager {
         plugin.getArenaManager().loadArenaWorld(arena.getArenaWorld(), () -> {
             World arenaWorld = Bukkit.getWorld(arena.getArenaWorld());
             if (arenaWorld == null) {
-                plugin.getLogger().severe("Arena world not found after loading: " + arena.getArenaWorld());
+                plugin.getLogger().severe("Arena world not found after loading: " + arena.getArenaWorld());  // i18n-ignore: technical match verification log
                 MessageUtil.sendMessage(player1, getMsg("arena-load-failed"));
                 MessageUtil.sendMessage(player2, getMsg("arena-load-failed"));
                 endMatch(match, null, true);
@@ -356,10 +534,15 @@ public class MatchManager {
 
             // 5s PRE-TELEPORT countdown with invite, then perform teleport and continue
             startPreTeleportCountdown(match, 5, () -> {
-                plugin.getLogger().info("Starting match in world: " + arenaWorld.getName());
+                plugin.getLogger().info("Starting match in world: " + arenaWorld.getName());  // i18n-ignore: technical match trace
+
+                // Inventare sichern, solange die Spieler noch in ihrer Ursprungswelt stehen
+                if (!beginInventorySessions(match)) {
+                    return;
+                }
 
                 // Teleport players using SpawnManager
-                plugin.getLogger().info("Teleporting players with spawn-type: " + arena.getSpawnType());
+                plugin.getLogger().info("Teleporting players with spawn-type: " + arena.getSpawnType());  // i18n-ignore: technical match trace
                 spawnManager.teleportPlayers(player1, player2, arena, arenaWorld);
 
                 // Mark players as teleported
@@ -377,10 +560,10 @@ public class MatchManager {
     private void afterTeleportVerifyOrRecover(Match match, Player player1, Player player2, Arena arena, World arenaWorld) {
         // Verify players are in correct world
         if (!player1.getWorld().equals(arenaWorld) || !player2.getWorld().equals(arenaWorld)) {
-            plugin.getLogger().warning("Players not in arena world after teleport!");
-            plugin.getLogger().warning("P1 World: " + player1.getWorld().getName());
-            plugin.getLogger().warning("P2 World: " + player2.getWorld().getName());
-            plugin.getLogger().warning("Arena World: " + arenaWorld.getName());
+            plugin.getLogger().warning("Players not in arena world after teleport!");  // i18n-ignore: technical match verification log
+            plugin.getLogger().warning("P1 World: " + player1.getWorld().getName());  // i18n-ignore: technical match verification log
+            plugin.getLogger().warning("P2 World: " + player2.getWorld().getName());  // i18n-ignore: technical match verification log
+            plugin.getLogger().warning("Arena World: " + arenaWorld.getName());  // i18n-ignore: technical match verification log
 
             // Versuche Notfall-Teleport und fahre mit Setup fort
             if (!attemptEmergencyTeleport(match, player1, player2, arena, arenaWorld)) {
@@ -398,7 +581,7 @@ public class MatchManager {
      * Gibt false zurück, wenn das Match beendet werden musste.
      */
     private boolean attemptEmergencyTeleport(Match match, Player player1, Player player2, Arena arena, World arenaWorld) {
-        plugin.getLogger().info("Attempting emergency teleport...");
+        plugin.getLogger().info("Attempting emergency teleport...");  // i18n-ignore: technical match recovery log
         try {
             Location spawn1 = (arena.getSpawnConfig() != null && arena.getSpawnConfig().getFixedSpawns() != null && !arena.getSpawnConfig().getFixedSpawns().isEmpty())
                 ? arena.getSpawnConfig().getFixedSpawns().get(0).clone()
@@ -416,7 +599,7 @@ public class MatchManager {
             // Nochmal warten und prüfen
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (!player1.getWorld().equals(arenaWorld) || !player2.getWorld().equals(arenaWorld)) {
-                    plugin.getLogger().severe("Emergency teleport failed! Ending match.");
+                    plugin.getLogger().severe("Emergency teleport failed! Ending match.");  // i18n-ignore: technical match recovery log
                     MessageUtil.sendMessage(player1, getMsg("arena-teleport-failed"));
                     MessageUtil.sendMessage(player2, getMsg("arena-teleport-failed"));
                     endMatch(match, null, true);
@@ -427,7 +610,7 @@ public class MatchManager {
 
             return true;
         } catch (Exception e) {
-            plugin.getLogger().severe("Emergency teleport failed with exception: " + e.getMessage());
+            plugin.getLogger().severe("Emergency teleport failed with exception: " + e.getMessage());  // i18n-ignore: technical match recovery log
             MessageUtil.sendMessage(player1, getMsg("arena-setup-failed"));
             MessageUtil.sendMessage(player2, getMsg("arena-setup-failed"));
             endMatch(match, null, true);
@@ -436,15 +619,8 @@ public class MatchManager {
     }
     
     private void continueMatchSetup(Match match, Player player1, Player player2, World arenaWorld) {
-        // Inventar-Backups in Matches sind deaktiviert
-
-        // Save inventory snapshots BEFORE clearing (per player, prefixed MATCH)
-        try {
-            de.zfzfg.eventplugin.storage.InventorySnapshotStorage.saveSnapshotWithIdsAsync(plugin, player1, "PVP_MATCH_PRE", match.getMatchId().toString(), false, "MATCH");
-            de.zfzfg.eventplugin.storage.InventorySnapshotStorage.saveSnapshotWithIdsAsync(plugin, player2, "PVP_MATCH_PRE", match.getMatchId().toString(), false, "MATCH");
-        } catch (Exception e) {
-            plugin.getLogger().warning("Failed to save inventory snapshot for match " + match.getMatchId() + ": " + e.getMessage());
-        }
+        // Inventare wurden vor dem Teleport gesichert (beginInventorySessions).
+        markInventorySessionsActive(match);
 
         // Clear inventories AFTER teleport
         player1.getInventory().clear();
@@ -479,7 +655,7 @@ public class MatchManager {
     private void applyEquipment(Player player, EquipmentSet equipment) {
         if (equipment == null) return;
         
-        plugin.getLogger().info("Applying equipment to " + player.getName() + " in world: " + player.getWorld().getName());
+        plugin.getDebugManager().log("Applying equipment to " + player.getName() + " in world: " + player.getWorld().getName());  // i18n-ignore: technical equipment debug log
         
         // Apply armor
         if (equipment.getHelmet() != null) {
@@ -494,7 +670,11 @@ public class MatchManager {
         if (equipment.getBoots() != null) {
             player.getInventory().setBoots(equipment.getBoots().clone());
         }
-        
+        // Nebenhand: das Web-Panel bietet sie seit jeher an, angezogen wurde sie erst ab 1.0.9.
+        if (equipment.getOffhand() != null) {
+            player.getInventory().setItemInOffHand(equipment.getOffhand().clone());
+        }
+
         // Apply inventory items
         if (equipment.getInventory() != null) {
             for (Map.Entry<Integer, ItemStack> entry : equipment.getInventory().entrySet()) {
@@ -502,7 +682,7 @@ public class MatchManager {
             }
         }
         
-        plugin.getLogger().info("Equipment applied to " + player.getName());
+        plugin.getDebugManager().log("Equipment applied to " + player.getName());  // i18n-ignore: technical equipment debug log
     }
 
     private boolean verifyEquipmentApplied(Player player, EquipmentSet equipment) {
@@ -554,19 +734,19 @@ public class MatchManager {
             @Override
             public void run() {
                 if (verifyEquipmentApplied(player, equipment)) {
-                    plugin.getLogger().info("Equipment verified for " + player.getName() + " (attempt " + attempt + ")");
+                    plugin.getDebugManager().log("Equipment verified for " + player.getName() + " (attempt " + attempt + ")");  // i18n-ignore: technical equipment debug log
                     cancel();
                     return;
                 }
 
                 if (attempt >= maxAttempts) {
-                    plugin.getLogger().warning("Equipment could not be verified for " + player.getName() + " after " + maxAttempts + " attempts.");
+                    plugin.getLogger().warning("Equipment could not be verified for " + player.getName() + " after " + maxAttempts + " attempts.");  // i18n-ignore: technical equipment debug log
                     cancel();
                     return;
                 }
 
                 attempt++;
-                plugin.getLogger().warning("Equipment not applied correctly to " + player.getName() + ", retrying (attempt " + attempt + ")...");
+                plugin.getLogger().warning("Equipment not applied correctly to " + player.getName() + ", retrying (attempt " + attempt + ")...");  // i18n-ignore: technical equipment debug log
                 applyEquipment(player, equipment);
             }
         }.runTaskTimer(plugin, de.zfzfg.core.util.Time.ticks(4), DISTRIBUTE_DELAY_TICKS);
@@ -592,7 +772,7 @@ public class MatchManager {
             BukkitTask task = Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (match.getState() != MatchState.STARTING) return;
                 
-                String message = getMsg("match-countdown", "{seconds}", String.valueOf(seconds));
+                String message = getMsg("match-countdown", "seconds", String.valueOf(seconds));
                 match.broadcast(message);
                 
                 // Play sound
@@ -642,12 +822,12 @@ public class MatchManager {
                     try {
                         onFinish.run();
                     } catch (Exception e) {
-                        plugin.getLogger().warning("Pre-teleport callback failed: " + e.getMessage());
+                        plugin.getLogger().warning("Pre-teleport callback failed: " + e.getMessage());  // i18n-ignore: technical match callback log
                     }
                     return;
                 }
 
-                match.broadcast(getMsg("teleport-countdown", "{seconds}", String.valueOf(remaining)));
+                match.broadcast(getMsg("teleport-countdown", "seconds", String.valueOf(remaining)));
                 player1.playSound(player1.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 player2.playSound(player2.getLocation(), org.bukkit.Sound.BLOCK_NOTE_BLOCK_PLING, 1.0f, 1.0f);
                 remaining--;
@@ -663,14 +843,13 @@ public class MatchManager {
             Player p2 = match.getPlayer2();
 
             TextComponent header = new TextComponent(MessageUtil.color(
-                getMsg("spectate-header", "{player1}", p1.getName())
-                    .replace("{player2}", p2.getName())
+                getMsg("spectate-header", "player1", p1.getName(), "player2", p2.getName())
             ));
 
             TextComponent spectateBtn1 = new TextComponent(MessageUtil.color(getMsg("spectate-button")));
             spectateBtn1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pvp spectate " + p1.getName()));
             spectateBtn1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(MessageUtil.color("§aKlicke, um das Match zu schauen")).create()));
+                new ComponentBuilder(MessageUtil.color(getMsg("spectate-hover"))).create()));
 
             TextComponent footer = new TextComponent(MessageUtil.color(getMsg("spectate-footer")));
 
@@ -688,8 +867,7 @@ public class MatchManager {
                 Player p1 = match.getPlayer1();
                 Player p2 = match.getPlayer2();
                 if (online.equals(p1) || online.equals(p2)) continue;
-                MessageUtil.sendMessage(online, getMsg("spectate-simple", "{player1}", p1.getName())
-                    .replace("{player2}", p2.getName()));
+                MessageUtil.sendMessage(online, getMsg("spectate-simple", "player1", p1.getName(), "player2", p2.getName()));
             }
         }
     }
@@ -737,7 +915,7 @@ public class MatchManager {
                 // Match timeout - draw
                 match.broadcast("");
                 match.broadcast("&c&l━━━━━━━━━━━━━━━━━━━━━━━");
-                match.broadcast("&c&lTIME'S UP!");
+                match.broadcast(getMsg("time-up"));
                 match.broadcast("&c&l━━━━━━━━━━━━━━━━━━━━━━━");
                 match.broadcast("");
                 match.broadcast(getMsg("timeout-draw"));
@@ -745,7 +923,7 @@ public class MatchManager {
                 
                 endMatch(match, null, true);
             } else if (java.util.Arrays.stream(MATCH_TIMER_ANNOUNCE_SECONDS).anyMatch(s -> s == remaining)) {
-                match.broadcast("&eMatch ends in &c" + remaining + " &eseconds!");
+                match.broadcast(getMsg("match-ends-in", "seconds", String.valueOf(remaining)));
             }
         }, 0L, de.zfzfg.core.util.Time.TICKS_PER_SECOND);
         
@@ -754,6 +932,30 @@ public class MatchManager {
         }
     }
     
+    /**
+     * Merkt sich, wohin ein Match-Teilnehmer zurueckgehoert - im Match-Objekt und dauerhaft.
+     *
+     * <p>Das Match lebt nur im Arbeitsspeicher; nach einem Absturz waere die Position sonst
+     * verloren, waehrend das Inventar ueber das Guard-Journal zurueckkaeme.</p>
+     */
+    private void rememberOrigin(Match match, java.util.UUID playerId, org.bukkit.Location location) {
+        if (location == null) {
+            return;
+        }
+        match.getOriginalLocations().put(playerId, location.clone());
+        if (plugin.getReturnLocations() != null) {
+            plugin.getReturnLocations().remember(playerId, location,
+                    de.zfzfg.core.location.ReturnReason.PVP_MATCH);
+        }
+    }
+
+    /** Gegenstueck zu {@link #rememberOrigin}: der Rueckweg ist erledigt. */
+    private void forgetOrigin(java.util.UUID playerId) {
+        if (plugin.getReturnLocations() != null) {
+            plugin.getReturnLocations().forget(playerId);
+        }
+    }
+
     public void endMatch(Match match, Player winner, boolean isDraw) {
         // Cancel tasks (unter Lock)
         List<BukkitTask> countdownTaskList;
@@ -780,8 +982,8 @@ public class MatchManager {
         // Handle winnings/returns based on mode
         if (match.isNoWagerMode()) {
             // No wager mode - nothing to distribute
-            MessageUtil.sendMessage(player1, "&7No wager match - no items to distribute.");
-            MessageUtil.sendMessage(player2, "&7No wager match - no items to distribute.");
+            MessageUtil.sendMessage(player1, getMsg("no-wager-items"));
+            MessageUtil.sendMessage(player2, getMsg("no-wager-items"));
         } else if (isDraw) {
             distributeItemsBack(match);
         } else if (winner != null) {
@@ -803,7 +1005,7 @@ public class MatchManager {
             }
             plugin.markExternalDisplayDirty();
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to record match statistics: " + e.getMessage());
+            plugin.getLogger().warning("Failed to record match statistics: " + e.getMessage());  // i18n-ignore: technical stats log
         }
 
         // Post-Match Inventar-Backups sind deaktiviert
@@ -813,13 +1015,13 @@ public class MatchManager {
             String worldName = match.getArena().getArenaWorld();
             String cloneSource = match.getArena().getCloneSourceWorld();
             if (cloneSource != null && !cloneSource.isEmpty()) {
-                plugin.getLogger().info("Scheduling clone reset for arena world: " + worldName + " from " + cloneSource);
+                plugin.getLogger().info("Scheduling clone reset for arena world: " + worldName + " from " + cloneSource);  // i18n-ignore: technical world reset log
                 // Nach Rück-Teleport der Spieler ausführen
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     plugin.getArenaManager().resetArenaWorldByClone(cloneSource, worldName);
                 }, de.zfzfg.core.util.Time.seconds(7)); // 7 Sekunden nach Match-Ende
             } else if (match.getArena().isRegenerateWorld()) {
-                plugin.getLogger().info("Scheduling Multiverse regeneration for arena world: " + worldName);
+                plugin.getLogger().info("Scheduling Multiverse regeneration for arena world: " + worldName);  // i18n-ignore: technical world reset log
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     plugin.getArenaManager().regenerateArenaWorld(worldName);
                 }, de.zfzfg.core.util.Time.seconds(7));
@@ -865,9 +1067,12 @@ public class MatchManager {
                 for (UUID spectatorId : new ArrayList<>(match.getSpectators())) {
                     playerToMatchId.remove(spectatorId);
                     teleportedPlayers.remove(spectatorId);
+                    forgetOrigin(spectatorId);
                 }
                 teleportedPlayers.remove(match.getPlayer1().getUniqueId());
                 teleportedPlayers.remove(match.getPlayer2().getUniqueId());
+                forgetOrigin(match.getPlayer1().getUniqueId());
+                forgetOrigin(match.getPlayer2().getUniqueId());
                 matches.remove(matchId);
             }
             
@@ -883,50 +1088,70 @@ public class MatchManager {
         Location winnerOriginal = match.getOriginalLocations().get(winner.getUniqueId());
         if (winnerOriginal != null) {
             winner.teleport(winnerOriginal);
-            plugin.getLogger().info("Teleported winner " + winner.getName() + " back to original location");
+            plugin.getLogger().info("Teleported winner " + winner.getName() + " back to original location");  // i18n-ignore: technical match teleport log
         }
         
-        // Give items to winner NACH Teleport
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+        // Reihenfolge: Teleport -> Wiederherstellung des Survival-Inventars -> Gewinn.
+        // Andersherum wuerde der Restore (clearBefore) den gerade uebergebenen Gewinn
+        // im selben Tick wieder loeschen. Die Wartezeit kommt aus der Multiverse-Bridge
+        // und ist ohne Multiverse-Inventories 0.
+        Bukkit.getScheduler().runTaskLater(plugin, () -> restoreInventoryAfterMatch(winner, inventoryReady -> {
+            if (!plugin.getInventorySessions().claimPayout(winner.getUniqueId())) {
+                // Bereits ausgeschuettet (z. B. durch den Shutdown-Pfad) - nicht doppelt.
+                return;
+            }
             List<ItemStack> allItems = new ArrayList<>();
             allItems.addAll(match.getWagerItems(match.getPlayer1()));
             allItems.addAll(match.getWagerItems(match.getPlayer2()));
-            
-            InventoryUtil.giveItems(winner, allItems);
-            
+
+            double totalMoney = 0;
+            if (plugin.hasEconomy()) {
+                totalMoney = match.getWagerMoney(match.getPlayer1()) + match.getWagerMoney(match.getPlayer2());
+            }
+
+            // Konnte das Inventar nicht wiederhergestellt werden - Spieler offline oder
+            // Restore fehlgeschlagen -, wandert der gesamte Gewinn in den Auffangspeicher
+            // und wird beim naechsten Join nachgereicht. Direkt ausgeben hiesse: weg.
+            boolean handedOut = plugin.getPendingPayouts().deliverOrQueue(
+                    winner, allItems, totalMoney, "pvp-win", inventoryReady);
+            if (!handedOut) {
+                return;  // Die Erfolgsmeldungen ergaeben ohne den Gewinn keinen Sinn.
+            }
+
+            String wonHeader = plugin.getCoreConfigManager().getMessages().getString("messages.match-display.you-won-header", "&a&l━━━━━━━━━━━━━━━━━━━━━━━");
+            String wonTitle = plugin.getCoreConfigManager().getMessages().getString("messages.match-display.you-won", "&a&lYOU WON THE MATCH!");
             MessageUtil.sendMessage(winner, "");
-            MessageUtil.sendMessage(winner, getMsg("you-won-header"));
-            MessageUtil.sendMessage(winner, getMsg("you-won"));
-            MessageUtil.sendMessage(winner, getMsg("you-won-header"));
+            MessageUtil.sendMessage(winner, wonHeader);
+            MessageUtil.sendMessage(winner, wonTitle);
+            MessageUtil.sendMessage(winner, wonHeader);
             MessageUtil.sendMessage(winner, "");
             List<ItemStack> opponentItems = match.getWagerItems(loser);
             List<ItemStack> ownItems = match.getWagerItems(winner);
             if (opponentItems != null && !opponentItems.isEmpty()) {
-                MessageUtil.sendMessage(winner, "&7Received from opponent: &e" + formatItemList(opponentItems));
+                MessageUtil.sendMessage(winner, getMsg("received-from-opponent-items", "items", formatItemList(opponentItems)));
             }
             if (ownItems != null && !ownItems.isEmpty()) {
-                MessageUtil.sendMessage(winner, "&7Your own stake added: &e" + formatItemList(ownItems));
+                MessageUtil.sendMessage(winner, getMsg("own-stake-added-items", "items", formatItemList(ownItems)));
             }
             
-            // Give money to winner
-            if (plugin.hasEconomy()) {
-                double totalMoney = match.getWagerMoney(match.getPlayer1()) + match.getWagerMoney(match.getPlayer2());
-                if (totalMoney > 0) {
-                    double opponentMoney = match.getWagerMoney(loser);
-                    double ownMoney = match.getWagerMoney(winner);
-                    plugin.getEconomy().depositPlayer(winner, totalMoney);
-                    if (opponentMoney > 0) {
-                        MessageUtil.sendMessage(winner, "&7Received from opponent: &6$" + String.format("%.2f", opponentMoney));
-                    }
-                    if (ownMoney > 0) {
-                        MessageUtil.sendMessage(winner, "&7Your own stake added: &6$" + String.format("%.2f", ownMoney));
-                    }
+            // Nur noch die Meldungen: die Gutschrift selbst hat deliverOrQueue() oben
+            // zusammen mit den Items erledigt. Beides muss denselben Weg gehen, sonst
+            // bekaeme ein offline ausgeschiedener Gewinner sein Geld sofort und seine
+            // Items erst beim Join.
+            if (totalMoney > 0) {
+                double opponentMoney = match.getWagerMoney(loser);
+                double ownMoney = match.getWagerMoney(winner);
+                if (opponentMoney > 0) {
+                    MessageUtil.sendMessage(winner, getMsg("received-from-opponent-money", "amount", String.format("%.2f", opponentMoney)));
+                }
+                if (ownMoney > 0) {
+                    MessageUtil.sendMessage(winner, getMsg("own-stake-added-money", "amount", String.format("%.2f", ownMoney)));
                 }
             }
             MessageUtil.sendMessage(winner, "");
-            
-        }, DISTRIBUTE_DELAY_TICKS);
-        
+
+        }), plugin.getInventoryRestoreDelayTicks());
+
         // Notify loser
         MessageUtil.sendMessage(loser, "");
         MessageUtil.sendMessage(loser, getMsg("you-lost-header"));
@@ -935,15 +1160,15 @@ public class MatchManager {
         MessageUtil.sendMessage(loser, "");
         List<ItemStack> lostItems = match.getWagerItems(loser);
         if (lostItems != null && !lostItems.isEmpty()) {
-            MessageUtil.sendMessage(loser, "&7You lost: &e" + formatItemList(lostItems));
+            MessageUtil.sendMessage(loser, getMsg("you-lost-items", "items", formatItemList(lostItems)));
         }
         if (plugin.hasEconomy()) {
             double lostMoney = match.getWagerMoney(loser);
             if (lostMoney > 0) {
-                MessageUtil.sendMessage(loser, "&7You lost: &6$" + String.format("%.2f", lostMoney));
+                MessageUtil.sendMessage(loser, getMsg("you-lost-money", "amount", String.format("%.2f", lostMoney)));
             }
         }
-        MessageUtil.sendMessage(loser, "&7Better luck next time!");
+        MessageUtil.sendMessage(loser, getMsg("better-luck"));
         MessageUtil.sendMessage(loser, "");
     }
     
@@ -961,28 +1186,34 @@ public class MatchManager {
         if (p1Original != null) player1.teleport(p1Original);
         if (p2Original != null) player2.teleport(p2Original);
         
-        // Give items AFTER teleport
+        // Erst wiederherstellen, dann den Einsatz zurueckgeben - sonst loescht der Restore
+        // die gerade zurueckgegebenen Items wieder.
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            InventoryUtil.giveItems(player1, match.getWagerItems(player1));
-            InventoryUtil.giveItems(player2, match.getWagerItems(player2));
-            
-            // Return money
-            if (plugin.hasEconomy()) {
-                double p1Money = match.getWagerMoney(player1);
-                double p2Money = match.getWagerMoney(player2);
-                
-                if (p1Money > 0) {
-                    plugin.getEconomy().depositPlayer(player1, p1Money);
-                }
-                if (p2Money > 0) {
-                    plugin.getEconomy().depositPlayer(player2, p2Money);
-                }
-            }
-            
-            MessageUtil.sendMessage(player1, "&7Your wager has been returned.");
-            MessageUtil.sendMessage(player2, "&7Your wager has been returned.");
-            
-        }, 10L); // 0.5 Sekunden nach Teleport
+            restoreInventoryAfterMatch(player1, ready -> returnOwnStake(match, player1, ready));
+            restoreInventoryAfterMatch(player2, ready -> returnOwnStake(match, player2, ready));
+        }, plugin.getInventoryRestoreDelayTicks());
+    }
+
+    /**
+     * Gibt einem Spieler seinen eigenen Einsatz zurueck - genau einmal (Guard).
+     *
+     * @param inventoryReady ob das Survival-Inventar bereits wiederhergestellt ist. Bei
+     *                       {@code false} wird der Einsatz vorgemerkt statt ausgegeben;
+     *                       frueher fiel er in diesem Fall ersatzlos weg.
+     */
+    private void returnOwnStake(Match match, Player player, boolean inventoryReady) {
+        if (plugin.getInventorySessions() != null
+                && !plugin.getInventorySessions().claimPayout(player.getUniqueId())) {
+            return;
+        }
+
+        double money = plugin.hasEconomy() ? match.getWagerMoney(player) : 0;
+        boolean handedOut = plugin.getPendingPayouts().deliverOrQueue(
+                player, match.getWagerItems(player), money, "pvp-draw-return", inventoryReady);
+
+        if (handedOut) {
+            MessageUtil.sendMessage(player, getMsg("wager-returned"));
+        }
     }
     
     private void teleportPlayerBack(Player player, Match match) {
@@ -992,13 +1223,12 @@ public class MatchManager {
         // Sie werden über den PlayerRespawnEvent behandelt.
         // Aber GameMode und Effekte müssen trotzdem zurückgesetzt werden!
         if (player.isDead()) {
-            plugin.getLogger().info("[SafeTeleport-PvP] Spieler " + player.getName() +
-                " ist tot - Teleport wird über RespawnEvent gehandhabt, aber GameMode wird zurückgesetzt.");
+            plugin.getLogger().info(plugin.getConsoleMsg("match-dead-player-gamemode", "player", player.getName()));
             try { player.setGameMode(GameMode.SURVIVAL); } catch (Exception e) {
-                plugin.getLogger().warning("Failed to set gamemode for dead player " + player.getName() + ": " + e.getMessage());
+                plugin.getLogger().warning("Failed to set gamemode for dead player " + player.getName() + ": " + e.getMessage());  // i18n-ignore: technical exception log
             }
             try { player.removePotionEffect(PotionEffectType.INVISIBILITY); } catch (Exception e) {
-                plugin.getLogger().warning("Failed to remove invisibility from dead player " + player.getName() + ": " + e.getMessage());
+                plugin.getLogger().warning("Failed to remove invisibility from dead player " + player.getName() + ": " + e.getMessage());  // i18n-ignore: technical exception log
             }
             return;
         }
@@ -1017,14 +1247,10 @@ public class MatchManager {
                 // Zusätzliche Sicherheit: Prüfe Y-Koordinate (Void-Schutz)
                 double minY = targetWorld.getMinHeight();
                 if (safeLocation.getY() < minY + 5) {
-                    // Zu tief - nutze Spawn stattdessen
-                    plugin.getLogger().warning("[SafeTeleport-PvP] Original-Location für " + player.getName() + 
-                        " zu tief (Y=" + safeLocation.getY() + "), nutze Spawn.");
                     safeLocation = targetWorld.getSpawnLocation();
                 }
                 
-                plugin.getLogger().info("[SafeTeleport-PvP] Teleportiere " + player.getName() + " zurück zu: " + 
-                    worldName + " @ " + safeLocation.getBlockX() + ", " + safeLocation.getBlockY() + ", " + safeLocation.getBlockZ());
+                plugin.getLogger().info(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", worldName, "coords", String.format("%d, %d, %d", safeLocation.getBlockX(), safeLocation.getBlockY(), safeLocation.getBlockZ())));
                 
                 // Secure Teleport Logic: Cache and Verify
                 teleportVerificationCache.put(player.getUniqueId(), safeLocation);
@@ -1034,15 +1260,21 @@ public class MatchManager {
                 Bukkit.getScheduler().runTaskLater(plugin, () -> verifyTeleportBack(player), 10L);
             } else {
                 // Welt nicht mehr geladen - Fallback zu Hauptwelt
-                plugin.getLogger().warning("[SafeTeleport-PvP] Original-Welt für " + player.getName() + 
-                    " nicht mehr geladen (" + worldName + "), nutze Hauptwelt.");
+                plugin.getLogger().warning(plugin.getConsoleMsg("safe-teleport-fallback", "player", player.getName()));
                 teleportToMainWorldFallback(player);
             }
         } else {
-            plugin.getLogger().warning("[SafeTeleport-PvP] Keine Original-Location für " + player.getName() + ", nutze Hauptwelt.");
+            plugin.getLogger().warning(plugin.getConsoleMsg("safe-teleport-no-location", "player", player.getName()));
             teleportToMainWorldFallback(player);
         }
         
+        // Survival-Inventar erst nach dem abgeschlossenen Weltwechsel zurueckspielen: laeuft
+        // Multiverse-Inventories parallel, wuerde dessen Weltwechsel-Hook ein frueheres
+        // Ergebnis sofort wieder ueberschreiben. Der Aufruf ist idempotent - fuer den
+        // Gewinner ist die Sitzung hier laengst geschlossen und es passiert nichts.
+        Bukkit.getScheduler().runTaskLater(plugin,
+                () -> restoreInventoryAfterMatch(player, null), plugin.getInventoryRestoreDelayTicks());
+
         // Reset player state
         if (match.getSpectators().contains(player.getUniqueId())) {
             player.setGameMode(GameMode.SURVIVAL);
@@ -1066,11 +1298,10 @@ public class MatchManager {
         
         if (mainWorld != null) {
             Location spawn = mainWorld.getSpawnLocation();
-            plugin.getLogger().info("[SafeTeleport-PvP] Teleportiere " + player.getName() + " zu Hauptwelt-Spawn: " + 
-                mainWorld.getName());
+            plugin.getLogger().info(plugin.getConsoleMsg("safe-teleport-player", "player", player.getName(), "world", mainWorld.getName(), "coords", String.format("%.0f, %.0f, %.0f", spawn.getX(), spawn.getY(), spawn.getZ())));
             player.teleport(spawn);
         } else {
-            plugin.getLogger().severe("[SafeTeleport-PvP] KRITISCH: Keine Hauptwelt verfügbar für " + player.getName());
+            plugin.getLogger().severe(plugin.getConsoleMsg("safe-teleport-critical", "player", player.getName()));
         }
     }
 
@@ -1096,9 +1327,9 @@ public class MatchManager {
                              current.getWorld().getName().equals(expected.getWorld().getName());
         
         if (!worldMatch || current.distanceSquared(expected) > 9) { // > 3 blocks away
-            plugin.getLogger().warning("Teleport verification failed for " + player.getName() + 
-                ". Expected: " + (expected.getWorld() != null ? expected.getWorld().getName() : "null") + 
-                ", Actual: " + (current.getWorld() != null ? current.getWorld().getName() : "null"));
+            plugin.getLogger().warning("Teleport verification failed for " + player.getName() +   // i18n-ignore: technical teleport verification log
+                ". Expected: " + (expected.getWorld() != null ? expected.getWorld().getName() : "null") +   // i18n-ignore: technical teleport verification log
+                ", Actual: " + (current.getWorld() != null ? current.getWorld().getName() : "null"));  // i18n-ignore: technical validation log
             
             // Retry teleport once
             player.teleport(expected);
@@ -1135,7 +1366,7 @@ public class MatchManager {
     public int stopAllMatches() {
         int count = matches.size();
         for (Match match : new ArrayList<>(getMatches().values())) {
-            match.broadcast("&cServer is shutting down! Match cancelled.");
+            match.broadcast(getMsg("server-shutdown"));
             endMatch(match, null, true);
         }
         // Nach dem Abbruch aller Matches: Flüchtige Zustände säubern
@@ -1180,15 +1411,15 @@ public class MatchManager {
         if (countdownTaskList != null) {
             for (BukkitTask task : countdownTaskList) {
                 try { task.cancel(); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to cancel countdown task: " + e.getMessage());
+                    plugin.getLogger().warning("Failed to cancel countdown task: " + e.getMessage());  // i18n-ignore: technical exception log
                 }
             }
         }
         if (preTeleportTask != null) try { preTeleportTask.cancel(); } catch (Exception e) {
-            plugin.getLogger().warning("Failed to cancel pre-teleport task: " + e.getMessage());
+            plugin.getLogger().warning("Failed to cancel pre-teleport task: " + e.getMessage());  // i18n-ignore: technical exception log
         }
         if (timerTask != null) try { timerTask.cancel(); } catch (Exception e) {
-            plugin.getLogger().warning("Failed to cancel timer task: " + e.getMessage());
+            plugin.getLogger().warning("Failed to cancel timer task: " + e.getMessage());  // i18n-ignore: technical exception log
         }
 
         match.setState(MatchState.ENDED);
@@ -1210,12 +1441,19 @@ public class MatchManager {
 
         // Rückgabe abhängig vom Modus
         if (!match.isNoWagerMode()) {
-            // Items direkt zurück
+            // Items direkt zurück. Im onDisable laeuft der Scheduler nicht mehr, also KEIN
+            // Restore-Versuch hier - die offenen Sitzungen stehen im Guard-Journal und werden
+            // beim naechsten Serverstart abgearbeitet. Nur die Ausschuettung wird vermerkt,
+            // damit der Wiederanlauf sie nicht ein zweites Mal vornimmt.
+            if (plugin.getInventorySessions() != null) {
+                plugin.getInventorySessions().claimPayout(player1.getUniqueId());
+                plugin.getInventorySessions().claimPayout(player2.getUniqueId());
+            }
             try {
                 InventoryUtil.giveItems(player1, match.getWagerItems(player1));
                 InventoryUtil.giveItems(player2, match.getWagerItems(player2));
             } catch (Exception e) {
-                plugin.getLogger().severe("Failed to return items on shutdown: " + e.getMessage());
+                plugin.getLogger().severe("Failed to return items on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
             }
 
             // Geld direkt zurück
@@ -1227,22 +1465,22 @@ public class MatchManager {
                     if (p2Money > 0) plugin.getEconomy().depositPlayer(player2, p2Money);
                 }
             } catch (Exception e) {
-                plugin.getLogger().severe("Failed to return money on shutdown: " + e.getMessage());
+                plugin.getLogger().severe("Failed to return money on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
             }
         }
 
         // Status von Spielern zurücksetzen
         try { player1.setGameMode(GameMode.SURVIVAL); } catch (Exception e) {
-            plugin.getLogger().warning("Failed to set gamemode for player1 on shutdown: " + e.getMessage());
+            plugin.getLogger().warning("Failed to set gamemode for player1 on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
         }
         try { player2.setGameMode(GameMode.SURVIVAL); } catch (Exception e) {
-            plugin.getLogger().warning("Failed to set gamemode for player2 on shutdown: " + e.getMessage());
+            plugin.getLogger().warning("Failed to set gamemode for player2 on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
         }
         try { player1.removePotionEffect(PotionEffectType.INVISIBILITY); } catch (Exception e) {
-            plugin.getLogger().warning("Failed to remove invisibility from player1 on shutdown: " + e.getMessage());
+            plugin.getLogger().warning("Failed to remove invisibility from player1 on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
         }
         try { player2.removePotionEffect(PotionEffectType.INVISIBILITY); } catch (Exception e) {
-            plugin.getLogger().warning("Failed to remove invisibility from player2 on shutdown: " + e.getMessage());
+            plugin.getLogger().warning("Failed to remove invisibility from player2 on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
         }
 
         // Zuschauer zurücksetzen
@@ -1252,14 +1490,14 @@ public class MatchManager {
                 Location origin = match.getOriginalLocations().get(spectatorId);
                 if (origin != null) {
                     try { spectator.teleport(origin); } catch (Exception e) {
-                        plugin.getLogger().warning("Failed to teleport spectator on shutdown: " + e.getMessage());
+                        plugin.getLogger().warning("Failed to teleport spectator on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
                     }
                 }
                 try { spectator.setGameMode(GameMode.SURVIVAL); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to set gamemode for spectator on shutdown: " + e.getMessage());
+                    plugin.getLogger().warning("Failed to set gamemode for spectator on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
                 }
                 try { spectator.removePotionEffect(PotionEffectType.INVISIBILITY); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to remove invisibility from spectator on shutdown: " + e.getMessage());
+                    plugin.getLogger().warning("Failed to remove invisibility from spectator on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
                 }
             }
         }
@@ -1270,7 +1508,7 @@ public class MatchManager {
             plugin.getStatsManager().recordDraw(player2);
             plugin.markExternalDisplayDirty();
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to record draw statistics on shutdown: " + e.getMessage());
+            plugin.getLogger().warning("Failed to record draw statistics on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
         }
 
         // Cleanup ohne Verzögerung
@@ -1281,9 +1519,12 @@ public class MatchManager {
             for (UUID spectatorId : new ArrayList<>(match.getSpectators())) {
                 playerToMatchId.remove(spectatorId);
                 teleportedPlayers.remove(spectatorId);
+                forgetOrigin(spectatorId);
             }
             teleportedPlayers.remove(player1.getUniqueId());
             teleportedPlayers.remove(player2.getUniqueId());
+            forgetOrigin(player1.getUniqueId());
+            forgetOrigin(player2.getUniqueId());
             matches.remove(matchId);
         }
     }
@@ -1293,14 +1534,14 @@ public class MatchManager {
         synchronized (matchOpMutex) {
             for (List<BukkitTask> taskList : countdownTaskLists.values()) {
                 for (BukkitTask t : taskList) { try { t.cancel(); } catch (Exception e) {
-                    plugin.getLogger().warning("Failed to cancel countdown task in cleanup: " + e.getMessage());
+                    plugin.getLogger().warning("Failed to cancel countdown task in cleanup: " + e.getMessage());  // i18n-ignore: technical exception log
                 } }
             }
             for (BukkitTask t : preTeleportCountdownTasks.values()) { try { t.cancel(); } catch (Exception e) {
-                plugin.getLogger().warning("Failed to cancel pre-teleport task in cleanup: " + e.getMessage());
+                plugin.getLogger().warning("Failed to cancel pre-teleport task in cleanup: " + e.getMessage());  // i18n-ignore: technical exception log
             } }
             for (BukkitTask t : matchTimerTasks.values()) { try { t.cancel(); } catch (Exception e) {
-                plugin.getLogger().warning("Failed to cancel timer task in cleanup: " + e.getMessage());
+                plugin.getLogger().warning("Failed to cancel timer task in cleanup: " + e.getMessage());  // i18n-ignore: technical exception log
             } }
             countdownTaskLists.clear();
             preTeleportCountdownTasks.clear();
@@ -1391,41 +1632,23 @@ public class MatchManager {
         Location targetOriginal = request.getTargetOriginalLocation();
         
         if (senderOriginal != null && senderOriginal.getWorld() != null) {
-            match.getOriginalLocations().put(player1.getUniqueId(), senderOriginal.clone());
-            plugin.getLogger().info("[Match] Original-Location für " + player1.getName() + " aus Request gespeichert:");
-            plugin.getLogger().info("  Welt: " + senderOriginal.getWorld().getName());
-            plugin.getLogger().info("  Koordinaten: X=" + String.format("%.2f", senderOriginal.getX()) + 
-                ", Y=" + String.format("%.2f", senderOriginal.getY()) + 
-                ", Z=" + String.format("%.2f", senderOriginal.getZ()));
-            plugin.getLogger().info("  Rotation: Yaw=" + String.format("%.1f", senderOriginal.getYaw()) + 
-                ", Pitch=" + String.format("%.1f", senderOriginal.getPitch()));
+            rememberOrigin(match, player1.getUniqueId(), senderOriginal);
+            plugin.getLogger().info(plugin.getConsoleMsg("match-origin-saved", "player", player1.getName(), "location", String.format("%s @ %.2f, %.2f, %.2f", senderOriginal.getWorld().getName(), senderOriginal.getX(), senderOriginal.getY(), senderOriginal.getZ())));
         } else {
             // Fallback: aktuelle Position verwenden
             Location fallback = player1.getLocation().clone();
-            match.getOriginalLocations().put(player1.getUniqueId(), fallback);
-            plugin.getLogger().warning("[Match] WARNUNG: Keine Original-Location im Request für " + player1.getName());
-            plugin.getLogger().warning("  Fallback auf aktuelle Position: " + 
-                (fallback.getWorld() != null ? fallback.getWorld().getName() : "NULL") + " @ " +
-                String.format("%.2f, %.2f, %.2f", fallback.getX(), fallback.getY(), fallback.getZ()));
+            rememberOrigin(match, player1.getUniqueId(), fallback);
+            plugin.getLogger().warning(plugin.getConsoleMsg("match-origin-warning", "player", player1.getName()));
         }
         
         if (targetOriginal != null && targetOriginal.getWorld() != null) {
-            match.getOriginalLocations().put(player2.getUniqueId(), targetOriginal.clone());
-            plugin.getLogger().info("[Match] Original-Location für " + player2.getName() + " aus Request gespeichert:");
-            plugin.getLogger().info("  Welt: " + targetOriginal.getWorld().getName());
-            plugin.getLogger().info("  Koordinaten: X=" + String.format("%.2f", targetOriginal.getX()) + 
-                ", Y=" + String.format("%.2f", targetOriginal.getY()) + 
-                ", Z=" + String.format("%.2f", targetOriginal.getZ()));
-            plugin.getLogger().info("  Rotation: Yaw=" + String.format("%.1f", targetOriginal.getYaw()) + 
-                ", Pitch=" + String.format("%.1f", targetOriginal.getPitch()));
+            rememberOrigin(match, player2.getUniqueId(), targetOriginal);
+            plugin.getLogger().info(plugin.getConsoleMsg("match-origin-saved", "player", player2.getName(), "location", String.format("%s @ %.2f, %.2f, %.2f", targetOriginal.getWorld().getName(), targetOriginal.getX(), targetOriginal.getY(), targetOriginal.getZ())));
         } else {
             // Fallback: aktuelle Position verwenden
             Location fallback = player2.getLocation().clone();
-            match.getOriginalLocations().put(player2.getUniqueId(), fallback);
-            plugin.getLogger().warning("[Match] WARNUNG: Keine Original-Location im Request für " + player2.getName());
-            plugin.getLogger().warning("  Fallback auf aktuelle Position: " + 
-                (fallback.getWorld() != null ? fallback.getWorld().getName() : "NULL") + " @ " +
-                String.format("%.2f, %.2f, %.2f", fallback.getX(), fallback.getY(), fallback.getZ()));
+            rememberOrigin(match, player2.getUniqueId(), fallback);
+            plugin.getLogger().warning(plugin.getConsoleMsg("match-origin-warning", "player", player2.getName()));
         }
         
         // Confirm both
@@ -1440,9 +1663,9 @@ public class MatchManager {
         match.broadcast(getMsg("match-starting"));
         match.broadcast("&a&l━━━━━━━━━━━━━━━━━━━━━━━");
         match.broadcast("");
-        match.broadcast(getMsg("vs-display", "{player1}", player1.getName()).replace("{player2}", player2.getName()));
-        match.broadcast(getMsg("arena-display", "{arena}", arena.getDisplayName()));
-        match.broadcast(getMsg("equipment-display", "{equipment}", p1Equipment.getDisplayName()));
+        match.broadcast(getMsg("vs-display", "player1", player1.getName(), "player2", player2.getName()));
+        match.broadcast(getMsg("arena-display", "arena", arena.getDisplayName()));
+        match.broadcast(getMsg("equipment-display", "equipment", p1Equipment.getDisplayName()));
         match.broadcast("");
         
         // Start match WITHOUT GUI - DIRECT START
@@ -1462,21 +1685,21 @@ public class MatchManager {
         
         // Load arena world first using /mvload command
         String worldName = arena.getArenaWorld();
-        plugin.getLogger().info("Loading arena world via /mvload: " + worldName);
+        plugin.getLogger().info(plugin.getConsoleMsg("world-loading", "world", worldName));
         
         // Use MultiverseHelper to load world with /mvload command
         plugin.getArenaManager().loadArenaWorld(worldName, () -> {
             // World loading completed, proceed with match start
             World arenaWorld = Bukkit.getWorld(worldName);
             if (arenaWorld == null) {
-                plugin.getLogger().severe("Arena world failed to load: " + worldName);
-                MessageUtil.error(player1, "Error: Arena world could not be loaded!");
-                MessageUtil.error(player2, "Error: Arena world could not be loaded!");
+                plugin.getLogger().severe(plugin.getConsoleMsg("world-load-failed", "world", worldName, "msg", "world is null"));
+                MessageUtil.error(player1, getMsg("arena-load-failed"));
+                MessageUtil.error(player2, getMsg("arena-load-failed"));
                 endMatch(match, null, true);
                 return;
             }
             
-            plugin.getLogger().info("Arena world loaded successfully: " + worldName);
+            plugin.getLogger().info(plugin.getConsoleMsg("arena-world-loaded", "world", worldName, "msg", "OK"));
             // Countdown vor dem Teleport (konfiguriert über Konstante)
             startPreTeleportCountdown(match, PRE_TELEPORT_COUNTDOWN_SECONDS, () -> continueMatchStart(match, arenaWorld));
         });
@@ -1488,7 +1711,7 @@ public class MatchManager {
         UUID sid = spectator.getUniqueId();
         if (match.getSpectators().contains(sid)) return;
         match.getSpectators().add(sid);
-        match.getOriginalLocations().put(sid, spectator.getLocation());
+        rememberOrigin(match, sid, spectator.getLocation());
         playerToMatchId.put(sid, match.getMatchId());
         // Race-Condition-Schutz: sofort als teleported markieren
         teleportedPlayers.add(sid);
@@ -1499,6 +1722,7 @@ public class MatchManager {
         UUID sid = spectator.getUniqueId();
         match.getSpectators().remove(sid);
         match.getOriginalLocations().remove(sid);
+        forgetOrigin(sid);
         playerToMatchId.remove(sid);
         teleportedPlayers.remove(sid);
         // Sofortige Ruecksetzung des Spieler-Zustands

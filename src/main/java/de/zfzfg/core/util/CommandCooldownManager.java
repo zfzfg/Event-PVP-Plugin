@@ -20,8 +20,10 @@ public class CommandCooldownManager {
 
     public CommandCooldownManager(long defaultCooldownMs) {
         this.defaultCooldownMs = defaultCooldownMs;
-        // Default message
-        this.messageProvider = seconds -> ChatColor.RED + "Please wait " + seconds + " more seconds!";
+        // Last-resort marker only: EventPlugin installs the localized provider right
+        // after construction. A baked-in English sentence here would answer in English
+        // on a German server whenever that call was ever forgotten.
+        this.messageProvider = seconds -> ChatColor.RED + "[missing: messages.system.cooldown-wait]";
     }
     
     /**

@@ -2,54 +2,67 @@ package de.zfzfg.core.monitoring.debug;
 
 /**
  * Debug-Stufen für das Plugin.
- * Je höher die Stufe, desto mehr Details werden ausgegeben.
+ *
+ * Bewusst nur drei Werte: aus, normal, ausführlich. Mehr Abstufungen haben
+ * sich als reine Konfigurationslast erwiesen, ohne dass sie ein Admin je
+ * sinnvoll auseinanderhalten konnte.
  */
 public enum DebugLevel {
     /**
      * Debug ist deaktiviert (Standard)
      */
-    OFF(0, "Aus"),
-    
+    OFF(0, "Off", "level-off"),
+
     /**
-     * Stufe 1: Grundlegende Informationen
-     * - Player-Aktionen (Join, Leave, Commands)
-     * - Event-Starts und -Ends
-     * - Match-Starts und -Ends
+     * Normale Debug-Ausgaben: Match-Ablauf, Equipment, Config-Laden.
      */
-    LEVEL_1(1, "Basis"),
-    
+    BASIC(1, "Basic", "level-basic"),
+
     /**
-     * Stufe 2: Erweiterte Informationen
-     * - Alles aus Stufe 1
-     * - Welt-Lade-Vorgänge
-     * - Konfigurationsänderungen
-     * - Inventar-Operationen
+     * Ausführlich: zusätzlich Teleport-Details, Spawn-Handling, interne Traces
+     * und Stack-Traces bei abgefangenen Fehlern.
      */
-    LEVEL_2(2, "Erweitert"),
-    
-    /**
-     * Stufe 3: Vollständige Details
-     * - Alles aus Stufe 2
-     * - Interne State-Änderungen
-     * - Timing-Informationen
-     * - Detaillierte Fehlermeldungen
-     */
-    LEVEL_3(3, "Vollständig");
+    FULL(2, "Full", "level-full");
 
     private final int level;
     private final String displayName;
+    private final String translationKey;
 
-    DebugLevel(int level, String displayName) {
+    DebugLevel(int level, String displayName, String translationKey) {
         this.level = level;
         this.displayName = displayName;
+        this.translationKey = translationKey;
     }
 
     public int getLevel() {
         return level;
     }
 
+    /**
+     * Sprachunabhängiger Name für Konsolen-Logs und Vergleiche.
+     * Für Chat-Ausgaben stattdessen {@link #getTranslationKey()} über
+     * messages.debug.enums.* auflösen.
+     */
     public String getDisplayName() {
         return displayName;
+    }
+
+    /**
+     * Key unterhalb von messages.debug.enums.* für die übersetzte Anzeige.
+     */
+    public String getTranslationKey() {
+        return translationKey;
+    }
+
+    /**
+     * Wert für den Config-Schlüssel settings.debug.
+     */
+    public String getConfigValue() {
+        switch (this) {
+            case BASIC: return "on";
+            case FULL:  return "full";
+            default:    return "off";
+        }
     }
 
     /**
@@ -60,47 +73,47 @@ public enum DebugLevel {
     }
 
     /**
-     * Gibt die Debug-Stufe für einen numerischen Wert zurück.
-     */
-    public static DebugLevel fromLevel(int level) {
-        for (DebugLevel dl : values()) {
-            if (dl.level == level) {
-                return dl;
-            }
-        }
-        return OFF;
-    }
-
-    /**
-     * Versucht eine Debug-Stufe anhand des Namens oder der Nummer zu finden.
+     * Versucht eine Debug-Stufe anhand eines Command-Arguments oder eines
+     * Config-Werts zu bestimmen. Toleriert Booleans aus der YAML sowie die
+     * deutschen Schreibweisen.
+     *
+     * @return die Stufe oder {@code null} bei unbekannter Eingabe
      */
     public static DebugLevel parse(String input) {
         if (input == null || input.isEmpty()) {
             return null;
         }
-        
-        // Versuche als Nummer zu parsen
-        try {
-            int level = Integer.parseInt(input);
-            if (level >= 0 && level <= 3) {
-                return fromLevel(level);
-            }
-        } catch (NumberFormatException ignored) {}
-        
-        // Versuche als Name zu parsen
-        String upper = input.toUpperCase();
-        if (upper.equals("OFF") || upper.equals("AUS")) {
-            return OFF;
+
+        switch (input.trim().toLowerCase()) {
+            case "off":
+            case "aus":
+            case "false":
+            case "no":
+            case "nein":
+            case "0":
+                return OFF;
+
+            case "on":
+            case "an":
+            case "true":
+            case "yes":
+            case "ja":
+            case "basic":
+            case "normal":
+            case "1":
+                return BASIC;
+
+            case "full":
+            case "all":
+            case "alle":
+            case "verbose":
+            case "ausführlich": // i18n-ignore: akzeptierte Eingabe, keine Anzeige
+            case "ausfuehrlich":
+            case "2":
+                return FULL;
+
+            default:
+                return null;
         }
-        for (DebugLevel dl : values()) {
-            if (dl.name().equalsIgnoreCase(upper) || 
-                dl.name().replace("_", "").equalsIgnoreCase(upper) ||
-                ("LEVEL" + dl.level).equalsIgnoreCase(upper) ||
-                ("L" + dl.level).equalsIgnoreCase(upper) ||
-                String.valueOf(dl.level).equals(input)) {
-                return dl;
-            }
-        }
-        return null;
     }
 }

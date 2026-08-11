@@ -120,7 +120,31 @@ public abstract class AbstractWagerGui {
     }
     
     protected String t(String key, String... replacements) {
-        return plugin.getPvpConfigManager().getMessage("messages.gui." + key, replacements);
+        String val = plugin.getCoreConfigManager().getMessages().getString("messages.gui." + key, null);
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.pvp-wager-gui." + key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.command-request." + key, null);
+        }
+        if (val == null) {
+            val = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, null);
+        }
+        if (val == null) {
+            return "&c[missing: " + key + "]";
+        }
+        String msg = org.bukkit.ChatColor.translateAlternateColorCodes('&', val);
+        if (replacements != null && replacements.length > 0) {
+            for (int i = 0; i < replacements.length - 1; i += 2) {
+                String raw = replacements[i] != null ? replacements[i].replaceAll("^[{%]+|[%}]+$", "") : "";
+                String valStr = replacements[i + 1] != null ? replacements[i + 1] : "";
+                if (!raw.isEmpty()) {
+                    msg = msg.replace("{" + raw + "}", valStr)
+                             .replace("%" + raw + "%", valStr);
+                }
+            }
+        }
+        return msg;
     }
     
     protected String[] tl(String... keys) {

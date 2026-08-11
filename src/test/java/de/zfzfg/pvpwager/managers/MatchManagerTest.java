@@ -12,8 +12,7 @@ class MatchManagerTest {
 
     @Test
     void indexAndGetMatchIdByPlayer() {
-        EventPlugin plugin = Mockito.mock(EventPlugin.class);
-        MatchManager matchManager = new MatchManager(plugin);
+        MatchManager matchManager = new MatchManager(null);
 
         UUID matchId = UUID.randomUUID();
         UUID p1 = UUID.randomUUID();
@@ -28,8 +27,7 @@ class MatchManagerTest {
 
     @Test
     void clearTransientStateClearsIndex() {
-        EventPlugin plugin = Mockito.mock(EventPlugin.class);
-        MatchManager matchManager = new MatchManager(plugin);
+        MatchManager matchManager = new MatchManager(null);
 
         UUID matchId = UUID.randomUUID();
         UUID playerId = UUID.randomUUID();

@@ -153,8 +153,8 @@ public class MoneySelectionGui extends AbstractWagerGui {
             "&e75%", "&7= &6$" + String.format("%,.2f", balance * 0.75)));
         
         inventory.setItem(ALL_IN_SLOT, createButton(Material.NETHER_STAR,
-            "&6&lALL IN!", "&7= &6$" + String.format("%,.2f", balance),
-            "", "&c⚠ Setzt alles ein!"));
+            t("money-selection.all-in-title"), "&7= &6$" + String.format("%,.2f", balance),
+            "", t("money-selection.all-in-warning")));
     }
     
     private void updateCurrentAmount() {

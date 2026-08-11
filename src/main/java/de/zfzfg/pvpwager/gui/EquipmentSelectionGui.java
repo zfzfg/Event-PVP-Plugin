@@ -27,7 +27,17 @@ public class EquipmentSelectionGui extends AbstractWagerGui {
     private static final int EQUIP_START_SLOT = 10;
     
     private final List<EquipmentSet> availableEquipment = new ArrayList<>();
-    
+
+    /**
+     * Belegung des Menues, beim Aufbau gefuellt.
+     *
+     * <p>Der Platz eines Sets laesst sich nicht aus dem Listenindex ausrechnen, weil die
+     * Randspalten uebersprungen werden. Der Klick-Handler schlaegt deshalb hier nach, statt
+     * die Platzierung ein zweites Mal nachzubilden.</p>
+     */
+    private final java.util.Map<Integer, EquipmentSet> slotToEquipment = new java.util.HashMap<>();
+
+
     public EquipmentSelectionGui(EventPlugin plugin, Player player, WagerSession session) {
         super(plugin, player, session);
     }
@@ -53,7 +63,7 @@ public class EquipmentSelectionGui extends AbstractWagerGui {
         } else {
             // Falls keine Arena gewählt, zeige alle
             availableEquipment.addAll(
-                plugin.getEquipmentManager().getEquipmentSets().values());
+                plugin.getEquipmentManager().getSortedEquipmentSets());
         }
     }
     
@@ -102,20 +112,27 @@ public class EquipmentSelectionGui extends AbstractWagerGui {
     }
     
     private void displayEquipment() {
+        // Wo welches Set liegt, wird beim Aufbau festgehalten statt im Klick-Handler erneut
+        // ausgerechnet - sonst muesste die Regel zum Ueberspringen der Randspalten an zwei
+        // Stellen gleich bleiben, und ein Klick haette sonst das falsche Set ausgewaehlt.
+        slotToEquipment.clear();
+
+        // Die Liste kommt bereits in der im Web-Panel eingestellten Reihenfolge; hier werden
+        // die Sets nur noch fortlaufend aufgereiht.
         int slot = EQUIP_START_SLOT;
-        
         for (EquipmentSet equipment : availableEquipment) {
             // Überspringe Slots in den Rändern
-            while (slot % 9 == 0 || slot % 9 == 8) {
+            while (slot < SIZE - 9 && (slot % 9 == 0 || slot % 9 == 8)) {
                 slot++;
             }
-            
+
             if (slot >= SIZE - 9) break; // Nicht in letzte Reihe
-            
+
+            slotToEquipment.put(slot, equipment);
             inventory.setItem(slot, createEquipmentItem(equipment));
             slot++;
         }
-        
+
         // Falls keine Ausrüstung verfügbar
         if (availableEquipment.isEmpty()) {
             inventory.setItem(22, createButton(Material.BARRIER,
@@ -129,12 +146,24 @@ public class EquipmentSelectionGui extends AbstractWagerGui {
     }
     
     private ItemStack createEquipmentItem(EquipmentSet equipment) {
-        boolean isSelected = session.getSelectedEquipment() != null && 
+        boolean isSelected = session.getSelectedEquipment() != null &&
                             session.getSelectedEquipment().getId().equals(equipment.getId());
-        
+
+        // Die eigene Beschreibung ersetzt die automatische Ruestungsuebersicht vollstaendig -
+        // wer sie setzt, will genau diesen Text sehen.
+        if (!equipment.getDescription().isEmpty()) {
+            List<String> customLore = new ArrayList<>();
+            for (String line : equipment.getDescription()) {
+                customLore.add(MessageUtil.color(line));
+            }
+            customLore.add("");
+            customLore.add(MessageUtil.color(t(isSelected ? "selected-check" : "click-to-select")));
+            return createButton(guiMaterial(equipment, isSelected), guiTitle(equipment, isSelected), customLore);
+        }
+
         List<String> lore = new ArrayList<>();
         lore.add("");
-        
+
         // Rüstungsinfo
         lore.add(MessageUtil.color(t("armor-label")));
         if (equipment.getHelmet() != null) {
@@ -174,16 +203,29 @@ public class EquipmentSelectionGui extends AbstractWagerGui {
             lore.add(MessageUtil.color(t("click-to-select")));
         }
         
-        // Material basierend auf Rüstung
-        Material material = getMaterialForEquipment(equipment);
-        if (isSelected) {
-            material = Material.EMERALD_BLOCK;
-        }
-        
-        String prefix = isSelected ? "&a&l✔ " : "&e";
-        return createButton(material, t("equipment-item-title", "name", prefix + equipment.getDisplayName()), lore);
+        return createButton(guiMaterial(equipment, isSelected), guiTitle(equipment, isSelected), lore);
     }
-    
+
+    /**
+     * Material des Menue-Icons.
+     *
+     * <p>Vorrang hat das eingestellte {@code icon}; ohne Angabe wird es wie bisher aus dem
+     * Brustpanzer abgeleitet. Das ausgewaehlte Set bleibt in beiden Faellen ein Smaragdblock -
+     * diese Rueckmeldung ist wichtiger als das eigene Icon.</p>
+     */
+    private Material guiMaterial(EquipmentSet equipment, boolean isSelected) {
+        if (isSelected) {
+            return Material.EMERALD_BLOCK;
+        }
+        return equipment.getIcon() != null ? equipment.getIcon() : getMaterialForEquipment(equipment);
+    }
+
+    /** Titel des Menue-Icons: der Anzeigename des Sets. */
+    private String guiTitle(EquipmentSet equipment, boolean isSelected) {
+        String prefix = isSelected ? "&a&l✔ " : "&e";
+        return t("equipment-item-title", "name", prefix + equipment.getDisplayName());
+    }
+
     private Material getMaterialForEquipment(EquipmentSet equipment) {
         // Versuche Material aus Chestplate zu nehmen
         if (equipment.getChestplate() != null) {
@@ -237,42 +279,22 @@ public class EquipmentSelectionGui extends AbstractWagerGui {
                 return true;
         }
         
-        // Equipment-Auswahl
-        int index = getEquipmentIndexForSlot(slot);
-        if (index >= 0 && index < availableEquipment.size()) {
-            EquipmentSet selected = availableEquipment.get(index);
+        // Equipment-Auswahl: nachschlagen, wo displayEquipment() das Set abgelegt hat.
+        EquipmentSet selected = slotToEquipment.get(slot);
+        if (selected != null) {
             session.setSelectedEquipment(selected);
-            
+
             playClickSound();
             MessageUtil.sendMessage(player, MessageUtil.color(t("equipment-selected-message", "equipment", selected.getDisplayName())));
-            
+
             // GUI neu aufbauen
             buildLayout();
         }
-        
+
         return true;
     }
-    
-    private int getEquipmentIndexForSlot(int slot) {
-        int checkSlot = EQUIP_START_SLOT;
-        
-        for (int i = 0; i < availableEquipment.size(); i++) {
-            while (checkSlot % 9 == 0 || checkSlot % 9 == 8) {
-                checkSlot++;
-            }
-            
-            if (checkSlot >= SIZE - 9) break;
-            
-            if (checkSlot == slot) {
-                return i;
-            }
-            
-            checkSlot++;
-        }
-        
-        return -1;
-    }
-    
+
+
     @Override
     public void onClose() {
         // Equipment-Auswahl bleibt in der Session

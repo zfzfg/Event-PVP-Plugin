@@ -45,6 +45,12 @@ public class SpectateSubCommand extends SubCommand {
             MessageUtil.sendMessage(player, cfg.getMessage("messages.command.pvp.spectate.no-match", "player", target.getName()));
             return true;
         }
+        if (match.getSpectators().contains(player.getUniqueId())) {
+            // Ohne diese Pruefung wurde ein zweites /pvp spectate stillschweigend
+            // erneut teleportiert, statt dem Spieler zu sagen, dass er schon zusieht.
+            MessageUtil.sendMessage(player, cfg.getMessage("messages.command.pvp.spectate.already-spectating"));
+            return true;
+        }
         if (match.getSpectators().size() >= plugin.getPvpConfigManager().getConfig().getInt("max-spectators", 10)) {
             MessageUtil.sendMessage(player, cfg.getMessage("messages.command.common.match-full"));
             return true;

@@ -10,7 +10,9 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -19,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Beide Spieler sehen das gleiche GUI in Echtzeit mit Items, Geld, Arena und Equipment.
  */
 public class LiveTradeSession {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     private final UUID sessionId;
     private final EventPlugin plugin;
@@ -52,18 +55,34 @@ public class LiveTradeSession {
     // Referenz auf Manager für Cleanup
     private LiveTradeManager manager;
     
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");  // i18n-ignore: i18n system warning
+        }
+    }
+
     /**
      * Holt eine Nachricht aus der Config.
      */
     private String getMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages().getString("messages.livetrade." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages().getString("messages.livetrade." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.livetrade." + key);
+        return "&c[missing: " + key + "]";
     }
     
     /**
      * Holt eine Nachricht aus der Config mit Platzhalter-Ersetzung.
      */
     private String getMsg(String key, String placeholder, String value) {
-        return getMsg(key).replace(placeholder, value);
+        String msg = getMsg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
     }
     
     public LiveTradeSession(EventPlugin plugin, Player p1, Player p2) {
@@ -254,7 +273,7 @@ public class LiveTradeSession {
                 plugin.getMatchManager().startMatchFromCommand(request);
                 
             } catch (Exception e) {
-                plugin.getLogger().log(java.util.logging.Level.SEVERE, "Fehler beim Starten des Matches aus LiveTrade", e);
+                plugin.getLogger().log(java.util.logging.Level.SEVERE, plugin.getConsoleMsg("livetrade-start-error"), e);
                 
                 // Items zurückgeben bei Fehler
                 returnAllItems();

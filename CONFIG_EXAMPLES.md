@@ -4,7 +4,7 @@ Diese Datei zeigt vollständige, kommentierte Beispiele für alle zentralen YAML
 - `config.yml` – globale Einstellungen und Event-Definitionen
 - `worlds.yml` – Welten-/Arena-Definitionen (für Events & PvP)
 - `equipment.yml` – Ausrüstungssets (für Events & PvP)
-- `messages.yml` – Nachrichten, Platzhalter und Kategorien
+- `messages_<lang>.yml` – Nachrichten, Platzhalter und Kategorien (eine Datei je Sprache)
 
 Hinweis: Nach Änderungen bitte `/eventpvp reload` ausführen.
 
@@ -12,11 +12,17 @@ Hinweis: Nach Änderungen bitte `/eventpvp reload` ausführen.
 
 ```yml
 settings:
+  # Sprache: "en" (Englisch), "de" (Deutsch), "fr" (Französisch), "es" (Spanisch), "ru" (Russisch), "pl" (Polnisch), "ja" (Japanisch)
+  language: "de"
+
   # Präfix für Nachrichten
   prefix: "&6[Event-PvP]&r"
 
   # Name der Hauptwelt (Teleport-Ziel bei Weltoperationen)
   main-world: "world"
+
+  # Debug-Modus: "off" (aus), "on" (normal), "full" (ausführlich)
+  debug: "off"
 
   # Speichert ursprüngliche Spielerposition vor Events/Matches
   save-player-location: true
@@ -27,35 +33,89 @@ settings:
   # Countdown (Sekunden) in der Lobby vor dem Start
   lobby-countdown: 30
 
-  # Beschränkt Befehle im Event/Match: none|event|pvp|both
-  command-restriction: both
+  # Inventar-Verwaltung (über InventoryBackup-Backend)
+  inventory-management:
+    # auto             = Automatische Sicherung & Wiederherstellung (empfohlen)
+    # inventoryrestore = Expliziter Modusbezeichner (identisch mit auto)
+    # none             = LEGACY: Multiverse-Inventories verwaltet Inventarwechsel
+    provider: "auto"
+    legacy-safety-backups: true
+    auto-restore-on-match-end: true
+    auto-restore-on-event-end: true
+    auto-restore-on-respawn: true
+    auto-restore-on-rejoin: true
+    on-backup-failure: "abort"
+    cleanup-backups-after-match: false
+    guard:
+      enabled: true
+      restore-orphans-on-start: true
+    warn-on-multiverse-inventories: true
 
-  # Automatische Welt-Ladung: none|lobby|event|arena|both
-  # - Events nutzen meist: none|lobby|event|both
-  # - PvP-Arenen nutzen: none|arena|both
-  world-loading: both
+  # Multiverse-Weltverwaltung
+  world-management:
+    events: true    # Lobby-/Eventwelten bei Bedarf laden und danach entladen
+    arenas: true    # Arenawelten nach Match-Ende entladen
+
+  # Befehlssperre bei Events: both | event | lobby | none
+  # (PvP-Matches sperren Befehle unabhängig davon immer)
+  command-restriction: "both"
 
   # Regenerations-/Backup-Optionen (Events & Arenen)
   arena-regeneration:
-    backups: true       # Zip-Backup vor Regeneration
-    backup-async: false # Backup asynchron (empfohlen bei großen Welten)
+    backups: true        # Zip-Backup vor Regeneration
+    backup-async: true   # Backup asynchron (empfohlen bei großen Welten)
 
   # Zuschauersystem & Match-Einstellungen (PvP)
-  spectator:
-    enable: true
-    allow-damage: false
+  spectators:
+    enabled: true
+    max-spectators: 10
+    announce-join: true
+    announce-leave: true
 
   match:
-    countdown: 10        # Sekunden vor Kampfbeginn
-    duration: 300        # Max. Matchdauer in Sekunden
-    draw-vote: true      # Unentschieden-Abstimmung erlauben
-    no-wager-mode: false # Wetten vollständig deaktivieren
-    inventory-group: default # (optional) PvP-Inventargruppe
+    countdown-time: 10        # Sekunden vor Kampfbeginn
+    max-duration: 600         # Max. Matchdauer in Sekunden
+    draw-vote-time: 30        # Zeit für Unentschieden-Abstimmung
+    allow-no-wager: true      # Matches ohne Wetteinsatz erlauben
 
-  security:
-    check-inventory-space: true   # Prüft freien Platz für Wette-Items
-    min-bet-money: 0.0            # minimale Geldwette
-    max-bet-money: 100000.0       # maximale Geldwette
+  # Sicherheitsprüfungen (PvP)
+  checks:
+    inventory-space: true     # Prüft freien Platz für Wette-Items
+    minimum-bet-items: 1      # Minimale Item-Anzahl
+    minimum-bet-money: 10     # Minimale Geldwette
+    max-bet-money: 100000     # Maximale Geldwette (0 = unbegrenzt)
+
+  # Auto-Event-System (Events)
+  auto-events:
+    enabled: false
+    interval-min: 1800        # 30 Minuten
+    interval-max: 3600        # 60 Minuten
+    random-selection: true
+    check-online-players: true
+    selected-events:
+      # - "pvparena"
+      # - "ctf"
+      # - "ffa"
+
+  # Update-Prüfung (Modrinth API)
+  update-check:
+    enabled: true
+    check-on-startup: true
+    notify-admins-on-join: true
+    modrinth-project-id: "pqJQdZ6R"
+    startup-delay-ticks: 20
+    stable-only: true
+    contact: "https://modrinth.com/plugin/pqJQdZ6R"
+
+  # Externe Integrationen
+  integrations:
+    ajleaderboards:
+      enabled: false
+    decentholograms:
+      enabled: false
+    pvpmanager:
+      enabled: true
+    refresh-interval-ticks: 20
 
 events:
   parkour:
@@ -263,7 +323,11 @@ equipment-sets:
 
 Tab-Completion in PvP-Kommandos filtert automatisch anhand der zuvor angegebenen Arena, sodass nur erlaubte Sets angeboten werden.
 
-## messages.yml – Nachrichten & Platzhalter
+## messages_&lt;lang&gt;.yml – Nachrichten & Platzhalter
+
+> Bearbeite immer die Sprachdatei, die zu `settings.language` passt, also z. B.
+> `messages_de.yml`. Die mitgelieferte `messages.yml` wird von keinem Loader
+> gelesen — Änderungen darin bleiben wirkungslos.
 
 ```yml
 general:
@@ -358,8 +422,102 @@ events:
 
 ---
 
+## Weltenverwaltung & Befehlssperre
+
+```yaml
+settings:
+  world-management:
+    events: true    # Lobby-/Eventwelten laden und nach dem Event entladen
+    arenas: true    # Arenawelten nach dem Match entladen
+  command-restriction: "both"   # both | event | lobby | none
+```
+
+**`world-management.events`** entscheidet nur, *ob* das Plugin Welten anfassen darf.
+*Welche* Welt ein Event braucht, steht im Event selbst: `use-lobby: false` bedeutet, dass
+weder eine Lobbywelt geladen noch eine entladen wird. Auf `false` setzen, wenn deine Welten
+dauerhaft geladen sind oder extern verwaltet werden. Die Hauptwelt (`settings.main-world`)
+wird nie entladen, auch wenn sie als Lobby eingetragen ist.
+
+**`world-management.arenas`** steuert nur das *Entladen* nach dem Match. Geladen werden
+Arenawelten immer bei Bedarf — sonst könnte kein Match starten. Auf `false` setzen, um
+Arenen dauerhaft im Speicher zu halten (schnellere Match-Starts).
+
+**`command-restriction`** sperrt Befehle für Event-Teilnehmer (außer `/event leave`).
+OPs und Träger von `eventpvp.opbypass` sind ausgenommen. PvP-Matches sperren Befehle
+unabhängig von dieser Einstellung immer.
+
+| Wert | Gesperrt wird in |
+|---|---|
+| `both` | Eventwelt und Lobbywelt |
+| `event` | nur der Eventwelt |
+| `lobby` | nur der Lobbywelt |
+| `none` | nirgends |
+
+> Der frühere Schlüssel `settings.world-loading` wird beim ersten Start automatisch auf
+> `world-management` umgeschrieben.
+
+---
+
+## Sicherheitsnetz: hängende Spieler und Inventare
+
+Zwei Dateien im Plugin-Ordner halten fest, was gerade offen ist. Im Normalbetrieb sind beide
+leer; bleibt etwas darin stehen, ist ein Wiederherstellungspfad gescheitert.
+
+| Datei | Inhalt |
+|---|---|
+| `inventory-guard.yml` | Offene Inventar-Sitzungen (wem gehört welches Backup) |
+| `player-return-locations.yml` | Wohin ein Spieler nach Event oder Match zurückgehört |
+
+Beide werden **synchron** geschrieben und überleben einen Serverabsturz. Beim nächsten Start
+bekommt der Spieler sein Inventar zurück; steht er in einer Event- oder Arenawelt, ohne dass
+dort noch etwas läuft, wird er beim Einloggen automatisch an seine Ursprungsposition
+zurückgeholt. Die Hauptwelt (`settings.main-world`) wird dabei nie entladen oder angetastet.
+
+Bleibt trotzdem etwas hängen, meldet die Konsole das nach 24 Stunden. Nachsehen und
+eingreifen (Permission `eventpvp.admin`):
+
+| Befehl | Wirkung |
+|---|---|
+| `/eventpvp rescue list` | Offene Sitzungen und hinterlegte Positionen mit Alter |
+| `/eventpvp rescue <spieler>` | Inventar wiederherstellen und zurückholen |
+| `/eventpvp rescue clean` | Verwaiste Einträge ohne Backup verwerfen |
+
+`clean` entfernt bewusst nur Einträge **ohne** Backup — bei denen gibt es nichts mehr zu
+retten. Einträge mit Backup bleiben stehen, auch alte; dort wäre das Verwerfen der
+eigentliche Datenverlust.
+
+---
+
+## Debug-Modus
+
+Der Debug-Modus kennt genau drei Zustände. Ausgabe geht immer in die Server-Konsole;
+OPs und Spieler mit `eventpvp.debug.receive` sehen sie zusätzlich im Chat.
+
+```yaml
+settings:
+  # "off"  = aus (Standard)
+  # "on"   = normal       - Match-Ablauf, Equipment, Config-Laden
+  # "full" = ausführlich  - zusätzlich Teleports, Spawn-Handling, Stack-Traces
+  debug: "off"
+```
+
+Umschalten im Spiel (Permission `eventpvp.debug`):
+
+| Befehl | Wirkung |
+|---|---|
+| `/eventpvp debug` | Status anzeigen |
+| `/eventpvp debug on` | Debug an (normal) |
+| `/eventpvp debug on full` | Debug an (ausführlich) |
+| `/eventpvp debug off` | Debug aus |
+
+Der Command schreibt `settings.debug` in die `config.yml` zurück — die Einstellung
+überlebt also einen Serverneustart.
+
+---
+
 ## Hinweise & Best Practices
+- **Multiverse-Core** ist zwingend erforderlich für Weltenverwaltung, Klonen und Regeneration. Ohne Multiverse-Core startet das Plugin nicht.
 - Welt-Ladung erfolgt nicht-blockierend (asynchron). Spieler sehen Statusmeldungen.
-- Backups können asynchron ausgeführt werden, um Server-Ticks zu schonen (`settings.arena-regeneration.backup-async`).
+- Backups können asynchron ausgeführt werden, um Server-Ticks zu schonen (`settings.arena-regeneration.backup-async: true`).
 - Für große Welten sind `clone-source-world` & Regeneration sinnvoll, um konsistente Zustände zu gewährleisten.
 - Nach YAML-Änderungen: `/eventpvp reload` durchführen.

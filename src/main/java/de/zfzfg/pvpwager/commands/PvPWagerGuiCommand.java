@@ -18,6 +18,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -32,6 +33,7 @@ import org.bukkit.scheduler.BukkitTask;
  * Usage: /pvpask <spieler>
  */
 public class PvPWagerGuiCommand implements CommandExecutor, TabCompleter {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     private final EventPlugin plugin;
     
@@ -194,11 +196,13 @@ public class PvPWagerGuiCommand implements CommandExecutor, TabCompleter {
     private void sendClickableWagerRequest(Player sender, Player target) {
         try {
             // Header
+            String header = getGuiMsg("request-header");
+            String challengeMsg = getGuiMsg("challenge-message").replace("{player}", sender.getName());
             TextComponent message = new TextComponent(MessageUtil.color(
                 "\n§6§l━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                getGuiMsg("request-header") + "\n" +
+                header + "\n" +
                 "§6§l━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
-                getGuiMsg("challenge-message").replace("{player}", sender.getName()) + "\n\n"
+                challengeMsg + "\n\n"
             ));
             
             // ANNEHMEN Button - öffnet das GUI
@@ -245,8 +249,8 @@ public class PvPWagerGuiCommand implements CommandExecutor, TabCompleter {
             MessageUtil.sendMessage(target, "");
             MessageUtil.sendMessage(target, getGuiMsg("challenge-message").replace("{player}", sender.getName()));
             MessageUtil.sendMessage(target, "");
-            MessageUtil.sendMessage(target, "&a/pvpaccept " + sender.getName() + " &7- " + getGuiMsg("accept-command"));
-            MessageUtil.sendMessage(target, "&c/pvpdeny " + sender.getName() + " &7- " + getGuiMsg("deny-command"));
+            MessageUtil.sendMessage(target, "&a/pvpaccept " + sender.getName() + " &7- " + getGuiMsg("accept-command")); // i18n-ignore
+            MessageUtil.sendMessage(target, "&c/pvpdeny " + sender.getName() + " &7- " + getGuiMsg("deny-command")); // i18n-ignore
             MessageUtil.sendMessage(target, "");
         }
     }
@@ -394,8 +398,17 @@ public class PvPWagerGuiCommand implements CommandExecutor, TabCompleter {
         wagerRequests.clear();
     }
     
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");  // i18n-ignore: i18n system warning
+        }
+    }
+
     private String getWagerHelpMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages().getString("messages.pvpwager.help." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages().getString("messages.pvpwager.help." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.pvpwager.help." + key);
+        return "&c[missing: " + key + "]";
     }
     
     private void showUsage(Player player) {

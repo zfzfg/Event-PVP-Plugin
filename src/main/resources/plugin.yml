@@ -3,8 +3,8 @@ version: ${project.version}
 main: de.zfzfg.eventplugin.EventPlugin
 api-version: 1.19
 author: zfzfg
-depend: [Vault]
-softdepend: [Multiverse-Core, AJLeaderboards, DecentHolograms, PlaceholderAPI, PvPManager]
+depend: [Vault, InventoryBackup, Multiverse-Core]
+softdepend: [AJLeaderboards, DecentHolograms, PlaceholderAPI, PvPManager]
 
 commands:
   pvp:
@@ -86,14 +86,9 @@ commands:
 
   eventpvp:
     description: Unified Event+PvP Plugin command
-    usage: /<command> reload
+    usage: /<command> <reload|version|debug|rescue|webtoken>
     aliases: [epvp, eventpvpreload]
     permission: eventpvp.admin
-
-  inventoryrestore:
-    description: Restore a saved inventory by its 4-digit ID
-    usage: /<command> [player] <InventoryID>
-    permission: eventpvp.inventory.restore
 
 permissions:
   pvpwager.admin:
@@ -111,7 +106,15 @@ permissions:
   pvpwager.spectate:
     description: Spectate matches
     default: true
-    
+
+  pvpwager.spectate.all:
+    description: Spectate matches that are already at the spectator limit
+    default: op
+
+  pvpwager.nowager:
+    description: Start a match without any wager
+    default: op
+
   pvpwager.command:
     description: Use command-based PvP requests
     default: true
@@ -128,17 +131,14 @@ permissions:
   eventpvp.opbypass:
     description: OP-Bypass für Command-Restriktionen
     default: op
-  eventpvp.inventory.restore:
-    description: Erlaubt das Wiederherstellen von Inventaren per ID
-    default: op
-  eventpvp.inventory.restore.any:
-    description: Erlaubt das Wiederherstellen fremder Inventare per ID
-    default: op
   eventpvp.debug:
-    description: Erlaubt die Nutzung des Debug-Commands
+    description: Erlaubt /eventpvp debug (on | on full | off | status)
     default: op
   eventpvp.debug.receive:
-    description: Erlaubt den Empfang von Debug-Nachrichten im Chat
+    description: Erhält Debug-Ausgaben zusätzlich zur Konsole im Chat
+    default: op
+  eventpvp.admin.web:
+    description: Zugriff auf das Web-Panel (/eventpvp webtoken)
     default: op
   eventpvp.admin.updatenotify:
     description: Erhält Benachrichtigungen bei verfügbaren Plugin-Updates

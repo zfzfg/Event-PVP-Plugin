@@ -21,8 +21,18 @@ public final class Time {
         return seconds(minutes * 60L);
     }
 
+    /** Konvertiert Stunden in Ticks. */
+    public static long hours(long hours) {
+        return minutes(hours * 60L);
+    }
+
     /** Direkter Zugriff auf Tick-Werte für kurze Delays. */
     public static long ticks(long ticks) {
         return ticks;
+    }
+
+    /** Millisekunden für Alters-Vergleiche (nicht für den Scheduler). */
+    public static long hoursToMillis(long hours) {
+        return hours * 60L * 60L * 1000L;
     }
 }

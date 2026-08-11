@@ -100,45 +100,216 @@
             margin: 0 0.5rem;
         }
 
-        /* Buttons */
-        .btn {
-            padding: 0.6rem 1.2rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
+        /* Live Server-Sync Badge */
+        .sync-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
             transition: all var(--transition);
+            user-select: none;
+        }
+
+        .sync-synced {
+            background: rgba(76, 175, 80, 0.12);
+            color: var(--primary, #4caf50);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .sync-unsaved {
+            background: rgba(245, 158, 11, 0.15);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.4);
+        }
+
+        .sync-saving {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+
+        .sync-error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.15rem;
+            font-size: 0.88rem;
+            font-weight: 500;
+            font-family: inherit;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-decoration: none;
+            line-height: 1.2;
+            white-space: nowrap;
+            user-select: none;
         }
 
         .btn-primary {
-            background: var(--primary);
-            color: white;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #ffffff;
+            border: 1px solid var(--primary-dark);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.25);
         }
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
+        .btn-primary:hover:not(:disabled):not(.disabled) {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            box-shadow: 0 4px 14px rgba(76, 175, 80, 0.4);
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
         }
 
         .btn-secondary {
-            background: var(--card);
+            background: var(--surface);
             color: var(--text);
             border: 1px solid var(--border);
         }
 
-        .btn-secondary:hover {
+        .btn-secondary:hover:not(:disabled):not(.disabled) {
             background: var(--card-hover);
-            border-color: var(--primary);
+            border-color: var(--border-light);
+            color: #ffffff;
         }
 
         .btn-danger {
+            background: rgba(244, 67, 54, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(244, 67, 54, 0.35);
+        }
+
+        .btn-danger:hover:not(:disabled):not(.disabled) {
             background: var(--error);
-            color: white;
+            border-color: var(--error);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.35);
+        }
+
+        .btn-success {
+            background: rgba(76, 175, 80, 0.15);
+            color: var(--primary-light);
+            border: 1px solid rgba(76, 175, 80, 0.35);
+        }
+
+        .btn-success:hover:not(:disabled):not(.disabled) {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-sm {
+            padding: 0.35rem 0.65rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .btn-icon {
+            padding: 0.6rem;
+            border-radius: 6px;
+            min-width: 36px;
+            height: 36px;
+            justify-content: center;
+        }
+
+        .btn:disabled, .btn.disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Button Groups */
+        .btn-group {
+            display: inline-flex;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .btn-group .btn {
+            border-radius: 0;
+            border: none;
+            border-right: 1px solid var(--border);
+            padding: 0.55rem 0.85rem;
+            background: transparent;
+        }
+
+        .btn-group .btn:hover:not(:disabled):not(.disabled) {
+            background: var(--card-hover);
+        }
+
+        .btn-group .btn:last-child {
+            border-right: none;
+        }
+
+        /* Dropdown Menu */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 6px);
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            min-width: 220px;
+            z-index: 1000;
+            padding: 0.4rem 0;
+        }
+
+        .dropdown.active .dropdown-menu {
+            display: block;
+            animation: fadeIn 0.15s ease-out;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1rem;
+            color: var(--text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            text-decoration: none;
+        }
+
+        .dropdown-item:hover {
+            background: var(--card-hover);
+            color: var(--primary);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 0.4rem 0;
+        }
+
+        .badge-counter {
+            background: #f59e0b;
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 10px;
+            margin-left: 0.35rem;
         }
 
         .btn-danger:hover {
@@ -623,8 +794,90 @@
         /* Tabs */
         .tabs {
             display: flex;
+            flex-wrap: wrap;
             border-bottom: 1px solid var(--border);
             margin-bottom: 1.5rem;
+        }
+
+        /* Zwischenueberschrift innerhalb einer Karte */
+        .form-section-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Globaler Warnstreifen unter der Kopfzeile - sichtbar in jedem Bereich.
+           Bewusst unter statt in der Kopfzeile: .header ist eine Flex-Zeile mit Logo und
+           Aktionen, ein eingeschobenes Element wuerde die Buttons umbrechen. */
+        .global-banner {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-size: 0.88rem;
+            border-bottom: 1px solid var(--border);
+            background: rgba(245, 158, 11, 0.12);
+            border-left: 4px solid var(--warning);
+            color: var(--text-primary);
+        }
+
+        .global-banner .global-banner-icon {
+            color: var(--warning);
+            margin-top: 0.15rem;
+        }
+
+        .global-banner .global-banner-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .global-banner .global-banner-title {
+            font-weight: 600;
+            color: var(--warning);
+        }
+
+        .global-banner .global-banner-text {
+            color: var(--text-secondary);
+            margin-top: 0.2rem;
+        }
+
+        .global-banner .global-banner-link {
+            background: none;
+            border: none;
+            padding: 0;
+            margin-top: 0.3rem;
+            font: inherit;
+            color: var(--warning);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .global-banner .global-banner-toggle {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0 0.25rem;
+        }
+
+        /* Zusammengeklappt bleibt nur die Ueberschrift stehen - weggeklickt werden kann der
+           Streifen nicht, solange der Konflikt besteht. */
+        .global-banner.is-collapsed .global-banner-text,
+        .global-banner.is-collapsed .global-banner-link {
+            display: none;
+        }
+
+        /* Inline-Warnung an riskanten Feldern */
+        .field-warning {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+            margin-top: 0.35rem;
+            font-size: 0.8rem;
+            color: var(--warning);
         }
 
         .tab {
@@ -650,6 +903,29 @@
 
         .tab-content.active {
             display: block;
+        }
+
+        /*
+         * Hinweiszeile fuer Bedienschritte, die man dem UI sonst nicht ansieht - etwa dass ein
+         * Doppelklick auf ein Item dessen Einstellungen oeffnet. Vorher steckte das nur in
+         * title-Attributen und wurde damit praktisch nie gefunden.
+         */
+        .form-hint-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.85rem;
+            margin-bottom: 1rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--primary);
+            background: var(--background);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .form-hint-inline i {
+            color: var(--primary);
         }
 
         /* Equipment Preview */
@@ -729,6 +1005,451 @@
             font-size: 0.7rem;
             font-weight: bold;
             text-shadow: 1px 1px 1px black;
+        }
+
+        /* Inventory Section Tabs */
+        .inv-tabs-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .inv-tab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: var(--surface);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .inv-tab-btn:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .inv-tab-btn.active {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(56, 142, 60, 0.2) 100%);
+            border-color: var(--primary);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* KPI Quick Status Bar */
+        .inv-status-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .inv-status-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all var(--transition);
+        }
+
+        .inv-status-item:hover {
+            border-color: var(--border-light);
+            background: var(--card);
+        }
+
+        .inv-status-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            background: rgba(76, 175, 80, 0.12);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .inv-status-info {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .inv-status-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .inv-status-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Search & Online Player Quick Picks */
+        .inv-search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .inv-search-row {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .inv-search-input-wrapper {
+            position: relative;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .inv-search-icon {
+            position: absolute;
+            left: 1rem;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .inv-search-input {
+            padding-left: 2.75rem;
+            font-size: 0.95rem;
+        }
+
+        .inv-online-quick-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .inv-quick-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .inv-quick-pills {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+
+        .inv-player-pill {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 0.2rem 0.65rem;
+            font-size: 0.78rem;
+            color: var(--text);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            transition: all var(--transition);
+        }
+
+        .inv-player-pill:hover {
+            border-color: var(--primary);
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .inv-player-pill .online-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4caf50;
+            box-shadow: 0 0 6px #4caf50;
+        }
+
+        /* Explorer Grid (Split view) */
+        .inv-explorer-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 1.25rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .inv-explorer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .inv-backups-body {
+            max-height: 650px;
+            overflow-y: auto;
+            padding: 0.5rem;
+        }
+
+        .inv-backup-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.85rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .inv-backup-item:hover {
+            border-color: var(--border-light);
+            background: var(--card-hover);
+            transform: translateY(-1px);
+        }
+
+        .inv-backup-item.active {
+            border-color: var(--primary);
+            background: rgba(76, 175, 80, 0.12);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .inv-backup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .inv-backup-date {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+
+        .inv-backup-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .inv-backup-actions {
+            display: flex;
+            gap: 0.4rem;
+            margin-top: 0.25rem;
+            justify-content: flex-end;
+        }
+
+        /* Minecraft Inventory Canvas Frame */
+        .inv-minecraft-canvas {
+            background: #252528;
+            border: 2px solid #3c3c42;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .inv-layout-wrapper {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .inv-armor-offhand-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            padding: 0.5rem;
+            background: #1c1c1e;
+            border: 1px solid #333336;
+            border-radius: 8px;
+        }
+
+        .inv-armor-slot-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .inv-armor-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            min-width: 60px;
+        }
+
+        .inv-main-storage-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #1c1c1e;
+            border: 1px solid #333336;
+            border-radius: 8px;
+        }
+
+        .inv-section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #3c3c42, transparent);
+            margin: 0.15rem 0;
+        }
+
+        /* Minecraft XP Bar */
+        .inv-xp-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.5rem 1rem;
+            background: #18181a;
+            border-radius: 8px;
+            border: 1px solid #2e2e32;
+        }
+
+        .inv-xp-bar-track {
+            width: 100%;
+            height: 10px;
+            background: #1a2f1a;
+            border: 1px solid #2e592e;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .inv-xp-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50 0%, #81c784 100%);
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+            transition: width 0.3s ease;
+        }
+
+        .inv-xp-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #81c784;
+            text-shadow: 0 0 6px rgba(76, 175, 80, 0.5);
+            font-family: monospace, sans-serif;
+        }
+
+        /* Stats Summary Grid */
+        .inv-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .inv-stat-card {
+            background: #1e1e22;
+            border: 1px solid #333338;
+            border-radius: 8px;
+            padding: 0.6rem 0.85rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .inv-stat-value {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary-light);
+        }
+
+        .inv-stat-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* Empty State */
+        .inv-empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            gap: 1rem;
+        }
+
+        .inv-empty-state i {
+            font-size: 3rem;
+            color: var(--border-light);
+        }
+
+        /* Floating Minecraft Tooltip */
+        .minecraft-tooltip {
+            position: fixed;
+            z-index: 9999;
+            pointer-events: none;
+            background: rgba(16, 0, 16, 0.94);
+            border: 2px solid #280054;
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(40, 0, 84, 0.5);
+            max-width: 320px;
+            word-wrap: break-word;
+            display: none;
+        }
+
+        .minecraft-tooltip-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .minecraft-tooltip-enchant {
+            color: #b0b0b0;
+            font-size: 0.82rem;
+        }
+
+        .minecraft-tooltip-lore {
+            color: #a020f0;
+            font-style: italic;
+            margin-top: 4px;
+            white-space: pre-line;
+        }
+
+        .minecraft-tooltip-meta {
+            color: #808080;
+            font-size: 0.75rem;
+            margin-top: 6px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 4px;
+        }
+
+        /* Modal Player Card */
+        .inv-modal-player-card {
+            background: var(--background);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1rem;
         }
 
         /* Spawn Visualizer */
@@ -863,6 +1584,21 @@
             max-height: 400px;
             overflow-y: auto;
             padding: 0.5rem;
+        }
+
+        /* Vorschau von Anzeigename und Lore so, wie Minecraft sie zeigt:
+           dunkler Tooltip-Hintergrund, Monospace, Farben aus den &-Codes. */
+        .mc-preview {
+            background: #100010;
+            border: 2px solid #2b0a4d;
+            border-radius: 4px;
+            padding: 0.5rem 0.75rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            min-height: 2.5rem;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
 
         .item-picker-item {
@@ -1181,6 +1917,111 @@
             color: var(--info);
         }
 
+        .badge-secondary {
+            background: rgba(150, 150, 150, 0.2);
+            color: var(--text-muted);
+        }
+
+        /* Alerts and help texts -- already used by the world editor, but never styled */
+        .alert {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            border-left: 3px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .alert-success { background: rgba(76, 175, 80, 0.1); border-left-color: var(--success); }
+        .alert-warning { background: rgba(255, 152, 0, 0.1); border-left-color: var(--warning); }
+        .alert-error   { background: rgba(244, 67, 54, 0.1); border-left-color: var(--error); }
+        .alert-info    { background: rgba(33, 150, 243, 0.1); border-left-color: var(--info); }
+
+        .form-help {
+            display: block;
+            margin-top: 0.35rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* ===== Multiverse: Server-Welten-Panel ===== */
+        .mv-panel {
+            background: var(--surface, var(--background));
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .mv-panel-summary {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.9rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        .mv-panel-summary:hover { color: var(--primary); }
+
+        .mv-panel-body {
+            padding: 0 1rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .mv-world-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+
+        .mv-world-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .mv-world-env {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .mv-world-actions {
+            display: flex;
+            gap: 0.4rem;
+            flex-shrink: 0;
+        }
+
+        .mv-usage {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            flex-basis: 100%;
+        }
+
+        .mv-usage-free { opacity: 0.6; }
+
+        .mv-status-line { margin-top: 0.4rem; }
+
+        .mv-hint {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.82rem;
+        }
+
+        .mv-hint-ok    { color: var(--success); }
+        .mv-hint-warn  { color: var(--warning); }
+        .mv-hint-muted { color: var(--text-muted); }
+
         /* Status indicator */
         .status-dot {
             width: 8px;
@@ -1434,27 +2275,23 @@
             <div class="login-logo">
                 <img src="logo.png" alt="Event-PVP Logo">
             </div>
-            <h1 class="login-title" data-i18n="auth.title">Event-PVP Konfigurator</h1>
-            <p class="login-subtitle" data-i18n="auth.subtitle">Authentifizierung erforderlich</p>
+            <h1 class="login-title" data-i18n="auth.title">Event-PVP Configurator</h1>
+            <p class="login-subtitle" data-i18n="auth.subtitle">Authentication required</p>
             
             <div class="login-instruction">
-                <div class="login-instruction-title" data-i18n="auth.tokenInstructionTitle">📋 So erhältst du einen Token:</div>
-                <div class="login-instruction-text" data-i18n-html="auth.tokenInstruction">
-                    Führe im Spiel als Admin den Befehl<br>
-                    <code>/eventpvp webtoken</code><br>
-                    aus und gib den Token hier ein.
-                </div>
+                <div class="login-instruction-title" data-i18n="auth.tokenInstructionTitle">📋 How to get a token:</div>
+                <div class="login-instruction-text" data-i18n-html="auth.tokenInstruction">Run the command<br><code>/eventpvp webtoken</code><br>in-game as admin and paste the token here.</div>
             </div>
             
             <div id="login-error"></div>
             
             <div class="login-input-group">
-                <label for="login-token" data-i18n="auth.tokenLabel">Zugangs-Token</label>
+                <label for="login-token" data-i18n="auth.tokenLabel">Access Token</label>
                 <input type="text" id="login-token" placeholder="ABC123..." autocomplete="off" spellcheck="false" data-i18n-placeholder="auth.tokenPlaceholder">
             </div>
             
             <button id="login-button" onclick="performLogin()">
-                <span aria-hidden="true">🔓</span> <span data-i18n="auth.login">Anmelden</span>
+                <span aria-hidden="true">🔓</span> <span data-i18n="auth.login">Login</span>
             </button>
         </div>
     </div>
@@ -1469,60 +2306,105 @@
                 <img src="logo.png" alt="Event-PVP Logo">
             </div>
             <div>
-                <h1 data-i18n="app.title">Event-PVP Konfigurator</h1>
-                <div id="connection-status" class="connection-status">
-                    <span class="status-dot connecting" id="status-dot"></span>
-                    <span id="status-text" data-i18n="status.initializing">Initialisiere...</span>
+                <h1 data-i18n="app.title">Event-PVP Configurator</h1>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <div id="connection-status" class="connection-status">
+                        <span class="status-dot connecting" id="status-dot"></span>
+                        <span id="status-text" data-i18n="status.initializing">Initializing...</span>
+                    </div>
+                    <!-- Live Server-Sync Status Indicator -->
+                    <div id="sync-status-badge" class="sync-badge sync-synced" data-i18n-title="sync.syncedTitle">
+                        <i class="fas fa-check-circle" id="sync-status-icon"></i>
+                        <span id="sync-status-text" data-i18n="sync.synced">Synced with Server</span>
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="header-actions">
             <!-- User Display -->
             <div id="user-display"></div>
-            
-            <!-- Server Actions -->
-            <button class="btn btn-secondary" onclick="reloadServer()" data-i18n-title="header.reload">
-                <i class="fas fa-power-off"></i>
-            </button>
-            <button class="btn btn-secondary" onclick="checkServerStatus()" data-i18n-title="header.serverStatus">
-                <i class="fas fa-heartbeat"></i>
-            </button>
-            
+
+            <!-- Undo / Redo Button Group -->
+            <div class="btn-group">
+                <button class="btn btn-secondary disabled" id="btn-undo" onclick="undoChange()" data-i18n-title="button.undo">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button class="btn btn-secondary disabled" id="btn-redo" onclick="redoChange()" data-i18n-title="button.redo">
+                    <i class="fas fa-redo"></i>
+                </button>
+            </div>
+
+            <!-- Tools Dropdown -->
+            <div class="dropdown" id="tools-dropdown">
+                <button class="btn btn-secondary" onclick="toggleToolsDropdown(event)">
+                    <i class="fas fa-tools"></i>
+                    <span data-i18n="header.tools">Tools</span>
+                    <i class="fas fa-chevron-down" style="font-size: 0.75rem; margin-left: 0.2rem;"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <div class="dropdown-item" onclick="showYamlPreview(); closeToolsDropdown();">
+                        <i class="fas fa-code" style="width: 16px;"></i>
+                        <span data-i18n="header.yamlPreview">YAML Preview</span>
+                    </div>
+                    <label class="dropdown-item" style="cursor: pointer; margin: 0;">
+                        <i class="fas fa-file-import" style="width: 16px;"></i>
+                        <span data-i18n="button.import">Import Configuration</span>
+                        <input type="file" accept=".json" onchange="importConfig(event); closeToolsDropdown();" style="display: none;">
+                    </label>
+                    <div class="dropdown-item" onclick="exportConfig(); closeToolsDropdown();">
+                        <i class="fas fa-file-export" style="width: 16px;"></i>
+                        <span data-i18n="button.export">Export Configuration</span>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" onclick="loadAllConfigs(); closeToolsDropdown();" data-i18n-title="header.pullServerDesc">
+                        <i class="fas fa-cloud-download-alt" style="width: 16px;"></i>
+                        <span data-i18n="header.pullServer">Reload from Server</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="header-divider"></div>
-            
-            <button class="btn btn-secondary" onclick="loadAllConfigs()" data-i18n-title="header.reloadConfigs">
-                <i class="fas fa-cloud-download-alt"></i>
+
+            <!-- Server Reload Action -->
+            <button class="btn btn-secondary" onclick="reloadServer()" data-i18n-title="header.reloadServer" title="Plugin auf Minecraft-Server neu laden">
+                <i class="fas fa-sync-alt"></i>
+                <span data-i18n="header.reloadServer">Server Reload</span>
             </button>
-            <button class="btn btn-secondary" onclick="showYamlPreview()" data-i18n-title="header.yamlPreview">
-                <i class="fas fa-code"></i>
-            </button>
-            <button class="btn btn-secondary" onclick="undoChange()" data-i18n-title="button.undo">
-                <i class="fas fa-undo"></i>
-            </button>
-            <button class="btn btn-secondary" onclick="redoChange()" data-i18n-title="button.redo">
-                <i class="fas fa-redo"></i>
-            </button>
-            <label class="btn btn-secondary" style="cursor: pointer;" data-i18n-title="button.import">
-                <i class="fas fa-upload"></i>
-                <input type="file" accept=".json" onchange="importConfig(event)" style="display: none;">
-            </label>
-            <button class="btn btn-secondary" onclick="exportConfig()">
-                <i class="fas fa-download"></i> <span data-i18n="button.export">Export</span>
-            </button>
-            <button class="btn btn-primary" onclick="saveAllConfigs()">
-                <i class="fas fa-save"></i> <span data-i18n="button.save">Speichern</span>
+
+            <!-- Save All Changes (Primary Action) -->
+            <button class="btn btn-primary" id="btn-save-all" onclick="saveAllConfigs()">
+                <i class="fas fa-save"></i>
+                <span data-i18n="button.save">Speichern</span>
+                <span id="save-counter-badge" class="badge-counter" style="display: none;">0</span>
             </button>
         </div>
     </header>
+
+    <!-- Globale Konfliktwarnung: sichtbar, sobald Multiverse-Inventories laeuft und das
+         Plugin die Inventare selbst verwaltet. Gefuellt von renderGlobalMviBanner(). -->
+    <div id="global-mvi-banner" class="global-banner" style="display: none;">
+        <i class="fas fa-triangle-exclamation global-banner-icon"></i>
+        <div class="global-banner-body">
+            <div class="global-banner-title" data-i18n="inventory.globalMviBannerTitle">Multiverse-Inventories detected</div>
+            <div class="global-banner-text" data-i18n="inventory.globalMviBannerText">This plugin manages inventories itself and no longer needs Multiverse-Inventories. As long as the mode is not set to Multiverse-Inventories, both swap the same inventory and can conflict.</div>
+            <button type="button" class="global-banner-link" onclick="showInventoryConflictDetails()" data-i18n="inventory.globalMviBannerLink">Show details</button>
+        </div>
+        <button type="button" class="global-banner-toggle" id="global-mvi-banner-toggle"
+                onclick="toggleGlobalMviBanner()" data-i18n-title="inventory.globalMviBannerCollapse"
+                title="Collapse">
+            <i class="fas fa-chevron-up"></i>
+        </button>
+    </div>
 
     <div class="main-container">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-section">
-                <div class="sidebar-title" data-i18n="sidebar.configuration">Konfiguration</div>
+                <div class="sidebar-title" data-i18n="sidebar.configuration">Configuration</div>
                 <a class="nav-item active" data-section="settings" onclick="showSection('settings')">
                     <i class="fas fa-cog"></i>
-                    <span data-i18n="nav.general">Allgemeine Einstellungen</span>
+                    <span data-i18n="nav.general">General Settings</span>
                 </a>
                 <a class="nav-item" data-section="events" onclick="showSection('events')">
                     <i class="fas fa-calendar-alt"></i>
@@ -1531,41 +2413,50 @@
                 </a>
                 <a class="nav-item" data-section="worlds" onclick="showSection('worlds')">
                     <i class="fas fa-globe"></i>
-                    <span data-i18n="nav.worlds">Welten & Arenen</span>
+                    <span data-i18n="nav.worlds">Worlds & Arenas</span>
                     <span class="nav-badge" id="worlds-count">0</span>
                 </a>
                 <a class="nav-item" data-section="equipment" onclick="showSection('equipment')">
                     <i class="fas fa-shield-alt"></i>
-                    <span data-i18n="nav.equipment">Equipment-Sets</span>
+                    <span data-i18n="nav.equipment">Equipment</span>
                     <span class="nav-badge" id="equipment-count">0</span>
+                </a>
+                <a class="nav-item" data-section="inventories" onclick="showSection('inventories')">
+                    <i class="fas fa-boxes-stacked"></i>
+                    <span data-i18n="nav.inventories">Inventories & Backups</span>
+                    <span class="nav-badge" id="inventories-count" style="display: none;">0</span>
                 </a>
             </div>
 
             <div class="sidebar-section">
-                <div class="sidebar-title" data-i18n="sidebar.web">Web Interface</div>
+                <div class="sidebar-title" data-i18n="sidebar.advanced">Advanced</div>
+                <a class="nav-item" data-section="expert" onclick="showSection('expert')">
+                    <i class="fas fa-wrench"></i>
+                    <span data-i18n="nav.expert">Expert Settings</span>
+                </a>
                 <a class="nav-item" data-section="theme" onclick="showSection('theme')">
                     <i class="fas fa-palette"></i>
-                    <span data-i18n="nav.theme">Theme & Farben</span>
+                    <span data-i18n="nav.theme">Theme & Colors</span>
                 </a>
             </div>
 
             <div class="sidebar-section" id="server-info-section" style="margin-top: 1rem; padding: 0.75rem; background: var(--background); border-radius: 8px;">
                 <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;" data-i18n="sidebar.serverInfo">Server Info</div>
                 <div id="server-info" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                    <p><i class="fas fa-users" style="width: 16px;"></i> <span id="online-players">-</span> <span data-i18n="label.serverPlayers">Spieler</span></p>
+                    <p><i class="fas fa-users" style="width: 16px;"></i> <span id="online-players">-</span> <span data-i18n="label.serverPlayers">Players</span></p>
                     <p><i class="fas fa-tachometer-alt" style="width: 16px;"></i> <span id="server-tps">-</span> <span data-i18n="label.serverTps">TPS</span></p>
                 </div>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="content" id="main-content">
+        <main class="content">
             <!-- Settings Section -->
             <section id="section-settings" class="section active">
                 <div class="content-header">
                     <div>
-                        <h2 class="content-title" data-i18n="general.title">Allgemeine Einstellungen</h2>
-                        <p class="content-subtitle" data-i18n="general.subtitle">Globale Plugin-Konfiguration</p>
+                        <h2 class="content-title" data-i18n="general.title">General Settings</h2>
+                        <p class="content-subtitle" data-i18n="general.subtitle">Global plugin configuration</p>
                     </div>
                 </div>
 
@@ -1574,46 +2465,34 @@
                     <div class="card-header">
                         <div class="card-title">
                             <i class="fas fa-sliders-h"></i>
-                            <span data-i18n="settings.base">Basis-Einstellungen</span>
+                            <span data-i18n="settings.base">Basic Settings</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
                             <label class="form-label">
                                 <span data-i18n="settings.prefixLabel">Prefix</span>
-                                <span class="form-label-hint" data-i18n="settings.prefixHint">(Wird vor Nachrichten angezeigt)</span>
+                                <span class="form-label-hint" data-i18n="settings.prefixHint">(Shown before messages)</span>
                             </label>
                             <input type="text" class="form-control" id="settings-prefix" value="&6[Event]&r" 
                                    onchange="updateConfig('settings.prefix', this.value)">
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label" data-i18n="general.mainWorld">Hauptwelt</label>
+                            <label class="form-label" data-i18n="general.mainWorld">Main World</label>
                             <input type="text" class="form-control" id="settings-main-world" value="world"
                                    onchange="updateConfig('settings.main-world', this.value)">
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" data-i18n="settings.languageSelector">Interface-Sprache</label>
+                            <label class="form-label" data-i18n="settings.languageSelector">Interface Language</label>
                             <select class="form-control" id="settings-language" onchange="changeLanguage(this.value)">
                                 <!-- Options are dynamically populated from languages.json -->
                             </select>
                         </div>
 
-                        <div class="toggle-wrapper">
-                            <div class="toggle-label">
-                                <span data-i18n="settings.saveLocation">Spielerposition speichern</span>
-                                <span data-i18n="settings.saveLocationHint">Speichert die Position vor Events/Matches</span>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox" id="settings-save-location" checked
-                                       onchange="updateConfig('settings.save-player-location', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
                         <div class="form-group">
-                            <label class="form-label" data-i18n="settings.joinPhase">Beitrittsphase (Sekunden)</label>
+                            <label class="form-label" data-i18n="settings.joinPhase">Join phase (seconds)</label>
                             <div class="number-input">
                                 <button class="number-btn" onclick="decrementValue('settings-join-phase')">-</button>
                                 <input type="number" class="form-control" id="settings-join-phase" value="30" min="5" max="300"
@@ -1623,7 +2502,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" data-i18n="settings.lobbyCountdown">Lobby-Countdown (Sekunden)</label>
+                            <label class="form-label" data-i18n="settings.lobbyCountdown">Lobby countdown (seconds)</label>
                             <div class="number-input">
                                 <button class="number-btn" onclick="decrementValue('settings-lobby-countdown')">-</button>
                                 <input type="number" class="form-control" id="settings-lobby-countdown" value="10" min="5" max="120"
@@ -1634,92 +2513,19 @@
                     </div>
                 </div>
 
-                <!-- Inventory Snapshots Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-archive"></i>
-                            <span data-i18n="settings.inventorySnapshots">Inventar-Snapshots</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="toggle-wrapper">
-                            <div class="toggle-label">
-                                <span data-i18n="settings.snapshotsEnabled">Snapshots aktivieren</span>
-                                <span data-i18n="settings.snapshotsEnabledHint">Sichert Inventare vor Events/Matches</span>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox" id="settings-snapshots-enabled" checked
-                                       onchange="updateConfig('settings.inventory-snapshots.enabled', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="settings.defaultGroup">Standard-Gruppe</label>
-                            <input type="text" class="form-control" id="settings-snapshot-group" value="default"
-                                   onchange="updateConfig('settings.inventory-snapshots.default-group', this.value)">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="settings.retainDays">Aufbewahrung (Tage)</label>
-                            <div class="number-input">
-                                <button class="number-btn" onclick="decrementValue('settings-retain-days')">-</button>
-                                <input type="number" class="form-control" id="settings-retain-days" value="30" min="1" max="365"
-                                       onchange="updateConfig('settings.inventory-snapshots.retain-days', parseInt(this.value))">
-                                <button class="number-btn" onclick="incrementValue('settings-retain-days')">+</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- World Loading Card -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-globe-americas"></i>
-                            <span data-i18n="settings.worldManagement">Weltenverwaltung</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="settings.worldLoading">Welt-Ladung</label>
-                            <select class="form-control" id="settings-world-loading"
-                                    onchange="updateConfig('settings.world-loading', this.value)">
-                                <option value="both" data-i18n="settings.worldLoadingBoth">Beide (Event + PvP)</option>
-                                <option value="event" data-i18n="settings.worldLoadingEvent">Nur Events</option>
-                                <option value="lobby" data-i18n="settings.worldLoadingLobby">Nur Lobby</option>
-                                <option value="arena" data-i18n="settings.worldLoadingArena">Nur Arena (PvP)</option>
-                                <option value="none" data-i18n="settings.worldLoadingNone">Keine</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="settings.commandRestriction">Befehlseinschränkung</label>
-                            <select class="form-control" id="settings-command-restriction"
-                                    onchange="updateConfig('settings.command-restriction', this.value)">
-                                <option value="both" data-i18n="settings.commandRestrictionBoth">Beide (Event + PvP)</option>
-                                <option value="event" data-i18n="settings.commandRestrictionEvent">Nur in Events</option>
-                                <option value="pvp" data-i18n="settings.commandRestrictionPvp">Nur in PvP</option>
-                                <option value="none" data-i18n="settings.commandRestrictionNone">Keine</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Spectator Settings -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
                             <i class="fas fa-eye"></i>
-                            <span data-i18n="settings.spectatorsTitle">Zuschauer-System</span>
+                            <span data-i18n="settings.spectatorsTitle">Spectator system</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="toggle-wrapper">
                             <div class="toggle-label">
-                                <span data-i18n="settings.spectatorsEnabled">Zuschauer aktivieren</span>
-                                <span data-i18n="settings.spectatorsEnabledHint">Erlaubt Spielern, Matches zuzuschauen</span>
+                                <span data-i18n="settings.spectatorsEnabled">Enable spectators</span>
+                                <span data-i18n="settings.spectatorsEnabledHint">Allow players to watch matches</span>
                             </div>
                             <label class="toggle">
                                 <input type="checkbox" id="settings-spectators-enabled" checked
@@ -1729,7 +2535,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" data-i18n="settings.maxSpectators">Max. Zuschauer</label>
+                            <label class="form-label" data-i18n="settings.maxSpectators">Max spectators</label>
                             <div class="number-input">
                                 <button class="number-btn" onclick="decrementValue('settings-max-spectators')">-</button>
                                 <input type="number" class="form-control" id="settings-max-spectators" value="10" min="0" max="100"
@@ -1740,8 +2546,8 @@
 
                         <div class="toggle-wrapper">
                             <div class="toggle-label">
-                                <span data-i18n="settings.announceJoin">Beitritt ankündigen</span>
-                                <span data-i18n="settings.announceJoinHint">Zeigt Nachricht wenn Zuschauer beitritt</span>
+                                <span data-i18n="settings.announceJoin">Announce join</span>
+                                <span data-i18n="settings.announceJoinHint">Show message when spectator joins</span>
                             </div>
                             <label class="toggle">
                                 <input type="checkbox" id="settings-announce-join" checked
@@ -1757,12 +2563,12 @@
                     <div class="card-header">
                         <div class="card-title">
                             <i class="fas fa-swords"></i>
-                            <span data-i18n="settings.matchSettings">Match-Einstellungen</span>
+                            <span data-i18n="settings.matchSettings">Match settings</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label class="form-label" data-i18n="settings.matchCountdown">Countdown (Sekunden)</label>
+                            <label class="form-label" data-i18n="settings.matchCountdown">Countdown (seconds)</label>
                             <div class="number-input">
                                 <button class="number-btn" onclick="decrementValue('settings-match-countdown')">-</button>
                                 <input type="number" class="form-control" id="settings-match-countdown" value="10" min="3" max="60"
@@ -1772,7 +2578,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" data-i18n="settings.matchDuration">Max. Dauer (Sekunden)</label>
+                            <label class="form-label" data-i18n="settings.matchDuration">Max duration (seconds)</label>
                             <div class="number-input">
                                 <button class="number-btn" onclick="decrementValue('settings-match-duration', 60)">-</button>
                                 <input type="number" class="form-control" id="settings-match-duration" value="600" min="60" max="3600"
@@ -1783,94 +2589,14 @@
 
                         <div class="toggle-wrapper">
                             <div class="toggle-label">
-                                <span data-i18n="settings.allowNoWager">Wetten ohne Einsatz erlauben</span>
-                                <span data-i18n="settings.allowNoWagerHint">Spieler können ohne Wette kämpfen</span>
+                                <span data-i18n="settings.allowNoWager">Allow fights without wager</span>
+                                <span data-i18n="settings.allowNoWagerHint">Players can fight without betting</span>
                             </div>
                             <label class="toggle">
                                 <input type="checkbox" id="settings-allow-no-wager" checked
                                        onchange="updateConfig('settings.match.allow-no-wager', this.checked)">
                                 <span class="toggle-slider"></span>
                             </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Arena Regeneration -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-sync"></i>
-                            <span data-i18n="settings.arenaRegenTitle">Arena-Regeneration</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="toggle-wrapper">
-                            <div class="toggle-label">
-                                <span data-i18n="settings.createBackups">Backups erstellen</span>
-                                <span data-i18n="settings.createBackupsHint">Erstellt Backups vor Regeneration</span>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox" id="settings-arena-backups" checked
-                                       onchange="updateConfig('settings.arena-regeneration.backups', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="toggle-wrapper">
-                            <div class="toggle-label">
-                                <span data-i18n="settings.backupAsync">Async Backup</span>
-                                <span data-i18n="settings.backupAsyncHint">Backup im Hintergrund (empfohlen)</span>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox" id="settings-backup-async" checked
-                                       onchange="updateConfig('settings.arena-regeneration.backup-async', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Security Checks -->
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">
-                            <i class="fas fa-shield-check"></i>
-                            <span data-i18n="settings.securityChecks">Sicherheitsprüfungen</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="toggle-wrapper">
-                            <div class="toggle-label">
-                                <span data-i18n="settings.checkInventory">Inventarplatz prüfen</span>
-                                <span data-i18n="settings.checkInventoryHint">Prüft freien Platz für Wetten</span>
-                            </div>
-                            <label class="toggle">
-                                <input type="checkbox" id="settings-check-inventory" checked
-                                       onchange="updateConfig('settings.checks.inventory-space', this.checked)">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="settings.minBet">Min. Geld-Wette</label>
-                            <div class="number-input">
-                                <button class="number-btn" onclick="decrementValue('settings-min-bet', 10)">-</button>
-                                <input type="number" class="form-control" id="settings-min-bet" value="10" min="0"
-                                       onchange="updateConfig('settings.checks.minimum-bet-money', parseFloat(this.value))">
-                                <button class="number-btn" onclick="incrementValue('settings-min-bet', 10)">+</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">
-                                <span data-i18n="settings.maxBet">Max. Geld-Wette</span> <span class="form-label-hint" data-i18n="settings.maxBetHint">(0 = unbegrenzt)</span>
-                            </label>
-                            <div class="number-input">
-                                <button class="number-btn" onclick="decrementValue('settings-max-bet', 1000)">-</button>
-                                <input type="number" class="form-control" id="settings-max-bet" value="100000" min="0"
-                                       onchange="updateConfig('settings.checks.max-bet-money', parseFloat(this.value))">
-                                <button class="number-btn" onclick="incrementValue('settings-max-bet', 1000)">+</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1886,8 +2612,8 @@
                     <div class="card-body">
                         <div class="toggle-wrapper">
                             <div class="toggle-label">
-                                <span data-i18n="settings.autoEventsEnabled">Auto-Events aktivieren</span>
-                                <span data-i18n="settings.autoEventsEnabledHint">Startet Events automatisch in festgelegten Intervallen</span>
+                                <span data-i18n="settings.autoEventsEnabled">Enable Auto-Events</span>
+                                <span data-i18n="settings.autoEventsEnabledHint">Automatically starts events at regular intervals</span>
                             </div>
                             <label class="toggle">
                                 <input type="checkbox" id="settings-auto-events-enabled"
@@ -1898,7 +2624,7 @@
 
                         <div id="auto-event-settings" style="display: none;">
                             <div class="form-group">
-                                <label class="form-label" data-i18n="settings.autoEventsIntervalMin">Minimales Intervall (Sekunden)</label>
+                                <label class="form-label" data-i18n="settings.autoEventsIntervalMin">Minimum Interval (seconds)</label>
                                 <div class="number-input">
                                     <button class="number-btn" onclick="decrementValue('settings-auto-events-interval-min', 300)">-</button>
                                     <input type="number" class="form-control" id="settings-auto-events-interval-min" value="1800" min="300" max="7200"
@@ -1908,7 +2634,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label" data-i18n="settings.autoEventsIntervalMax">Maximales Intervall (Sekunden)</label>
+                                <label class="form-label" data-i18n="settings.autoEventsIntervalMax">Maximum Interval (seconds)</label>
                                 <div class="number-input">
                                     <button class="number-btn" onclick="decrementValue('settings-auto-events-interval-max', 300)">-</button>
                                     <input type="number" class="form-control" id="settings-auto-events-interval-max" value="3600" min="600" max="14400"
@@ -1919,33 +2645,33 @@
 
                             <div class="form-group">
                                 <label class="form-label">
-                                    <span data-i18n="settings.autoEventsSelectionMode">Event-Auswahl-Modus</span>
-                                    <span class="form-label-hint" data-i18n="settings.autoEventsSelectionModeHint">Bestimmt, wie Events ausgewählt werden</span>
+                                    <span data-i18n="settings.autoEventsSelectionMode">Event Selection Mode</span>
+                                    <span class="form-label-hint" data-i18n="settings.autoEventsSelectionModeHint">Determines how events are selected</span>
                                 </label>
                                 <select class="form-control" id="settings-auto-events-mode" onchange="updateConfig('settings.auto-events.random-selection', this.value === 'random'); toggleEventSelectionMode()">
-                                    <option value="random" data-i18n="settings.autoEventsModeRandom">Zufällig</option>
-                                    <option value="sequential" data-i18n="settings.autoEventsModeSequential">Sortiert</option>
+                                    <option value="random" data-i18n="settings.autoEventsModeRandom">Random</option>
+                                    <option value="sequential" data-i18n="settings.autoEventsModeSequential">Sequential</option>
                                 </select>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label">
-                                    <span data-i18n="settings.autoEventsSelectedEvents">Ausgewählte Events</span>
-                                    <span class="form-label-hint" id="event-selection-mode-hint" data-i18n="settings.autoEventsSelectedEventsHint">(Leer = alle Events werden verwendet)</span>
+                                    <span data-i18n="settings.autoEventsSelectedEvents">Selected Events</span>
+                                    <span class="form-label-hint" id="event-selection-mode-hint" data-i18n="settings.autoEventsSelectedEventsHint">(Empty = all events will be used)</span>
                                 </label>
                                 <div id="auto-events-selection-list" style="margin-bottom: 0.5rem;">
                                     <!-- Selected events will be listed here -->
                                 </div>
                                 <select class="form-control" id="auto-events-add-select" onchange="addAutoEventSelection(this.value); this.value='';">
-                                    <option value="" data-i18n="settings.autoEventsSelectEvent">Event hinzufügen...</option>
+                                    <option value="" data-i18n="settings.autoEventsSelectEvent">Add event...</option>
                                     <!-- Options populated dynamically -->
                                 </select>
                             </div>
 
                             <div class="toggle-wrapper">
                                 <div class="toggle-label">
-                                    <span data-i18n="settings.autoEventsCheckPlayers">Online-Spieler prüfen</span>
-                                    <span data-i18n="settings.autoEventsCheckPlayersHint">Startet Events nur, wenn genug Spieler online sind</span>
+                                    <span data-i18n="settings.autoEventsCheckPlayers">Check Online Players</span>
+                                    <span data-i18n="settings.autoEventsCheckPlayersHint">Only starts events when enough players are online</span>
                                 </div>
                                 <label class="toggle">
                                     <input type="checkbox" id="settings-auto-events-check-players" checked
@@ -1957,19 +2683,52 @@
                     </div>
                 </div>
 
+                <!-- Wager Limits -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-coins"></i>
+                            <span data-i18n="settings.wagerLimitsTitle">Wager limits</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="settings.minBet">Min. money bet</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-min-bet', 10)">-</button>
+                                <input type="number" class="form-control" id="settings-min-bet" value="10" min="0"
+                                       onchange="updateConfig('settings.checks.minimum-bet-money', parseFloat(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-min-bet', 10)">+</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span data-i18n="settings.maxBet">Max. money bet</span> <span class="form-label-hint" data-i18n="settings.maxBetHint">(0 = unlimited)</span>
+                            </label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-max-bet', 1000)">-</button>
+                                <input type="number" class="form-control" id="settings-max-bet" value="100000" min="0"
+                                       onchange="updateConfig('settings.checks.max-bet-money', parseFloat(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-max-bet', 1000)">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Integrations -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
                             <i class="fas fa-plug"></i>
-                            <span data-i18n="settings.integrationsTitle">Integrationen</span>
+                            <span data-i18n="settings.integrationsTitle">Integrations</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="toggle-wrapper">
                             <div class="toggle-label">
                                 <span data-i18n="settings.ajleaderboardsEnabled">AJLeaderboards</span>
-                                <span data-i18n="settings.ajleaderboardsEnabledHint">Integration für Leaderboards aktivieren</span>
+                                <span data-i18n="settings.ajleaderboardsEnabledHint">Enable leaderboard integration</span>
                             </div>
                             <label class="toggle">
                                 <input type="checkbox" id="settings-ajleaderboards-enabled"
@@ -1981,7 +2740,7 @@
                         <div class="toggle-wrapper">
                             <div class="toggle-label">
                                 <span data-i18n="settings.decenthologramsEnabled">DecentHolograms</span>
-                                <span data-i18n="settings.decenthologramsEnabledHint">Integration für Hologramme aktivieren</span>
+                                <span data-i18n="settings.decenthologramsEnabledHint">Enable hologram integration</span>
                             </div>
                             <label class="toggle">
                                 <input type="checkbox" id="settings-decentholograms-enabled"
@@ -1993,7 +2752,7 @@
                         <div class="toggle-wrapper">
                             <div class="toggle-label">
                                 <span data-i18n="settings.pvpmanagerEnabled">PvPManager</span>
-                                <span data-i18n="settings.pvpmanagerEnabledHint">Integration für Combat-Tag Entfernung aktivieren</span>
+                                <span data-i18n="settings.pvpmanagerEnabledHint">Enable combat tag removal integration</span>
                             </div>
                             <label class="toggle">
                                 <input type="checkbox" id="settings-pvpmanager-enabled"
@@ -2001,18 +2760,13 @@
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="settings.refreshIntervalTicks">Aktualisierungsintervall (Ticks)</label>
-                            <div class="number-input">
-                                <button class="number-btn" onclick="decrementValue('settings-refresh-interval-ticks', 20)">-</button>
-                                <input type="number" class="form-control" id="settings-refresh-interval-ticks" value="20" min="1" max="600"
-                                       onchange="updateConfig('settings.integrations.refresh-interval-ticks', parseInt(this.value))">
-                                <button class="number-btn" onclick="incrementValue('settings-refresh-interval-ticks', 20)">+</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
+
+                <p class="content-subtitle" style="margin-top: 1rem;">
+                    <i class="fas fa-wrench"></i>
+                    <span data-i18n="general.expertHint">Looking for a setting? Advanced options are under "Expert Settings".</span>
+                </p>
             </section>
 
             <!-- Events Section -->
@@ -2020,10 +2774,10 @@
                 <div class="content-header">
                     <div>
                         <h2 class="content-title" data-i18n="events.title">Events</h2>
-                        <p class="content-subtitle" data-i18n="events.subtitle">Konfiguriere deine Event-Typen</p>
+                        <p class="content-subtitle" data-i18n="events.subtitle">Configure your event types</p>
                     </div>
                     <button class="btn btn-primary" onclick="createNewEvent()">
-                        <i class="fas fa-plus"></i> <span data-i18n="events.new">Neues Event</span>
+                        <i class="fas fa-plus"></i> <span data-i18n="events.new">New Event</span>
                     </button>
                 </div>
 
@@ -2036,13 +2790,40 @@
             <section id="section-worlds" class="section">
                 <div class="content-header">
                     <div>
-                        <h2 class="content-title" data-i18n="worlds.title">Welten & Arenen</h2>
-                        <p class="content-subtitle" data-i18n="worlds.subtitle">PvP-Welten und Arena-Konfigurationen</p>
+                        <h2 class="content-title" data-i18n="worlds.title">Worlds & Arenas</h2>
+                        <p class="content-subtitle" data-i18n="worlds.subtitle">PvP worlds and arena settings</p>
                     </div>
                     <button class="btn btn-primary" onclick="createNewWorld()">
-                        <i class="fas fa-plus"></i> <span data-i18n="worlds.new">Neue Welt</span>
+                        <i class="fas fa-plus"></i> <span data-i18n="worlds.new">New World</span>
                     </button>
                 </div>
+
+                <!-- Server-Welten: der tatsaechliche Weltbestand laut Multiverse, unabhaengig
+                     davon, ob dazu ein Preset existiert. Aufklappbar, damit die Preset-Liste
+                     darunter der Standardblick bleibt. -->
+                <details class="mv-panel" id="server-worlds-panel" ontoggle="if(this.open) renderServerWorldsPanel()">
+                    <summary class="mv-panel-summary">
+                        <i class="fas fa-server"></i>
+                        <span data-i18n="mv.serverWorlds">Server worlds</span>
+                        <span id="server-worlds-backend" class="badge badge-secondary"></span>
+                    </summary>
+                    <div id="server-worlds-list" class="mv-panel-body">
+                        <!-- wird von renderServerWorldsPanel() gefuellt -->
+                    </div>
+                </details>
+
+                <!-- Backup worlds: die Zips aus plugins/<plugin>/backups/, mit Wiederherstellen
+                     und Loeschen. Baugleich zum Server-Welten-Panel, laedt beim Aufklappen. -->
+                <details class="mv-panel" id="backup-worlds-panel" ontoggle="if(this.open) loadMvBackups()">
+                    <summary class="mv-panel-summary">
+                        <i class="fas fa-box-archive"></i>
+                        <span data-i18n="mv.backupWorlds">Backup worlds</span>
+                        <span id="backup-worlds-count" class="badge badge-secondary"></span>
+                    </summary>
+                    <div id="backup-worlds-list" class="mv-panel-body">
+                        <!-- wird von renderBackupWorldsPanel() gefuellt -->
+                    </div>
+                </details>
 
                 <div id="worlds-list">
                     <!-- Welten werden dynamisch geladen -->
@@ -2053,12 +2834,17 @@
             <section id="section-equipment" class="section">
                 <div class="content-header">
                     <div>
-                        <h2 class="content-title" data-i18n="equipment.title">Equipment-Sets</h2>
-                        <p class="content-subtitle" data-i18n="equipment.subtitle">Rüstungs- und Inventar-Konfigurationen</p>
+                        <h2 class="content-title" data-i18n="equipment.title">Equipment</h2>
+                        <p class="content-subtitle" data-i18n="equipment.subtitle">Armor and inventory configurations</p>
                     </div>
                     <button class="btn btn-primary" onclick="createNewEquipment()">
-                        <i class="fas fa-plus"></i> <span data-i18n="equipment.new">Neues Set</span>
+                        <i class="fas fa-plus"></i> <span data-i18n="equipment.new">New Equipment Set</span>
                     </button>
+                </div>
+
+                <div class="form-hint-inline" style="margin-bottom: 1rem;">
+                    <i class="fas fa-arrows-up-down"></i>
+                    <span data-i18n="equipment.orderHint">The order of this list is the order the sets appear in the PvP wager menu. Use the arrow buttons to change it.</span>
                 </div>
 
                 <div id="equipment-list">
@@ -2066,93 +2852,510 @@
                 </div>
             </section>
 
-            <!-- Theme Section -->
-            <section id="section-theme" class="section">
+            <!-- Inventories & Backups Section -->
+            <section id="section-inventories" class="section">
                 <div class="content-header">
                     <div>
-                        <h2 class="content-title" data-i18n="theme.title">Theme & Farben</h2>
-                        <p class="content-subtitle" data-i18n="theme.subtitle">Passe das Aussehen des Web-Interface an</p>
+                        <h2 class="content-title" data-i18n="inventory.headerTitle">Inventory & Backup Management</h2>
+                        <p class="content-subtitle" data-i18n="inventory.headerSubtitle">Search player inventories, manage restore points, and monitor live sessions</p>
                     </div>
-                    <button class="btn btn-secondary" onclick="resetTheme()">
-                        <i class="fas fa-undo"></i> <span data-i18n="theme.resetButton">Standard wiederherstellen</span>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary btn-sm" onclick="refreshInventorySection()">
+                            <i class="fas fa-rotate"></i>
+                            <span data-i18n="inventory.guardRefresh">Refresh</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI / Status Quick Bar -->
+                <div class="inv-status-bar">
+                    <div class="inv-status-item">
+                        <div class="inv-status-icon"><i class="fas fa-server"></i></div>
+                        <div class="inv-status-info">
+                            <span class="inv-status-label" data-i18n="inventory.modeLabel">Mode</span>
+                            <span class="inv-status-value" id="inv-kpi-provider">-</span>
+                        </div>
+                    </div>
+                    <div class="inv-status-item">
+                        <div class="inv-status-icon"><i class="fas fa-user-clock"></i></div>
+                        <div class="inv-status-info">
+                            <span class="inv-status-label" data-i18n="inventory.guardTitle">Open sessions</span>
+                            <span class="inv-status-value" id="inv-kpi-sessions">0</span>
+                        </div>
+                    </div>
+                    <div class="inv-status-item">
+                        <div class="inv-status-icon"><i class="fas fa-shield-halved"></i></div>
+                        <div class="inv-status-info">
+                            <span class="inv-status-label" data-i18n="inventory.safetyBackups">Safety backups</span>
+                            <span class="inv-status-value" id="inv-kpi-safety">-</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warnings Container -->
+                <div id="inventory-coexistence-warning" class="alert alert-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <span data-i18n="inventory.coexistenceWarning">Multiverse-Inventories is running alongside the plugin's own management. Both swapping inventories at the same time gives unpredictable results — remove the world groups or switch to legacy mode.</span>
+                        <!-- Wird von renderInventoryCoexistence() gefuellt: die konkreten Weltkollisionen -->
+                        <div id="inventory-coexistence-details"></div>
+                    </div>
+                </div>
+                <div id="inventory-missing-warning" class="alert alert-error" style="display: none;">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span data-i18n="inventory.missingWarning">The InventoryBackup API is not available. Matches and events are refused until it is, so that no inventory is cleared without a backup.</span>
+                </div>
+
+                <!-- Tab Navigation -->
+                <div class="inv-tabs-nav">
+                    <button class="inv-tab-btn active" id="inv-tab-btn-explorer" onclick="switchInventoryTab('explorer')">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <span data-i18n="inventory.tabExplorer">Backup Explorer</span>
+                    </button>
+                    <button class="inv-tab-btn" id="inv-tab-btn-sessions" onclick="switchInventoryTab('sessions')">
+                        <i class="fas fa-shield-virus"></i>
+                        <span data-i18n="inventory.tabSessions">Live Sessions & Guard</span>
+                        <span class="nav-badge" id="inv-tab-sessions-badge" style="display: none;">0</span>
+                    </button>
+                    <button class="inv-tab-btn" id="inv-tab-btn-settings" onclick="switchInventoryTab('settings')">
+                        <i class="fas fa-sliders"></i>
+                        <span data-i18n="inventory.tabSettings">Settings & Policies</span>
                     </button>
                 </div>
 
+                <!-- Tab 1: Backup Explorer -->
+                <div id="inv-tab-pane-explorer" class="inv-tab-pane">
+                    <!-- Search & Quick Selection Card -->
+                    <div class="card" style="margin-bottom: 1.25rem;">
+                        <div class="card-body">
+                            <div class="inv-search-container">
+                                <label class="form-label" data-i18n="inventory.browser.player">Player</label>
+                                <div class="inv-search-row">
+                                    <div class="inv-search-input-wrapper">
+                                        <i class="fas fa-user-tag inv-search-icon"></i>
+                                        <input type="text" class="form-control inv-search-input" id="inventory-browser-player"
+                                               placeholder="Steve" data-i18n-placeholder="inventory.browser.playerPlaceholder"
+                                               list="inv-recent-players-list"
+                                               onkeydown="if(event.key==='Enter'){event.preventDefault();loadInventoryBackups();}">
+                                        <datalist id="inv-recent-players-list"></datalist>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="loadInventoryBackups()">
+                                        <i class="fas fa-search"></i>
+                                        <span data-i18n="inventory.browser.search">Search</span>
+                                    </button>
+                                </div>
+                                <small class="form-label-hint" data-i18n="inventory.browser.playerHint">Name or UUID. Offline players work too.</small>
+                                <p class="form-label-hint" data-i18n="inventory.browser.hint" style="margin: 0.25rem 0 0 0;">Look up a player's saved inventories, preview them and restore or delete a single backup.</p>
+                                <!-- Online Players Quick-Select Bar -->
+                                <div class="inv-online-quick-bar" id="inv-online-quick-bar" style="display: none;">
+                                    <span class="inv-quick-label"><i class="fas fa-signal"></i> <span data-i18n="inventory.onlinePlayers">Online Players</span>:</span>
+                                    <div class="inv-quick-pills" id="inv-online-players-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Split Explorer Container (Backup List + Inventory Viewer) -->
+                    <div class="inv-explorer-grid">
+                        <!-- Left Side: Backups List -->
+                        <div class="card inv-backups-card">
+                            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                <div class="card-title">
+                                    <i class="fas fa-clock-rotate-left"></i>
+                                    <span data-i18n="inventory.browser.title">Inventory backups</span>
+                                </div>
+                                <div id="inv-filter-container" style="display: none;">
+                                    <select class="form-control form-control-sm" id="inv-backup-filter-select" onchange="filterInventoryBackups(this.value)">
+                                        <option value="ALL" id="inv-filter-all-option">All</option>
+                                        <option value="pvp_match" data-i18n="inventory.filterPvp">PvP Matches</option>
+                                        <option value="event" data-i18n="inventory.filterEvent">Events</option>
+                                        <option value="manual" data-i18n="inventory.filterManual">Manual & Web</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="card-body inv-backups-body">
+                                <div id="inventory-browser-list">
+                                    <div class="inv-empty-state">
+                                        <i class="fas fa-boxes-packing"></i>
+                                        <p data-i18n="inventory.searchHint">Search for a player above to explore their saved backups.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Interactive Minecraft Inventory Viewer -->
+                        <div class="card inv-viewer-card">
+                            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                                <div class="card-title">
+                                    <i class="fas fa-cube"></i>
+                                    <span data-i18n="inventory.browser.previewTitle">Backup contents</span>
+                                </div>
+                                <div id="inv-viewer-header-actions" style="display: none;">
+                                    <button class="btn btn-secondary btn-sm" onclick="exportCurrentBackupToEquipment()" title="" data-i18n-title="inventory.exportEquipment">
+                                        <i class="fas fa-shield-alt"></i> <span data-i18n="inventory.exportEquipment">Export as Equipment Set</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body inv-viewer-body" id="inventory-browser-preview">
+                                <div class="inv-empty-state">
+                                    <i class="fas fa-eye"></i>
+                                    <p data-i18n="inventory.selectBackupHint">Select a backup on the left to view detailed inventory contents.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Live Sessions & Guard Journal -->
+                <div id="inv-tab-pane-sessions" class="inv-tab-pane" style="display: none;">
+                    <div class="card">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="card-title">
+                                <i class="fas fa-shield-virus"></i>
+                                <span data-i18n="inventory.guardTitle">Open sessions</span>
+                            </div>
+                            <button class="btn btn-secondary btn-sm" onclick="loadInventoryGuard()">
+                                <i class="fas fa-rotate"></i>
+                                <span data-i18n="inventory.guardRefresh">Refresh</span>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <p class="form-label-hint" data-i18n="inventory.guardHint">Sessions a crash left open. They are worked off on the next server start.</p>
+                            <div id="inventory-guard-list" style="margin-top: 1rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3: Settings & Policies -->
+                <div id="inv-tab-pane-settings" class="inv-tab-pane" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-sliders"></i>
+                                <span data-i18n="inventory.title">Inventory management</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="form-label-hint" data-i18n="inventory.intro">Decides who manages player inventories when they enter arena and event worlds.</p>
+
+                            <div class="form-group">
+                                <label class="form-label" data-i18n="inventory.modeLabel">Mode</label>
+                                <select class="form-control" id="inventory-provider" onchange="setInventoryProvider(this.value)">
+                                    <option value="auto" data-i18n="inventory.modeAuto">InventoryBackup (recommended)</option>
+                                    <option value="none" data-i18n="inventory.modeLegacy">Multiverse-Inventories (legacy · unstable)</option>
+                                </select>
+                            </div>
+
+                            <div id="inventory-mode-description" class="alert alert-info">
+                                <span data-i18n="inventory.descAuto">The plugin backs inventories up through InventoryBackup and restores them automatically after matches, events, deaths and disconnects. Multiverse-Inventories is not needed.</span>
+                            </div>
+
+                            <div id="inventory-legacy-warning" class="alert alert-warning" style="display: none;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span data-i18n="inventory.legacyWarning">Legacy mode: Multiverse-Inventories handles the inventory swap. The plugin never restores on its own — if the world groups are missing or wrong, that is real item loss.</span>
+                            </div>
+
+                            <div id="inventory-legacy-settings" style="display: none;">
+                                <div class="toggle-wrapper">
+                                    <div class="toggle-label">
+                                        <span data-i18n="inventory.safetyBackups">Safety backups</span>
+                                        <span data-i18n="inventory.safetyBackupsHint">Still copies every inventory through InventoryBackup before the arena/lobby teleport. Never restored automatically — an admin picks it up by hand if something goes wrong.</span>
+                                        <span class="field-warning" id="inventory-warn-legacy-safety" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span data-i18n="inventory.safetyBackupsWarning">Turning this off leaves legacy mode without any net of its own.</span>
+                                        </span>
+                                    </div>
+                                    <label class="toggle">
+                                        <input type="checkbox" id="inventory-legacy-safety" checked
+                                               onchange="updateConfig('settings.inventory-management.legacy-safety-backups', this.checked); renderInventoryWarnings()">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="inventory-managed-settings">
+                                <div class="form-section-title" data-i18n="inventory.autoRestoreTitle">Automatic restore</div>
+
+                                <div class="toggle-wrapper">
+                                    <div class="toggle-label">
+                                        <span data-i18n="inventory.restoreMatchEnd">After match end</span>
+                                        <span data-i18n="inventory.restoreMatchEndHint">Gives the survival inventory back when a PvP match finishes</span>
+                                        <span class="field-warning" id="inventory-warn-match-end" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span data-i18n="inventory.warnMatchEndOff">Off: the inventory is still backed up, but never given back after a match. Players keep the kit until an admin restores it by hand.</span>
+                                        </span>
+                                    </div>
+                                    <label class="toggle">
+                                        <input type="checkbox" id="inventory-restore-match-end" checked
+                                               onchange="updateConfig('settings.inventory-management.auto-restore-on-match-end', this.checked); renderInventoryWarnings()">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-wrapper">
+                                    <div class="toggle-label">
+                                        <span data-i18n="inventory.restoreEventEnd">After event end</span>
+                                        <span data-i18n="inventory.restoreEventEndHint">Gives the survival inventory back when an event finishes</span>
+                                        <span class="field-warning" id="inventory-warn-event-end" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span data-i18n="inventory.warnEventEndOff">Off: participants leave the event with the kit. Their survival inventory stays in the backup until an admin restores it by hand.</span>
+                                        </span>
+                                    </div>
+                                    <label class="toggle">
+                                        <input type="checkbox" id="inventory-restore-event-end" checked
+                                               onchange="updateConfig('settings.inventory-management.auto-restore-on-event-end', this.checked); renderInventoryWarnings()">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-wrapper">
+                                    <div class="toggle-label">
+                                        <span data-i18n="inventory.restoreRespawn">After respawn</span>
+                                        <span data-i18n="inventory.restoreRespawnHint">Restores the inventory of a player who died in an arena</span>
+                                        <span class="field-warning" id="inventory-warn-respawn" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span data-i18n="inventory.warnRespawnOff">Off: whoever dies in an arena respawns without their survival inventory. It only exists in the backup from then on.</span>
+                                        </span>
+                                    </div>
+                                    <label class="toggle">
+                                        <input type="checkbox" id="inventory-restore-respawn" checked
+                                               onchange="updateConfig('settings.inventory-management.auto-restore-on-respawn', this.checked); renderInventoryWarnings()">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="toggle-wrapper">
+                                    <div class="toggle-label">
+                                        <span data-i18n="inventory.restoreRejoin">On rejoin</span>
+                                        <span data-i18n="inventory.restoreRejoinHint">Restores the inventory of a player who disconnected mid-match</span>
+                                        <span class="field-warning" id="inventory-warn-rejoin" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span data-i18n="inventory.warnRejoinOff">Off: anyone who loses connection mid-match gets nothing back on their next join. Of the four switches this is the one that loses the most items.</span>
+                                        </span>
+                                    </div>
+                                    <label class="toggle">
+                                        <input type="checkbox" id="inventory-restore-rejoin" checked
+                                               onchange="updateConfig('settings.inventory-management.auto-restore-on-rejoin', this.checked); renderInventoryWarnings()">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label" data-i18n="inventory.failurePolicy">If the backup cannot be written</label>
+                                    <select class="form-control" id="inventory-failure-policy"
+                                            onchange="updateConfig('settings.inventory-management.on-backup-failure', this.value); renderInventoryWarnings()">
+                                        <option value="abort" data-i18n="inventory.failureAbort">Abort the match / event join (safest)</option>
+                                        <option value="warn" data-i18n="inventory.failureWarn">Continue and warn</option>
+                                    </select>
+                                    <span class="field-warning" id="inventory-warn-failure-policy" style="display: none;">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span data-i18n="inventory.warnFailurePolicyWarn">"Continue and warn": matches start even when no backup reached the disk. The only remaining net is the in-memory copy, and it does not survive a server restart.</span>
+                                    </span>
+                                </div>
+
+                                <div class="toggle-wrapper">
+                                    <div class="toggle-label">
+                                        <span data-i18n="inventory.cleanupAfterMatch">Delete backup after success</span>
+                                        <span data-i18n="inventory.cleanupAfterMatchHint">Off keeps the backup as an archive</span>
+                                        <span class="field-warning" id="inventory-warn-cleanup" style="display: none;">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <span data-i18n="inventory.warnCleanupOn">On: the backup is deleted the moment the restore succeeds. If the restore put back the wrong state, there is no way back.</span>
+                                        </span>
+                                    </div>
+                                    <label class="toggle">
+                                        <input type="checkbox" id="inventory-cleanup-after-match"
+                                               onchange="updateConfig('settings.inventory-management.cleanup-backups-after-match', this.checked); renderInventoryWarnings()">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Expert Section -->
+            <section id="section-expert" class="section">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title" data-i18n="expert.title">Expert Settings</h2>
+                        <p class="content-subtitle" data-i18n="expert.subtitle">Rarely changed, advanced configuration</p>
+                    </div>
+                </div>
+
+                <!-- Warning Banner -->
+                <div class="card" style="border-left: 4px solid var(--warning);">
+                    <div class="card-body" style="display: flex; gap: 0.75rem; align-items: flex-start;">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--warning); margin-top: 0.2rem;"></i>
+                        <div>
+                            <div style="font-weight: 600;" data-i18n="expert.warningTitle">For advanced users</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;" data-i18n="expert.warningText">These settings rarely need changing. The defaults work for most servers.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Player Data Protection Card -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-paint-brush"></i>
-                            <span data-i18n="theme.colorScheme">Farbschema</span>
+                            <i class="fas fa-user-shield"></i>
+                            <span data-i18n="settings.playerDataTitle">Player data protection</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.saveLocation">Save player position</span>
+                                <span data-i18n="settings.saveLocationHint">Saves the position before events/matches</span>
+                                <span class="field-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span data-i18n="settings.saveLocationWarning">Turning this off is experimental — players can lose their position.</span>
+                                </span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-save-location" checked
+                                       onchange="updateConfig('settings.save-player-location', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- World Loading Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-globe-americas"></i>
+                            <span data-i18n="settings.worldManagement">World management</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.worldManagementEvents">Manage event worlds</span>
+                                <span data-i18n="settings.worldManagementEventsHint">Loads lobby and event worlds at event start. Whether an event needs a lobby world is decided by its own "use lobby" setting.</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-world-management-events" checked
+                                       onchange="updateConfig('settings.world-management.events', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.worldManagementArenas">Unload arena worlds</span>
+                                <span data-i18n="settings.worldManagementArenasHint">Unloads an arena world after the match. Arena worlds are always loaded on demand, otherwise no match could start.</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-world-management-arenas" checked
+                                       onchange="updateConfig('settings.world-management.arenas', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span data-i18n="settings.commandRestriction">Block commands during events</span>
+                                <span class="form-label-hint" data-i18n="settings.commandRestrictionHint">Event participants only; OPs are exempt. PvP matches always block commands.</span>
+                            </label>
+                            <select class="form-control" id="settings-command-restriction"
+                                    onchange="updateConfig('settings.command-restriction', this.value)">
+                                <option value="both" data-i18n="settings.commandRestrictionBoth">Event world + lobby</option>
+                                <option value="event" data-i18n="settings.commandRestrictionEvent">Event world only</option>
+                                <option value="lobby" data-i18n="settings.commandRestrictionLobby">Lobby only</option>
+                                <option value="none" data-i18n="settings.commandRestrictionNone">Do not block</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Arena Regeneration -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-sync"></i>
+                            <span data-i18n="settings.arenaRegenTitle">Arena regeneration</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.createBackups">Create backups</span>
+                                <span data-i18n="settings.createBackupsHint">Create backups before regeneration</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-arena-backups" checked
+                                       onchange="updateConfig('settings.arena-regeneration.backups', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.backupAsync">Async backup</span>
+                                <span data-i18n="settings.backupAsyncHint">Background backup (recommended)</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-backup-async" checked
+                                       onchange="updateConfig('settings.arena-regeneration.backup-async', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Checks -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-shield-check"></i>
+                            <span data-i18n="settings.securityChecks">Security checks</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="toggle-wrapper">
+                            <div class="toggle-label">
+                                <span data-i18n="settings.checkInventory">Check inventory space</span>
+                                <span data-i18n="settings.checkInventoryHint">Verify free space for wagers</span>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="settings-check-inventory" checked
+                                       onchange="updateConfig('settings.checks.inventory-space', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Performance -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span data-i18n="settings.performanceTitle">Performance</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="form-group">
-                            <label class="form-label" data-i18n="theme.primary">Primärfarbe (Akzent)</label>
-                            <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-primary" value="#4caf50"
-                                       onchange="updateThemeColor('primary', this.value)">
-                                <input type="text" class="form-control color-input" value="#4caf50"
-                                       oninput="document.getElementById('theme-primary').value = this.value; updateThemeColor('primary', this.value)">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="theme.secondary">Sekundärfarbe</label>
-                            <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-secondary" value="#66bb6a"
-                                       onchange="updateThemeColor('secondary', this.value)">
-                                <input type="text" class="form-control color-input" value="#66bb6a"
-                                       oninput="document.getElementById('theme-secondary').value = this.value; updateThemeColor('secondary', this.value)">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="theme.background">Hintergrundfarbe</label>
-                            <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-background" value="#1a1a1a"
-                                       onchange="updateThemeColor('background', this.value)">
-                                <input type="text" class="form-control color-input" value="#1a1a1a"
-                                       oninput="document.getElementById('theme-background').value = this.value; updateThemeColor('background', this.value)">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="theme.surface">Oberflächen-Farbe</label>
-                            <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-surface" value="#2d2d2d"
-                                       onchange="updateThemeColor('surface', this.value)">
-                                <input type="text" class="form-control color-input" value="#2d2d2d"
-                                       oninput="document.getElementById('theme-surface').value = this.value; updateThemeColor('surface', this.value)">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="theme.card">Karten-Farbe</label>
-                            <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-card" value="#3a3a3a"
-                                       onchange="updateThemeColor('card', this.value)">
-                                <input type="text" class="form-control color-input" value="#3a3a3a"
-                                       oninput="document.getElementById('theme-card').value = this.value; updateThemeColor('card', this.value)">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label" data-i18n="theme.text">Textfarbe</label>
-                            <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-text" value="#e0e0e0"
-                                       onchange="updateThemeColor('text', this.value)">
-                                <input type="text" class="form-control color-input" value="#e0e0e0"
-                                       oninput="document.getElementById('theme-text').value = this.value; updateThemeColor('text', this.value)">
+                            <label class="form-label" data-i18n="settings.refreshIntervalTicks">Refresh interval (ticks)</label>
+                            <div class="number-input">
+                                <button class="number-btn" onclick="decrementValue('settings-refresh-interval-ticks', 20)">-</button>
+                                <input type="number" class="form-control" id="settings-refresh-interval-ticks" value="20" min="1" max="600"
+                                       onchange="updateConfig('settings.integrations.refresh-interval-ticks', parseInt(this.value))">
+                                <button class="number-btn" onclick="incrementValue('settings-refresh-interval-ticks', 20)">+</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Web Server Settings -->
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
                             <i class="fas fa-server"></i>
-                            <span data-i18n="web.settingsTitle">Web-Server Einstellungen</span>
+                            <span data-i18n="web.settingsTitle">Web server settings</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -2163,47 +3366,116 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" data-i18n="web.title">Titel</label>
-                            <input type="text" class="form-control" id="web-title" value="Event-PVP Konfigurator"
-                                   onchange="updateWebConfig('web.title', this.value)">
+                            <label class="form-label" data-i18n="web.publicUrl">Public URL</label>
+                            <input type="text" class="form-control" id="web-public-url" placeholder="http://localhost"
+                                   onchange="updatePublicUrl(this.value)">
+                            <small class="form-hint" style="display: block; margin-top: 0.35rem; color: var(--text-muted); font-size: 0.8rem;" data-i18n="web.publicUrlHint">Address displayed in the /eventpvp webtoken command. The port ({port}) is appended automatically.</small>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <!-- Theme Section -->
+            <section id="section-theme" class="section">
+                <div class="content-header">
+                    <div>
+                        <h2 class="content-title" data-i18n="theme.title">Theme & Colors</h2>
+                        <p class="content-subtitle" data-i18n="theme.subtitle">Adjust the look of the web interface</p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="resetTheme()">
+                        <i class="fas fa-undo"></i> <span data-i18n="theme.resetButton">Restore default</span>
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fas fa-paint-brush"></i>
+                            <span data-i18n="theme.colorScheme">Color scheme</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.primary">Primary color (accent)</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-primary" value="#4caf50"
+                                       onchange="updateThemeColor('primary', this.value)">
+                                <input type="text" class="form-control color-input" value="#4caf50"
+                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-primary').value = this.value; document.documentElement.style.setProperty('--primary', this.value); }"
+                                       onchange="updateThemeColor('primary', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.secondary">Secondary color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-secondary" value="#66bb6a"
+                                       onchange="updateThemeColor('secondary', this.value)">
+                                <input type="text" class="form-control color-input" value="#66bb6a"
+                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-secondary').value = this.value; document.documentElement.style.setProperty('--secondary', this.value); }"
+                                       onchange="updateThemeColor('secondary', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.background">Background color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-background" value="#1a1a1a"
+                                       onchange="updateThemeColor('background', this.value)">
+                                <input type="text" class="form-control color-input" value="#1a1a1a"
+                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-background').value = this.value; document.documentElement.style.setProperty('--background', this.value); }"
+                                       onchange="updateThemeColor('background', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.surface">Surface color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-surface" value="#2d2d2d"
+                                       onchange="updateThemeColor('surface', this.value)">
+                                <input type="text" class="form-control color-input" value="#2d2d2d"
+                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-surface').value = this.value; document.documentElement.style.setProperty('--surface', this.value); }"
+                                       onchange="updateThemeColor('surface', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.card">Card color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-card" value="#3a3a3a"
+                                       onchange="updateThemeColor('card', this.value)">
+                                <input type="text" class="form-control color-input" value="#3a3a3a"
+                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-card').value = this.value; document.documentElement.style.setProperty('--card', this.value); }"
+                                       onchange="updateThemeColor('card', this.value)">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="theme.text">Text color</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" class="color-preview" id="theme-text" value="#e0e0e0"
+                                       onchange="updateThemeColor('text', this.value)">
+                                <input type="text" class="form-control color-input" value="#e0e0e0"
+                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-text').value = this.value; document.documentElement.style.setProperty('--text', this.value); }"
+                                       onchange="updateThemeColor('text', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
         </main>
     </div>
 
-    <!-- Item Picker Modal -->
-    <div class="modal-overlay" id="item-picker-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 class="modal-title" data-i18n="modal.itemPickerTitle">Item auswählen</h3>
-                <button class="modal-close" onclick="closeItemPicker()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="search-box item-picker-search">
-                    <i class="fas fa-search"></i>
-                    <input type="text" class="form-control" placeholder="Item suchen..." 
-                           id="item-search" oninput="filterItems(this.value)" data-i18n-placeholder="modal.itemSearch">
-                </div>
-                <div class="item-picker-grid" id="item-grid">
-                    <!-- Items werden dynamisch geladen -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeItemPicker()" data-i18n="button.cancel">Abbrechen</button>
-                <button class="btn btn-primary" onclick="confirmItemSelection()" data-i18n="button.select">Auswählen</button>
-            </div>
-        </div>
-    </div>
+    <!-- Hier stand das generische Item-Picker-Modal. Es liess sich nie oeffnen: einziger
+         Eingang war openItemPicker() in app.js, und diese Funktion hatte keinen Aufrufer.
+         Die Item-Auswahl passiert in den Inline-Pickern des Equipment-Editors. -->
 
     <!-- YAML Preview Modal -->
     <div class="modal-overlay" id="yaml-modal">
         <div class="modal" style="max-width: 800px;">
             <div class="modal-header">
-                <h3 class="modal-title" data-i18n="modal.yamlPreview">YAML Vorschau</h3>
+                <h3 class="modal-title" data-i18n="modal.yamlPreview">YAML preview</h3>
                 <button class="modal-close" onclick="closeYamlPreview()">
                     <i class="fas fa-times"></i>
                 </button>
@@ -2218,29 +3490,87 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="copyYaml()">
-                    <i class="fas fa-copy"></i> <span data-i18n="button.copy">Kopieren</span>
+                    <i class="fas fa-copy"></i> <span data-i18n="button.copy">Copy</span>
                 </button>
-                <button class="btn btn-primary" onclick="closeYamlPreview()" data-i18n="button.close">Schließen</button>
+                <button class="btn btn-primary" onclick="closeYamlPreview()" data-i18n="button.close">Close</button>
             </div>
         </div>
     </div>
+
+    <!-- Restore Inventory Modal -->
+    <div class="modal-overlay" id="modal-restore-inventory">
+        <div class="modal" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-rotate-left" style="color: var(--primary); margin-right: 0.5rem;"></i>
+                    <span data-i18n="inventory.modal.restoreTitle">Restore Inventory Backup</span>
+                </h3>
+                <button class="modal-close" onclick="closeRestoreModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p data-i18n="inventory.modal.restoreConfirmText" style="margin-bottom: 1rem; color: var(--text-secondary);">
+                    Are you sure you want to restore this backup to the player? This creates items in the game.
+                </p>
+
+                <div class="inv-modal-player-card">
+                    <div class="form-label" data-i18n="inventory.modal.targetPlayer" style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Target Player</div>
+                    <div style="font-weight: 600; font-size: 1.05rem;" id="modal-restore-player-name">-</div>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;" id="modal-restore-player-uuid">-</div>
+                    <div id="modal-restore-player-status" style="margin-top: 0.35rem;"></div>
+                </div>
+
+                <div class="toggle-wrapper" style="margin: 1rem 0;">
+                    <div class="toggle-label">
+                        <span data-i18n="inventory.browser.clearBefore">Clear the current inventory first</span>
+                        <span data-i18n="inventory.browser.clearBeforeHint">If off, restored items are added to whatever the player is carrying and may not fit.</span>
+                    </div>
+                    <label class="toggle">
+                        <input type="checkbox" id="modal-restore-clear-before" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" id="modal-restore-type-prompt" data-i18n="inventory.modal.typeConfirmPrompt">Type the player name to confirm:</label>
+                    <input type="text" class="form-control" id="modal-restore-confirm-input" placeholder=""
+                           onkeydown="if(event.key==='Enter'){event.preventDefault();executeRestoreFromModal();}">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRestoreModal()">
+                    <span data-i18n="inventory.modal.cancel">Cancel</span>
+                </button>
+                <button class="btn btn-primary" onclick="executeRestoreFromModal()">
+                    <i class="fas fa-rotate-left"></i>
+                    <span data-i18n="inventory.modal.confirm">Restore Now</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Minecraft Tooltip Container -->
+    <div id="minecraft-tooltip" class="minecraft-tooltip"></div>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
 
     <!-- Quick Actions (shown when changes are pending) -->
     <div class="quick-actions hidden" id="quick-actions">
-        <span style="color: var(--text-secondary);" data-i18n="quick.unsavedChanges">Ungespeicherte Änderungen</span>
-        <button class="btn btn-secondary btn-icon" onclick="discardChanges()" data-i18n-title="quick.discard">
+        <span style="color: var(--text-secondary);" data-i18n="quick.unsavedChanges">Unsaved changes</span>
+        <button class="btn btn-secondary btn-icon" onclick="discardChanges()" data-i18n="quick.discard" title="Discard">
             <i class="fas fa-times"></i>
         </button>
         <button class="btn btn-primary" onclick="saveAllConfigs()">
-            <i class="fas fa-save"></i> <span data-i18n="button.save">Speichern</span>
+            <i class="fas fa-save"></i> <span data-i18n="button.save">Save</span>
         </button>
     </div>
 
     </div><!-- End #main-content -->
 
+    <!-- items.js zuerst: liefert Item-Katalog und Icon-Aufloesung, die app.js und editors.js nutzen. -->
+    <script src="items.js"></script>
     <script src="app.js"></script>
     <script src="editors.js"></script>
 </body>

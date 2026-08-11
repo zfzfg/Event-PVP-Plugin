@@ -31,7 +31,16 @@ public class PvPAcceptCommand implements CommandExecutor, TabCompleter {
     }
 
     private String getMsg(String key) {
-        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, "");
+        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.request." + key, null);
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.general." + key, null);
+        }
+        if (msg == null) {
+            return "&c[missing: " + key + "]";
+        }
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
     

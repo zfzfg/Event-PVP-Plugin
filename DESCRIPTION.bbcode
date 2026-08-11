@@ -2,7 +2,21 @@
 
 A comprehensive Minecraft plugin that combines [b]custom event management[/b] and [b]PvP wager system[/b] into one unified solution.
 
-[b]🌍 Multilingual Support: Available in 8 Languages[/b] (English, German, French, Spanish, Russian, Polish, Japanese, Chinese)
+[size=5][b]Upgrading to 1.0.9[/b][/size]
+
+You [b]do not need to replace your entire config.yml[/b]! The plugin automatically adds missing settings with default values.
+
+[size=4][b]Important Notes in 1.0.9[/b][/size]
+[list]
+[*][b]True i18n Localization for Console & Terminal Output[/b]: All logger, startup/shutdown, and server console messages now respect [font=courier new]settings.language[/font] in all 7 languages via [font=courier new]messages.console.*[/font].
+[*][b]Automatic Fallbacks[/b]: Missing keys in custom or partial translation files now automatically display English text via embedded resource defaults instead of failing or printing raw keys.
+[*][b]Web Interface Live Server Sync Badge[/b]: Real-time status indicators in the top bar show whether your configuration changes are synchronized with the server ([font=courier new]🟢 Synced[/font], [font=courier new]🟡 Unsaved Changes[/font], [font=courier new]🔵 Saving[/font], [font=courier new]🔴 Out of Sync[/font]).
+[*][b]Switchable Lobby Phase ([font=courier new]use-lobby[/font])[/b]: Events can now run with or without a lobby phase. When disabled, players join the event world immediately without needing a separate lobby world.
+[*][b]World Regeneration Safeguards[/b]: Redundant double-regenerations are automatically prevented, and [font=courier new]regenerate-event-world[/font] is locked when the world is already set to regenerate globally in [font=courier new]worlds.yml[/font].
+[*][b]Zero Hardcoded Messages[/b]: Complete localization audit pass (0 findings across all 9 rules D1–D9).
+[/list]
+
+[b]🌍 Multilingual Support: Available in 7 Core Languages[/b] (English, German, Spanish, French, Japanese, Polish, Russian) with 100% key parity and full web interface translation.
 
 [size=5][b]What Does This Plugin Do?[/b][/size]
 
@@ -29,16 +43,25 @@ Let players bet on PvP matches:
 [size=4][b]Web Interface[/b][/size]
 Configure everything through a modern browser interface:
 [list]
-[*]Edit all YAML configurations visually
-[*]Create events and equipment sets with live preview
-[*]Token-based secure access
-[*][b]Multi-language support: 8 languages[/b] (EN, DE, FR, ES, RU, PL, JA, ZH)
+[*]Edit all YAML configurations visually ([font=courier new]config.yml[/font], [font=courier new]worlds.yml[/font], [font=courier new]equipment.yml[/font], [font=courier new]web-config.yml[/font]) with deep-snapshot precision dirty-tracking
+[*]Create events and equipment sets with live preview and server material validation
+[*][b]Dedicated 3-Tab Inventory Manager[/b]: Search backups, inspect with authentic Minecraft Canvas & XP bar, 2-step restores, live session/guard monitoring
+[*][b]Multiverse World Management[/b]: Create, import, load, unload, delete, and backup/restore worlds directly in the browser
+[*][b]Server Resource Pack Textures[/b]: Automatically extracts and displays custom item textures from your server resource pack
+[*][b]Web Server Settings[/b]: Configurable port with pre-save safety warning dialog and public URL with automatic dynamic port binding for [font=courier new]/eventpvp webtoken[/font]
+[*]Token-based secure access ([font=courier new]/eventpvp webtoken[/font]) with rate-limiting protection
+[*][b]Multi-language support: 7 languages[/b] (EN, DE, FR, ES, RU, PL, JA) with real-time synchronization badges
 [/list]
 
 [size=5][b]Important Dependencies[/b][/size]
 
+[size=4][b]⚠️ InventoryBackup / InventoryRestore (REQUIRED)[/b][/size]
+[b]This plugin requires the plugin [font=courier new]InventoryBackup[/font][/b] (from the InventoryRestore project) and will not start without it — it is listed under [font=courier new]depend[/font] in [font=courier new]plugin.yml[/font], exactly like Vault.
+
+It is the storage behind all inventory safety: the backup taken before a player is teleported into an arena or lobby, the automatic restore afterwards, and the persistent queue that returns an inventory to a player who disconnected mid-match. Requires Paper/Spigot [b]1.20+[/b].
+
 [size=4][b]⚠️ Multiverse-Core (REQUIRED)[/b][/size]
-[b]This plugin fundamentally requires Multiverse-Core[/b] for proper operation:
+[b]This plugin requires Multiverse-Core[/b] for proper operation and will not start without it — it is listed under [font=courier new]depend[/font] in [font=courier new]plugin.yml[/font]:
 [list]
 [*][b]World Loading[/b]: Loads event/arena worlds when matches start
 [*][b]World Cloning[/b]: Creates temporary world copies from templates
@@ -46,48 +69,27 @@ Configure everything through a modern browser interface:
 [*][b]World Unloading[/b]: Unloads worlds to save server resources
 [/list]
 
-[b]Without Multiverse-Core[/b], the plugin will have limited functionality and may not work correctly.
+Both Multiverse-Core 4 and 5 are supported.
 
-[size=4][b]⚠️ Multiverse-Inventories (STRONGLY RECOMMENDED)[/b][/size]
-[b]Multiverse-Inventories is essential for proper inventory restoration[/b]. Here's why:
-
-[b]The Problem:[/b]
+[size=4][b]✅ Inventory Management (no Multiverse-Inventories required)[/b][/size]
+The plugin manages inventory backups and restorations automatically through [font=courier new]InventoryBackup[/font]:
 [list]
-[*]When players join an event or PvP match, they are teleported to a different world
-[*]Their inventory is cleared and replaced with event/match equipment
-[*]When returning to the main world, they need their original inventory back
+[*][b]After a match or event ends[/b], including draws and cancellations
+[*][b]After a death[/b] in an arena, on respawn
+[*][b]After a disconnect[/b]: the restore is queued persistently and applied on the player's next login
+[*][b]After a crash[/b]: open sessions are written to [font=courier new]inventory-guard.yml[/font] and restored on startup
 [/list]
 
-[b]The Solution:[/b]
-Multiverse-Inventories handles this automatically:
+[b]Modes[/b] ([font=courier new]settings.inventory-management.provider[/font]):
 [list]
-[*][b]Separate Inventories[/b]: Each world group (main, event, pvp) has its own inventory
-[*][b]Automatic Switching[/b]: When players change worlds, their inventory is automatically restored
-[*][b]No Data Loss[/b]: Player inventories are preserved by Multiverse-Inventories
-[/list]
-
-[b]Without Multiverse-Inventories:[/b]
-[list]
-[*]The plugin has a fallback inventory backup system, but it's still [b]experimental and buggy[/b]
-[*]Players may lose items or experience inventory issues
-[*]Inventory restoration is not guaranteed to work correctly
-[/list]
-
-[b]Recommended Setup:[/b]
-[list=1]
-[*]Install Multiverse-Core
-[*]Install Multiverse-Inventories
-[*]Configure world groups in Multiverse-Inventories:
-[list]
-[*][font=courier new]default[/font] group: Main/survival worlds
-[*][font=courier new]event[/font] group: Event worlds
-[*][font=courier new]pvp[/font] group: PvP arena worlds
-[/list]
+[*][font=courier new]auto[/font] (default): Backup and automatic restore through InventoryBackup
+[*][font=courier new]none[/font]: [b]Legacy[/b] mode for Multiverse-Inventories (plugin only writes safety backups)
 [/list]
 
 [size=4][b]Other Dependencies[/b][/size]
 [list]
 [*][b]Vault[/b] (Required): For economy integration (money wagers)
+[*][b]InventoryBackup[/b] (Required): Inventory backup and restore
 [/list]
 
 [size=5][b]Essential Commands[/b][/size]
@@ -114,24 +116,20 @@ Multiverse-Inventories handles this automatically:
 /pvpstats me                                          - View your PvP statistics
 [/code]
 
-[b]Examples:[/b]
-[code]
-/pvpa Steve DIAMOND_SWORD 1 PvPArena diamond_pvp    - Challenge Steve with item wager
-/pvpa Alex MONEY 100 desert standard                - Challenge Alex with $100 wager
-/pvpa Mike SKIP 0 forest pvp_starter                - Challenge Mike without wager
-[/code]
-
 [size=4][b]For Admins[/b][/size]
 
 [code]
 /eventpvp reload            - Reload all configurations
 /eventpvp webtoken          - Generate web interface access token
+/eventpvp version           - Check plugin version and update status
+/eventpvp debug             - Toggle debug logging (on|on full|off|status)
+/eventpvp rescue            - Manage stuck sessions and stranded player return locations
 /event <name> start         - Start an event
 /event <name> stop          - Stop an event
 /event <name> forcestart    - Force start without minimum players
 /pvpadmin reload            - Reload PvP configuration
 /pvpadmin stopall           - Stop all active matches
-/inventoryrestore <player> <ID>  - Restore player inventory (fallback)
+/inv <player>               - Inspect and restore player backups via InventoryBackup
 [/code]
 
 [size=5][b]Quick Start[/b][/size]
@@ -139,28 +137,16 @@ Multiverse-Inventories handles this automatically:
 [list=1]
 [*][b]Install Dependencies:[/b]
 [list]
-[*]Vault
-[*]Multiverse-Core
-[*]Multiverse-Inventories
+[*]Multiverse-Core (Required)
+[*]Vault (Required)
+[*]InventoryBackup from InventoryRestore (Required)
 [/list]
-
-[*][b]Configure World Groups[/b] (in Multiverse-Inventories):
-[code]
-/mvinv group default
-/mvinv group event
-/mvinv group pvp
-[/code]
-
-[*][b]Assign Worlds to Groups:[/b]
-[code]
-/mvinv world <world_name> event
-/mvinv world <arena_name> pvp
-[/code]
 
 [*][b]Configure the Plugin:[/b]
 [list]
 [*]Edit [font=courier new]config.yml[/font], [font=courier new]worlds.yml[/font], [font=courier new]equipment.yml[/font]
 [*]Or use the web interface: [font=courier new]/eventpvp webtoken[/font]
+[*]Enable optional integrations (AJLeaderboards, DecentHolograms, PvPManager)
 [/list]
 
 [*][b]Reload and Test:[/b]
@@ -173,21 +159,20 @@ Multiverse-Inventories handles this automatically:
 [size=5][b]Server Requirements[/b][/size]
 
 [list]
-[*][b]Platform[/b]: Paper/Spigot 1.19+
+[*][b]Platform[/b]: Paper/Spigot 1.19+ (InventoryBackup requires 1.20+)
 [*][b]RAM[/b]: 4GB+ recommended (depending on world size)
-[*][b]Multiverse-Core[/b]: Latest version
-[*][b]Multiverse-Inventories[/b]: Latest version (strongly recommended)
-[*][b]Vault[/b]: Latest version
+[*][b]Required Plugins[/b]: Multiverse-Core (v4 or v5), Vault, InventoryBackup (from InventoryRestore)
+[*][b]Optional / Soft Integrations[/b]: PlaceholderAPI, AJLeaderboards, DecentHolograms, PvPManager
 [/list]
 
 [size=5][b]Need Help?[/b][/size]
 
 [list]
 [*]Check the full [font=courier new]README.md[/font] for detailed documentation
-[*]Review configuration examples in [font=courier new]CONFIG_EXAMPLES.md[/font]
+[*]Review configuration examples in [font=courier new]CONFIG_EXAMPLES.md[/font] (or [font=courier new]CONFIG_EXAMPLES_EN.md[/font])
 [*]Test spawn configurations using [font=courier new]SpawnExamples.md[/font]
 [/list]
 
 [hr]
 
-[b]Remember[/b]: Multiverse-Core and Multiverse-Inventories are not just optional - they are [b]essential[/b] for this plugin to work properly!
+[b]Remember[/b]: Multiverse-Core, Vault, and InventoryBackup are required dependencies. The plugin will not start without them!

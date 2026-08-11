@@ -2,6 +2,12 @@
 # Unified Event + PvP-Konfiguration
 # ============================================
 
+# Schema-Stand dieser Datei. Nicht von Hand aendern.
+# Das Plugin erkennt daran, welche Umschreibungen eine aus einer aelteren Version
+# stammende Datei noch braucht, und setzt den Wert danach selbst hoch. Vor jeder
+# Aenderung legt es eine Kopie config.yml.bak-<zeitstempel> daneben.
+config-version: 2
+
 settings:
   # Sprache: "de" (Deutsch), "en" (Englisch), "fr" (Französisch), "ja" (Japanisch), "ru" (Russisch), "es" (Spanisch), "pl" (Polski)
   # Default: "en"
@@ -10,32 +16,100 @@ settings:
   # Gemeinsames Prefix für alle Nachrichten
   prefix: "&6[Event]&r"
   main-world: "world"
+
+  # Debug-Ausgaben im Server-Log.
+  #   "off"  = aus (Standard)
+  #   "on"   = normal      - Match-Ablauf, Equipment, Config-Laden
+  #   "full" = ausfuehrlich - zusaetzlich Teleports, Spawn-Handling, Stack-Traces
+  # Die Ausgabe geht in die Konsole; OPs und Spieler mit eventpvp.debug.receive
+  # sehen sie zusaetzlich im Chat.
+  # Umschalten im Spiel: /eventpvp debug on | on full | off
+  debug: "off"
+
   save-player-location: true
   join-phase-duration: 30
   lobby-countdown: 10
 
-  # INVENTAR-SNAPSHOTS (Backup & Restore)
-  inventory-snapshots:
-    enabled: true
-    # Standard-Inventargruppe, falls keine welt-spezifische Gruppe definiert ist
-    default-group: "default"
-    # Optional: Globale Gruppenliste, die gesichert werden soll (nur informativ)
-    groups:
-      - "default"
-    # Hinweis: Welt-Zuordnung erfolgt über Multiverse-Inventories.
-    # Dieses Plugin sichert nur nach Gruppen-Logik; keine per-Welt-Mappings nötig.
-    # Aufbewahrungsdauer in Tagen für Einträge (Pruning)
-    retain-days: 30
-    # IDs
-    ids:
-      inventory-id-digits: 4   # pro Welt eindeutige Inventar-ID, z. B. 0001
-      eventmatch-id-digits: 5  # Event/Match-ID zur Verknüpfung Vor/Nach
+  # INVENTAR-VERWALTUNG
+  #
+  # Legt fest, wer die Inventare der Spieler beim Wechsel in Arena- und Event-Welten
+  # verwaltet. Standard ist die eigene Verwaltung ueber das Plugin InventoryBackup:
+  # gesichert wird vor dem Teleport, zurueckgespielt nach Match, Event, Tod und Rejoin.
+  # Multiverse-Inventories wird dafuer nicht benoetigt.
+  inventory-management:
+    # auto = Sichern und Wiederherstellen ueber InventoryBackup (Standard, empfohlen)
+    # none = LEGACY: Multiverse-Inventories uebernimmt den Inventartausch. Das Plugin
+    #        stellt dann nichts automatisch wieder her, legt aber weiterhin
+    #        Sicherungskopien an (siehe legacy-safety-backups). Zweite Wahl - nur, wenn
+    #        es wirklich nicht anders geht.
+    #
+    # Der frueher moegliche Wert 'inventoryrestore' war immer gleichbedeutend mit 'auto'
+    # und wird beim naechsten Start automatisch darauf umgeschrieben.
+    provider: "auto"
 
-  # Weltenverwaltung für beide Module
-  # Optionen: both, event/lobby (Events) | both, arena (PvP) | none
-  world-loading: "both"
+    # Nur im Legacy-Betrieb (provider: none): trotzdem vor jedem Arena- und Lobby-Teleport
+    # eine Kopie ueber InventoryBackup anlegen. Diese Kopien werden NIE automatisch
+    # zurueckgespielt - sie sind das Netz, aus dem ein Admin im Schadensfall von Hand
+    # wiederherstellt (Web-Panel oder /inv <spieler>).
+    legacy-safety-backups: true
 
-  # Command-Einschränkung (Events & PvP)
+    # Automatische Wiederherstellung
+    auto-restore-on-match-end: true
+    auto-restore-on-event-end: true
+    auto-restore-on-respawn: true
+    auto-restore-on-rejoin: true
+
+    # Was passiert, wenn das Backup vor einem Match/Event nicht geschrieben werden konnte?
+    #   abort = Match bzw. Event-Beitritt abbrechen (sicherste Variante)
+    #   warn  = fortfahren und den Abzug im Arbeitsspeicher als Rueckfallebene nutzen
+    on-backup-failure: "abort"
+
+    # Temporaere Backups nach erfolgreichem Ende loeschen oder als Archiv behalten.
+    # Aus bedeutet: sie bleiben liegen und unterliegen dem Pruning von InventoryBackup.
+    # Dessen Aufbewahrungsdauer muss laenger sein als die laengste denkbare offene
+    # Sitzung, sonst verschwindet das Backup eines lange abwesenden Spielers.
+    cleanup-backups-after-match: false
+
+    # Crash-Wiederanlauf: offene Sitzungen werden in inventory-guard.yml gefuehrt und beim
+    # naechsten Serverstart abgearbeitet.
+    guard:
+      enabled: true
+      restore-orphans-on-start: true
+
+    # Warnen, wenn Multiverse-Inventories parallel zur eigenen Verwaltung laeuft.
+    # Die Meldung nennt Welt, Gruppe und den Befehl, der die Ueberschneidung aufloest.
+    warn-on-multiverse-inventories: true
+
+    # Umgang mit einem parallel laufenden Multiverse-Inventories
+    multiverse-inventories:
+      # Konfliktschutz: nach jeder Wiederherstellung wird einen Tick spaeter geprueft, ob
+      # noch der gewollte Zustand steht - hat ein anderes Plugin dazwischen getauscht,
+      # wird einmal nachgezogen. Zusaetzlich wird ein Weltwechsel mit offener Sitzung
+      # gegen fremde Aenderungen abgesichert. Aus bedeutet: bei einem Konflikt gewinnt,
+      # wer zufaellig zuletzt schreibt.
+      conflict-guard: true
+
+      # Wartezeit in Ticks zwischen Rueckteleport und Wiederherstellung. Wirkt nur, wenn
+      # Multiverse-Inventories installiert ist; ohne es wird ohne Verzoegerung
+      # wiederhergestellt. Reiner Puffer - die Zusage gibt conflict-guard.
+      restore-delay-ticks: 3
+
+  # Automatische Weltenverwaltung ueber Multiverse
+  world-management:
+    # Lobby- und Eventwelt beim Eventstart laden und nach dem Event entladen.
+    # WELCHE der beiden Welten ein Event braucht, entscheidet dessen 'use-lobby'.
+    # Die Hauptwelt (settings.main-world) wird nie entladen.
+    events: true
+
+    # Arenawelten nach dem Match entladen.
+    # Geladen werden sie bei Bedarf immer - sonst koennte kein Match starten.
+    arenas: true
+
+  # Befehle waehrend eines Events sperren (ausser /event leave).
+  # Betrifft nur Event-Teilnehmer; OPs und Traeger von eventpvp.opbypass sind
+  # ausgenommen. PvP-Matches sperren Befehle unabhaengig davon immer.
+  #   both  = Eventwelt + Lobbywelt      event = nur Eventwelt
+  #   lobby = nur Lobbywelt              none  = nicht sperren
   command-restriction: "both"
 
   # Zuschauer-System (PvP)
@@ -93,6 +167,11 @@ settings:
     notify-admins-on-join: true
     modrinth-project-id: "pqJQdZ6R"
     startup-delay-ticks: 20  # 1 Sekunde Delay vor API-Request
+    # true = Vorabversionen (beta/alpha) werden ignoriert
+    stable-only: true
+    # Kontakt fuer den User-Agent der API-Anfrage (Modrinth verlangt eine
+    # erreichbare Adresse: E-Mail oder URL)
+    contact: "https://modrinth.com/plugin/pqJQdZ6R"
 
   # Optional external integration support
   integrations:

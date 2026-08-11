@@ -3,7 +3,6 @@ package de.zfzfg.pvpwager.listeners;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.models.Match;
 import org.bukkit.GameMode;
-import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -45,24 +44,16 @@ public class SpectatorRecoveryListener implements Listener {
         }
 
         // Spieler ist SPECTATOR ohne aktives Match/Event - resette
-        plugin.getLogger().info("[SpectatorRecovery] " + player.getName() +
-            " war im SPECTATOR ohne aktives Match/Event. Resetting...");
+        plugin.getLogger().info(plugin.getConsoleMsg("spectator-recovered", "player", player.getName()));
 
         player.setGameMode(GameMode.SURVIVAL);
         player.removePotionEffect(PotionEffectType.INVISIBILITY);
 
-        // Teleportiere zur Hauptwelt als Fallback
-        String mainWorldName = plugin.getConfigManager().getMainWorld();
-        World mainWorld = mainWorldName != null
-            ? org.bukkit.Bukkit.getWorld(mainWorldName)
-            : null;
-        if (mainWorld == null && !org.bukkit.Bukkit.getWorlds().isEmpty()) {
-            mainWorld = org.bukkit.Bukkit.getWorlds().get(0);
-        }
-        if (mainWorld != null) {
-            player.teleport(mainWorld.getSpawnLocation());
-            plugin.getLogger().info("[SpectatorRecovery] " + player.getName() +
-                " zur Hauptwelt teleportiert.");
+        // Frueher ging es hier direkt zum Hauptwelt-Spawn - die gespeicherte Position wurde
+        // nicht einmal versucht. Jetzt dieselbe Kette wie ueberall sonst.
+        org.bukkit.Location target = plugin.getSafeLocations().resolve(player);
+        if (target != null && plugin.getSafeLocations().teleportSafely(player, target)) {
+            plugin.getReturnLocations().consume(player.getUniqueId());
         }
     }
 }

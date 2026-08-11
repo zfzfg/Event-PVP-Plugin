@@ -119,7 +119,7 @@ public class WorldChangeListener implements Listener {
         
         if (lastTime == null || currentTime - lastTime > 1000) {
             MessageUtil.sendMessage(player, 
-                plugin.getPvpConfigManager().getMessage("match.boundaries-warning"));
+                plugin.getPvpConfigManager().getMessage("match-manager.boundaries-warning"));
             lastWarningTime.put(player.getUniqueId(), currentTime);
         }
     }

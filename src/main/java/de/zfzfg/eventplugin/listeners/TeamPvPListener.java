@@ -93,8 +93,8 @@ public class TeamPvPListener implements Listener {
             TeamManager.Team team = teamManager.getPlayerTeam(attacker);
             if (team != null) {
                 attacker.sendMessage(ColorUtil.color(
-                    plugin.getConfigManager().getPrefix() + 
-                    " &cDu kannst deine Teammitglieder nicht angreifen!"
+                    plugin.getConfigManager().getPrefix() + " " +
+                    plugin.getConfigManager().getMessage("no-friendly-fire")
                 ));
             }
         }

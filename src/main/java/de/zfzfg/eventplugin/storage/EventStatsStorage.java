@@ -35,7 +35,7 @@ public class EventStatsStorage {
                 } catch (Exception ignored) {}
             }
         } catch (Exception e) {
-            plugin.getLogger().warning("Failed to load Event stats: " + e.getMessage());
+            plugin.getLogger().warning("Failed to load Event stats: " + e.getMessage());  // i18n-ignore: technical storage exception log
         }
         return map;
     }
@@ -53,7 +53,7 @@ public class EventStatsStorage {
             }
             saveYamlAtomic(cfg, file);
         } catch (IOException e) {
-            plugin.getLogger().warning("Failed to save Event stats: " + e.getMessage());
+            plugin.getLogger().warning("Failed to save Event stats: " + e.getMessage());  // i18n-ignore: technical storage exception log
         }
     }
 
@@ -63,7 +63,7 @@ public class EventStatsStorage {
             try {
                 save(plugin, stats);
             } catch (Exception e) {
-                plugin.getLogger().warning("Async save Event stats failed: " + e.getMessage());
+                plugin.getLogger().warning("Async save Event stats failed: " + e.getMessage());  // i18n-ignore: technical storage exception log
             }
         });
     }

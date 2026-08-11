@@ -28,7 +28,10 @@ public class ConfigurationService {
         if (plugin.getConfigManager() != null) {
             return plugin.getConfigManager().getMessage(path, replacements);
         }
-        return "&cNachricht nicht gefunden: " + path;
+        // i18n-ignore -- Notfall-Marker: greift nur, wenn gar kein ConfigManager
+        // existiert, also auch kein Bundle geladen werden koennte. Englisch wie
+        // der gleichartige Marker in AbstractWagerGui.t().
+        return "&c[missing: " + path + "]";
     }
 
     /**
@@ -38,29 +41,35 @@ public class ConfigurationService {
         // Core
         CoreConfigManager core = plugin.getCoreConfigManager();
         if (core != null) {
-            try { core.reloadAll(); } catch (Exception e) { plugin.getLogger().warning("Core-Reload Fehler: " + e.getMessage()); }
+            try { core.reloadAll(); } catch (Exception e) { plugin.getLogger().warning("Core reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+        }
+
+        // Debug-Stufe aus der frisch geladenen config.yml uebernehmen
+        de.zfzfg.core.monitoring.debug.DebugManager debug = plugin.getDebugManager();
+        if (debug != null) {
+            try { debug.loadFromConfig(); } catch (Exception e) { plugin.getLogger().warning("Debug reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         // Events
         ConfigManager events = plugin.getConfigManager();
         if (events != null) {
-            try { events.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("Event-Reload Fehler: " + e.getMessage()); }
+            try { events.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("Event reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         // PvP
         de.zfzfg.pvpwager.managers.ConfigManager pvp = plugin.getPvpConfigManager();
         if (pvp != null) {
-            try { pvp.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("PvP-Reload Fehler: " + e.getMessage()); }
+            try { pvp.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("PvP reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
-        // Abhängige Manager aktualisieren
+        // Dependent managers
         ArenaManager arenas = plugin.getArenaManager();
         if (arenas != null) {
-            try { arenas.reloadArenas(); } catch (Exception e) { plugin.getLogger().warning("Arenen-Reload Fehler: " + e.getMessage()); }
+            try { arenas.reloadArenas(); } catch (Exception e) { plugin.getLogger().warning("Arenas reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
         EquipmentManager equip = plugin.getEquipmentManager();
         if (equip != null) {
-            try { equip.reloadEquipmentSets(); } catch (Exception e) { plugin.getLogger().warning("Equipment-Reload Fehler: " + e.getMessage()); }
+            try { equip.reloadEquipmentSets(); } catch (Exception e) { plugin.getLogger().warning("Equipment reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         WorldStateManager worldState = plugin.getWorldStateManager();
@@ -68,6 +77,9 @@ public class ConfigurationService {
             try { worldState.clearCache(); } catch (Exception ignored) {}
         }
 
-        plugin.getLogger().info("Alle Konfigurationen und abhängigen Manager neu geladen.");
+        // Inventar-Verwaltung: haelt ihre Werte in final-Feldern, muss also neu gelesen werden.
+        try { plugin.reloadInventoryConfig(); } catch (Exception e) { plugin.getLogger().warning("Inventory config reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+
+        plugin.getLogger().info(plugin.getConsoleMsg("core-reload-all"));
     }
 }

@@ -1,173 +1,132 @@
 package de.zfzfg.eventplugin.model;
 
-import org.bukkit.Material;
+import de.zfzfg.core.items.ConfiguredItemFactory;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Ausruestungsgruppe der Event-Seite.
+ *
+ * <p>Der Bau der ItemStacks liegt seit 1.0.9 vollstaendig in {@link ConfiguredItemFactory} -
+ * vorher gab es hier zwei eigene Implementierungen, die nur Material, Anzahl und
+ * Verzauberungen kannten und bei einem unbekannten Material stillschweigend {@code STONE}
+ * einsetzten. Lore, Unbreakable, CustomModelData, Item-Flags und Trankeffekte funktionieren
+ * dadurch jetzt auf der Event-Seite genauso wie auf der PvP-Seite.</p>
+ */
 public class EquipmentGroup {
-    
+
     private final String id;
     private final ArmorSet armor;
     private final List<InventoryItem> inventory;
-    
+
     public EquipmentGroup(String id, ConfigurationSection section) {
         this.id = id;
-        
-        // Lade Rüstung
+
         ConfigurationSection armorSection = section.getConfigurationSection("armor");
-        this.armor = new ArmorSet(armorSection);
-        
-        // Lade Inventar
+        this.armor = new ArmorSet(armorSection, id);
+
         this.inventory = new ArrayList<>();
         ConfigurationSection invSection = section.getConfigurationSection("inventory");
         if (invSection != null) {
+            // Sektions-Schreibweise: benannte Unterabschnitte je Item.
             for (String key : invSection.getKeys(false)) {
                 ConfigurationSection itemSection = invSection.getConfigurationSection(key);
                 if (itemSection != null) {
-                    inventory.add(new InventoryItem(itemSection));
+                    InventoryItem item = InventoryItem.from(itemSection, id);
+                    if (item != null) {
+                        inventory.add(item);
+                    }
                 }
             }
         } else {
-            // Alte Format-Unterstützung (Liste)
-            List<Map<?, ?>> invList = section.getMapList("inventory");
-            for (Map<?, ?> itemMap : invList) {
-                inventory.add(new InventoryItem(itemMap));
+            // Listen-Schreibweise, wie sie das Web-Panel schreibt.
+            for (Map<?, ?> itemMap : section.getMapList("inventory")) {
+                InventoryItem item = InventoryItem.from(itemMap, id);
+                if (item != null) {
+                    inventory.add(item);
+                }
             }
         }
     }
-    
+
     public String getId() {
         return id;
     }
-    
+
     public ArmorSet getArmor() {
         return armor;
     }
-    
+
     public List<InventoryItem> getInventory() {
         return inventory;
     }
-    
+
     public static class ArmorSet {
         private final ItemStack helmet;
         private final ItemStack chestplate;
         private final ItemStack leggings;
         private final ItemStack boots;
-        
+        /** Nebenhand; steht in der Konfiguration eine Ebene ueber der Ruestung. */
+        private final ItemStack offhand;
+
         public ArmorSet(ConfigurationSection section) {
-            this.helmet = parseItem(section.getString("helmet"));
-            this.chestplate = parseItem(section.getString("chestplate"));
-            this.leggings = parseItem(section.getString("leggings"));
-            this.boots = parseItem(section.getString("boots"));
+            this(section, null);
         }
-        
-        private ItemStack parseItem(String materialName) {
-            if (materialName == null || materialName.equalsIgnoreCase("null")) {
-                return null;
+
+        ArmorSet(ConfigurationSection section, String context) {
+            if (section == null) {
+                this.helmet = null;
+                this.chestplate = null;
+                this.leggings = null;
+                this.boots = null;
+                this.offhand = null;
+                return;
             }
-            try {
-                Material material = Material.valueOf(materialName.toUpperCase());
-                return new ItemStack(material);
-            } catch (IllegalArgumentException e) {
-                return null;
-            }
+            this.helmet = ConfiguredItemFactory.buildPrefixed(section, "helmet", null, context);
+            this.chestplate = ConfiguredItemFactory.buildPrefixed(section, "chestplate", null, context);
+            this.leggings = ConfiguredItemFactory.buildPrefixed(section, "leggings", null, context);
+            this.boots = ConfiguredItemFactory.buildPrefixed(section, "boots", null, context);
+
+            // Die Nebenhand steht eine Ebene ueber der Ruestung, direkt im Set.
+            this.offhand = ConfiguredItemFactory.buildPrefixed(section.getParent(), "offhand", null, context);
         }
-        
+
         public ItemStack getHelmet() { return helmet; }
         public ItemStack getChestplate() { return chestplate; }
         public ItemStack getLeggings() { return leggings; }
         public ItemStack getBoots() { return boots; }
+        public ItemStack getOffhand() { return offhand; }
     }
-    
+
     public static class InventoryItem {
         private final int slot;
         private final ItemStack itemStack;
-        
-        public InventoryItem(ConfigurationSection section) {
-            this.slot = section.getInt("slot", 0);
-            
-            String itemStr = section.getString("item", "STONE");
-            int amount = section.getInt("amount", 1);
-            List<String> enchantments = section.getStringList("enchantments");
-            
-            this.itemStack = createItemStack(itemStr, amount, enchantments);
+
+        private InventoryItem(int slot, ItemStack itemStack) {
+            this.slot = slot;
+            this.itemStack = itemStack;
         }
-        
-        public InventoryItem(Map<?, ?> map) {
-            // Slot mit sicherer Typ-Konvertierung
-            Object slotObj = map.get("slot");
-            if (slotObj instanceof Number) {
-                this.slot = ((Number) slotObj).intValue();
-            } else {
-                this.slot = 0;
-            }
-            
-            // Item String
-            Object itemObj = map.get("item");
-            String itemStr = (itemObj instanceof String) ? (String) itemObj : "STONE";
-            
-            // Amount mit sicherer Typ-Konvertierung
-            Object amountObj = map.get("amount");
-            int amount = 1;
-            if (amountObj instanceof Number) {
-                amount = ((Number) amountObj).intValue();
-            }
-            
-            // Enchantments
-            List<String> enchantments = new ArrayList<>();
-            Object enchObj = map.get("enchantments");
-            if (enchObj instanceof List<?>) {
-                List<?> enchList = (List<?>) enchObj;
-                for (Object obj : enchList) {
-                    if (obj instanceof String) {
-                        enchantments.add((String) obj);
-                    }
-                }
-            }
-            
-            this.itemStack = createItemStack(itemStr, amount, enchantments);
+
+        /** @return das Item oder {@code null}, wenn das Material unbekannt ist */
+        static InventoryItem from(ConfigurationSection section, String context) {
+            ItemStack stack = ConfiguredItemFactory.build(section, null, context);
+            return stack == null ? null : new InventoryItem(section.getInt("slot", 0), stack);
         }
-        
-        private ItemStack createItemStack(String itemStr, int amount, List<String> enchantments) {
-            try {
-                Material material = Material.valueOf(itemStr.toUpperCase());
-                ItemStack item = new ItemStack(material, amount);
-                
-                // Füge Verzauberungen hinzu
-                if (enchantments != null && !enchantments.isEmpty()) {
-                    ItemMeta meta = item.getItemMeta();
-                    if (meta != null) {
-                        for (String enchStr : enchantments) {
-                            String[] parts = enchStr.split(":");
-                            if (parts.length == 2) {
-                                try {
-                                    Enchantment enchant = Enchantment.getByName(parts[0].toUpperCase());
-                                    int level = Integer.parseInt(parts[1]);
-                                    if (enchant != null) {
-                                        meta.addEnchant(enchant, level, true);
-                                    }
-                                } catch (Exception e) {
-                                    // Ignoriere fehlerhafte Verzauberungen
-                                }
-                            }
-                        }
-                        item.setItemMeta(meta);
-                    }
-                }
-                
-                return item;
-            } catch (IllegalArgumentException e) {
-                return new ItemStack(Material.STONE);
+
+        /** @return das Item oder {@code null}, wenn das Material unbekannt ist */
+        static InventoryItem from(Map<?, ?> map, String context) {
+            ItemStack stack = ConfiguredItemFactory.build(map, null, context);
+            if (stack == null) {
+                return null;
             }
+            int slot = ConfiguredItemFactory.readSlot(map);
+            return new InventoryItem(slot < 0 ? 0 : slot, stack);
         }
-        
+
         public int getSlot() { return slot; }
         public ItemStack getItemStack() { return itemStack; }
     }

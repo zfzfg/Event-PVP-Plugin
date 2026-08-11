@@ -3,7 +3,7 @@
 
   <groupId>de.zfzfg</groupId>
   <artifactId>event-pvp-plugin</artifactId>
-  <version>1.0.8</version>
+  <version>1.0.9</version>
   <name>Event-PVP-Plugin</name>
   <description>Kombiniertes Event- und PvP-Wager-Plugin</description>
 
@@ -34,6 +34,10 @@
     <repository>
       <id>codemc</id>
       <url>https://repo.codemc.org/repository/maven-public/</url>
+    </repository>
+    <repository>
+      <id>onarandombox</id>
+      <url>https://repo.onarandombox.com/content/groups/public/</url>
     </repository>
   </repositories>
 
@@ -68,6 +72,38 @@
       <version>4.0.8</version>
       <scope>provided</scope>
     </dependency>
+    <!--
+      Multiverse-Core 5.x API. Wird ausschliesslich von
+      de.zfzfg.core.world.mv.Mv5WorldBackend referenziert; diese Klasse wird nur
+      geladen, wenn org.mvplugins.multiverse.core.MultiverseCoreApi zur Laufzeit
+      existiert. Auf MV4-Servern (oder ganz ohne Multiverse) greift stattdessen
+      LegacyCommandWorldBackend, deshalb ist der Verweis hier gefahrlos.
+    -->
+    <dependency>
+      <groupId>org.mvplugins.multiverse.core</groupId>
+      <artifactId>multiverse-core</artifactId>
+      <!-- 5.7.3 wegen MultiverseWorld.getOfflineWorldFolder() (kennt das Dimensions-Layout
+           moderner Server). Der Aufruf ist defensiv gekapselt, aeltere 5.x laufen weiter. -->
+      <version>5.7.3</version>
+      <scope>provided</scope>
+    </dependency>
+    <!--
+      InventoryBackup-API (Plugin "InventoryRestore"). Pflicht-Abhaengigkeit: das Plugin
+      steht in plugin.yml unter depend, der Server startet Event-PVP-Plugin also gar nicht
+      erst ohne es. Scope bleibt trotzdem provided - die API-Klassen liegen zur Laufzeit im
+      InventoryBackup.jar und duerfen nicht mitgeshadet werden, sonst passen zwei Kopien
+      derselben Klasse nicht zueinander.
+
+      Das Artefakt liegt in keinem oeffentlichen Repository. Vor dem ersten Build einmalig
+      aus dem InventoryRestore-Projekt installieren:
+          cd .../InventoryRestore/InventoryRestore-0.0.7 && mvn -pl api -am clean install
+    -->
+    <dependency>
+      <groupId>com.zfzfg</groupId>
+      <artifactId>InventoryBackup-API</artifactId>
+      <version>0.1.0</version>
+      <scope>provided</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -94,6 +130,16 @@
       <resource>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>plugin.yml</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>plugin.yml</exclude>
+        </excludes>
       </resource>
     </resources>
     <plugins>
@@ -132,6 +178,9 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.5</version>
+        <configuration>
+          <argLine>-Dnet.bytebuddy.experimental=true</argLine>
+        </configuration>
       </plugin>
     </plugins>
   </build>

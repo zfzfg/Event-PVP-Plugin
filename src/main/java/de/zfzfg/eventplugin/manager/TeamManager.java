@@ -8,19 +8,22 @@ import java.util.*;
 public class TeamManager {
     
     public enum Team {
-        RED("&c&lRot", Color.RED),
-        BLUE("&9&lBlau", Color.BLUE),
-        GREEN("&a&lGrün", Color.GREEN);
+        RED("red", "&c&lRed", Color.RED),
+        BLUE("blue", "&9&lBlue", Color.BLUE),
+        GREEN("green", "&a&lGreen", Color.GREEN);
         
-        private final String displayName;
+        private final String translationKey;
+        private final String fallbackDisplayName;
         private final Color color;
         
-        Team(String displayName, Color color) {
-            this.displayName = displayName;
+        Team(String translationKey, String fallbackDisplayName, Color color) {
+            this.translationKey = translationKey;
+            this.fallbackDisplayName = fallbackDisplayName;
             this.color = color;
         }
         
-        public String getDisplayName() { return displayName; }
+        public String getTranslationKey() { return translationKey; }
+        public String getDisplayName() { return fallbackDisplayName; }
         public Color getColor() { return color; }
     }
     

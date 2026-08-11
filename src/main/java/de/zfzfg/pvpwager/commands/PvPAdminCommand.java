@@ -67,7 +67,7 @@ public class PvPAdminCommand implements CommandExecutor {
             
         } catch (Exception e) {
             MessageUtil.sendMessage(sender, cfg.getMessage("messages.command.pvpadmin.reload-error", "error", e.getMessage()));
-            plugin.getLogger().log(java.util.logging.Level.SEVERE, "Admin reload failed", e);
+            plugin.getLogger().log(java.util.logging.Level.SEVERE, plugin.getConsoleMsg("admin-reload-failed", "error", e.getMessage()), e);
         }
     }
     

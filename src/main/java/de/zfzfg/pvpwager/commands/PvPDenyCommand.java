@@ -30,7 +30,16 @@ public class PvPDenyCommand implements CommandExecutor, TabCompleter {
     }
 
     private String getMsg(String key) {
-        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, "");
+        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.request." + key, null);
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, null);
+        }
+        if (msg == null) {
+            msg = plugin.getCoreConfigManager().getMessages().getString("messages.general." + key, null);
+        }
+        if (msg == null) {
+            return "&c[missing: " + key + "]";
+        }
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
     
@@ -55,25 +64,20 @@ public class PvPDenyCommand implements CommandExecutor, TabCompleter {
         
         PvPWagerGuiCommand wagerCommand = plugin.getPvpWagerGuiCommand();
         
-        // Ohne Argument: Prüfe ob es eine Anfrage gibt
+        // Ohne Argumente: Erste Anfrage ablehnen
         if (args.length == 0) {
-            UUID senderId = wagerCommand.getWagerRequestSender(player);
-            
-            if (senderId == null) {
-                MessageUtil.sendMessage(player, getPvpMsg("no-pending-requests"));
-                return true;
+            // Finde den ersten Spieler, der eine Anfrage an diesen Spieler gesendet hat
+            for (Player senderPlayer : Bukkit.getOnlinePlayers()) {
+                UUID targetId = wagerCommand.getWagerRequestTarget(senderPlayer.getUniqueId());
+                if (targetId != null && targetId.equals(player.getUniqueId())) {
+                    wagerCommand.cancelWagerRequest(senderPlayer.getUniqueId());
+                    MessageUtil.sendMessage(player, getMsg("denied").replace("{player}", senderPlayer.getName()));
+                    MessageUtil.sendMessage(senderPlayer, getMsg("denied").replace("{player}", senderPlayer.getName()));
+                    return true;
+                }
             }
             
-            Player senderPlayer = Bukkit.getPlayer(senderId);
-            if (senderPlayer == null || !senderPlayer.isOnline()) {
-                // Trotzdem entfernen
-                wagerCommand.cancelWagerRequest(senderId);
-                MessageUtil.sendMessage(player, getPvpMsg("request-removed-offline"));
-                return true;
-            }
-            
-            // Anfrage ablehnen
-            wagerCommand.denyWagerRequest(player, senderPlayer);
+            MessageUtil.sendMessage(player, getMsg("no-request"));
             return true;
         }
         
@@ -82,16 +86,15 @@ public class PvPDenyCommand implements CommandExecutor, TabCompleter {
         Player senderPlayer = Bukkit.getPlayer(senderName);
         
         if (senderPlayer == null || !senderPlayer.isOnline()) {
-            // Versuche trotzdem zu löschen
-            for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                UUID targetId = wagerCommand.getWagerRequestTarget(onlinePlayer.getUniqueId());
-                if (targetId != null && targetId.equals(player.getUniqueId())) {
-                    if (onlinePlayer.getName().equalsIgnoreCase(senderName)) {
-                        wagerCommand.cancelWagerRequest(onlinePlayer.getUniqueId());
-                        MessageUtil.sendMessage(player, getMsg("request-denied").replace("{player}", senderName));
-                        return true;
-                    }
-                }
+            // Die offene Anfrage eines ausgeloggten Spielers trotzdem entfernen. Die
+            // frühere Schleife über getOnlinePlayers() konnte hier nie treffen, weil
+            // der gesuchte Spieler ja gerade offline ist.
+            UUID offlineId = Bukkit.getOfflinePlayer(senderName).getUniqueId();
+            UUID targetId = wagerCommand.getWagerRequestTarget(offlineId);
+            if (targetId != null && targetId.equals(player.getUniqueId())) {
+                wagerCommand.cancelWagerRequest(offlineId);
+                MessageUtil.sendMessage(player, getPvpMsg("request-removed-offline"));
+                return true;
             }
             MessageUtil.sendMessage(player, getMsg("player-offline").replace("{player}", senderName));
             return true;

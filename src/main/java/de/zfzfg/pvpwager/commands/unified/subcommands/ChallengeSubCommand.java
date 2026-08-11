@@ -6,7 +6,6 @@ import de.zfzfg.core.util.InputValidator;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.Material;
@@ -23,13 +22,8 @@ public class ChallengeSubCommand extends SubCommand {
 
     public ChallengeSubCommand(EventPlugin plugin) {
         super(plugin);
+        // Die übersetzte Cooldown-Nachricht wird zentral in EventPlugin gesetzt.
         this.cooldowns = plugin.getCommandCooldownManager();
-        // Setze die übersetzte Cooldown-Nachricht
-        this.cooldowns.setMessageProvider(seconds -> {
-            String msg = plugin.getCoreConfigManager().getMessages()
-                .getString("messages.system.cooldown-wait", "&cPlease wait {seconds} more seconds!");
-            return ChatColor.translateAlternateColorCodes('&', msg.replace("{seconds}", String.valueOf(seconds)));
-        });
     }
 
     @Override
@@ -39,7 +33,7 @@ public class ChallengeSubCommand extends SubCommand {
     public String getPermission() { return "pvpwager.command"; }
 
     @Override
-    public String getUsage() { return "/pvp challenge <player> [wager] [amount] [arena] [equipment]"; }
+    public String getUsage() { return "/pvp challenge <player> [wager] [amount] [arena] [equipment]"; }  // i18n-ignore: Befehlssyntax, keine uebersetzbare Prosa
 
     @Override
     public boolean execute(CommandSender sender, String[] args) {

@@ -55,11 +55,25 @@ public class MessageUtil {
     }
 
     public static String formatItemList(List<ItemStack> items) {
-        if (items == null || items.isEmpty()) return "no items";
+        if (items == null || items.isEmpty()) return noItemsText();
         return items.stream()
                 .filter(Objects::nonNull)
                 .map(item -> item.getType().name() + " x" + item.getAmount())
                 .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Der Platzhaltertext für eine leere Item-Liste. Er wird als {items} in
+     * Spieler-Nachrichten eingesetzt, muss also aus dem Bundle kommen --
+     * MatchManager löst denselben Key auf.
+     */
+    private static String noItemsText() {
+        de.zfzfg.eventplugin.EventPlugin plugin = de.zfzfg.eventplugin.EventPlugin.getInstance();
+        if (plugin == null || plugin.getCoreConfigManager() == null) {
+            return "&c[missing: messages.utility.no-items]";
+        }
+        return plugin.getCoreConfigManager().getMessages()
+                .getString("messages.utility.no-items", "&c[missing: messages.utility.no-items]");
     }
 
     /**

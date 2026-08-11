@@ -63,7 +63,7 @@ public class VoidProtectionListener implements Listener {
         event.setCancelled(true);
         
         // Sofortige Rettung
-        rescuePlayer(player, "Void-Schaden in falscher Welt erkannt");
+        rescuePlayer(player, "Void-Schaden in falscher Welt erkannt");  // i18n-ignore: nur Log-Diagnose (VoidProtection)
     }
     
     /**
@@ -83,13 +83,13 @@ public class VoidProtectionListener implements Listener {
         World world = to.getWorld();
         if (world == null) {
             // Welt existiert nicht mehr - sofortige Rettung!
-            rescuePlayer(player, "Welt nicht mehr geladen");
+            rescuePlayer(player, "World no longer loaded");  // i18n-ignore: console-only diagnosis (VoidProtection)
             return;
         }
         
         double minY = world.getMinHeight();
         if (to.getY() < minY + VOID_DANGER_Y_OFFSET) {
-            rescuePlayer(player, "Unter Void-Grenze in falscher Welt");
+            rescuePlayer(player, "Below void threshold in invalid world");  // i18n-ignore: console-only diagnosis (VoidProtection)
         }
     }
     
@@ -191,10 +191,7 @@ public class VoidProtectionListener implements Listener {
         Location safeLocation = findSafeLocation(player);
         
         if (safeLocation != null) {
-            plugin.getLogger().warning("[VoidProtection] " + player.getName() + 
-                " wurde gerettet (" + reason + ") -> " + 
-                safeLocation.getWorld().getName() + " @ " + 
-                safeLocation.getBlockX() + ", " + safeLocation.getBlockY() + ", " + safeLocation.getBlockZ());
+            plugin.getLogger().warning(plugin.getConsoleMsg("void-protection-rescued", "player", player.getName(), "reason", reason));
             
             // Sofortiger Teleport
             player.teleport(safeLocation);
@@ -204,77 +201,29 @@ public class VoidProtectionListener implements Listener {
                 player.setHealth(Math.min(player.getHealth() + 10, player.getMaxHealth()));
             }
             
-            player.sendMessage(org.bukkit.ChatColor.YELLOW + 
-                "[Schutz] Du wurdest zu einem sicheren Standort teleportiert.");
+            player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&', 
+                plugin.getConfigManager().getMessage("system.void-protection-teleported")));
         } else {
-            plugin.getLogger().severe("[VoidProtection] KRITISCH: Kein sicherer Standort für " + 
-                player.getName() + " gefunden!");
+            plugin.getLogger().severe(plugin.getConsoleMsg("void-protection-critical", "player", player.getName()));
         }
     }
     
     /**
-     * Findet einen sicheren Standort für den Spieler.
-     * Priorität:
-     * 1. Gespeicherter Original-Standort (vor Event/Match)
-     * 2. Match Original-Location
-     * 3. Hauptwelt-Spawn
+     * Findet einen sicheren Standort fuer den Spieler.
+     *
+     * <p>Die Kette liegt seit der Vereinheitlichung im
+     * {@link de.zfzfg.core.location.SafeLocationResolver}; frueher stand hier eine eigene
+     * Fassung, die mit den drei anderen Kopien im Plugin auseinanderlaufen konnte.</p>
      */
     private Location findSafeLocation(Player player) {
-        UUID playerId = player.getUniqueId();
-        
-        // 1. Event: Gespeicherter Original-Standort
-        Location eventSaved = plugin.getEventManager().getSavedLocation(playerId);
-        if (eventSaved != null && isLocationSafe(eventSaved)) {
-            return eventSaved;
-        }
-        
-        // 2. PvP-Match: Original-Location
-        Match match = plugin.getMatchManager().getMatchByPlayer(player);
-        if (match != null) {
-            Location matchOrigin = match.getOriginalLocations().get(playerId);
-            if (matchOrigin != null && isLocationSafe(matchOrigin)) {
-                return matchOrigin;
-            }
-        }
-        
-        // 3. Hauptwelt-Spawn
-        return getMainWorldSpawn();
+        return plugin.getSafeLocations().resolve(player);
     }
-    
-    /**
-     * Prüft ob eine Location sicher ist.
-     */
+
+    /** Ob eine Location benutzbar ist. Delegiert an die gemeinsame Pruefung. */
     private boolean isLocationSafe(Location loc) {
-        if (loc == null || loc.getWorld() == null) return false;
-        
-        String worldName = loc.getWorld().getName();
-        World world = Bukkit.getWorld(worldName);
-        if (world == null) return false;
-        
-        double minY = world.getMinHeight();
-        if (loc.getY() < minY + 5) return false;
-        
-        return true;
+        return plugin.getSafeLocations().isSafe(loc);
     }
-    
-    /**
-     * Gibt den Spawn der Hauptwelt zurück.
-     */
-    private Location getMainWorldSpawn() {
-        String mainWorldName = plugin.getConfigManager().getMainWorld();
-        World mainWorld = mainWorldName != null ? Bukkit.getWorld(mainWorldName) : null;
-        
-        if (mainWorld == null && !Bukkit.getWorlds().isEmpty()) {
-            mainWorld = Bukkit.getWorlds().get(0);
-        }
-        
-        if (mainWorld != null) {
-            return mainWorld.getSpawnLocation();
-        }
-        
-        return null;
-    }
-    
+
     /**
      * Bereinigt Cooldowns für offline Spieler.
      * Sollte periodisch aufgerufen werden.

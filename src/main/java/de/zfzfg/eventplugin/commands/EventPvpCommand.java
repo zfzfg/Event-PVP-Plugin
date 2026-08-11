@@ -2,11 +2,10 @@ package de.zfzfg.eventplugin.commands;
 
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.eventplugin.util.ColorUtil;
+import de.zfzfg.eventplugin.util.UpdateChecker;
 import de.zfzfg.core.security.Permission;
-import de.zfzfg.core.monitoring.debug.DebugCategory;
 import de.zfzfg.core.monitoring.debug.DebugLevel;
 import de.zfzfg.core.monitoring.debug.DebugManager;
-import de.zfzfg.core.monitoring.debug.DebugOutput;
 import de.zfzfg.core.web.WebAuthManager;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -21,12 +20,17 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class EventPvpCommand implements CommandExecutor, TabCompleter {
 
     private final EventPlugin plugin;
-    private static final String DEBUG_PREFIX = "&8[&bDEBUG&8]&r ";
+    private static final String DEBUG_PREFIX = DebugManager.DEBUG_PREFIX;
+
+    /** Bereits gemeldete fehlende Message-Keys, damit die Konsole nicht zuläuft. */
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
 
     public EventPvpCommand(EventPlugin plugin) {
         this.plugin = plugin;
@@ -34,26 +38,85 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
     
     // Hilfsmethode für Debug-Nachrichten
     private String getDebugMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.debug." + key, key);
+        if (key.startsWith("help-") || key.startsWith("level-")) {
+            String subKey = key.replace("help-", "");
+            String val = plugin.getCoreConfigManager().getMessages()
+                .getString("messages.debug.help." + subKey, null);
+            if (val != null) return val;
+        }
+        String msgVal = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.debug.messages." + key, null);
+        if (msgVal != null) return msgVal;
+
+        String sysVal = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.system." + key, null);
+        if (sysVal != null) return sysVal;
+
+        String debugVal = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.debug." + key, null);
+        if (debugVal != null) return debugVal;
+
+        // Früher wurde hier der Key selbst zurückgegeben. Das sah im Chat wie
+        // eine echte Nachricht aus (z.B. die Zeile "status-header" als
+        // Überschrift), statt den fehlenden Key sichtbar zu machen.
+        warnMissingKey("messages.debug." + key);
+        return "&c[missing: " + key + "]";
     }
-    
+
     private String getDebugMsg(String key, String placeholder, String value) {
-        String message = plugin.getCoreConfigManager().getMessages()
-            .getString("messages.debug." + key, key);
-        return message.replace("{" + placeholder + "}", value);
+        String msg = getDebugMsg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
+    }
+
+    /**
+     * Übersetzte Anzeige für einen {@link DebugLevel}. Die Konstanten selbst
+     * tragen nur einen Key, damit der angezeigte Text der eingestellten
+     * Sprache folgt und nicht der Sprache, in der die Enum-Datei geschrieben
+     * wurde.
+     *
+     * @param translationKey Key unterhalb von messages.debug.enums.
+     * @param fallback       sprachunabhängiger Name, falls der Key fehlt
+     */
+    private String getDebugEnum(String translationKey, String fallback) {
+        String val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.debug.enums." + translationKey, null);
+        if (val != null) return val;
+        warnMissingKey("messages.debug.enums." + translationKey);
+        return fallback;
+    }
+
+    /** Meldet jeden fehlenden Key genau einmal in der Konsole. */
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)"); // i18n-ignore: i18n system warning
+        }
     }
     
     // Hilfsmethode für Help-Nachrichten
     private String getHelpMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.help.eventpvp." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.command-help.eventpvp." + key, null);
+        if (val != null) return val;
+        val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.help.eventpvp." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.help.eventpvp." + key);
+        return "&c[missing: " + key + "]";
     }
     
     // Hilfsmethode für General-Nachrichten
     private String getGeneralMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.general." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.general." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.general." + key);
+        return "&c[missing: " + key + "]";
     }
 
     @Override
@@ -75,6 +138,8 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
             case "webtoken":
             case "wt":
                 return handleWebToken(sender);
+            case "rescue":
+                return handleRescue(sender, label, Arrays.copyOfRange(args, 1, args.length));
             default:
                 sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + 
                     getGeneralMsg("unknown-command").replace("{command}", sub)));
@@ -83,12 +148,24 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    private String getHelpMsg(String key, String placeholder, String value) {
+        String msg = getHelpMsg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
+    }
+
     private void showHelp(CommandSender sender, String label) {
         String webtokenHelp = getWebtokenMsg("help-description");
         sender.sendMessage(ColorUtil.color(getHelpMsg("header")));
-        sender.sendMessage(ColorUtil.color(getHelpMsg("reload").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getHelpMsg("version").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getHelpMsg("debug").replace("{label}", label)));
+        sender.sendMessage(ColorUtil.color(getHelpMsg("reload", "label", label)));
+        sender.sendMessage(ColorUtil.color(getHelpMsg("version", "label", label)));
+        sender.sendMessage(ColorUtil.color(getHelpMsg("debug", "label", label)));
+        sender.sendMessage(ColorUtil.color(getHelpMsg("rescue", "label", label)));
         sender.sendMessage(ColorUtil.color(webtokenHelp));
         sender.sendMessage("");
     }
@@ -99,7 +176,7 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
             return true;
         }
         plugin.getConfigurationService().reloadAll();
-        sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " &aAlle Konfigurationen neu geladen."));
+        sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + plugin.getConfigManager().getMessage("reload-success")));
         return true;
     }
 
@@ -110,48 +187,66 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         }
         
         sender.sendMessage(ColorUtil.color("&8&m                                                &r"));
-        sender.sendMessage(ColorUtil.color("&6&lEvent-PVP Plugin Version"));
+        sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("title")));
         sender.sendMessage(ColorUtil.color("&8&m                                                &r"));
         sender.sendMessage("");
         
         // Current version
         String currentVersion = plugin.getDescription().getVersion();
-        sender.sendMessage(ColorUtil.color("&7Aktuelle Version: &e" + currentVersion));
+        sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("current", "version", currentVersion)));
         
-        // Check for updates
-        plugin.getUpdateChecker().checkForUpdates();
-        
-        // Wait a moment for the async check to complete
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            if (plugin.getUpdateChecker().hasChecked()) {
-                if (plugin.getUpdateChecker().isUpdateAvailable()) {
-                    sender.sendMessage(ColorUtil.color("&aUpdate verfügbar!"));
-                    sender.sendMessage(ColorUtil.color("&7Neueste Version: &e" + plugin.getUpdateChecker().getLatestVersion()));
-                    sender.sendMessage(ColorUtil.color("&7Download: &bhttps://modrinth.com/plugin/pqJQdZ6R"));
+        final UpdateChecker checker = plugin.getUpdateChecker();
+
+        // Ist der Update-Check abgeschaltet, wird auch nichts abgerufen --
+        // manche Betreiber wollen bewusst keinen ausgehenden HTTP-Verkehr.
+        if (!plugin.getConfigManager().isUpdateCheckEnabled() || checker == null) {
+            sender.sendMessage("");
+            sender.sendMessage(ColorUtil.color("&8&m                                                &r"));
+            return true;
+        }
+
+        sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("checking")));
+
+        // Ergebnis anzeigen, sobald der asynchrone Abruf fertig ist -- der
+        // Callback laeuft im Main-Thread. Keine geratene Wartezeit.
+        checker.checkForUpdates(() -> {
+            if (checker.hasChecked()) {
+                if (checker.isUpdateAvailable()) {
+                    sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("update-available")));
+                    sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("latest", "version", checker.getLatestVersion())));
+                    sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("download")));
                 } else {
-                    sender.sendMessage(ColorUtil.color("&aPlugin ist auf dem neuesten Stand."));
+                    sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("up-to-date")));
                 }
             } else {
-                sender.sendMessage(ColorUtil.color("&7Update-Prüfung läuft..."));
+                sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("check-failed")));
             }
             sender.sendMessage("");
             sender.sendMessage(ColorUtil.color("&8&m                                                &r"));
-        }, 20L);
-        
+        });
+
         return true;
     }
     
     // ==================== WebToken Subcommand ====================
     
     private String getWebtokenMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages()
-            .getString("messages.webtoken." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.webtoken." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.webtoken." + key);
+        return "&c[missing: " + key + "]";
     }
     
     private String getWebtokenMsg(String key, String placeholder, String value) {
-        String message = plugin.getCoreConfigManager().getMessages()
-            .getString("messages.webtoken." + key, key);
-        return message.replace("{" + placeholder + "}", value);
+        String msg = getWebtokenMsg(key);
+        String val = value != null ? value : "";
+        String raw = placeholder != null ? placeholder.replaceAll("^[{%]+|[%}]+$", "") : "";
+        if (!raw.isEmpty()) {
+            msg = msg.replace("{" + raw + "}", val)
+                     .replace("%" + raw + "%", val);
+        }
+        return msg;
     }
     
     private boolean handleWebToken(CommandSender sender) {
@@ -186,7 +281,7 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ColorUtil.color(getWebtokenMsg("your-token")));
         
         // Klickbarer Token
-        TextComponent tokenComponent = new TextComponent(ColorUtil.color("  &a&l➤ " + token + " " + getWebtokenMsg("click-to-copy")));
+        TextComponent tokenComponent = new TextComponent(ColorUtil.color("  &a&l➤ " + token + " " + getWebtokenMsg("click-to-copy"))); // i18n-ignore
         tokenComponent.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, token));
         tokenComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
             new Text(ColorUtil.color(getWebtokenMsg("hover-copy")))));
@@ -200,7 +295,7 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         // Web-URL (aus Konfiguration)
         String url = plugin.getWebPublicUrl();
         
-        TextComponent urlComponent = new TextComponent(ColorUtil.color("  &b&l➤ " + url + " " + getWebtokenMsg("click-to-open")));
+        TextComponent urlComponent = new TextComponent(ColorUtil.color("  &b&l➤ " + url + " " + getWebtokenMsg("click-to-open"))); // i18n-ignore
         urlComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
         urlComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
             new Text(ColorUtil.color(getWebtokenMsg("hover-open")))));
@@ -212,283 +307,275 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    // ==================== Rescue Subcommand ====================
+
+    /**
+     * Werkzeug fuer haengengebliebene Inventar-Sitzungen und Rueckkehr-Positionen.
+     *
+     * <p>Ersetzt das in mehreren Sprachdateien genannte {@code /pvp invdebug}, das nie
+     * existiert hat - Admins wurden dort auf einen Befehl geschickt, den es nicht gab.</p>
+     */
+    private boolean handleRescue(CommandSender sender, String label, String[] args) {
+        if (!Permission.EVENTPVP_ADMIN.check(sender)) {
+            sender.sendMessage(ColorUtil.color(getGeneralMsg("no-permission")));
+            return true;
+        }
+
+        if (args.length == 0) {
+            showRescueHelp(sender, label);
+            return true;
+        }
+
+        switch (args[0].toLowerCase()) {
+            case "list":
+            case "liste":
+                showRescueList(sender);
+                break;
+            case "clean":
+            case "cleanup":
+                cleanRescueEntries(sender);
+                break;
+            case "help":
+            case "hilfe":
+            case "?":
+                showRescueHelp(sender, label);
+                break;
+            default:
+                rescuePlayer(sender, args[0]);
+                break;
+        }
+        return true;
+    }
+
+    private void showRescueHelp(CommandSender sender, String label) {
+        sender.sendMessage(ColorUtil.color(getRescueMsg("header")));
+        sender.sendMessage("");
+        sender.sendMessage(ColorUtil.color(getRescueMsg("help-list").replace("{label}", label)));
+        sender.sendMessage(ColorUtil.color(getRescueMsg("help-player").replace("{label}", label)));
+        sender.sendMessage(ColorUtil.color(getRescueMsg("help-clean").replace("{label}", label)));
+        sender.sendMessage("");
+    }
+
+    /** Offene Inventar-Sitzungen und hinterlegte Rueckkehr-Positionen nebeneinander. */
+    private void showRescueList(CommandSender sender) {
+        sender.sendMessage(ColorUtil.color(getRescueMsg("header")));
+        sender.sendMessage("");
+
+        java.util.Collection<de.zfzfg.core.inventory.guard.GuardEntry> sessions =
+                plugin.getInventoryGuard().openSessions();
+        java.util.Collection<de.zfzfg.core.location.StoredReturn> returns =
+                plugin.getReturnLocations().all();
+
+        if (sessions.isEmpty() && returns.isEmpty()) {
+            sender.sendMessage(ColorUtil.color(getRescueMsg("list-empty")));
+            sender.sendMessage("");
+            return;
+        }
+
+        if (!sessions.isEmpty()) {
+            sender.sendMessage(ColorUtil.color(getRescueMsg("list-sessions")
+                    .replace("{count}", String.valueOf(sessions.size()))));
+            for (de.zfzfg.core.inventory.guard.GuardEntry entry : sessions) {
+                sender.sendMessage(ColorUtil.color(getRescueMsg("list-session-entry")
+                        .replace("{player}", describePlayer(entry.playerId()))
+                        .replace("{phase}", entry.phase().name())
+                        .replace("{context}", entry.context().name())
+                        .replace("{age}", formatAge(entry.openedAt()))));
+            }
+        }
+
+        if (!returns.isEmpty()) {
+            sender.sendMessage(ColorUtil.color(getRescueMsg("list-returns")
+                    .replace("{count}", String.valueOf(returns.size()))));
+            for (de.zfzfg.core.location.StoredReturn entry : returns) {
+                sender.sendMessage(ColorUtil.color(getRescueMsg("list-return-entry")
+                        .replace("{player}", describePlayer(entry.playerId()))
+                        .replace("{world}", entry.worldName())
+                        .replace("{age}", formatAge(entry.savedAt()))));
+            }
+        }
+        sender.sendMessage("");
+    }
+
+    /** Holt einen Spieler zurueck und stellt sein Inventar wieder her. */
+    private void rescuePlayer(CommandSender sender, String playerName) {
+        Player target = plugin.getServer().getPlayerExact(playerName);
+        if (target == null) {
+            sender.sendMessage(ColorUtil.color(getRescueMsg("player-offline")
+                    .replace("{player}", playerName)));
+            return;
+        }
+
+        java.util.UUID playerId = target.getUniqueId();
+        boolean didSomething = false;
+
+        // Inventar zuerst - danach steht der Spieler wenigstens mit seinen Sachen da.
+        if (plugin.getInventoryGuard().hasOpenSession(playerId)) {
+            plugin.getInventorySessions().finish(playerId, outcome ->
+                    sender.sendMessage(ColorUtil.color(getRescueMsg("inventory-result")
+                            .replace("{player}", target.getName())
+                            .replace("{outcome}", outcome.name()))));
+            didSomething = true;
+        }
+
+        // Danach der Rueckweg. Bewusst ohne die isStranded-Pruefung: ein Admin, der diesen
+        // Befehl tippt, weiss besser als die Heuristik, dass der Spieler hier weg soll.
+        de.zfzfg.core.location.StrandedPlayerListener rescuer = plugin.getStrandedPlayers();
+        if (rescuer != null && rescuer.rescue(target)) {
+            sender.sendMessage(ColorUtil.color(getRescueMsg("teleport-done")
+                    .replace("{player}", target.getName())));
+            didSomething = true;
+        }
+
+        if (!didSomething) {
+            sender.sendMessage(ColorUtil.color(getRescueMsg("nothing-to-do")
+                    .replace("{player}", target.getName())));
+        }
+    }
+
+    /**
+     * Verwirft verwaiste Eintraege.
+     *
+     * <p>Nur solche ohne Backup: bei denen ist nichts mehr wiederherzustellen, sie halten
+     * das Journal nur unuebersichtlich. Eintraege mit Backup bleiben stehen, auch alte -
+     * dort waere das Verwerfen der eigentliche Datenverlust.</p>
+     */
+    private void cleanRescueEntries(CommandSender sender) {
+        int removed = 0;
+        for (de.zfzfg.core.inventory.guard.GuardEntry entry
+                : plugin.getInventoryGuard().openSessions()) {
+            if (!entry.hasBackup()
+                    && entry.phase() == de.zfzfg.core.inventory.guard.GuardPhase.ORPHANED) {
+                plugin.getInventoryGuard().close(entry.playerId());
+                removed++;
+            }
+        }
+        sender.sendMessage(ColorUtil.color(getRescueMsg("clean-done")
+                .replace("{count}", String.valueOf(removed))));
+    }
+
+    /** Name, wenn bekannt - sonst die UUID, damit der Eintrag zuordenbar bleibt. */
+    private String describePlayer(java.util.UUID playerId) {
+        org.bukkit.OfflinePlayer offline = plugin.getServer().getOfflinePlayer(playerId);
+        String name = offline.getName();
+        return name != null ? name : playerId.toString();
+    }
+
+    private String formatAge(long since) {
+        long minutes = Math.max(0L, (System.currentTimeMillis() - since) / 60_000L);
+        if (minutes < 60) {
+            return minutes + "m";
+        }
+        long hours = minutes / 60;
+        return hours < 24 ? hours + "h" : (hours / 24) + "d";
+    }
+
+    private String getRescueMsg(String key) {
+        String val = plugin.getCoreConfigManager().getMessages()
+            .getString("messages.rescue." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.rescue." + key);
+        return "&c[missing: " + key + "]";
+    }
+
     // ==================== Debug Subcommand ====================
 
     private boolean handleDebug(CommandSender sender, String label, String[] args) {
-        // Permission-Check für Debug
-        if (!sender.hasPermission("eventpvp.debug")) {
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("no-permission")));
+        if (!Permission.DEBUG.check(sender)) {
+            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getGeneralMsg("no-permission")));
             return true;
         }
 
         DebugManager debugManager = plugin.getDebugManager();
 
         if (args.length == 0) {
-            showDebugStatus(sender, debugManager);
+            showDebugStatus(sender, debugManager, label);
             return true;
         }
 
-        String debugSub = args[0].toLowerCase();
-
-        switch (debugSub) {
+        switch (args[0].toLowerCase()) {
             case "on":
             case "an":
             case "enable":
             case "aktivieren":
                 handleDebugEnable(sender, debugManager, args);
                 break;
-                
+
             case "off":
             case "aus":
             case "disable":
             case "deaktivieren":
-                handleDebugDisable(sender, debugManager);
+                debugManager.setLevel(DebugLevel.OFF);
+                sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("disabled")));
                 break;
-                
-            case "level":
-            case "stufe":
-                handleDebugLevel(sender, debugManager, label, args);
-                break;
-                
-            case "output":
-            case "ausgabe":
-                handleDebugOutput(sender, debugManager, label, args);
-                break;
-                
-            case "test":
-                handleDebugTest(sender, debugManager, args);
-                break;
-                
-            case "subscribe":
-            case "sub":
-            case "empfangen":
-                handleDebugSubscribe(sender, debugManager, true);
-                break;
-                
-            case "unsubscribe":
-            case "unsub":
-            case "stopp":
-                handleDebugSubscribe(sender, debugManager, false);
-                break;
-                
-            case "categories":
-            case "kategorien":
-            case "cats":
-                showDebugCategories(sender);
-                break;
-                
+
             case "status":
             case "info":
-                showDebugStatus(sender, debugManager);
+                showDebugStatus(sender, debugManager, label);
                 break;
-                
+
             case "help":
             case "hilfe":
             case "?":
                 showDebugHelp(sender, label);
                 break;
-                
+
             default:
-                // Versuche als Level zu interpretieren
-                DebugLevel parsed = DebugLevel.parse(debugSub);
-                if (parsed != null) {
-                    debugManager.setLevel(parsed);
-                    sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("level-set")
-                        .replace("{level}", parsed.getDisplayName())
-                        .replace("{number}", String.valueOf(parsed.getLevel()))));
-                } else {
-                    sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("unknown-command").replace("{command}", debugSub)));
-                    sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("use-help").replace("{label}", label)));
-                }
+                sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("unknown-command").replace("{command}", args[0])));
+                sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("use-help").replace("{label}", label)));
                 break;
         }
 
         return true;
     }
 
+    /**
+     * /eventpvp debug on [full] -- ohne Zusatz die normale Stufe.
+     */
     private void handleDebugEnable(CommandSender sender, DebugManager debugManager, String[] args) {
-        DebugLevel level = DebugLevel.LEVEL_1;
-        
-        if (args.length > 1) {
-            DebugLevel parsed = DebugLevel.parse(args[1]);
-            if (parsed != null && parsed != DebugLevel.OFF) {
-                level = parsed;
-            }
+        DebugLevel level = DebugLevel.BASIC;
+
+        if (args.length > 1 && DebugLevel.parse(args[1]) == DebugLevel.FULL) {
+            level = DebugLevel.FULL;
         }
-        
+
         debugManager.setLevel(level);
         sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("enabled")
-            .replace("{level}", level.getDisplayName())
-            .replace("{number}", String.valueOf(level.getLevel()))));
-        
-        // Info über aktive Kategorien
-        sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("active-categories")));
-        for (DebugCategory cat : DebugCategory.values()) {
-            if (cat.isActiveAt(level)) {
-                sender.sendMessage(ColorUtil.color("  " + cat.getColorCode() + "• " + cat.getDisplayName() + " &7(ab Level " + cat.getMinLevel().getLevel() + ")"));
-            }
-        }
+            .replace("{level}", getDebugEnum(level.getTranslationKey(), level.getDisplayName()))));
     }
 
-    private void handleDebugDisable(CommandSender sender, DebugManager debugManager) {
-        debugManager.setLevel(DebugLevel.OFF);
-        sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("disabled")));
-    }
-
-    private void handleDebugLevel(CommandSender sender, DebugManager debugManager, String label, String[] args) {
-        if (args.length < 2) {
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("current-level")
-                .replace("{level}", debugManager.getLevel().getDisplayName())
-                .replace("{number}", String.valueOf(debugManager.getLevel().getLevel()))));
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("use-level-change").replace("{label}", label)));
-            return;
-        }
-        
-        DebugLevel level = DebugLevel.parse(args[1]);
-        if (level == null) {
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("invalid-level").replace("{level}", args[1])));
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("valid-levels")));
-            return;
-        }
-        
-        debugManager.setLevel(level);
-        sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("level-set")
-            .replace("{level}", level.getDisplayName())
-            .replace("{number}", String.valueOf(level.getLevel()))));
-    }
-
-    private void handleDebugOutput(CommandSender sender, DebugManager debugManager, String label, String[] args) {
-        if (args.length < 2) {
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("current-output")
-                .replace("{mode}", debugManager.getOutputMode().getDisplayName())));
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("use-output-change").replace("{label}", label)));
-            return;
-        }
-        
-        DebugOutput output = DebugOutput.parse(args[1]);
-        if (output == null) {
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("invalid-output").replace("{mode}", args[1])));
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("valid-outputs")));
-            return;
-        }
-        
-        debugManager.setOutputMode(output);
-        sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("output-set").replace("{mode}", output.getDisplayName())));
-    }
-
-    private void handleDebugTest(CommandSender sender, DebugManager debugManager, String[] args) {
-        if (!debugManager.isEnabled()) {
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("not-enabled")));
-            return;
-        }
-        
-        DebugCategory category = DebugCategory.SYSTEM;
-        if (args.length > 1) {
-            DebugCategory parsed = DebugCategory.parse(args[1]);
-            if (parsed != null) {
-                category = parsed;
-            }
-        }
-        
-        sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("test-message").replace("{category}", category.getDisplayName())));
-        debugManager.log(category, DebugLevel.LEVEL_1, "Test-Nachricht von " + sender.getName());
-    }
-
-    private void handleDebugSubscribe(CommandSender sender, DebugManager debugManager, boolean subscribe) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("player-only")));
-            return;
-        }
-        
-        Player player = (Player) sender;
-        if (subscribe) {
-            debugManager.addReceiver(player.getUniqueId());
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("subscribed")));
-        } else {
-            debugManager.removeReceiver(player.getUniqueId());
-            sender.sendMessage(ColorUtil.color(DEBUG_PREFIX + getDebugMsg("unsubscribed")));
-        }
-    }
-
-    private void showDebugCategories(CommandSender sender) {
-        sender.sendMessage(ColorUtil.color("&8&m                    &r &bDebug-Kategorien &8&m                    "));
+    private void showDebugStatus(CommandSender sender, DebugManager debugManager, String label) {
+        sender.sendMessage(ColorUtil.color(getDebugMsg("status-header")));
         sender.sendMessage("");
-        
-        sender.sendMessage(ColorUtil.color(getDebugMsg("level1-header")));
-        for (DebugCategory cat : DebugCategory.values()) {
-            if (cat.getMinLevel() == DebugLevel.LEVEL_1) {
-                sender.sendMessage(ColorUtil.color("  " + cat.getColorCode() + "• " + cat.getDisplayName() + " &8- " + cat.name()));
-            }
-        }
-        
-        sender.sendMessage(ColorUtil.color(getDebugMsg("level2-header")));
-        for (DebugCategory cat : DebugCategory.values()) {
-            if (cat.getMinLevel() == DebugLevel.LEVEL_2) {
-                sender.sendMessage(ColorUtil.color("  " + cat.getColorCode() + "• " + cat.getDisplayName() + " &8- " + cat.name()));
-            }
-        }
-        
-        sender.sendMessage(ColorUtil.color(getDebugMsg("level3-header")));
-        for (DebugCategory cat : DebugCategory.values()) {
-            if (cat.getMinLevel() == DebugLevel.LEVEL_3) {
-                sender.sendMessage(ColorUtil.color("  " + cat.getColorCode() + "• " + cat.getDisplayName() + " &8- " + cat.name()));
-            }
-        }
-        
-        sender.sendMessage("");
-    }
 
-    private void showDebugStatus(CommandSender sender, DebugManager debugManager) {
-        sender.sendMessage(ColorUtil.color("&8&m                    &r &bDebug-Status &8&m                    "));
-        sender.sendMessage("");
-        
         DebugLevel level = debugManager.getLevel();
-        DebugOutput output = debugManager.getOutputMode();
-        
-        String statusText = level == DebugLevel.OFF ? getDebugMsg("status-disabled") : getDebugMsg("status-enabled");
-        sender.sendMessage(ColorUtil.color(getDebugMsg("status-label").replace("{status}", 
-            (level == DebugLevel.OFF ? "&c" : "&a") + statusText)));
-        
-        if (level != DebugLevel.OFF) {
+        boolean enabled = level != DebugLevel.OFF;
+
+        String statusText = enabled ? getDebugMsg("status-enabled") : getDebugMsg("status-disabled");
+        sender.sendMessage(ColorUtil.color(getDebugMsg("status-label")
+            .replace("{status}", (enabled ? "&a" : "&c") + statusText)));
+
+        if (enabled) {
             sender.sendMessage(ColorUtil.color(getDebugMsg("level-label")
-                .replace("{level}", level.getDisplayName())
-                .replace("{number}", String.valueOf(level.getLevel()))));
-            sender.sendMessage(ColorUtil.color("&7Ausgabe: &e" + output.getDisplayName()));
-            
-            sender.sendMessage(ColorUtil.color(getDebugMsg("active-categories")));
-            StringBuilder cats = new StringBuilder();
-            for (DebugCategory cat : DebugCategory.values()) {
-                if (cat.isActiveAt(level)) {
-                    cats.append(cat.getColorCode()).append(cat.getDisplayName()).append("&7, ");
-                }
-            }
-            if (cats.length() > 0) {
-                cats.setLength(cats.length() - 6);
-            }
-            sender.sendMessage(ColorUtil.color("  " + cats.toString()));
+                .replace("{level}", getDebugEnum(level.getTranslationKey(), level.getDisplayName()))));
         }
-        
+
         sender.sendMessage("");
-        sender.sendMessage(ColorUtil.color(getDebugMsg("use-debug-help")));
+        sender.sendMessage(ColorUtil.color(getDebugMsg("use-debug-help").replace("{label}", label)));
     }
 
     private void showDebugHelp(CommandSender sender, String label) {
-        sender.sendMessage(ColorUtil.color("&8&m                    &r &bDebug-Befehle &8&m                    "));
+        sender.sendMessage(ColorUtil.color(getDebugMsg("help-header")));
         sender.sendMessage("");
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-status").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-on").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-off").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-level").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-output").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-test").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-subscribe").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-unsubscribe").replace("{label}", label)));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("help-categories").replace("{label}", label)));
+        sender.sendMessage(ColorUtil.color(getDebugMsg("help.status", "label", label)));
+        sender.sendMessage(ColorUtil.color(getDebugMsg("help.on", "label", label)));
+        sender.sendMessage(ColorUtil.color(getDebugMsg("help.on-full", "label", label)));
+        sender.sendMessage(ColorUtil.color(getDebugMsg("help.off", "label", label)));
         sender.sendMessage("");
         sender.sendMessage(ColorUtil.color(getDebugMsg("level-overview")));
-        sender.sendMessage(ColorUtil.color(getDebugMsg("level-values")));
         sender.sendMessage("");
     }
+
 
     // ==================== Tab Complete ====================
 
@@ -501,41 +588,29 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
             if (Permission.EVENTPVP_ADMIN.check(sender)) {
                 completions.add("version");
             }
-            if (sender.hasPermission("eventpvp.debug")) {
+            if (Permission.DEBUG.check(sender)) {
                 completions.add("debug");
             }
             if (sender.hasPermission("eventpvp.admin.web") || sender.isOp()) {
                 completions.add("webtoken");
             }
-        } else if (args.length >= 2 && args[0].equalsIgnoreCase("debug") && sender.hasPermission("eventpvp.debug")) {
+            if (Permission.EVENTPVP_ADMIN.check(sender)) {
+                completions.add("rescue");
+            }
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("rescue")
+                && Permission.EVENTPVP_ADMIN.check(sender)) {
+            completions.addAll(Arrays.asList("list", "clean", "help"));
+            for (Player online : plugin.getServer().getOnlinePlayers()) {
+                completions.add(online.getName());
+            }
+        } else if (args.length >= 2 && args[0].equalsIgnoreCase("debug") && Permission.DEBUG.check(sender)) {
             if (args.length == 2) {
-                completions.addAll(Arrays.asList(
-                    "on", "off", "level", "output", "test", 
-                    "subscribe", "unsubscribe", "categories", 
-                    "status", "help", "0", "1", "2", "3"
-                ));
+                completions.addAll(Arrays.asList("on", "off", "status", "help"));
             } else if (args.length == 3) {
                 String debugSub = args[1].toLowerCase();
-                
-                switch (debugSub) {
-                    case "on":
-                    case "level":
-                    case "stufe":
-                        completions.addAll(Arrays.asList("0", "1", "2", "3", "off", "level_1", "level_2", "level_3"));
-                        break;
-                        
-                    case "output":
-                    case "ausgabe":
-                        completions.addAll(Arrays.asList("console", "chat", "both", "konsole", "beides"));
-                        break;
-                        
-                    case "test":
-                        completions.addAll(
-                            Arrays.stream(DebugCategory.values())
-                                .map(c -> c.name().toLowerCase())
-                                .collect(Collectors.toList())
-                        );
-                        break;
+
+                if (debugSub.equals("on") || debugSub.equals("an")) {
+                    completions.add("full");
                 }
             }
         }

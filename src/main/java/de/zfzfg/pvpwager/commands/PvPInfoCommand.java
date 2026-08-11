@@ -6,8 +6,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PvPInfoCommand implements CommandExecutor {
+    private static final Set<String> MISSING_KEYS_LOGGED = ConcurrentHashMap.newKeySet();
     
     private final EventPlugin plugin;
     
@@ -15,8 +18,17 @@ public class PvPInfoCommand implements CommandExecutor {
         this.plugin = plugin;
     }
     
+    private void warnMissingKey(String path) {
+        if (MISSING_KEYS_LOGGED.add(path)) {
+            plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");  // i18n-ignore: i18n system warning
+        }
+    }
+    
     private String getInfoMsg(String key) {
-        return plugin.getCoreConfigManager().getMessages().getString("messages.info." + key, key);
+        String val = plugin.getCoreConfigManager().getMessages().getString("messages.info." + key, null);
+        if (val != null) return val;
+        warnMissingKey("messages.info." + key);
+        return "&c[missing: " + key + "]";
     }
     
     @Override

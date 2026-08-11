@@ -3,6 +3,7 @@ package de.zfzfg.pvpwager.commands.unified;
 import de.zfzfg.core.commands.SubCommand;
 import de.zfzfg.core.commands.SmartTabCompleter;
 import de.zfzfg.eventplugin.EventPlugin;
+import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -88,8 +89,8 @@ public class PvPUnifiedCommand implements CommandExecutor, TabCompleter, Listene
         sender.sendMessage(getMsg("pvp-help.commands.leave"));
         sender.sendMessage(getMsg("pvp-help.commands.surrender"));
         sender.sendMessage(getMsg("pvp-help.commands.draw"));
-        sender.sendMessage("");
-        sender.sendMessage(ChatColor.YELLOW + "Hinweis: Nutze " + ChatColor.GREEN + "/pvpask <spieler>" + ChatColor.YELLOW + " für Wette mit GUI");
+        String hintMsg = plugin.getCoreConfigManager().getMessages().getString("messages.pvp.gui-hint", "&7Hint: Use &e/pvpask <player> &7for wager with GUI");
+        sender.sendMessage(MessageUtil.color(hintMsg));
     }
 
     @EventHandler

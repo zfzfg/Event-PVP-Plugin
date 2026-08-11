@@ -64,14 +64,14 @@ public class SpawnManager {
                     break;
             }
         } catch (Exception ex) {
-            plugin.getLogger().severe("Teleport-Fehler: " + ex.getMessage());
+            plugin.getLogger().severe(plugin.getConsoleMsg("teleport-error", "error", ex.getMessage()));
             // Fallback: beide Spieler zum Welt-Spawn
             try {
                 Location spawn = world.getSpawnLocation();
                 if (player1 != null && player1.isOnline()) player1.teleport(spawn);
                 if (player2 != null && player2.isOnline()) player2.teleport(spawn);
             } catch (Exception e) {
-                plugin.getLogger().warning("Failed to teleport players to world spawn as fallback: " + e.getMessage());
+                plugin.getLogger().warning("Failed to teleport players to world spawn as fallback: " + e.getMessage());  // i18n-ignore: technical exception log
             }
         }
     }
@@ -194,12 +194,12 @@ public class SpawnManager {
         Bukkit.getScheduler().runTask(plugin, () -> {
             try {
                 if (!commandTeleportInProgress.add(player1.getUniqueId())) {
-                    plugin.getLogger().warning("Teleport command already in progress for " + player1.getName());
+                    plugin.getLogger().warning("Teleport command already in progress for " + player1.getName());  // i18n-ignore: internal command deduplication warning
                     return;
                 }
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd1);
             } catch (Exception ex) {
-                plugin.getLogger().severe("Teleport-Command Fehler für " + player1.getName() + ": " + ex.getMessage());
+                plugin.getLogger().severe(plugin.getConsoleMsg("teleport-error", "error", ex.getMessage()));
                 // Fallback: Welt-Spawn
                 safeTeleport(player1, world.getSpawnLocation());
             } finally {
@@ -213,12 +213,12 @@ public class SpawnManager {
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
             try {
                 if (!commandTeleportInProgress.add(player2.getUniqueId())) {
-                    plugin.getLogger().warning("Teleport command already in progress for " + player2.getName());
+                    plugin.getLogger().warning("Teleport command already in progress for " + player2.getName());  // i18n-ignore: internal command deduplication warning
                     return;
                 }
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd2);
             } catch (Exception ex) {
-                plugin.getLogger().severe("Teleport-Command Fehler für " + player2.getName() + ": " + ex.getMessage());
+                plugin.getLogger().severe(plugin.getConsoleMsg("teleport-error", "error", ex.getMessage()));
                 safeTeleport(player2, world.getSpawnLocation());
             } finally {
                 commandTeleportInProgress.remove(player2.getUniqueId());
@@ -239,13 +239,13 @@ public class SpawnManager {
         try {
             player.teleport(location);
         } catch (Exception ex) {
-            plugin.getLogger().severe("Teleport fehlgeschlagen für " + player.getName() + ": " + ex.getMessage());
+            plugin.getLogger().severe(plugin.getConsoleMsg("teleport-error", "error", ex.getMessage()));
             // Fallback auf Welt-Spawn
             try {
                 World w = location.getWorld();
                 if (w != null) player.teleport(w.getSpawnLocation());
             } catch (Exception e) {
-                plugin.getLogger().warning("Failed to teleport player to world spawn as fallback: " + e.getMessage());
+                plugin.getLogger().warning("Failed to teleport player to world spawn as fallback: " + e.getMessage());  // i18n-ignore: technical exception log
             }
         }
     }

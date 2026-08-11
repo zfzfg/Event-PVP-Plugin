@@ -55,7 +55,7 @@ public class LocationUtil {
     }
     
     public static Location getCenterLocation(Location loc1, Location loc2) {
-        if (loc1 == null || loc2 == null || !loc1.getWorld().equals(loc2.getWorld())) {
+        if (loc1 == null || loc2 == null || loc1.getWorld() == null || loc2.getWorld() == null || !loc1.getWorld().equals(loc2.getWorld())) {
             return null;
         }
         
