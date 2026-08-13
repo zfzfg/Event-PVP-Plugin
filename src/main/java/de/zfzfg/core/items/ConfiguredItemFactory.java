@@ -168,6 +168,7 @@ public final class ConfiguredItemFactory {
 
     // ============ Kern ============
 
+    @SuppressWarnings("deprecation")
     private static ItemStack build(Source source, Logger logger, String context) {
         String materialName = source.string("item");
         if (materialName == null || materialName.trim().isEmpty()) {
