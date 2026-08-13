@@ -33,12 +33,14 @@ public class PvPACommand implements CommandExecutor, TabCompleter {
     private final EventPlugin plugin;
     private final CommandRequestManager requestManager;
     
+    @Deprecated
     public PvPACommand(EventPlugin plugin) {
         this.plugin = plugin;
         this.requestManager = plugin.getCommandRequestManager();
     }
     
     @Override
+    @Deprecated
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         var cfg = plugin.getPvpConfigManager();
 
@@ -203,6 +205,7 @@ public class PvPACommand implements CommandExecutor, TabCompleter {
     }
     
     @Override
+    @Deprecated
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         List<String> completions = new ArrayList<>();
         

@@ -231,7 +231,7 @@ public class EventPlugin extends JavaPlugin {
             if (msg == null) {
                 return "&c[missing: messages.system.cooldown-wait]";
             }
-            return org.bukkit.ChatColor.translateAlternateColorCodes('&', msg.replace("{seconds}", String.valueOf(seconds)));
+            return de.zfzfg.eventplugin.util.ColorUtil.color(msg.replace("{seconds}", String.valueOf(seconds)));
         });
         getServer().getPluginManager().registerEvents(new org.bukkit.event.Listener() {
             @org.bukkit.event.EventHandler
@@ -245,12 +245,22 @@ public class EventPlugin extends JavaPlugin {
         registerCommand("pvp", unifiedPvp, unifiedPvp);
         // Also listen for quit to clear unified surrender confirmations
         getServer().getPluginManager().registerEvents(unifiedPvp, this);
+        // Die folgenden Alias-Befehle sind bewusst als @Deprecated markiert: sie werden von
+        // /pvp bzw. /pvpanswer abgeloest, bleiben aber registriert, damit bestehende
+        // Tastenbelegungen und Makros der Spieler weiter funktionieren. Die Unterdrueckung
+        // steht deshalb an der einzelnen Deklaration und nicht an der ganzen Methode - so
+        // faellt eine kuenftige, echte Deprecation in onEnable() weiterhin auf.
+        @SuppressWarnings("deprecation")
         PvPACommand pvpaCommand = new PvPACommand(this);
         registerCommand("pvpa", pvpaCommand, pvpaCommand);
         PvPAnswerCommand pvpanswerCommand = new PvPAnswerCommand(this);
         registerCommand("pvpanswer", pvpanswerCommand, pvpanswerCommand);
-        registerCommand("pvpyes", new PvPYesCommand(this));
-        registerCommand("pvpno", new PvPNoCommand(this));
+        @SuppressWarnings("deprecation")
+        PvPYesCommand pvpYesCommand = new PvPYesCommand(this);
+        registerCommand("pvpyes", pvpYesCommand);
+        @SuppressWarnings("deprecation")
+        PvPNoCommand pvpNoCommand = new PvPNoCommand(this);
+        registerCommand("pvpno", pvpNoCommand);
         registerCommand("pvpadmin", new PvPAdminCommand(this));
         SurrenderCommand surrenderCommand = new SurrenderCommand(this);
         registerCommand("surrender", surrenderCommand);
@@ -266,9 +276,11 @@ public class EventPlugin extends JavaPlugin {
         registerCommand("pvpask", pvpWagerGuiCommand, pvpWagerGuiCommand);
 
         // Wager Accept/Deny Befehle
+        @SuppressWarnings("deprecation")
         PvPAcceptCommand acceptCommand = new PvPAcceptCommand(this);
         registerCommand("pvpaccept", acceptCommand, acceptCommand);
 
+        @SuppressWarnings("deprecation")
         PvPDenyCommand denyCommand = new PvPDenyCommand(this);
         registerCommand("pvpdeny", denyCommand, denyCommand);
 

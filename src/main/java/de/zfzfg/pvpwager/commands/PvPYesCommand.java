@@ -18,11 +18,13 @@ public class PvPYesCommand implements CommandExecutor {
     
     private final EventPlugin plugin;
     
+    @Deprecated
     public PvPYesCommand(EventPlugin plugin) {
         this.plugin = plugin;
     }
     
     @Override
+    @Deprecated
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         var cfg = plugin.getPvpConfigManager();
         if (!(sender instanceof Player)) {

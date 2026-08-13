@@ -17,11 +17,13 @@ public class PvPNoCommand implements CommandExecutor {
     
     private final EventPlugin plugin;
     
+    @Deprecated
     public PvPNoCommand(EventPlugin plugin) {
         this.plugin = plugin;
     }
     
     @Override
+    @Deprecated
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         ConfigManager cfg = plugin.getPvpConfigManager();
         if (!(sender instanceof Player)) {
