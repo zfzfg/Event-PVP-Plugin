@@ -4,6 +4,7 @@ import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.eventplugin.manager.TeamManager;
 import de.zfzfg.eventplugin.model.EventConfig;
 import de.zfzfg.eventplugin.model.EquipmentGroup;
+import de.zfzfg.core.util.Text;
 import de.zfzfg.eventplugin.util.ColorUtil;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -233,19 +234,11 @@ public class EventSession {
             onlinePlayer.sendMessage("");
             onlinePlayer.sendMessage(ColorUtil.color(message));
             
-            net.md_5.bungee.api.chat.TextComponent component = new net.md_5.bungee.api.chat.TextComponent(
-                ColorUtil.color(plugin.getConfigManager().getMessage("start.join-button"))
-            );
-            component.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
-                net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
-                "/event join " + config.getCommand()
+            onlinePlayer.sendMessage(Text.button(
+                plugin.getConfigManager().getMessage("start.join-button"),
+                "/event join " + config.getCommand(),
+                plugin.getConfigManager().getMessage("start.join-hover")
             ));
-            component.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
-                net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                new net.md_5.bungee.api.chat.ComponentBuilder(plugin.getConfigManager().getMessage("start.join-hover")).create()
-            ));
-            
-            onlinePlayer.spigot().sendMessage(component);
             onlinePlayer.sendMessage("");
         }
     }
@@ -1300,21 +1293,11 @@ public class EventSession {
                 player.sendMessage("");
                 player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("event.eliminated-spectator")));
                 
-                net.md_5.bungee.api.chat.TextComponent component = new net.md_5.bungee.api.chat.TextComponent(
-                    ColorUtil.color(plugin.getConfigManager().getMessage("event.leave-button"))
-                );
-                component.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
-                    net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
-                    "/event leave"
+                player.sendMessage(Text.button(
+                    plugin.getConfigManager().getMessage("event.leave-button"),
+                    "/event leave",
+                    plugin.getConfigManager().getMessage("event.leave-hover")
                 ));
-                component.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
-                    net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(
-                        ColorUtil.color(plugin.getConfigManager().getMessage("event.leave-hover"))
-                    ).create()
-                ));
-                
-                player.spigot().sendMessage(component);
                 player.sendMessage("");
             }
         }.runTaskLater(plugin, de.zfzfg.core.util.Time.seconds(1)));
