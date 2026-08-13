@@ -289,15 +289,43 @@ final class MaterialCatalog {
             entry.put("key", keyOf(enchantment));
             entry.put("maxLevel", enchantment.getMaxLevel());
             entry.put("startLevel", enchantment.getStartLevel());
-            try {
-                entry.put("treasure", enchantment.isTreasure());
-                entry.put("curse", enchantment.isCursed());
-            } catch (Throwable ignored) {
-                // isCursed() ist auf neueren APIs deprecated/entfernt - optional.
-            }
+            entry.put("treasure", isTreasure(enchantment));
+            entry.put("curse", isCursed(enchantment));
             list.add(entry);
         }
         return list;
+    }
+
+    @SuppressWarnings("deprecation")
+    private static boolean isTreasure(Enchantment enchantment) {
+        try {
+            var tagValues = Registry.ENCHANTMENT.getTagValues(io.papermc.paper.registry.keys.tags.EnchantmentTagKeys.TREASURE);
+            if (tagValues != null) {
+                return tagValues.contains(enchantment);
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
+            return enchantment.isTreasure();
+        } catch (Throwable ignored) {
+            return false;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static boolean isCursed(Enchantment enchantment) {
+        try {
+            var tagValues = Registry.ENCHANTMENT.getTagValues(io.papermc.paper.registry.keys.tags.EnchantmentTagKeys.CURSE);
+            if (tagValues != null) {
+                return tagValues.contains(enchantment);
+            }
+        } catch (Throwable ignored) {
+        }
+        try {
+            return enchantment.isCursed();
+        } catch (Throwable ignored) {
+            return false;
+        }
     }
 
     /**
