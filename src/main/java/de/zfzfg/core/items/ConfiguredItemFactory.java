@@ -325,36 +325,11 @@ public final class ConfiguredItemFactory {
     }
 
     private static boolean setBasePotion(PotionMeta meta, String typeName, boolean extended, boolean upgraded) {
-        Object potionType;
         try {
-            potionType = org.bukkit.potion.PotionType.valueOf(typeName.toUpperCase(Locale.ROOT).trim());
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-
-        // Neue API (1.20.5+): die Varianten stecken bereits im Enum (LONG_/STRONG_).
-        try {
-            PotionMeta.class
-                    .getMethod("setBasePotionType", org.bukkit.potion.PotionType.class)
-                    .invoke(meta, potionType);
+            org.bukkit.potion.PotionType potionType = org.bukkit.potion.PotionType.valueOf(typeName.toUpperCase(Locale.ROOT).trim());
+            meta.setBasePotionType(potionType);
             return true;
-        } catch (ReflectiveOperationException ignored) {
-            // Aeltere API - unten weiter.
-        } catch (RuntimeException e) {
-            return false;
-        }
-
-        // Alte API (bis 1.20.4): PotionData traegt die Varianten getrennt.
-        try {
-            Class<?> dataClass = Class.forName("org.bukkit.potion.PotionData");
-            Object data = dataClass
-                    .getConstructor(org.bukkit.potion.PotionType.class, boolean.class, boolean.class)
-                    // extended und upgraded schliessen sich gegenseitig aus; upgraded gewinnt,
-                    // weil "Trank der Staerke II" die haeufigere Absicht ist.
-                    .newInstance(potionType, upgraded ? false : extended, upgraded);
-            PotionMeta.class.getMethod("setBasePotionData", dataClass).invoke(meta, data);
-            return true;
-        } catch (ReflectiveOperationException | RuntimeException e) {
+        } catch (IllegalArgumentException | NoSuchMethodError e) {
             return false;
         }
     }
@@ -383,31 +358,43 @@ public final class ConfiguredItemFactory {
         return material;
     }
 
+    static String normalizeEnchantKey(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        String key = raw.trim().toLowerCase(Locale.ROOT);
+        if (!key.contains(":")) key = "minecraft:" + key;
+        return key;
+    }
+
     @SuppressWarnings("deprecation")
     private static Enchantment resolveEnchantment(String rawName) {
-        String key = rawName.trim().toUpperCase(Locale.ROOT);
-        Enchantment cached = ENCHANTMENT_CACHE.get(key);
+        if (rawName == null || rawName.isBlank()) return null;
+        String normalized = normalizeEnchantKey(rawName);
+        if (normalized == null) return null;
+
+        Enchantment cached = ENCHANTMENT_CACHE.get(normalized);
         if (cached != null) {
             return cached;
         }
 
         Enchantment enchantment = null;
-        try {
-            enchantment = org.bukkit.Registry.ENCHANTMENT.get(NamespacedKey.minecraft(key.toLowerCase(Locale.ROOT)));
-        } catch (Throwable ignored) {
-            // Registry nicht verfuegbar - unten ueber den alten Weg versuchen.
+        NamespacedKey nsk = NamespacedKey.fromString(normalized);
+        if (nsk != null) {
+            try {
+                enchantment = org.bukkit.Registry.ENCHANTMENT.get(nsk);
+            } catch (Throwable ignored) {
+            }
         }
         if (enchantment == null) {
             // Alte Bukkit-Namen (DAMAGE_ALL statt SHARPNESS) weiterhin akzeptieren, damit
             // bestehende equipment.yml-Dateien nicht brechen.
             try {
-                enchantment = Enchantment.getByName(key);
+                enchantment = Enchantment.getByName(rawName.trim().toUpperCase(Locale.ROOT));
             } catch (Throwable ignored) {
                 enchantment = null;
             }
         }
         if (enchantment != null) {
-            ENCHANTMENT_CACHE.put(key, enchantment);
+            ENCHANTMENT_CACHE.put(normalized, enchantment);
         }
         return enchantment;
     }
