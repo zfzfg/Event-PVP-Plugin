@@ -1,9 +1,7 @@
 package de.zfzfg.pvpwager.commands;
 
 import de.zfzfg.eventplugin.EventPlugin;
-import de.zfzfg.pvpwager.managers.ArenaManager;
 import de.zfzfg.pvpwager.models.CommandRequest;
-import de.zfzfg.pvpwager.models.Match;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;

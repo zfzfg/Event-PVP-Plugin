@@ -6,7 +6,6 @@ import de.zfzfg.pvpwager.models.Match;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.entity.Player;
 
@@ -14,7 +13,6 @@ import java.util.Optional;
 
 /**
  * Sicherheits-/Modus-Listener:
- * - Blockiert /v (vanish) und /fly für Nicht-OP-Spieler
  * - Verhindert, dass Zuschauer den Spectator-Modus verlassen
  */
 public class PlayerModeListener implements Listener {
@@ -30,18 +28,9 @@ public class PlayerModeListener implements Listener {
         return ChatColor.translateAlternateColorCodes('&', msg);
     }
 
-    @EventHandler
-    public void onCommandPreprocess(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        String cmd = event.getMessage().toLowerCase();
-
-        // OP-Bypass erlaubt
-        if (player.isOp() || player.hasPermission("eventpvp.opbypass")) {
-            return;
-        }
-
-        // Entfernt: Hardcoded Blockierung von /v und /fly. Spectator-Mode-Protection bleibt separat.
-    }
+    // Entfernt: onCommandPreprocess. Die hardcodierte Blockierung von /v und /fly ist
+    // weggefallen; der Handler tat danach nichts mehr, lief aber bei jedem Chat-Befehl mit.
+    // Die Spectator-Mode-Protection unten ist davon unabhaengig.
 
     @EventHandler
     public void onGameModeChange(PlayerGameModeChangeEvent event) {

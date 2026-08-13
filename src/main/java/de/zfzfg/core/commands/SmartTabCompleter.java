@@ -3,7 +3,6 @@ package de.zfzfg.core.commands;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.managers.ArenaManager;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -20,7 +20,7 @@
   - `PotionEffectType.getByName` / `values()` -> `Registry.POTION_EFFECT_TYPE`
   - `enchantment.isTreasure()` / `isCursed()` -> `EnchantmentTagKeys.TREASURE` / `CURSE`
   - `ItemMeta#setCustomModelData(Integer)` -> mit `@SuppressWarnings("deprecation")` belassen (Kompatibilitaet mit Integer-Schema der `equipment.yml`).
-- Phase D6 (`org.bukkit.ChatColor`): Wie geplant unveraendert belassen, um Regressionsrisiken zu vermeiden.
+- Phase D6 (`org.bukkit.ChatColor`): Wie geplant unveraendert belassen, um Regressionsrisiken zu vermeiden. Ungenutzte Alt-Reste wie die private Hilfsmethode `color(String)` und der ungenutzte `ChatColor`-Import in `ConfiguredItemFactory` wurden bereinigt (da Item-Namen & Lore vollstaendig ueber `Text.ofItem(...)` laufen).
 
 ## Durchgefuehrte Git-Commits
 - `D0: DEPRECATION_NOTES.md angelegt und Baseline dokumentiert`

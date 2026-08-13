@@ -1,8 +1,6 @@
 package de.zfzfg.pvpwager.managers;
 
-import de.zfzfg.eventplugin.EventPlugin;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.util.UUID;
 

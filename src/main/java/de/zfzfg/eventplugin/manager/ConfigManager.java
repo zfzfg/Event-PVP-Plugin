@@ -18,7 +18,6 @@ public class ConfigManager {
     private final EventPlugin plugin;
     private FileConfiguration config;
     private FileConfiguration equipmentConfig;
-    private String equipmentFilePath;
     private FileConfiguration messagesConfig;
     
     private Map<String, EventConfig> events;
@@ -171,7 +170,6 @@ public class ConfigManager {
             plugin.saveResource("equipment.yml", false);
         }
         equipmentConfig = YamlConfiguration.loadConfiguration(unified);
-        equipmentFilePath = unified.getAbsolutePath();
 
         // Validierung: hat die Datei überhaupt eine der erwarteten Sektionen?
         //
@@ -190,7 +188,6 @@ public class ConfigManager {
             try {
                 plugin.saveResource("equipment.yml", true);
                 equipmentConfig = YamlConfiguration.loadConfiguration(unified);
-                equipmentFilePath = unified.getAbsolutePath();
             } catch (IllegalArgumentException ex) {
                 plugin.getLogger().severe("Could not deploy default 'equipment.yml': " + ex.getMessage()); // i18n-ignore: technical exception log
             }

@@ -372,7 +372,6 @@ public class WebConfigManager {
     /**
      * Konvertiert Liste für YAML-Format
      */
-    @SuppressWarnings("unchecked")
     private List<Object> convertListForYaml(List<?> list) {
         List<Object> result = new ArrayList<>();
         
@@ -405,7 +404,6 @@ public class WebConfigManager {
     /**
      * Konvertiert Map für YAML-Format
      */
-    @SuppressWarnings("unchecked")
     private Map<String, Object> convertMapForYaml(Map<?, ?> map) {
         Map<String, Object> result = new LinkedHashMap<>();
         

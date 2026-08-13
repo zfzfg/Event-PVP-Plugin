@@ -178,20 +178,6 @@ public class EventListener implements Listener {
     }
 
     /**
-     * Prüft ob die Event-Welt entladen ist.
-     */
-    private boolean isEventWorldUnloaded(EventSession session) {
-        String eventWorldName = session.getConfig().getEventWorld();
-        String lobbyWorldName = session.getConfig().getLobbyWorld();
-        
-        World eventWorld = eventWorldName != null ? Bukkit.getWorld(eventWorldName) : null;
-        World lobbyWorld = lobbyWorldName != null ? Bukkit.getWorld(lobbyWorldName) : null;
-        
-        // Wenn beide Welten entladen sind, ist die Welt "entladen"
-        return eventWorld == null && lobbyWorld == null;
-    }
-    
-    /**
      * Ermittelt einen sicheren Respawn-Ort für einen Event-Spieler.
      * 
      * @param player Der Spieler, der respawnt

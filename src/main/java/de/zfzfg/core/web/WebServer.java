@@ -549,74 +549,10 @@ public class WebServer {
         } catch (IOException ignored) {}
     }
 
-    /**
-     * Handlet GET-Requests für API (ohne Auth)
-     */
-    private void handleApiRequest(HttpExchange exchange, ResponseProvider provider) {
-        try {
-            if (!"GET".equals(exchange.getRequestMethod())) {
-                sendError(exchange, 405, "Method Not Allowed");
-                return;
-            }
-            
-            Object response = provider.get();
-            String jsonResponse = gson.toJson(response);
-            
-            exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-            sendCorsHeaders(exchange);
-            byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
-            exchange.sendResponseHeaders(200, responseBytes.length);
-
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(responseBytes);
-            }
-        } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
-            sendError(exchange, 500, "Internal Server Error");
-        }
-    }
-
-    /**
-     * Handlet POST-Requests für API (ohne Auth)
-     */
-    private void handleApiPostRequest(HttpExchange exchange, PostRequestHandler handler) {
-        try {
-            // Handle CORS preflight
-            if ("OPTIONS".equals(exchange.getRequestMethod())) {
-                sendCorsHeaders(exchange);
-                exchange.sendResponseHeaders(204, -1);
-                return;
-            }
-
-            if (!"POST".equals(exchange.getRequestMethod())) {
-                sendError(exchange, 405, "Method Not Allowed");
-                return;
-            }
-
-            StringBuilder sb = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line);
-                }
-            }
-
-            Object response = handler.handle(sb.toString());
-            String jsonResponse = gson.toJson(response);
-
-            exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
-            sendCorsHeaders(exchange);
-            byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
-            exchange.sendResponseHeaders(200, responseBytes.length);
-            
-            try (OutputStream os = exchange.getResponseBody()) {
-                os.write(responseBytes);
-            }
-        } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
-            sendError(exchange, 500, "Internal Server Error");
-        }
-    }
+    // Entfernt: handleApiRequest/handleApiPostRequest - die auth-freien Gegenstuecke zu
+    // handleProtectedApiRequest/handleProtectedApiPostRequest. Sie waren an keine Route
+    // gebunden. Neue Endpunkte gehen ueber die "Protected"-Varianten; ein auth-freier
+    // Handler soll nicht versehentlich griffbereit herumliegen.
 
     /**
      * Sendet Error-Response

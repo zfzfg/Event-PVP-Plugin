@@ -2,7 +2,6 @@ package de.zfzfg.core.items;
 
 import de.zfzfg.core.util.Text;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
@@ -429,10 +428,6 @@ public final class ConfiguredItemFactory {
         } catch (Throwable ignored) {
             return null;
         }
-    }
-
-    private static String color(String text) {
-        return ChatColor.translateAlternateColorCodes('&', text);
     }
 
     private static void logSkipped(Logger logger, String context, String message) {

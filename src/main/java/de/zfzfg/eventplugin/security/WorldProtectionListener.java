@@ -12,8 +12,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.Set;
 
 public class WorldProtectionListener implements Listener {
     private final EventPlugin plugin;
