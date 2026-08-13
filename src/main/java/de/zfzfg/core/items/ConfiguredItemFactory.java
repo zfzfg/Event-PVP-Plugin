@@ -5,6 +5,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -402,22 +403,36 @@ public final class ConfiguredItemFactory {
         return enchantment;
     }
 
+    @SuppressWarnings("deprecation")
     private static PotionEffectType resolvePotionEffect(String rawName) {
-        String key = rawName.trim().toUpperCase(Locale.ROOT);
-        // getByKey nimmt den heutigen Minecraft-Namen (z.B. "strength"), getByName zusaetzlich
-        // die alten Bukkit-Konstanten (z.B. "INCREASE_DAMAGE"). Beide Wege offen halten,
-        // damit bestehende equipment.yml-Dateien weiterhin laden.
+        if (rawName == null || rawName.isBlank()) {
+            return null;
+        }
+        String trimmed = rawName.trim();
         try {
-            PotionEffectType byKey = PotionEffectType.getByKey(
-                    NamespacedKey.minecraft(key.toLowerCase(Locale.ROOT)));
-            if (byKey != null) {
-                return byKey;
+            String normalized = trimmed.toLowerCase(Locale.ROOT);
+            NamespacedKey key = normalized.contains(":")
+                    ? NamespacedKey.fromString(normalized)
+                    : NamespacedKey.minecraft(normalized);
+            if (key != null) {
+                PotionEffectType byKey = Registry.POTION_EFFECT_TYPE.get(key);
+                if (byKey != null) {
+                    return byKey;
+                }
             }
         } catch (Throwable ignored) {
             // Rueckfall unten.
         }
         try {
-            return PotionEffectType.getByName(key);
+            PotionEffectType matched = Registry.POTION_EFFECT_TYPE.match(trimmed);
+            if (matched != null) {
+                return matched;
+            }
+        } catch (Throwable ignored) {
+            // Rueckfall unten.
+        }
+        try {
+            return PotionEffectType.getByName(trimmed.toUpperCase(Locale.ROOT));
         } catch (Throwable ignored) {
             return null;
         }

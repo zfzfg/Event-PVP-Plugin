@@ -323,7 +323,10 @@ final class MaterialCatalog {
         return list;
     }
 
-    @SuppressWarnings("deprecation")
+    // "removal", nicht "deprecation": Enchantment#getName() ist deprecated-for-removal, und
+    // dafuer ist in Eclipse/javac eine eigene Kategorie zustaendig. Mit "deprecation" blieb die
+    // Warnung stehen und die Annotation wurde zusaetzlich als ueberfluessig gemeldet.
+    @SuppressWarnings("removal")
     private static String keyOf(Enchantment enchantment) {
         try {
             return enchantment.getKey().getKey().toUpperCase(Locale.ROOT);
@@ -360,9 +363,9 @@ final class MaterialCatalog {
     private static List<String> describePotionEffects() {
         List<String> effects = new ArrayList<>();
         try {
-            for (org.bukkit.potion.PotionEffectType type : org.bukkit.potion.PotionEffectType.values()) {
+            for (org.bukkit.potion.PotionEffectType type : org.bukkit.Registry.POTION_EFFECT_TYPE) {
                 if (type != null) {
-                    effects.add(type.getName());
+                    effects.add(type.getKey().getKey());
                 }
             }
         } catch (Throwable ignored) {
