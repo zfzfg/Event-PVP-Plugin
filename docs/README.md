@@ -46,3 +46,4 @@ Interne Entwickler-Notizen, Export-Listen und Debug-Logs.
 - [`all_logger_calls.txt`](development/all_logger_calls.txt) – Übersicht aller Logger-Aufrufe
 - [`problems-export.md`](development/problems-export.md) – Analyse- und Problem-Exports
 - [`walkthrough.md`](development/walkthrough.md) – Entwicklungs-Walkthroughs
+- [`ALPHA_RELEASE_GUIDE.md`](development/ALPHA_RELEASE_GUIDE.md) – **Anleitung: Alpha-Versionen veröffentlichen ohne Update-Benachrichtigung**
