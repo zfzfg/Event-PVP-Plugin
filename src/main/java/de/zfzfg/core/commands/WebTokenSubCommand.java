@@ -2,13 +2,11 @@ package de.zfzfg.core.commands;
 
 import de.zfzfg.core.web.WebAuthManager;
 import de.zfzfg.eventplugin.EventPlugin;
-import de.zfzfg.pvpwager.utils.MessageUtil;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import de.zfzfg.core.util.Text;
+import de.zfzfg.core.util.TextUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -59,10 +57,10 @@ public class WebTokenSubCommand extends SubCommand {
         FileConfiguration messages = plugin.getCoreConfigManager().getMessages();
         String val = messages.getString("messages.webtoken." + key, null);
         if (val != null) {
-            return ChatColor.translateAlternateColorCodes('&', val);
+            return TextUtil.color(val);
         }
         warnMissingKey("messages.webtoken." + key);
-        return "&c[missing: " + key + "]";
+        return "§c[missing: " + key + "]";
     }
     
     private String msg(String key, String placeholder, String value) {
@@ -109,11 +107,10 @@ public class WebTokenSubCommand extends SubCommand {
         player.sendMessage(msg("your-token"));
         
         // Klickbarer Token
-        TextComponent tokenComponent = new TextComponent("  §a§l➤ " + token + " " + msg("click-to-copy")); // i18n-ignore
-        tokenComponent.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, token));
-        tokenComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
-            new Text(msg("hover-copy"))));
-        player.spigot().sendMessage(tokenComponent);
+        Component tokenComponent = Text.of("  §a§l➤ " + token + " " + msg("click-to-copy"))
+            .clickEvent(ClickEvent.copyToClipboard(token))
+            .hoverEvent(HoverEvent.showText(Text.of(msg("hover-copy"))));
+        player.sendMessage(tokenComponent);
         
         player.sendMessage("");
         player.sendMessage(msg("valid-for", "minutes", String.valueOf(authManager.getTokenValidityMinutes())));
@@ -126,11 +123,12 @@ public class WebTokenSubCommand extends SubCommand {
         // Debug-Log
         plugin.getDebugManager().log("WebToken Command - URL from config: " + url);  // i18n-ignore: technical debug trace
         
-        TextComponent urlComponent = new TextComponent("  §b§l➤ " + url + " " + msg("click-to-open")); // i18n-ignore
-        urlComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-        urlComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
-            new Text(msg("hover-open"))));
-        player.spigot().sendMessage(urlComponent);
+        Component urlComponent = Text.link(
+            "  §b§l➤ " + url + " " + msg("click-to-open"),
+            url,
+            msg("hover-open")
+        );
+        player.sendMessage(urlComponent);
         
         player.sendMessage("§8§m                                                §r");
         player.sendMessage("");
