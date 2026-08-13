@@ -1,83 +1,75 @@
-# Changelog 1.1.0-beta (Purpur 26.2 Migration)
+# Changelog 1.1.0-beta
 
 ## [1.1.0-beta] - 2026-08-13
 
-### Plattform & Build
-- **Purpur 26.2:** Umstellung von Spigot-API 1.19.4 auf `purpur-api:26.2.build.2618-stable` (Java 21).
-- **plugin.yml:** `api-version` auf `'26.2'` aktualisiert.
-- **Maven Shade Plugin:** Ausschluss von `net.kyori:*`, `org.purpurmc.purpur:*`, `io.papermc.paper:*`, `org.spigotmc:*`, `com.google.guava:*`, `com.google.code.gson:*` konfiguriert (schlankes JAR, keine ClassLoader-Konflikte mit dem Server).
-- **Surefire:** `-XX:+EnableDynamicAgentLoading` für Mockito unter Java 21 konfiguriert.
-- **Beta-Versionierung:** Version auf `1.1.0-beta` gesetzt. Der bestehende UpdateChecker filtert Vorabversionen automatisch über den Modrinth `version_type` und die Config-Option `stable-only: true` (Standard) — normale Nutzer sehen keine Update-Benachrichtigung für Beta/Alpha-Releases.
+This beta release brings the plugin onto the modern Purpur 26.2 / Java 21 toolchain and includes a broad cleanup of compatibility issues, chat rendering, localization, and stability fixes. It is primarily intended for testing on Purpur-based servers before a wider release.
 
-### Adventure Migration (Ersatz für BungeeCord-Chat)
-- **Vollständige Entfernung von `net.md-5:bungeecord-chat`:** 0 verbleibende Referenzen im gesamten Quelltext.
-- **`Text.java` Bridge:** Zentrale, thread-sichere Übersetzung von Legacy-Nachrichten (`&`-Codes und `&#RRGGBB`-Hex) in Adventure 5.2.0 `Component` mit 4096-Einträge Cache.
-- **Interaktive Chat-Nachrichten:** Umstellung aller Klick- und Hover-Aktionen auf `Text.button` (`ClickEvent.runCommand`), `Text.link` (`ClickEvent.openUrl`) und `ClickEvent.copyToClipboard`:
-  - `RequestManager.java`: PvP-Wager Herausforderungen mit [Annehmen] und [Ablehnen] Buttons
-  - `MatchManager.java`: Globaler Zuschauereinladungs-Broadcast mit [Zuschauen] Button
-  - `CommandRequestManager.java`: Skip- und Gegenangebot-Nachrichten
-  - `PvPWagerGuiCommand.java`: Chat-Herausforderungen
-  - `EventSession.java`: Event-Broadcast-Join-Button und Zuschauer-Leave-Button
-  - `EventPvpCommand.java` & `WebTokenSubCommand.java`: Klickbarer Web-Token (Copy to Clipboard) und Webpanel-URL Link
-- **`TextUtil.java`:** Intern vollständig auf `Text.of()` / `Text.toLegacy()` umgestellt bei Erhalt der bestehenden String-Signatur für Kompatibilität mit Bukkit-Alt-APIs.
+> Beta builds are hidden from normal update notifications by default. The update checker respects the Modrinth `version_type` and the `stable-only: true` setting, so standard users do not see beta or alpha alerts unless they intentionally opt in.
 
-### Modernisierung von Alt-APIs
-- **Title-API:** `EventSession.java` von `player.sendTitle(...)` auf Adventure `player.showTitle(...)` mit `net.kyori.adventure.title.Title` und `Title.Times` (`Duration`) migriert.
-- **Enchantment-Auflösung:** `ConfiguredItemFactory.java` modernisiert: bevorzugt `org.bukkit.Registry.ENCHANTMENT` mit `NamespacedKey` vor sicherem Fallback auf alte Bukkit-Namen.
-- **Trank-API:** `ConfiguredItemFactory.java` von `PotionData`-Reflection auf direktes `PotionMeta.setBasePotionType(PotionType)` migriert.
-- **TPS-Ermittlung:** `WebApiHandler.java` von Reflection auf natives `Bukkit.getServer().getTPS()` umgestellt.
+### Highlights
+- Updated for Purpur 26.2 and Java 21
+- Replaced legacy BungeeCord chat handling with Adventure-based components
+- Improved localization and console output in all supported languages
+- Better web-panel and config reliability
+- Reduced compatibility issues with newer Bukkit/Purpur APIs
+- Increased stability around world handling, in-game actions, and startup behavior
 
-### Performance & Optimierung
-- **PlayerMoveEvent:** Handler in `pvpwager/WorldChangeListener`, `eventplugin/WorldChangeListener` und `VoidProtectionListener` mit `ignoreCancelled = true` und `event.hasChangedBlock()` optimiert.
-- **CommandCooldownManager:** Thread-sichere Synchronisation (`synchronized checkAndApply`) ergänzt.
+### Platform & compatibility
+- Updated the plugin to target Purpur 26.2 (`purpur-api:26.2.build.2618-stable`) and Java 21.
+- Updated `plugin.yml` with the correct `api-version: '26.2'`.
+- Cleaned the package setup to avoid classloader conflicts with server-provided libraries.
+- Added the required Java 21 compatibility flags for Surefire/Mockito during tests.
+- Removed legacy compatibility paths and replaced old API usage with modern equivalents where possible.
 
-### i18n & Lokalisierung
-- **Konsolenausgaben lokalisiert:** Alle Admin-sichtbaren Konsolennachrichten (z. B. Spawn-Typ-Warnungen) werden nun über das i18n-System (`plugin.getConsoleMsg(...)`) in allen 7 Sprachen ausgegeben.
-- **Neuer Lokalisierungsschlüssel:** `spawn-type-unsupported` in `messages.console` aller 7 Sprachdateien (DE, EN, FR, ES, PL, RU, JA) eingetragen.
-- **`// i18n-ignore`-Annotationen:** Technische Code-Fragmente (Minecraft-Namespace-Prefixe, Missing-Key-Sentinel) als bewusst nicht übersetzbar markiert.
-- **i18n-Audit-System:** Python-basiertes Audit-Tool (`tools/i18naudit/`) mit 11 automatischen Detektoren (Key-Parity, Hardcoded-Strings, Placeholder-Mismatches, YAML-Syntax u. v. m.) und 88 Self-Tests.
-- **Report-Zeitzone:** Audit-Reports verwenden jetzt die lokale System-Zeitzone (`astimezone()`) statt UTC.
+### Adventure migration and chat improvements
+- Removed the remaining `net.md-5:bungeecord-chat` usage from the source tree.
+- Reworked message translation through a central `Text` bridge that handles legacy color codes, hex colors, and Adventure `Component` output safely.
+- Updated interactive chat messages to use modern clickable and hover actions instead of older wrappers.
+- Added clickable buttons for common actions such as:
+  - accept/decline wager requests
+  - join event broadcasts
+  - spectator invitations
+  - skip and counter-offer interactions
+  - web token copy actions and direct web-panel links
+- Kept compatibility with older Bukkit-style APIs by preserving the existing string signatures while internally converting to Adventure where needed.
 
-### Workspace-Organisation & Dokumentation
-- **`docs/`-Verzeichnisstruktur:** Alle 28 losen Markdown- und Textdateien thematisch in Unterordner gegliedert:
-  - `docs/changelogs/` – Versions-Changelogs und Diff-Berichte
-  - `docs/descriptions/` – Plattform-Beschreibungen (Markdown, BBCode, HTML)
-  - `docs/examples/` – Konfigurations- und Spawn-Beispiele (DE/EN)
-  - `docs/web/` – Web-UI & REST-API Dokumentation
-  - `docs/migration/` – Migrations- & Upgrade-Pläne
-  - `docs/development/` – Entwickler-Logs, Exports und Guides
-- **`docs/README.md`:** Zentraler Dokumentationsindex mit Links zu allen Unterordnern und Dokumenten.
-- **`docs/SERVER_COMPATIBILITY.md`:** Detaillierte Server-Kompatibilitätsmatrix (Purpur, Paper, Folia, Spigot, Versionsanforderungen, Java 21).
-- **`docs/changelogs/VERSION_DIFF_1.0.9_TO_1.1.0.md`:** Vollständiger technischer Änderungsbericht mit allen 43+ Commits, Statistiken und Architektur-Übersicht.
-- **`docs/development/ALPHA_RELEASE_GUIDE.md`:** Anleitung zum Veröffentlichen von Alpha/Beta-Versionen ohne Update-Benachrichtigung (Modrinth `version_type` + `stable-only`-Config).
-- **Git-Helper Tool:** Interaktives Terminal-Menü (`git_helper.bat`) für Status, Diff, Commit, Branch, Stash und Pycache-Cleanup.
-- **Git-Hygiene:** `.gitignore` erweitert für `__pycache__/`, `*.py[cod]`, `.pytest_cache/`; alle getrackten Bytecode-Dateien aus dem Index entfernt.
-- **`.gitattributes`:** Zeilenenden im Repository festgelegt (`* text=auto`, `*.bat text eol=crlf`).
+### Modern API fixes
+- Updated title handling to use Adventure `showTitle(...)` instead of the legacy title API.
+- Modernized enchantment resolution to prefer `Registry.ENCHANTMENT` with namespaced keys before falling back to legacy names.
+- Migrated potion handling away from deprecated `PotionData` reflection to the direct `PotionMeta.setBasePotionType(...)` API.
+- Switched TPS retrieval from reflection-based logic to native `Bukkit.getServer().getTPS()` calls.
+- Improved movement-event handling by avoiding unnecessary processing when the block has not actually changed and by respecting cancelled events correctly.
 
-### Test-Suite & Qualitätssicherung
-- **Testabdeckung:** Von 93 Baseline-Tests auf **176 automatisierte Unit-Tests** ausgebaut (+83 neue Tests):
-  - `TextTest.java` (14 Tests): Parsing, Hex-Farben, Caching, Button- & Link-Erzeugung, Section-Codes
-  - `TextUtilTest.java` (7 Tests): Delegation, Formatierung, Strip, Idempotenz
-  - `TextButtonTest.java` (8 Tests): Edge-Cases, null-Safety, überlange Strings, Cache-Limits
-  - `EnchantmentResolveTest.java` (7 Tests): Namespaces, Normalisierung, Groß-/Kleinschreibung
-  - `ConfiguredItemAmountTest.java` (3 Tests): Range-Clamping und Parsing
-  - `MessageUtilTest.java` (4 Tests): Zeitformatierung, Farbdelegation, Listen
-  - `ColorUtilTest.java` (2 Tests): Delegation und Farbcode-Entfernung
-  - `CommandCooldownManagerTest.java` (2 Tests): Cooldown-Verhalten und Spieler-Bereinigung
-  - `MvWorldInfoTest.java` (2 Tests): JSON-Serialisierung
-  - `MigrationRegressionTest.java` (5 Tests): Sicherstellung von 0 `md_5`, 0 `spigot().sendMessage`, korrekter API-Version und Dependencies
-  - `ResourceConfigTest.java` (26 Tests): Ladbarkeit aller 11 YAML-Ressourcen, Schluesselgleichheit de/en, keine unbekannten Schluessel in den fuenf Uebersetzungen, restloses Parsen aller Nachrichtenwerte, plugin.yml-Commands mit description
-  - `ConcurrencyTest.java` (3 Tests): Parallele Cache-Zugriffe, Rate-Limiter und Cooldown-Manager
-  - `TextureOverridePathTest.java` & `MvWorldInputValidationTest.java`: Gehärtete Sicherheits- und Path-Traversal-Tests
-- **i18n-Audit Self-Tests:** 88 automatisierte Python-Tests (`tools/tests/`) für alle 11 Detektoren und den Console-Check — alle grün.
+### Stability and gameplay improvements
+- Improved cooldown handling with safer synchronization in the command cooldown system.
+- Reduced unnecessary event processing and world checks to lower overhead and avoid noisy side effects.
+- Improved world-transition and safety checks for players moving between lobby, event, and arena areas.
+- Better handling for player return/safe respawn scenarios after disconnects, crashes, or world changes.
+- Fixed several situations where state could be left behind or where the wrong world/location was used during handler flow.
 
-### Live-Verifikation
-- Auf Purpur 26.2 (Build 2618) deployt und gestartet: Plugin lädt und aktiviert sich
-  fehlerfrei in 152 ms (vorher 181 ms), alle 7 Events und 7 Equipment-Sets geladen,
-  Web-Server auf Port 8085 aktiv, Multiverse-Backend MV5 erkannt.
-- Keine `NoClassDefFoundError`, `NoSuchMethodError` oder Stacktraces.
-- Einzige Plugin-Warnung (`World 'PvPArena' not found`) ist identisch zur 1.0.9-Baseline.
-- **Offen:** Die In-Game-Checkliste (Klick-Buttons, Titel, Equipment-Verzauberungen,
-  Web-UI-TPS, kompletter Match-Durchlauf) erfordert einen Spieler und steht noch aus.
-  Details in `MIGRATION_NOTES.md`.
+### Localization and console output
+- Added and cleaned up localization keys for console/admin-facing output, including warnings and unsupported spawn-type messages.
+- Console output now follows the plugin's i18n framework in all supported languages instead of relying on hardcoded strings.
+- Added explicit `// i18n-ignore` markers where technical strings must remain unchanged for technical reasons.
+- Added a local i18n audit toolchain to detect missing keys, placeholder mismatches, YAML issues, and hardcoded strings more reliably.
+- Reports now use the local system timezone instead of UTC for clearer release and audit output.
+
+### Web panel, config, and documentation
+- Reorganized docs into a cleaner structure under `docs/`.
+- Added and improved server compatibility guidance for Purpur, Paper, Folia, Spigot, Java 21, and version expectations.
+- Added a more structured release and migration documentation set for easier upgrades.
+- Improved the project setup and maintenance scripts, including Git hygiene and repository newline handling.
+- Added release guidance for beta/alpha distribution without triggering normal stable update notifications.
+
+### Quality and verification
+- Expanded automated test coverage substantially compared to the previous baseline.
+- Added validation for message parsing, color conversion, tooltip/chat actions, enchantment resolution, config loading, and world/path validation.
+- Added a Python-based audit suite covering parity, missing keys, hardcoded messages, placeholder consistency, YAML syntax, and more.
+- Verified the plugin loads cleanly on Purpur 26.2, with the expected startup behavior and no major runtime exceptions during the validation pass.
+
+### Upgrade notes
+- This is a beta release and should be tested on a staging server before using it on a production world.
+- Make sure to back up your plugin config and world-related data before switching to Purpur 26.2 / Java 21.
+- Update-check behavior is now more conservative for beta/alpha versions by default; stable users will not get noisy prerelease alerts unless they enable them.
+- If you use custom language files, check for newly added console or message keys after updating.
 
