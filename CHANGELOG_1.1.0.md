@@ -31,7 +31,7 @@
 - **CommandCooldownManager:** Thread-sichere Synchronisation (`synchronized checkAndApply`) ergänzt.
 
 ### Test-Suite & Qualitätssicherung
-- **Testabdeckung:** Von 93 Baseline-Tests auf **152 automatisierte Unit-Tests** ausgebaut (+59 neue Tests):
+- **Testabdeckung:** Von 93 Baseline-Tests auf **176 automatisierte Unit-Tests** ausgebaut (+83 neue Tests):
   - `TextTest.java` (14 Tests): Parsing, Hex-Farben, Caching, Button- & Link-Erzeugung, Section-Codes
   - `TextUtilTest.java` (7 Tests): Delegation, Formatierung, Strip, Idempotenz
   - `TextButtonTest.java` (8 Tests): Edge-Cases, null-Safety, überlange Strings, Cache-Limits
@@ -42,6 +42,16 @@
   - `CommandCooldownManagerTest.java` (2 Tests): Cooldown-Verhalten und Spieler-Bereinigung
   - `MvWorldInfoTest.java` (2 Tests): JSON-Serialisierung
   - `MigrationRegressionTest.java` (5 Tests): Sicherstellung von 0 `md_5`, 0 `spigot().sendMessage`, korrekter API-Version und Dependencies
-  - `ResourceConfigTest.java` (2 Tests): Validierung aller mitgelieferten YAML-Dateien (`messages_de.yml`, `messages_en.yml`, `config.yml`, etc.)
+  - `ResourceConfigTest.java` (26 Tests): Ladbarkeit aller 11 YAML-Ressourcen, Schluesselgleichheit de/en, keine unbekannten Schluessel in den fuenf Uebersetzungen, restloses Parsen aller Nachrichtenwerte, plugin.yml-Commands mit description
   - `ConcurrencyTest.java` (3 Tests): Parallele Cache-Zugriffe, Rate-Limiter und Cooldown-Manager
   - `TextureOverridePathTest.java` & `MvWorldInputValidationTest.java`: Gehärtete Sicherheits- und Path-Traversal-Tests
+
+### Live-Verifikation
+- Auf Purpur 26.2 (Build 2618) deployt und gestartet: Plugin lädt und aktiviert sich
+  fehlerfrei in 152 ms (vorher 181 ms), alle 7 Events und 7 Equipment-Sets geladen,
+  Web-Server auf Port 8085 aktiv, Multiverse-Backend MV5 erkannt.
+- Keine `NoClassDefFoundError`, `NoSuchMethodError` oder Stacktraces.
+- Einzige Plugin-Warnung (`World 'PvPArena' not found`) ist identisch zur 1.0.9-Baseline.
+- **Offen:** Die In-Game-Checkliste (Klick-Buttons, Titel, Equipment-Verzauberungen,
+  Web-UI-TPS, kompletter Match-Durchlauf) erfordert einen Spieler und steht noch aus.
+  Details in `MIGRATION_NOTES.md`.

@@ -20,9 +20,56 @@
 - [x] **Phase 2 (Adventure-Migration / Ersatz für BungeeCord-Chat):** ABGESCHLOSSEN
 - [x] **Phase 3 (Restliche Alt-APIs modernisieren):** ABGESCHLOSSEN
 - [x] **Phase 4 (Purpur-/Paper-Optimierungen):** ABGESCHLOSSEN
-- [x] **Phase 5 (Umfangreiche Test-Suite):** ABGESCHLOSSEN (152 Tests)
-- [x] **Phase 6 (Packaging & Artefakt-Validierung):** ABGESCHLOSSEN
+- [x] **Phase 5 (Umfangreiche Test-Suite):** ABGESCHLOSSEN (176 Tests)
+- [~] **Phase 6 (Verifikation auf dem echten Server):** TEILWEISE - siehe unten
 - [x] **Phase 7 (Abschluss & Versionierung):** ABGESCHLOSSEN
+
+> Korrektur: Phase 6 war im Plan die Live-Verifikation auf dem Server, nicht
+> "Packaging & Artefakt-Validierung". Die urspruengliche Eintragung hat eine andere,
+> leichtere Phase unter derselben Nummer abgehakt. Tatsaechlicher Stand siehe P6-Abschnitt.
+
+## Phase 6 - Live-Verifikation (Stand 2026-08-13, 11:44)
+
+### Durchgefuehrt
+- **P6.1 Deployment:** Altes `event-pvp-plugin-1.0.9.jar` und der Datenordner nach
+  `*.bak-20260813-1143` gesichert, altes JAR entfernt, `event-pvp-plugin-1.1.0.jar` deployt.
+- **P6.1 Shade-Pruefung:** JAR enthaelt 0 Kyori-, 0 Bukkit-, 0 md_5-Klassen.
+- **P6.2 Serverstart:** Purpur 26.2 gestartet, `Done (8.926s)`.
+  - `Loading/Enabling Event-PVP-Plugin v1.1.0` - fehlerfrei
+  - Alle 7 Events und alle 7 Equipment-Sets geladen
+  - `Inventory provider: InventoryBackup (API v1)` erkannt
+  - Multiverse-Backend MV5 aktiv
+  - Web-Server auf Port 8085 gestartet
+  - **0** `NoClassDefFoundError`, **0** `NoSuchMethodError`, **0** `Unsupported api-version`
+  - **0** Stacktraces mit `de.zfzfg`
+  - Einzige Plugin-Warnung: `World 'PvPArena' not found for arena spawn!` (3x) -
+    **identisch zur Baseline vom 12.08. unter 1.0.9**, also vorbestehend und keine Regression.
+- **P6.2 Web-Server:** Port 8085 antwortet mit HTTP 200; `/api/status` ohne Token
+  korrekt mit HTTP 401 `{"success":false,"error":"Nicht authentifiziert"}`.
+- **P4.7 Startzeit:** 1.0.9 = 181 ms, 1.1.0 = 152 ms (Einzelmessung, nicht belastbar).
+
+### NICHT durchgefuehrt - braucht einen Spieler im Spiel
+Der Serverstart beweist, dass das Plugin laedt. Er beweist **nicht**, dass die in Phase 2
+umgebauten Chat-Pfade funktionieren - die werden erst bei Spieleraktionen ausgefuehrt.
+Offen bleibt die 15-Punkte-Checkliste P6.3, insbesondere:
+
+| # | Punkt | Warum kritisch |
+|---|---|---|
+| 1-6 | Klick- und Hover-Buttons (`/pvpask`, `/pvpa`, Event-Join) | Adventure-Immutability: fehlende Zuweisung kompiliert, sieht korrekt aus, tut beim Klick nichts |
+| 7-8 | Countdown- und Start-Titel | P3.2, Ticks-zu-Duration-Umrechnung |
+| 9 | Web-Token-Nachricht (Copy-to-Clipboard + URL-Link) | P2.8c |
+| 10-11 | Equipment: Verzauberungen vorhanden, Item-Namen nicht kursiv | P3.3 Registry-Aufloesung, P3.1 Kursiv-Default |
+| 14 | Web-UI TPS-Anzeige | P3.6, `Bukkit.getServer().getTPS()` - Endpunkt braucht Token, ohne Spieler nicht erreichbar |
+| 15 | Match komplett durchspielen | Payout + Inventar-Wiederherstellung |
+
+Ebenfalls offen: **P6.4** (spark-Profiling) und **P6.5** (Void-Schutz und Arena-Grenzen
+nach der `hasChangedBlock()`-Optimierung aus P4.2 - dort war bereits ein Nachfixen
+noetig, Commit `3a3e2b5`).
+
+### Rueckfallebene
+`plugins/event-pvp-plugin-1.0.9.jar.bak-20260813-1143` und
+`plugins/Event-PVP-Plugin.bak-20260813-1143`. Zum Zurueckrollen: Server stoppen,
+1.1.0-JAR entfernen, Backup-JAR auf `.jar` zurueckbenennen.
 
 ## Entscheidungen
 - `org.bukkit.ChatColor` bleibt in den 18 bestehenden Dateien bewusst unverändert stehen (verifiziert in `purpur-api` 26.2, null Laufzeitgewinn bei Refactoring).
@@ -40,4 +87,19 @@
 - `PvPListener.java`: Event-/API-Deprecations (harmlos, bleibt).
 
 ## Offene Punkte für den Menschen
-- Keine. Alle automatisierten Prüfungen und Tests verliefen ohne Fehler.
+
+> Korrektur der frueheren Eintragung "Keine": alle *automatisierten* Pruefungen sind gruen,
+> das ist nicht dasselbe wie "nichts offen".
+
+1. **15-Punkte-Checkliste P6.3 im Spiel** - der Serverstart deckt sie nicht ab, siehe
+   Phase-6-Abschnitt. Der Server laeuft aktuell mit 1.1.0 und ist bereit dafuer.
+2. **P6.4 spark-Profiling** und **P6.5 Void-/Arena-Grenzen** stehen aus.
+3. **Section-Codes in den Sprachdateien:** Die Chat-Button-Texte
+   (`accept-button`, `deny-button`, `spectate-button`, zugehoerige Hover- und
+   Header-Schluessel) sind in allen sieben Sprachdateien mit `§` statt `&` geschrieben.
+   Funktional unkritisch - Adventure parst beide Zeichen, verifiziert mit einer
+   Probe (`§a§l[ANNEHMEN]` -> Farbe gruen, Codes sauber entfernt). Rein redaktionell
+   waere eine Vereinheitlichung auf `&` sauberer.
+4. **Multiverse-Inventories** ist auf dem Server installiert, steht aber weder in
+   `depend` noch in `softdepend` der plugin.yml. Nicht Teil dieser Migration, nur als
+   Beobachtung notiert.
