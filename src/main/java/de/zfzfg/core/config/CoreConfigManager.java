@@ -334,7 +334,7 @@ public class CoreConfigManager {
                 }
             }
         }
-        return org.bukkit.ChatColor.translateAlternateColorCodes('&', msg);
+        return de.zfzfg.core.util.TextUtil.color(msg);
     }
 
     public FileConfiguration getConfig() { return config; }

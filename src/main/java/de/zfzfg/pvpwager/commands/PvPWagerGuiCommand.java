@@ -6,7 +6,6 @@ import de.zfzfg.pvpwager.gui.livetrade.LiveTradeManager;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -46,7 +45,7 @@ public class PvPWagerGuiCommand implements CommandExecutor, TabCompleter {
 
     private String getMsg(String key) {
         String msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, "");
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return MessageUtil.color(msg);
     }
     
     private String getGuiMsg(String key) {

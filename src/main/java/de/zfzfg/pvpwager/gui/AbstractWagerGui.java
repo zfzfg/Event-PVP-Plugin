@@ -2,6 +2,7 @@ package de.zfzfg.pvpwager.gui;
 
 import de.zfzfg.core.util.Text;
 import de.zfzfg.eventplugin.EventPlugin;
+import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -133,7 +134,7 @@ public abstract class AbstractWagerGui {
         if (val == null) {
             return "&c[missing: " + key + "]";
         }
-        String msg = org.bukkit.ChatColor.translateAlternateColorCodes('&', val);
+        String msg = MessageUtil.color(val);
         if (replacements != null && replacements.length > 0) {
             for (int i = 0; i < replacements.length - 1; i += 2) {
                 String raw = replacements[i] != null ? replacements[i].replaceAll("^[{%]+|[%}]+$", "") : "";

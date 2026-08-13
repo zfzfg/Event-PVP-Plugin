@@ -6,7 +6,6 @@ import de.zfzfg.pvpwager.gui.ResponseGui;
 import de.zfzfg.pvpwager.gui.WagerSession;
 import de.zfzfg.pvpwager.models.CommandRequest;
 import de.zfzfg.pvpwager.utils.MessageUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -38,7 +37,7 @@ public class PvPRespondCommand implements CommandExecutor {
         if (msg == null) {
             return "&c[missing: " + key + "]";
         }
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return MessageUtil.color(msg);
     }
     
     @Override

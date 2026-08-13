@@ -1,8 +1,8 @@
 package de.zfzfg.eventplugin.listeners;
 
+import de.zfzfg.eventplugin.util.ColorUtil;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.eventplugin.util.UpdateChecker;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -48,8 +48,8 @@ public class UpdateNotifyListener implements Listener {
         
         // Kurze Verzögerung damit die Join-Nachricht zuerst angezeigt wird
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', availableMessage));
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', downloadLinkMessage));
+            player.sendMessage(ColorUtil.color(availableMessage));
+            player.sendMessage(ColorUtil.color(downloadLinkMessage));
         }, 20L); // 1 Sekunde Delay
     }
 }

@@ -6,7 +6,6 @@ import de.zfzfg.pvpwager.models.CommandRequest;
 import de.zfzfg.core.util.Text;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import net.kyori.adventure.text.Component;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -48,7 +47,7 @@ public class CommandRequestManager {
         if (msg == null) {
             return "&c[missing: " + key + "]";
         }
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return MessageUtil.color(msg);
     }
     
     private String getMsg(String key, String placeholder, String value) {

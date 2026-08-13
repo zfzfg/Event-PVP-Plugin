@@ -1,9 +1,9 @@
 package de.zfzfg.eventplugin.security;
 
+import de.zfzfg.eventplugin.util.ColorUtil;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.eventplugin.session.EventSession;
 import de.zfzfg.pvpwager.models.Match;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
@@ -25,7 +25,7 @@ public class PlayerModeListener implements Listener {
     
     private String getMsg(String key) {
         String msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, "");
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return ColorUtil.color(msg);
     }
 
     // Entfernt: onCommandPreprocess. Die hardcodierte Blockierung von /v und /fly ist

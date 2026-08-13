@@ -207,7 +207,7 @@ public class VoidProtectionListener implements Listener {
                 player.setHealth(Math.min(player.getHealth() + 10, maxHealth));
             }
             
-            player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&', 
+            player.sendMessage(de.zfzfg.eventplugin.util.ColorUtil.color(
                 plugin.getConfigManager().getMessage("system.void-protection-teleported")));
         } else {
             plugin.getLogger().severe(plugin.getConsoleMsg("void-protection-critical", "player", player.getName()));

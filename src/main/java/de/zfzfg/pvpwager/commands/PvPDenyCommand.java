@@ -3,7 +3,6 @@ package de.zfzfg.pvpwager.commands;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -25,6 +24,7 @@ public class PvPDenyCommand implements CommandExecutor, TabCompleter {
     
     private final EventPlugin plugin;
     
+    @Deprecated
     public PvPDenyCommand(EventPlugin plugin) {
         this.plugin = plugin;
     }
@@ -40,7 +40,7 @@ public class PvPDenyCommand implements CommandExecutor, TabCompleter {
         if (msg == null) {
             return "&c[missing: " + key + "]";
         }
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return MessageUtil.color(msg);
     }
     
     private String getPvpMsg(String key) {
@@ -48,6 +48,7 @@ public class PvPDenyCommand implements CommandExecutor, TabCompleter {
     }
     
     @Override
+    @Deprecated
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(getMsg("players-only"));
@@ -115,6 +116,7 @@ public class PvPDenyCommand implements CommandExecutor, TabCompleter {
     }
     
     @Override
+    @Deprecated
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return new ArrayList<>();
         

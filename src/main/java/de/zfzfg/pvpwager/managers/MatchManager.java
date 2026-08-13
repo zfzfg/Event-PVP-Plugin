@@ -9,7 +9,6 @@ import de.zfzfg.pvpwager.utils.MessageUtil;
 import de.zfzfg.pvpwager.utils.InventoryUtil;
 import de.zfzfg.pvpwager.models.CommandRequest;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import de.zfzfg.core.util.Text;
 import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
@@ -78,7 +77,7 @@ public class MatchManager {
         if (msg == null) {
             return "&c[missing: " + key + "]";
         }
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return MessageUtil.color(msg);
     }
     
     /**

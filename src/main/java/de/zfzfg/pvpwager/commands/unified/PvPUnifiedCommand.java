@@ -4,7 +4,6 @@ import de.zfzfg.core.commands.SubCommand;
 import de.zfzfg.core.commands.SmartTabCompleter;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.utils.MessageUtil;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -35,7 +34,7 @@ public class PvPUnifiedCommand implements CommandExecutor, TabCompleter, Listene
     
     private String getMsg(String key) {
         String msg = plugin.getCoreConfigManager().getMessages().getString("messages." + key, "");
-        return ChatColor.translateAlternateColorCodes('&', msg);
+        return MessageUtil.color(msg);
     }
 
     private void register(SubCommand cmd) {

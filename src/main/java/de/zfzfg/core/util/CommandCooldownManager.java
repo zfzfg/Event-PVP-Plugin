@@ -1,6 +1,5 @@
 package de.zfzfg.core.util;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -23,7 +22,7 @@ public class CommandCooldownManager {
         // Last-resort marker only: EventPlugin installs the localized provider right
         // after construction. A baked-in English sentence here would answer in English
         // on a German server whenever that call was ever forgotten.
-        this.messageProvider = seconds -> ChatColor.RED + "[missing: messages.system.cooldown-wait]";
+        this.messageProvider = seconds -> TextUtil.color("&c[missing: messages.system.cooldown-wait]");
     }
     
     /**

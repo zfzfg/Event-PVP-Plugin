@@ -5,7 +5,6 @@ import de.zfzfg.pvpwager.gui.livetrade.LiveTradeManager;
 import de.zfzfg.pvpwager.gui.livetrade.LiveTradeSession;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,6 +31,7 @@ public class PvPAskCommand implements CommandExecutor, TabCompleter {
     
     private final EventPlugin plugin;
     
+    @Deprecated
     public PvPAskCommand(EventPlugin plugin) {
         this.plugin = plugin;
     }
@@ -56,7 +56,7 @@ public class PvPAskCommand implements CommandExecutor, TabCompleter {
         if (val == null) {
             val = plugin.getCoreConfigManager().getMessages().getString("messages.general." + key, null);
         }
-        if (val != null) return ChatColor.translateAlternateColorCodes('&', val);
+        if (val != null) return MessageUtil.color(val);
         warnMissingKey("messages.pvpask." + key);
         return "&c[missing: " + key + "]";
     }
@@ -108,6 +108,7 @@ public class PvPAskCommand implements CommandExecutor, TabCompleter {
     }
     
     @Override
+    @Deprecated
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(MessageUtil.color(getGeneralMsg("player-only")));
@@ -204,6 +205,7 @@ public class PvPAskCommand implements CommandExecutor, TabCompleter {
     }
     
     @Override
+    @Deprecated
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (!(sender instanceof Player)) return new ArrayList<>();
         

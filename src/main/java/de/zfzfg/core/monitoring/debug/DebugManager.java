@@ -1,9 +1,9 @@
 package de.zfzfg.core.monitoring.debug;
 
+import de.zfzfg.core.util.TextUtil;
 import de.zfzfg.core.security.Permission;
 import de.zfzfg.eventplugin.EventPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.time.LocalDateTime;
@@ -143,10 +143,10 @@ public class DebugManager {
     }
 
     private String colorize(String message) {
-        return ChatColor.translateAlternateColorCodes('&', message);
+        return TextUtil.color(message);
     }
 
     private String stripColor(String message) {
-        return ChatColor.stripColor(colorize(message));
+        return TextUtil.strip(message);
     }
 }
