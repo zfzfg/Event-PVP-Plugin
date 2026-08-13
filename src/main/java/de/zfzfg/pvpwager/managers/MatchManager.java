@@ -10,10 +10,8 @@ import de.zfzfg.pvpwager.utils.InventoryUtil;
 import de.zfzfg.pvpwager.models.CommandRequest;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import de.zfzfg.core.util.Text;
+import net.kyori.adventure.text.Component;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -842,24 +840,23 @@ public class MatchManager {
             Player p1 = match.getPlayer1();
             Player p2 = match.getPlayer2();
 
-            TextComponent header = new TextComponent(MessageUtil.color(
+            Component header = Text.of(
                 getMsg("spectate-header", "player1", p1.getName(), "player2", p2.getName())
-            ));
+            );
 
-            TextComponent spectateBtn1 = new TextComponent(MessageUtil.color(getMsg("spectate-button")));
-            spectateBtn1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/pvp spectate " + p1.getName()));
-            spectateBtn1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(MessageUtil.color(getMsg("spectate-hover"))).create()));
+            Component spectateBtn1 = Text.button(
+                getMsg("spectate-button"),
+                "/pvp spectate " + p1.getName(),
+                getMsg("spectate-hover")
+            );
 
-            TextComponent footer = new TextComponent(MessageUtil.color(getMsg("spectate-footer")));
-
-            header.addExtra(spectateBtn1);
-            header.addExtra(footer);
+            Component footer = Text.of(getMsg("spectate-footer"));
+            Component fullMessage = header.append(spectateBtn1).append(footer);
 
             for (Player online : Bukkit.getOnlinePlayers()) {
                 // Don't send to match participants; they already see match messages
                 if (online.equals(p1) || online.equals(p2)) continue;
-                online.spigot().sendMessage(header);
+                online.sendMessage(fullMessage);
             }
         } catch (Exception e) {
             // Fallback simple broadcast
