@@ -25,7 +25,6 @@ public class ConfirmationGui extends AbstractWagerGui {
     private static final int YOUR_WAGER_SLOT = 19;
     private static final int VS_SLOT = 22;
     private static final int ARENA_SLOT = 25;
-    private static final int ITEMS_DISPLAY_START = 28;
     private static final int MONEY_DISPLAY_SLOT = 30;
     private static final int EQUIPMENT_SLOT = 32;
     
@@ -81,12 +80,12 @@ public class ConfirmationGui extends AbstractWagerGui {
             if (target != null) {
                 meta.setOwningPlayer(target);
             }
-            meta.setDisplayName(MessageUtil.color(t("confirmation.target-title")));
-            meta.setLore(java.util.Arrays.asList(
-                MessageUtil.color(t("confirmation.target-player", "player", session.getTargetName())),
-                "",
-                MessageUtil.color(t("confirmation.target-line1")),
-                MessageUtil.color(t("confirmation.target-line2"))
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("confirmation.target-title")));
+            meta.lore(java.util.Arrays.asList(
+                de.zfzfg.core.util.Text.ofItem(t("confirmation.target-player", "player", session.getTargetName())),
+                de.zfzfg.core.util.Text.ofItem(""),
+                de.zfzfg.core.util.Text.ofItem(t("confirmation.target-line1")),
+                de.zfzfg.core.util.Text.ofItem(t("confirmation.target-line2"))
             ));
             head.setItemMeta(meta);
         }
