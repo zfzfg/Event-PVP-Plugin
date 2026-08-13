@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -143,11 +142,11 @@ public class NegotiationGui extends AbstractWagerGui {
         org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) head.getItemMeta();
         if (meta != null && opponent != null) {
             meta.setOwningPlayer(opponent);
-            meta.setDisplayName(MessageUtil.color(t("negotiation.opponent-title", "player", opponent.getName())));
-            meta.setLore(java.util.Arrays.asList(
-                "",
-                MessageUtil.color(t("negotiation.opponent-lore1")),
-                MessageUtil.color(t("negotiation.opponent-lore2"))
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("negotiation.opponent-title", "player", opponent.getName())));
+            meta.lore(java.util.Arrays.asList(
+                de.zfzfg.core.util.Text.ofItem(""),
+                de.zfzfg.core.util.Text.ofItem(t("negotiation.opponent-lore1")),
+                de.zfzfg.core.util.Text.ofItem(t("negotiation.opponent-lore2"))
             ));
             head.setItemMeta(meta);
         }
@@ -187,10 +186,10 @@ public class NegotiationGui extends AbstractWagerGui {
         org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) head.getItemMeta();
         if (meta != null) {
             meta.setOwningPlayer(player);
-            meta.setDisplayName(MessageUtil.color(t("negotiation.you-title", "player", player.getName())));
-            meta.setLore(java.util.Arrays.asList(
-                "",
-                MessageUtil.color(t("negotiation.you-lore"))
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("negotiation.you-title", "player", player.getName())));
+            meta.lore(java.util.Arrays.asList(
+                de.zfzfg.core.util.Text.ofItem(""),
+                de.zfzfg.core.util.Text.ofItem(t("negotiation.you-lore"))
             ));
             head.setItemMeta(meta);
         }
