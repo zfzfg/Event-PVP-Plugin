@@ -1449,6 +1449,7 @@ messages:
     stranded-no-target: 'Nie znaleziono bezpiecznego miejsca dla utknietego gracza {player}.'
     stranded-rescue-failed: 'Nie udalo sie uratowac {player} z {world}.'
     stranded-rescued: 'Uratowano {player}: {from} -> {to}'
+    spawn-type-unsupported: "Typ spawnu '{type}' nie jest obslugiwany przez teleportPlayersToSpawns - gracze nie zostali przeteleportowani."
   rescue:
     header: '&8&m                    &r &bRatunek &8&m                    '
     help-list: '&e/{label} rescue list &8- &7Pokaz otwarte sesje i pozycje powrotu'

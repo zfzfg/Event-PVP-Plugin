@@ -1450,6 +1450,7 @@ messages:
     stranded-no-target: 'Kein sicherer Ort fuer gestrandeten Spieler {player} gefunden.'
     stranded-rescue-failed: '{player} konnte nicht aus {world} zurueckgeholt werden.'
     stranded-rescued: '{player} zurueckgeholt: {from} -> {to}'
+    spawn-type-unsupported: "Spawn-Typ '{type}' wird von teleportPlayersToSpawns nicht unterstützt - Spieler wurden nicht teleportiert."
   rescue:
     header: '&8&m                    &r &bRettung &8&m                    '
     help-list: '&e/{label} rescue list &8- &7Offene Sitzungen und Rueckkehr-Positionen anzeigen'

@@ -365,7 +365,7 @@ public final class ConfiguredItemFactory {
     static String normalizeEnchantKey(String raw) {
         if (raw == null || raw.isBlank()) return null;
         String key = raw.trim().toLowerCase(Locale.ROOT);
-        if (!key.contains(":")) key = "minecraft:" + key;
+        if (!key.contains(":")) key = "minecraft:" + key; // i18n-ignore: minecraft namespace prefix
         return key;
     }
 

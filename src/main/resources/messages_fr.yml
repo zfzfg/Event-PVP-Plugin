@@ -1458,6 +1458,7 @@ messages:
     stranded-no-target: 'Aucun endroit sur trouve pour le joueur echoue {player}.'
     stranded-rescue-failed: 'Impossible de recuperer {player} depuis {world}.'
     stranded-rescued: '{player} recupere : {from} -> {to}'
+    spawn-type-unsupported: "Le type de spawn '{type}' n'est pas pris en charge par teleportPlayersToSpawns - les joueurs n'ont pas ete teleportes."
   rescue:
     header: '&8&m                    &r &bSauvetage &8&m                    '
     help-list: '&e/{label} rescue list &8- &7Afficher sessions ouvertes et positions de retour'

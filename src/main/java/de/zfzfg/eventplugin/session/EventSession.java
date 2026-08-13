@@ -925,8 +925,7 @@ public class EventSession {
             default:
                 // Sicherheitsnetz fuer neue SpawnType-Werte: lieber laut scheitern als Spieler
                 // in der Lobby stehen lassen.
-                plugin.getLogger().warning("Spawn-Typ " + config.getSpawnType()
-                        + " wird von teleportPlayersToSpawns nicht unterstuetzt - Spieler wurden nicht teleportiert."); // i18n-ignore: technical config error log
+                plugin.getLogger().warning(plugin.getConsoleMsg("spawn-type-unsupported", "type", String.valueOf(config.getSpawnType())));
                 break;
         }
     }

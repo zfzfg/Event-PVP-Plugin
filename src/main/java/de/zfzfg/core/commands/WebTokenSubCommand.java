@@ -61,7 +61,7 @@ public class WebTokenSubCommand extends SubCommand {
             return TextUtil.color(val);
         }
         warnMissingKey("messages.webtoken." + key);
-        return "§c[missing: " + key + "]";
+        return "§c[missing: " + key + "]"; // i18n-ignore: missing key fallback marker
     }
     
     private String msg(String key, String placeholder, String value) {

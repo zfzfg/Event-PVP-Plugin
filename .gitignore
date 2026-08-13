@@ -1,4 +1,15 @@
+# Build & target directories
 target/
-.pytest_cache/
 reports/
 deprecation-*.txt
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# IDE / Editor files
+.idea/
+*.iml
+.DS_Store

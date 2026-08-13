@@ -1454,6 +1454,7 @@ messages:
     stranded-no-target: 'No se encontro lugar seguro para el jugador varado {player}.'
     stranded-rescue-failed: 'No se pudo rescatar a {player} de {world}.'
     stranded-rescued: '{player} rescatado: {from} -> {to}'
+    spawn-type-unsupported: "El tipo de spawn '{type}' no es compatible con teleportPlayersToSpawns - los jugadores no fueron teletransportados."
   rescue:
     header: '&8&m                    &r &bRescate &8&m                    '
     help-list: '&e/{label} rescue list &8- &7Mostrar sesiones abiertas y posiciones de regreso'

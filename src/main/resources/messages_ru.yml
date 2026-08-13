@@ -1445,6 +1445,7 @@ messages:
     stranded-no-target: 'Не найдено безопасное место для застрявшего игрока {player}.'
     stranded-rescue-failed: 'Не удалось вернуть {player} из {world}.'
     stranded-rescued: '{player} возвращён: {from} -> {to}'
+    spawn-type-unsupported: "Тип спавна '{type}' не поддерживается teleportPlayersToSpawns - игроки не были телепортированы."
   rescue:
     header: '&8&m                    &r &bСпасение &8&m                    '
     help-list: '&e/{label} rescue list &8- &7Показать открытые сессии и позиции возврата'

@@ -1434,6 +1434,7 @@ messages:
     stranded-no-target: '取り残された {player} の安全な移動先が見つかりません。'
     stranded-rescue-failed: '{player} を {world} から救出できませんでした。'
     stranded-rescued: '{player} を救出しました: {from} -> {to}'
+    spawn-type-unsupported: "スポーンタイプ '{type}' は teleportPlayersToSpawns でサポートされていません - プレイヤーはテレポートされませんでした。"
   rescue:
     header: '&8&m                    &r &bレスキュー &8&m                    '
     help-list: '&e/{label} rescue list &8- &7未処理のセッションと帰還位置を表示'

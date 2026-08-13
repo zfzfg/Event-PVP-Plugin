@@ -1443,6 +1443,7 @@ messages:
     stranded-no-target: 'No safe location found for stranded player {player}.'
     stranded-rescue-failed: 'Could not rescue {player} from {world}.'
     stranded-rescued: 'Rescued {player}: {from} -> {to}'
+    spawn-type-unsupported: "Spawn type '{type}' is not supported by teleportPlayersToSpawns - players were not teleported."
   rescue:
     header: '&8&m                    &r &bRescue &8&m                    '
     help-list: '&e/{label} rescue list &8- &7Show open sessions and return locations'

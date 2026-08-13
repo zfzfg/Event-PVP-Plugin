@@ -247,7 +247,7 @@ def print_console(ctx, findings, baseline_suppressed=0, max_per_detector=15):
 def export_json(path: Path, ctx, findings, summary, console_result=None, untranslated_result=None,
                 selftest_result=None):
     payload = {
-        "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated": datetime.now().astimezone().isoformat(timespec="seconds"),
         "project_root": str(ctx.config.project_root).replace("\\", "/"),
         "summary": summary,
         "stats": {
@@ -284,7 +284,7 @@ def export_markdown(path: Path, ctx, findings, summary, console_result=None, unt
 
     out = []
     out.append("# i18n & Quality Audit Report\n")
-    out.append(f"**Generated**: {datetime.now(timezone.utc).isoformat(timespec='seconds')}  ")
+    out.append(f"**Generated**: {datetime.now().astimezone().isoformat(timespec='seconds')}  ")
     out.append(f"**Project root**: `{ctx.config.project_root}`  ")
     out.append(f"**Master bundle**: `{ctx.config.master_bundle}` "
                f"({len(ctx.master_keys)} keys)  ")
@@ -388,7 +388,7 @@ def load_baseline(path: Path):
 
 def write_baseline(path: Path, findings):
     payload = {
-        "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "generated": datetime.now().astimezone().isoformat(timespec="seconds"),
         "note": "Known findings accepted at the time of writing. Delete an entry "
                 "once it is fixed so it can never silently come back.",
         "fingerprints": sorted({f.fingerprint for f in findings}),
