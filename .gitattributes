@@ -1,0 +1,52 @@
+# Zeilenenden-Regeln fuer dieses Repository.
+#
+# Ausgangslage: core.autocrlf=true wandelte beim Auschecken auf CRLF um, waehrend im
+# Index (korrekterweise) LF steht. Dadurch meldete jeder Commit "LF will be replaced by
+# CRLF the next time Git touches it" und die Arbeitskopien waren gemischt - pom.xml mit
+# CRLF, die .java-Dateien mit LF. Diese Datei legt die Regel im Repository fest, sodass
+# sie unabhaengig von der lokalen Git-Konfiguration und auf jedem Rechner gleich gilt.
+#
+# Der Index bleibt unveraendert bei LF; es aendert sich nur, was beim Auschecken in der
+# Arbeitskopie landet.
+
+# Standard: Git erkennt Textdateien selbst und normalisiert sie im Index auf LF.
+* text=auto
+
+# --- Quelltext und Konfiguration: ueberall LF, auch in der Arbeitskopie ---
+*.java      text eol=lf
+*.xml       text eol=lf
+*.yml       text eol=lf
+*.yaml      text eol=lf
+*.json      text eol=lf
+*.js        text eol=lf
+*.html      text eol=lf
+*.css       text eol=lf
+*.py        text eol=lf
+*.md        text eol=lf
+*.txt       text eol=lf
+*.bbcode    text eol=lf
+*.properties text eol=lf
+*.gitignore text eol=lf
+*.gitattributes text eol=lf
+LICENSE     text eol=lf
+
+# --- Windows-Skripte brauchen CRLF ---
+# cmd.exe interpretiert .bat-Dateien mit reinen LF-Enden fehlerhaft (abgeschnittene
+# Argumente bei goto/call). Deshalb hier bewusst die Ausnahme.
+*.bat       text eol=crlf
+*.cmd       text eol=crlf
+*.ps1       text eol=crlf
+
+# --- Binaerdateien: nie anfassen ---
+# Ohne diese Zeilen koennte die Auto-Erkennung eine Datei faelschlich als Text einstufen
+# und beim Ein-/Auschecken CR-Bytes einfuegen - das zerstoert sie unbemerkt.
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.ico       binary
+*.pyc       binary
+*.jar       binary
+*.zip       binary
+*.gz        binary
+*.mcmeta    text eol=lf
