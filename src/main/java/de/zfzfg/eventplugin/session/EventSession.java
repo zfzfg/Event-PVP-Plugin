@@ -1858,13 +1858,24 @@ plugin.getEventManager().removeSession(config.getId());
         for (UUID uuid : validParticipants) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.sendTitle(ColorUtil.color(title), ColorUtil.color(subtitle), 10, 40, 10);
+                showTitle(player, title, subtitle, 10, 40, 10);
             }
         }
     }
     
     private void sendTitleToPlayer(Player player, String title, String subtitle) {
-        player.sendTitle(ColorUtil.color(title), ColorUtil.color(subtitle), 10, 60, 10);
+        showTitle(player, title, subtitle, 10, 60, 10);
+    }
+
+    private static void showTitle(Player player, String title, String subtitle,
+                                  int fadeIn, int stay, int fadeOut) {
+        player.showTitle(net.kyori.adventure.title.Title.title(
+                Text.of(title),
+                Text.of(subtitle),
+                net.kyori.adventure.title.Title.Times.times(
+                        java.time.Duration.ofMillis(fadeIn * 50L),
+                        java.time.Duration.ofMillis(stay * 50L),
+                        java.time.Duration.ofMillis(fadeOut * 50L))));
     }
     
     private void playSound(Sound sound, float volume, float pitch) {
