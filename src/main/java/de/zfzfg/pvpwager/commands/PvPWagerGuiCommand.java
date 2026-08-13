@@ -1,12 +1,10 @@
 package de.zfzfg.pvpwager.commands;
 
 import de.zfzfg.eventplugin.EventPlugin;
+import de.zfzfg.core.util.Text;
 import de.zfzfg.pvpwager.gui.livetrade.LiveTradeManager;
 import de.zfzfg.pvpwager.utils.MessageUtil;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -198,47 +196,32 @@ public class PvPWagerGuiCommand implements CommandExecutor, TabCompleter {
             // Header
             String header = getGuiMsg("request-header");
             String challengeMsg = getGuiMsg("challenge-message").replace("{player}", sender.getName());
-            TextComponent message = new TextComponent(MessageUtil.color(
+            Component message = Text.of(
                 "\n§6§l━━━━━━━━━━━━━━━━━━━━━━━\n" +
                 header + "\n" +
                 "§6§l━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
                 challengeMsg + "\n\n"
-            ));
+            );
             
             // ANNEHMEN Button - öffnet das GUI
-            TextComponent acceptButton = new TextComponent(MessageUtil.color(getGuiMsg("accept-button")));
-            acceptButton.setClickEvent(new ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/pvpaccept " + sender.getName()
-            ));
-            acceptButton.setHoverEvent(new HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(MessageUtil.color(getGuiMsg("accept-hover"))).create()
-            ));
+            Component acceptButton = Text.button(
+                getGuiMsg("accept-button"),
+                "/pvpaccept " + sender.getName(),
+                getGuiMsg("accept-hover")
+            );
             
             // ABLEHNEN Button
-            TextComponent denyButton = new TextComponent(MessageUtil.color(getGuiMsg("deny-button")));
-            denyButton.setClickEvent(new ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/pvpdeny " + sender.getName()
-            ));
-            denyButton.setHoverEvent(new HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(MessageUtil.color(getGuiMsg("deny-hover"))).create()
-            ));
+            Component denyButton = Text.button(
+                getGuiMsg("deny-button"),
+                "/pvpdeny " + sender.getName(),
+                getGuiMsg("deny-hover")
+            );
             
             // Footer
-            TextComponent footer = new TextComponent(MessageUtil.color(
-                getGuiMsg("request-footer")
-            ));
-            
-            // Zusammensetzen
-            message.addExtra(acceptButton);
-            message.addExtra(denyButton);
-            message.addExtra(footer);
+            Component footer = Text.of(getGuiMsg("request-footer"));
             
             // An Target senden
-            target.spigot().sendMessage(message);
+            target.sendMessage(message.append(acceptButton).append(denyButton).append(footer));
             
         } catch (Exception e) {
             // Fallback
