@@ -158,7 +158,7 @@ public class PvPListener implements Listener {
             
             Player killer = player.getKiller();
             // Suppress default death message synchronously; we will broadcast our own later
-            event.setDeathMessage(null);
+            event.deathMessage(null);
 
             // Evaluate outcome one tick later to catch simultaneous deaths (double-kill/void)
             org.bukkit.Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -348,8 +348,7 @@ public class PvPListener implements Listener {
             boolean criticallyFar = distance > 50.0;
             
             String currentCoords = String.format("%.2f, %.2f, %.2f", current.getX(), current.getY(), current.getZ());
-            String expectedCoords = String.format("%.2f, %.2f, %.2f", expected.getX(), expected.getY(), expected.getZ());
-            
+
             if (wrongWorld) {
                 // KRITISCH: Spieler in falscher Welt - MUSS teleportiert werden!
                 plugin.getLogger().warning(plugin.getConsoleMsg("safe-respawn-wrong-world", "player", player.getName()));
@@ -394,18 +393,6 @@ public class PvPListener implements Listener {
                 plugin.getLogger().info(plugin.getConsoleMsg("safe-respawn-correction-success", "player", player.getName(), "world", currentWorld));
             }
         }, 3L);
-    }
-    
-    /**
-     * Prüft ob die Arena-Welt entladen ist.
-     */
-    private boolean isArenaWorldUnloaded(Match match) {
-        if (match == null || match.getArena() == null) return false;
-        
-        String arenaWorldName = match.getArena().getArenaWorld();
-        if (arenaWorldName == null || arenaWorldName.isEmpty()) return false;
-        
-        return org.bukkit.Bukkit.getWorld(arenaWorldName) == null;
     }
     
     /**
