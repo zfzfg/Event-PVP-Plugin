@@ -1,12 +1,10 @@
 package de.zfzfg.pvpwager.managers;
 
 import de.zfzfg.eventplugin.EventPlugin;
+import de.zfzfg.core.util.Text;
 import de.zfzfg.core.util.Time;
 import de.zfzfg.pvpwager.models.PvPRequest;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.scheduler.BukkitTask;
@@ -63,48 +61,20 @@ public class RequestManager {
     
     private void sendClickableRequest(Player sender, Player target) {
         try {
-            // Create main message
-            TextComponent message = new TextComponent(MessageUtil.color(
-                getMsg("request.header", "{player}", sender.getName())));
+            Component message = Text.of(getMsg("request.header", "{player}", sender.getName()));
+            Component acceptButton = Text.button(
+                getMsg("request.accept-button"),
+                "/pvp accept " + sender.getName(),
+                getMsg("request.accept-hover")
+            );
+            Component denyButton = Text.button(
+                getMsg("request.deny-button"),
+                "/pvp deny " + sender.getName(),
+                getMsg("request.deny-hover")
+            );
+            Component footer = Text.of(getMsg("request.footer"));
             
-            // Create clickable ACCEPT button
-            TextComponent acceptButton = new TextComponent(MessageUtil.color(
-                getMsg("request.accept-button")));
-            acceptButton.setClickEvent(new ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/pvp accept " + sender.getName()
-            ));
-            acceptButton.setHoverEvent(new HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(MessageUtil.color(
-                    getMsg("request.accept-hover"))).create()
-            ));
-            
-            // Create DENY button
-            TextComponent denyButton = new TextComponent(MessageUtil.color(
-                getMsg("request.deny-button")));
-            denyButton.setClickEvent(new ClickEvent(
-                ClickEvent.Action.RUN_COMMAND,
-                "/pvp deny " + sender.getName()
-            ));
-            denyButton.setHoverEvent(new HoverEvent(
-                HoverEvent.Action.SHOW_TEXT,
-                new ComponentBuilder(MessageUtil.color(
-                    getMsg("request.deny-hover"))).create()
-            ));
-            
-            // Create footer
-            TextComponent footer = new TextComponent(MessageUtil.color(
-                getMsg("request.footer")));
-            
-            // Combine all components
-            message.addExtra(acceptButton);
-            message.addExtra(denyButton);
-            message.addExtra(footer);
-            
-            // Send to target
-            target.spigot().sendMessage(message);
-            
+            target.sendMessage(message.append(acceptButton).append(denyButton).append(footer));
         } catch (Exception e) {
             // Fallback to simple message if chat components fail
             MessageUtil.sendMessage(target, 
