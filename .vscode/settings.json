@@ -1,4 +1,10 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.compile.nullAnalysis.mode": "automatic"
+    // "automatic" schaltet die Null-Analyse von Eclipse JDT ein, sobald Null-Annotationen
+    // im Klassenpfad liegen. Die Bukkit/Paper-API traegt solche Annotationen nur
+    // teilweise, wodurch rund 175 Falschmeldungen entstehen ("needs unchecked
+    // conversion to conform to '@NonNull ...'", "Potential null pointer access" auf
+    // Werten, die nie null sind). Maven/javac melden davon nichts - es ist reine
+    // Editor-Anzeige. Deshalb aus.
+    "java.compile.nullAnalysis.mode": "disabled"
 }

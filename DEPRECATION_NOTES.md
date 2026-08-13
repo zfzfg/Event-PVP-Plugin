@@ -20,7 +20,46 @@
   - `PotionEffectType.getByName` / `values()` -> `Registry.POTION_EFFECT_TYPE`
   - `enchantment.isTreasure()` / `isCursed()` -> `EnchantmentTagKeys.TREASURE` / `CURSE`
   - `ItemMeta#setCustomModelData(Integer)` -> mit `@SuppressWarnings("deprecation")` belassen (Kompatibilitaet mit Integer-Schema der `equipment.yml`).
-- Phase D6 (`org.bukkit.ChatColor`): Wie geplant unveraendert belassen, um Regressionsrisiken zu vermeiden. Ungenutzte Alt-Reste wie die private Hilfsmethode `color(String)` und der ungenutzte `ChatColor`-Import in `ConfiguredItemFactory` wurden bereinigt (da Item-Namen & Lore vollstaendig ueber `Text.ofItem(...)` laufen).
+- Phase D6 (`org.bukkit.ChatColor`): Zunaechst wie geplant zurueckgestellt, danach **doch ausgefuehrt** (siehe Nachtrag unten). Ungenutzte Alt-Reste wie die private Hilfsmethode `color(String)` und der ungenutzte `ChatColor`-Import in `ConfiguredItemFactory` wurden bereinigt (da Item-Namen & Lore vollstaendig ueber `Text.ofItem(...)` laufen).
+
+## Nachtrag 2026-08-13: D6 ausgefuehrt, Panel auf null Meldungen
+
+Nach D7 blieben 39 Editor-Meldungen uebrig. Der Grund, D6 zurueckzustellen, war das
+Regressionsrisiko einer flaechendeckenden Migration - der tatsaechliche Restbestand war aber
+klein und gleichfoermig, deshalb die Neubewertung.
+
+- **15 `ChatColor`-Stellen entfernt.** 14 davon waren woertlich dieselbe Zeile
+  (`ChatColor.translateAlternateColorCodes('&', msg)`). Ersetzt durch den jeweils im Paket
+  bereits vorhandenen Delegaten - `TextUtil.color` (core), `ColorUtil.color` (eventplugin),
+  `MessageUtil.color` (pvpwager) -, die alle auf `Text.of`/`Text.toLegacy` zusammenlaufen.
+  Kein neuer Parser, keine zusaetzliche Abstraktion. Sonderfaelle:
+  `DebugManager#stripColor` -> `TextUtil.strip`, `CommandCooldownManager` -> `&c` im Text
+  statt `ChatColor.RED`.
+- **Legacy-`PvP*Command`-Aliase (8 Meldungen in `EventPlugin`):**
+  `@SuppressWarnings("deprecation")` an den **einzelnen Variablendeklarationen**, nicht an
+  `onEnable()`. Bewusst so: `onEnable()` ist lang, eine Unterdrueckung auf Methodenebene
+  wuerde dort kuenftige, echte Deprecations verschlucken. Fuer `pvpyes`/`pvpno` wurden dafuer
+  lokale Variablen eingefuehrt; die Registrierungsreihenfolge bleibt unveraendert.
+- **16 Member in den 6 Legacy-Command-Klassen** haben `@Deprecated` erhalten (Konstruktor,
+  `onCommand`, `onTabComplete`). Das ist keine Unterdrueckung, sondern die inhaltlich richtige
+  Antwort auf den Hinweis: gehoert die Klasse zum Altbestand, gilt das auch fuer ihre Member.
+
+**Ergebnis:** `mvn -o clean test-compile -DcompilerArgument=-Xlint:deprecation` meldet
+**keine einzige** Deprecation mehr. 176 Tests gruen. Im Quelltext existiert kein
+`ChatColor.`-Aufruf mehr (nur noch eine Erwaehnung in einem Kommentar in `Text.java`).
+
+**Bewusst NICHT gemacht:** die Kategorie ueber
+`org.eclipse.jdt.core.compiler.problem.deprecation=ignore` global stummschalten. Genau diese
+Kategorie hat `Enchantment#getName()` gemeldet - die einzige Stelle im Plugin, die
+*deprecated for removal* ist und bei einem kuenftigen Paper-Update den Build bricht. Die
+Meldungen wurden behoben, nicht ausgeblendet.
+
+### Editor-Einstellung (kein Code)
+
+In `.vscode/settings.json` steht `java.compile.nullAnalysis.mode` jetzt auf `disabled`
+(vorher `automatic`). Grund: Eclipse JDT erzeugte rund 200 Null-Annotation-Falschmeldungen,
+weil die Bukkit/Paper-API nur teilweise annotiert ist. Maven und javac haben davon nie etwas
+gemeldet - reine Editor-Anzeige, das Artefakt ist unveraendert.
 
 ## Durchgefuehrte Git-Commits
 - `D0: DEPRECATION_NOTES.md angelegt und Baseline dokumentiert`
