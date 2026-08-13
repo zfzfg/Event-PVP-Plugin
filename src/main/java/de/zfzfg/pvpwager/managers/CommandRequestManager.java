@@ -3,7 +3,9 @@ package de.zfzfg.pvpwager.managers;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.core.util.Time;
 import de.zfzfg.pvpwager.models.CommandRequest;
+import de.zfzfg.core.util.Text;
 import de.zfzfg.pvpwager.utils.MessageUtil;
+import net.kyori.adventure.text.Component;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -139,27 +141,10 @@ public class CommandRequestManager {
         if (isSkip) {
             // Show clickable accept/deny buttons for SKIP
             try {
-                net.md_5.bungee.api.chat.TextComponent accept = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-accept")));
-                accept.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
-                    net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
-                    "/pvp accept " + request.getSender().getName()
-                ));
-                accept.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
-                    net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-accept-hover"))).create()
-                ));
+                Component accept = Text.button(getMsg("btn-accept"), "/pvp accept " + request.getSender().getName(), getMsg("btn-accept-hover"));
+                Component deny = Text.button(getMsg("btn-deny"), "/pvp deny " + request.getSender().getName(), getMsg("btn-deny-hover"));
 
-                net.md_5.bungee.api.chat.TextComponent deny = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-deny")));
-                deny.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
-                    net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
-                    "/pvp deny " + request.getSender().getName()
-                ));
-                deny.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
-                    net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-deny-hover"))).create()
-                ));
-
-                target.spigot().sendMessage(accept, deny);
+                target.sendMessage(accept.append(Component.space()).append(deny));
             } catch (Exception ignored) {
                 // Fallback to plain text
                 MessageUtil.sendMessage(target, "&a/pvp accept " + request.getSender().getName() + " &7- " + getMsg("accept-command")); // i18n-ignore
@@ -171,30 +156,10 @@ public class CommandRequestManager {
         } else {
             // Show clickable buttons for responding with GUI or command
             try {
-                // GUI Button
-                net.md_5.bungee.api.chat.TextComponent guiBtn = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-open-gui")));
-                guiBtn.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
-                    net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
-                    "/pvprespond gui"
-                ));
-                guiBtn.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
-                    net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-open-gui-hover"))).create()
-                ));
-                
-                net.md_5.bungee.api.chat.TextComponent space = new net.md_5.bungee.api.chat.TextComponent(" ");
-                
-                net.md_5.bungee.api.chat.TextComponent denyBtn = new net.md_5.bungee.api.chat.TextComponent(MessageUtil.color(getMsg("btn-deny")));
-                denyBtn.setClickEvent(new net.md_5.bungee.api.chat.ClickEvent(
-                    net.md_5.bungee.api.chat.ClickEvent.Action.RUN_COMMAND,
-                    "/pvp deny " + request.getSender().getName()
-                ));
-                denyBtn.setHoverEvent(new net.md_5.bungee.api.chat.HoverEvent(
-                    net.md_5.bungee.api.chat.HoverEvent.Action.SHOW_TEXT,
-                    new net.md_5.bungee.api.chat.ComponentBuilder(MessageUtil.color(getMsg("btn-deny-hover"))).create()
-                ));
-                
-                target.spigot().sendMessage(guiBtn, space, denyBtn);
+                Component guiBtn = Text.button(getMsg("btn-open-gui"), "/pvprespond gui", getMsg("btn-open-gui-hover"));
+                Component denyBtn = Text.button(getMsg("btn-deny"), "/pvp deny " + request.getSender().getName(), getMsg("btn-deny-hover"));
+
+                target.sendMessage(guiBtn.append(Component.space()).append(denyBtn));
             } catch (Exception ignored) {
                 // Fallback
             }
