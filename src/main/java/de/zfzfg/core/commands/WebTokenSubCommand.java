@@ -4,6 +4,7 @@ import de.zfzfg.core.web.WebAuthManager;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.core.util.Text;
 import de.zfzfg.core.util.TextUtil;
+import de.zfzfg.pvpwager.utils.MessageUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
