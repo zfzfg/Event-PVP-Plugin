@@ -1,3 +1,4 @@
 target/
 .pytest_cache/
 reports/
+deprecation-*.txt
