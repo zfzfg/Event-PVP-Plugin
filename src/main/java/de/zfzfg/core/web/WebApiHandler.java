@@ -1,6 +1,5 @@
 package de.zfzfg.core.web;
 
-import com.google.gson.Gson;
 import org.bukkit.plugin.java.JavaPlugin;
 import de.zfzfg.eventplugin.EventPlugin;
 
@@ -14,7 +13,6 @@ public class WebApiHandler {
 
     private final JavaPlugin plugin;
     private final WebConfigManager configManager;
-    private final Gson gson;
 
     /** Wiederherstellungen pro Minute ueber das gesamte Panel. */
     private static final int RESTORE_LIMIT_PER_MINUTE = 10;
@@ -34,7 +32,6 @@ public class WebApiHandler {
     public WebApiHandler(JavaPlugin plugin, WebConfigManager configManager) {
         this.plugin = plugin;
         this.configManager = configManager;
-        this.gson = configManager.getGson();
     }
 
     // ============ Config API ============
@@ -546,10 +543,15 @@ public class WebApiHandler {
             org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 if (meta.hasDisplayName()) {
-                    map.put("displayName", meta.getDisplayName());
+                    map.put("displayName", de.zfzfg.core.util.Text.plain(de.zfzfg.core.util.Text.toLegacy(meta.displayName())));
                 }
                 if (meta.hasLore()) {
-                    map.put("lore", meta.getLore());
+                    List<net.kyori.adventure.text.Component> loreComponents = meta.lore();
+                    if (loreComponents != null) {
+                        map.put("lore", loreComponents.stream()
+                            .map(c -> de.zfzfg.core.util.Text.plain(de.zfzfg.core.util.Text.toLegacy(c)))
+                            .toList());
+                    }
                 }
                 if (!meta.getEnchants().isEmpty()) {
                     Map<String, Integer> enchants = new LinkedHashMap<>();
