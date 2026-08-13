@@ -68,18 +68,13 @@ public class WorldChangeListener implements Listener {
         }
     }
     
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        Location from = event.getFrom();
-        Location to = event.getTo();
-        
-        // Optimization: Only check if player actually moved to a new block
-        if (to == null || (from.getBlockX() == to.getBlockX() && 
-                          from.getBlockY() == to.getBlockY() && 
-                          from.getBlockZ() == to.getBlockZ())) {
+        if (!event.hasChangedBlock()) {
             return;
         }
+        
+        Player player = event.getPlayer();
         
         Match match = plugin.getMatchManager().getMatchByPlayer(player);
         

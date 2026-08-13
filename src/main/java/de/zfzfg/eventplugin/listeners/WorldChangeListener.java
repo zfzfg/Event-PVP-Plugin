@@ -106,14 +106,12 @@ public class WorldChangeListener implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
-        Player player = event.getPlayer();
-        Location to = event.getTo();
-        Location from = event.getFrom();
-        if (to == null || (from.getBlockX() == to.getBlockX() && from.getBlockY() == to.getBlockY() && from.getBlockZ() == to.getBlockZ())) {
+        if (!event.hasChangedBlock()) {
             return;
         }
+        Player player = event.getPlayer();
 
         // Enforce presence rules only when worlds are loaded
         Optional<EventSession> sessionOpt = plugin.getEventManager().getPlayerSession(player);

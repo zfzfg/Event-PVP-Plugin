@@ -69,7 +69,7 @@ public class VoidProtectionListener implements Listener {
     /**
      * Überwacht Spielerbewegung NUR wenn in falscher Welt.
      */
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerMove(PlayerMoveEvent event) {
         Location to = event.getTo();
         if (to == null) return;
