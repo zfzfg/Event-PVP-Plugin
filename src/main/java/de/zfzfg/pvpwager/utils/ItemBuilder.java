@@ -1,5 +1,6 @@
 package de.zfzfg.pvpwager.utils;
 
+import de.zfzfg.core.util.Text;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
@@ -23,7 +24,7 @@ public class ItemBuilder {
     public ItemBuilder setName(String name) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(MessageUtil.color(name));
+            meta.displayName(Text.ofItem(name));
             item.setItemMeta(meta);
         }
         return this;
@@ -36,8 +37,7 @@ public class ItemBuilder {
     public ItemBuilder setLore(List<String> lore) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<String> coloredLore = lore.stream().map(MessageUtil::color).toList();
-            meta.setLore(coloredLore);
+            meta.lore(lore.stream().map(Text::ofItem).toList());
             item.setItemMeta(meta);
         }
         return this;
