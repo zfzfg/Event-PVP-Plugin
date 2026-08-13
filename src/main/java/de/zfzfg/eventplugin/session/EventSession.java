@@ -217,7 +217,7 @@ public class EventSession {
                 if (java.util.Arrays.stream(JOIN_PHASE_ANNOUNCE_SECONDS).anyMatch(s -> s == joinPhaseCountdown)) {
                     String msg = plugin.getConfigManager().getMessage("start.join-phase-ending")
                         .replace("{time}", String.valueOf(joinPhaseCountdown));
-                    Bukkit.broadcastMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + msg));
+                    Bukkit.broadcast(Text.of(plugin.getConfigManager().getPrefix() + " " + msg));
                 }
                 
                 joinPhaseCountdown--;
@@ -248,14 +248,14 @@ public class EventSession {
             joinPhaseTask.cancel();
         }
         
-        Bukkit.broadcastMessage(ColorUtil.color(
+        Bukkit.broadcast(Text.of(
             plugin.getConfigManager().getPrefix() + " " +
             plugin.getConfigManager().getMessage("start.join-phase-closed")
         ));
         
         // NEU: PrÃƒÂ¼fe ob genug Spieler angemeldet sind
         if (participants.size() < config.getMinPlayers()) {
-            Bukkit.broadcastMessage(ColorUtil.color(
+            Bukkit.broadcast(Text.of(
                 plugin.getConfigManager().getPrefix() + " " +
                 plugin.getConfigManager().getMessage("start.not-enough-players")
                     .replace("{min}", String.valueOf(config.getMinPlayers()))
@@ -283,7 +283,7 @@ public class EventSession {
             int validPlayerCount = (participants.size() / teamCount) * teamCount;
             
             if (validPlayerCount < config.getMinPlayers()) {
-                Bukkit.broadcastMessage(ColorUtil.color(
+                Bukkit.broadcast(Text.of(
                     plugin.getConfigManager().getPrefix() + " " +
                     plugin.getConfigManager().getMessage("start.not-enough-players")
                         .replace("{min}", String.valueOf(config.getMinPlayers()))
@@ -913,6 +913,20 @@ public class EventSession {
             case COMMAND:
                 // Teleport via command - handled by executeSpawnCommand()
                 executeSpawnCommand();
+                break;
+
+            case TEAM_SPAWNS:
+                // TEAM_SPAWNS ohne Team-Spielmodus: die Team-Verteilung funktioniert trotzdem,
+                // weil teleportTeamsToSpawns() pro Spieler ueber den TeamManager aufloest. Ohne
+                // diesen Zweig wuerde der Switch stumm durchfallen und niemand wuerde teleportiert.
+                teleportTeamsToSpawns(world);
+                break;
+
+            default:
+                // Sicherheitsnetz fuer neue SpawnType-Werte: lieber laut scheitern als Spieler
+                // in der Lobby stehen lassen.
+                plugin.getLogger().warning("Spawn-Typ " + config.getSpawnType()
+                        + " wird von teleportPlayersToSpawns nicht unterstuetzt - Spieler wurden nicht teleportiert."); // i18n-ignore: technical config error log
                 break;
         }
     }
