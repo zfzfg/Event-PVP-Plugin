@@ -74,6 +74,12 @@ public class WorldChangeListener implements Listener {
             return;
         }
         
+        Location to = event.getTo();
+        Location from = event.getFrom();
+        if (to == null) {
+            return;
+        }
+
         Player player = event.getPlayer();
         
         Match match = plugin.getMatchManager().getMatchByPlayer(player);
