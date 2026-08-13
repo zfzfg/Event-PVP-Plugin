@@ -7,10 +7,10 @@ import de.zfzfg.core.security.Permission;
 import de.zfzfg.core.monitoring.debug.DebugLevel;
 import de.zfzfg.core.monitoring.debug.DebugManager;
 import de.zfzfg.core.web.WebAuthManager;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import de.zfzfg.core.util.Text;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -281,11 +281,10 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         player.sendMessage(ColorUtil.color(getWebtokenMsg("your-token")));
         
         // Klickbarer Token
-        TextComponent tokenComponent = new TextComponent(ColorUtil.color("  &a&l➤ " + token + " " + getWebtokenMsg("click-to-copy"))); // i18n-ignore
-        tokenComponent.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, token));
-        tokenComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
-            new Text(ColorUtil.color(getWebtokenMsg("hover-copy")))));
-        player.spigot().sendMessage(tokenComponent);
+        Component tokenComponent = Text.of("  &a&l➤ " + token + " " + getWebtokenMsg("click-to-copy"))
+            .clickEvent(ClickEvent.copyToClipboard(token))
+            .hoverEvent(HoverEvent.showText(Text.of(getWebtokenMsg("hover-copy"))));
+        player.sendMessage(tokenComponent);
         
         player.sendMessage("");
         player.sendMessage(ColorUtil.color(getWebtokenMsg("valid-for", "minutes", "10")));
@@ -295,11 +294,12 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         // Web-URL (aus Konfiguration)
         String url = plugin.getWebPublicUrl();
         
-        TextComponent urlComponent = new TextComponent(ColorUtil.color("  &b&l➤ " + url + " " + getWebtokenMsg("click-to-open"))); // i18n-ignore
-        urlComponent.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, url));
-        urlComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, 
-            new Text(ColorUtil.color(getWebtokenMsg("hover-open")))));
-        player.spigot().sendMessage(urlComponent);
+        Component urlComponent = Text.link(
+            "  &b&l➤ " + url + " " + getWebtokenMsg("click-to-open"),
+            url,
+            getWebtokenMsg("hover-open")
+        );
+        player.sendMessage(urlComponent);
         
         player.sendMessage(ColorUtil.color("&8&m                                                &r"));
         player.sendMessage("");
