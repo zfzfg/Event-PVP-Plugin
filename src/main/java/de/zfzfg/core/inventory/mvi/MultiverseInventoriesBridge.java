@@ -65,7 +65,7 @@ public final class MultiverseInventoriesBridge {
             this.report = MviConflictReport.notInstalled();
             return;
         }
-        this.version = mvi.getDescription().getVersion();
+        this.version = mvi.getPluginMeta().getVersion();
         this.report = diagnose(mvi);
     }
 

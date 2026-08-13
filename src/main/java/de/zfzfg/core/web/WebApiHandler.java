@@ -1007,8 +1007,8 @@ public class WebApiHandler {
         response.put("success", true);
         
         Map<String, Object> status = new LinkedHashMap<>();
-        status.put("pluginName", plugin.getDescription().getName());
-        status.put("pluginVersion", plugin.getDescription().getVersion());
+        status.put("pluginName", plugin.getPluginMeta().getName());
+        status.put("pluginVersion", plugin.getPluginMeta().getVersion());
         status.put("serverVersion", plugin.getServer().getVersion());
         status.put("onlinePlayers", plugin.getServer().getOnlinePlayers().size());
         status.put("maxPlayers", plugin.getServer().getMaxPlayers());

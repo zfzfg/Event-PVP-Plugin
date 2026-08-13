@@ -290,7 +290,7 @@ public class EventPlugin extends JavaPlugin {
         // GUI-Listener für Wager-GUIs
         getServer().getPluginManager().registerEvents(new GuiListener(this), this);
         // Live Trade GUI Listener
-        getServer().getPluginManager().registerEvents(new LiveTradeListener(this, liveTradeManager), this);
+        getServer().getPluginManager().registerEvents(new LiveTradeListener(liveTradeManager), this);
 
         // === Multiverse-Weltverwaltung (Backend-Wahl MV5-API vs. Konsolenbefehle) ===
         mvWorldService = new de.zfzfg.core.world.mv.MvWorldService(this);
@@ -328,7 +328,7 @@ public class EventPlugin extends JavaPlugin {
         // === Update-Check ===
         // Der Checker wird immer angelegt, damit /eventpvp version ihn benutzen
         // kann; nur der Abruf beim Start haengt an der Konfiguration.
-        updateChecker = new UpdateChecker(this, getDescription().getVersion(),
+        updateChecker = new UpdateChecker(this, getPluginMeta().getVersion(),
                 configManager.getModrinthProjectId());
         if (configManager.isUpdateCheckEnabled() && configManager.shouldCheckOnStartup()) {
             updateChecker.checkForUpdates();

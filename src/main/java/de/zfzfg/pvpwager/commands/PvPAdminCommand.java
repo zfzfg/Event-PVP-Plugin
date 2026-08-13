@@ -82,7 +82,7 @@ public class PvPAdminCommand implements CommandExecutor {
         int activeMatches = plugin.getMatchManager().getActiveMatchCount();
         MessageUtil.sendMessage(sender, cfg.getMessage(
             "messages.command.pvpadmin.info",
-            "version", plugin.getDescription().getVersion(),
+            "version", plugin.getPluginMeta().getVersion(),
             "active", String.valueOf(activeMatches),
             "arenas", String.valueOf(plugin.getArenaManager().getArenas().size()),
             "equipment", String.valueOf(plugin.getEquipmentManager().getEquipmentSets().size()),

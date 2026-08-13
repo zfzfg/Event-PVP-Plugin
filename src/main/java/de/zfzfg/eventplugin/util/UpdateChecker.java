@@ -69,7 +69,7 @@ public class UpdateChecker {
                         ? plugin.getConfigManager().getUpdateContact()
                         : "https://modrinth.com/plugin/" + modrinthProjectId;
                 connection.setRequestProperty("User-Agent",  // i18n-ignore: HTTP-Header bzw. JSON-Feldname der Update-API
-                        plugin.getDescription().getName() + "/" + currentVersion + " (" + contact + ")");
+                        plugin.getPluginMeta().getName() + "/" + currentVersion + " (" + contact + ")");
                 connection.setRequestProperty("Accept", "application/json");
                 connection.setConnectTimeout(10000);
                 connection.setReadTimeout(10000);
