@@ -92,7 +92,6 @@ public class LiveTradeGui {
     );
     
     // Mittlere Spalte (Separator + Funktionen)
-    private static final int CENTER_COLUMN = 4;
     private static final List<Integer> CENTER_SLOTS = Arrays.asList(4, 13, 22, 31, 40, 49);
     
     // Separator-Spalten
@@ -113,11 +112,10 @@ public class LiveTradeGui {
     private static final int COUNTDOWN_SLOT = 31;         // Countdown-Anzeige (Reihe 3)
     private static final int COUNTDOWN_BAR_SLOT = 40;     // Countdown-Balken (Reihe 4)
     private static final int CANCEL_SLOT = 49;            // Abbrechen unten mitte
-    
-    // Filler-Slots
-    private static final List<Integer> TOP_FILLER = Arrays.asList(3, 5);
-    private static final List<Integer> BOTTOM_FILLER = Arrays.asList(45, 46, 47, 48, 50, 51, 52, 53);
-    
+
+    // Entfernt: CENTER_COLUMN, TOP_FILLER, BOTTOM_FILLER - das Layout wird ueber
+    // SEPARATOR_LEFT/RIGHT und CENTER_SLOTS gefuellt, die drei Konstanten waren ungenutzt.
+
     public LiveTradeGui(LiveTradeSession session, LiveTradePlayer tradePlayer) {
         this.session = session;
         this.tradePlayer = tradePlayer;
@@ -228,16 +226,16 @@ public class LiveTradeGui {
         SkullMeta meta1 = (SkullMeta) head1.getItemMeta();
         if (meta1 != null) {
             meta1.setOwningPlayer(player1.getPlayer());
-            meta1.setDisplayName(MessageUtil.color("&a&l" + player1.getPlayer().getName()));
-            List<String> lore1 = new ArrayList<>();
-            lore1.add("");
-            lore1.add(MessageUtil.color(getMsg("items-label", "count", String.valueOf(player1.getWagerItemCount()))));
-            lore1.add(MessageUtil.color(getMsg("money-label", "amount", String.format("%.2f", player1.getWagerMoney()))));
-            lore1.add("");
+            meta1.displayName(de.zfzfg.core.util.Text.ofItem("&a&l" + player1.getPlayer().getName()));
+            List<net.kyori.adventure.text.Component> lore1 = new ArrayList<>();
+            lore1.add(net.kyori.adventure.text.Component.empty());
+            lore1.add(de.zfzfg.core.util.Text.ofItem(getMsg("items-label", "count", String.valueOf(player1.getWagerItemCount()))));
+            lore1.add(de.zfzfg.core.util.Text.ofItem(getMsg("money-label", "amount", String.format("%.2f", player1.getWagerMoney()))));
+            lore1.add(net.kyori.adventure.text.Component.empty());
             lore1.add(player1.hasConfirmed() ? 
-                MessageUtil.color(getMsg("status-ready")) : 
-                MessageUtil.color(getMsg("status-waiting")));
-            meta1.setLore(lore1);
+                de.zfzfg.core.util.Text.ofItem(getMsg("status-ready")) : 
+                de.zfzfg.core.util.Text.ofItem(getMsg("status-waiting")));
+            meta1.lore(lore1);
             head1.setItemMeta(meta1);
         }
         inventory.setItem(PLAYER1_HEAD_SLOT, head1);
@@ -247,16 +245,16 @@ public class LiveTradeGui {
         SkullMeta meta2 = (SkullMeta) head2.getItemMeta();
         if (meta2 != null) {
             meta2.setOwningPlayer(player2.getPlayer());
-            meta2.setDisplayName(MessageUtil.color("&c&l" + player2.getPlayer().getName()));
-            List<String> lore2 = new ArrayList<>();
-            lore2.add("");
-            lore2.add(MessageUtil.color(getMsg("items-label", "count", String.valueOf(player2.getWagerItemCount()))));
-            lore2.add(MessageUtil.color(getMsg("money-label", "amount", String.format("%.2f", player2.getWagerMoney()))));
-            lore2.add("");
+            meta2.displayName(de.zfzfg.core.util.Text.ofItem("&c&l" + player2.getPlayer().getName()));
+            List<net.kyori.adventure.text.Component> lore2 = new ArrayList<>();
+            lore2.add(net.kyori.adventure.text.Component.empty());
+            lore2.add(de.zfzfg.core.util.Text.ofItem(getMsg("items-label", "count", String.valueOf(player2.getWagerItemCount()))));
+            lore2.add(de.zfzfg.core.util.Text.ofItem(getMsg("money-label", "amount", String.format("%.2f", player2.getWagerMoney()))));
+            lore2.add(net.kyori.adventure.text.Component.empty());
             lore2.add(player2.hasConfirmed() ? 
-                MessageUtil.color(getMsg("status-ready")) : 
-                MessageUtil.color(getMsg("status-waiting")));
-            meta2.setLore(lore2);
+                de.zfzfg.core.util.Text.ofItem(getMsg("status-ready")) : 
+                de.zfzfg.core.util.Text.ofItem(getMsg("status-waiting")));
+            meta2.lore(lore2);
             head2.setItemMeta(meta2);
         }
         inventory.setItem(PLAYER2_HEAD_SLOT, head2);
@@ -676,23 +674,9 @@ public class LiveTradeGui {
         return true;
     }
     
-    /**
-     * Verarbeitet das Platzieren eines Items auf einem eigenen Slot.
-     */
-    private void handlePlaceItem(int slot, ItemStack cursor) {
-        if (cursor == null || cursor.getType().isAir()) return;
-        
-        if (tradePlayer.getWagerItemCount() >= 12) {
-            MessageUtil.sendMessage(player, getMsg("max-items-reached"));
-            player.playSound(player.getLocation(), Sound.ENTITY_VILLAGER_NO, 0.5f, 1.0f);
-            return;
-        }
-        
-        tradePlayer.addWagerItem(cursor.clone());
-        player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 1.2f);
-        session.update();
-    }
-    
+    // Entfernt: handlePlaceItem - zweite, nie aufgerufene Fassung derselben Logik, die
+    // in handleClick direkt beim Cursor-Klick auf einen eigenen Slot inline steht.
+
     /**
      * Verarbeitet Klick auf eigenen Item-Slot (Item entfernen).
      */
@@ -892,7 +876,7 @@ public class LiveTradeGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(" ");
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(" "));
             item.setItemMeta(meta);
         }
         return item;
@@ -902,13 +886,9 @@ public class LiveTradeGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(MessageUtil.color(name));
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(name));
             if (lore.length > 0) {
-                List<String> coloredLore = new ArrayList<>();
-                for (String line : lore) {
-                    coloredLore.add(MessageUtil.color(line));
-                }
-                meta.setLore(coloredLore);
+                meta.lore(java.util.Arrays.stream(lore).map(de.zfzfg.core.util.Text::ofItem).toList());
             }
             item.setItemMeta(meta);
         }
@@ -919,17 +899,11 @@ public class LiveTradeGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(MessageUtil.color(name));
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(name));
             if (lore != null && !lore.isEmpty()) {
-                item.setItemMeta(meta);
-                meta = item.getItemMeta();
-                if (meta != null) {
-                    meta.setLore(lore);
-                    item.setItemMeta(meta);
-                }
-            } else {
-                item.setItemMeta(meta);
+                meta.lore(lore.stream().map(de.zfzfg.core.util.Text::ofItem).toList());
             }
+            item.setItemMeta(meta);
         }
         return item;
     }
