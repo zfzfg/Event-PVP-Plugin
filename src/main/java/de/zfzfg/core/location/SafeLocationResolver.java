@@ -66,9 +66,9 @@ public final class SafeLocationResolver {
         }
 
         // 3. Bett bzw. Respawn-Anker
-        Location bed = player.getBedSpawnLocation();
-        if (isSafe(bed)) {
-            return bed;
+        Location respawn = player.getRespawnLocation();
+        if (isSafe(respawn)) {
+            return respawn;
         }
 
         // 4./5. Hauptwelt, sonst irgendeine geladene Welt
