@@ -27,8 +27,14 @@ public final class Text {
     private Text() {}
 
     /** Parser fuer &-Codes inkl. &#RRGGBB-Hex. Thread-safe und wiederverwendbar. */
-    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
+    private static final LegacyComponentSerializer LEGACY_AMPERSAND = LegacyComponentSerializer.builder()
             .character('&')
+            .hexColors()
+            .build();
+
+    /** Serializer fuer Section-Codes (§) fuer Bukkit Alt-APIs. */
+    private static final LegacyComponentSerializer LEGACY_SECTION = LegacyComponentSerializer.builder()
+            .character('§')
             .hexColors()
             .build();
 
@@ -43,12 +49,14 @@ public final class Text {
     /** Obergrenze, damit dynamisch erzeugte Strings den Cache nicht unbegrenzt fuellen. */
     private static final int CACHE_LIMIT = 4096;
 
-    /** Legacy-String (&-Codes) zu Component. {@code null} wird zu {@link Component#empty()}. */
+    /** Legacy-String (&- oder §-Codes) zu Component. {@code null} wird zu {@link Component#empty()}. */
     public static Component of(String legacy) {
         if (legacy == null || legacy.isEmpty()) return Component.empty();
         Component cached = CACHE.get(legacy);
         if (cached != null) return cached;
-        Component parsed = LEGACY.deserialize(legacy);
+        
+        String input = legacy.indexOf('§') != -1 ? legacy.replace('§', '&') : legacy;
+        Component parsed = LEGACY_AMPERSAND.deserialize(input);
         if (CACHE.size() < CACHE_LIMIT) CACHE.put(legacy, parsed);
         return parsed;
     }
@@ -61,9 +69,9 @@ public final class Text {
         return of(legacy).decoration(TextDecoration.ITALIC, false);
     }
 
-    /** Component zurueck in einen Legacy-String - nur fuer Alt-APIs, die noch String wollen. */
+    /** Component zurueck in einen Legacy-Section-String (§) - nur fuer Alt-APIs, die noch String wollen. */
     public static String toLegacy(Component component) {
-        return component == null ? "" : LEGACY.serialize(component);
+        return component == null ? "" : LEGACY_SECTION.serialize(component);
     }
 
     /** Farbcodes entfernen (Ersatz fuer ChatColor.stripColor). */

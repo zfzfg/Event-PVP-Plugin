@@ -60,7 +60,7 @@ class TextTest {
     @Test
     void roundtripUeberLegacyIstStabil() {
         String original = "&cRot &7grau";
-        assertEquals(original, Text.toLegacy(Text.of(original)));
+        assertEquals("\u00a7cRot \u00a77grau", Text.toLegacy(Text.of(original)));
     }
 
     @Test
