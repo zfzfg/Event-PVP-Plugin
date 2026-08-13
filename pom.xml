@@ -8,13 +8,17 @@
   <description>Kombiniertes Event- und PvP-Wager-Plugin</description>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <spigot.api.version>1.19.4-R0.1-SNAPSHOT</spigot.api.version>
+    <purpur.api.version>26.2.build.2618-stable</purpur.api.version>
   </properties>
 
   <repositories>
+    <repository>
+      <id>purpur-repo</id>
+      <url>https://repo.purpurmc.org/snapshots</url>
+    </repository>
     <repository>
       <id>spigot-repo</id>
       <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -42,10 +46,16 @@
   </repositories>
 
   <dependencies>
+    <!--
+      Purpur-API 26.2 (Superset von Paper- und Bukkit-API) - passend zum Zielserver
+      C:\Users\zfzfg\Documents\servers\purpur-26-2 (Build 2618).
+      Bringt Adventure 5.2.0 transitiv mit; deshalb ist hier KEINE eigene
+      net.kyori-Dependency noetig und auch nicht erwuenscht (siehe P1.5).
+    -->
     <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>${spigot.api.version}</version>
+      <groupId>org.purpurmc.purpur</groupId>
+      <artifactId>purpur-api</artifactId>
+      <version>${purpur.api.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -163,6 +173,16 @@
               <goal>shade</goal>
             </goals>
             <configuration>
+              <artifactSet>
+                <excludes>
+                  <exclude>net.kyori:*</exclude>
+                  <exclude>org.purpurmc.purpur:*</exclude>
+                  <exclude>io.papermc.paper:*</exclude>
+                  <exclude>org.spigotmc:*</exclude>
+                  <exclude>com.google.guava:*</exclude>
+                  <exclude>com.google.code.gson:*</exclude>
+                </excludes>
+              </artifactSet>
               <relocations>
                 <relocation>
                   <pattern>de.zfzfg.pvpwager</pattern>

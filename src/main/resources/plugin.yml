@@ -1,7 +1,7 @@
 name: Event-PVP-Plugin
 version: ${project.version}
 main: de.zfzfg.eventplugin.EventPlugin
-api-version: 1.19
+api-version: '26.2'
 author: zfzfg
 depend: [Vault, InventoryBackup, Multiverse-Core]
 softdepend: [AJLeaderboards, DecentHolograms, PlaceholderAPI, PvPManager]
