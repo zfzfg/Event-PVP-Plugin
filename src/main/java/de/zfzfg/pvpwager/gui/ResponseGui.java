@@ -6,7 +6,6 @@ import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -85,11 +84,11 @@ public class ResponseGui extends AbstractWagerGui {
             if (sender != null && sender.isOnline()) {
                 meta.setOwningPlayer(sender);
             }
-            meta.setDisplayName(MessageUtil.color(t("response.challenge-from")));
-            meta.setLore(java.util.Arrays.asList(
-                MessageUtil.color("&f&l" + incomingRequest.getSender().getName()),
-                "",
-                MessageUtil.color(t("response.challenge-subtitle"))
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("response.challenge-from")));
+            meta.lore(java.util.Arrays.asList(
+                de.zfzfg.core.util.Text.ofItem("&f&l" + incomingRequest.getSender().getName()),
+                de.zfzfg.core.util.Text.ofItem(""),
+                de.zfzfg.core.util.Text.ofItem(t("response.challenge-subtitle"))
             ));
             head.setItemMeta(meta);
         }
