@@ -425,14 +425,6 @@ public final class ConfiguredItemFactory {
             // Rueckfall unten.
         }
         try {
-            PotionEffectType matched = Registry.POTION_EFFECT_TYPE.match(trimmed);
-            if (matched != null) {
-                return matched;
-            }
-        } catch (Throwable ignored) {
-            // Rueckfall unten.
-        }
-        try {
             return PotionEffectType.getByName(trimmed.toUpperCase(Locale.ROOT));
         } catch (Throwable ignored) {
             return null;
