@@ -52,7 +52,7 @@ public class MoneySelectionGui extends AbstractWagerGui {
     @Override
     public void open() {
         inventory = Bukkit.createInventory(null, SIZE, 
-            MessageUtil.color(t("money-title")));
+            de.zfzfg.core.util.Text.of(t("money-title")));
         
         buildLayout();
         openInventory();

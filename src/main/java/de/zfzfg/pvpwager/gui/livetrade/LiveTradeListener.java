@@ -1,6 +1,5 @@
 package de.zfzfg.pvpwager.gui.livetrade;
 
-import de.zfzfg.eventplugin.EventPlugin;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,11 +15,9 @@ import org.bukkit.inventory.Inventory;
  */
 public class LiveTradeListener implements Listener {
     
-    private final EventPlugin plugin;
     private final LiveTradeManager manager;
-    
-    public LiveTradeListener(EventPlugin plugin, LiveTradeManager manager) {
-        this.plugin = plugin;
+
+    public LiveTradeListener(LiveTradeManager manager) {
         this.manager = manager;
     }
     
@@ -40,7 +37,6 @@ public class LiveTradeListener implements Listener {
         LiveTradeGui gui = tradePlayer.getGui();
         if (gui == null) return;
         
-        Inventory clickedInv = event.getClickedInventory();
         Inventory guiInv = gui.getInventory();
         
         // Prüfe ob es unser GUI ist

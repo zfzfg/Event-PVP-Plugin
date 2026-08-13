@@ -36,7 +36,7 @@ public class WagerMainGui extends AbstractWagerGui {
     public void open() {
         // Erstelle 6-Reihen Inventar
         inventory = Bukkit.createInventory(null, 54, 
-            MessageUtil.color(t("wager-title", "target", session.getTargetName())));
+            de.zfzfg.core.util.Text.of(t("wager-title", "target", session.getTargetName())));
         
         // Fülle Hintergrund
         fillBorder(Material.BLACK_STAINED_GLASS_PANE);

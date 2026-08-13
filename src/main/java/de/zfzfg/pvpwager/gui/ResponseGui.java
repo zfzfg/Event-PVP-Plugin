@@ -45,7 +45,7 @@ public class ResponseGui extends AbstractWagerGui {
     @Override
     public void open() {
         inventory = Bukkit.createInventory(null, SIZE,
-            MessageUtil.color(t("response.title")));
+            de.zfzfg.core.util.Text.of(t("response.title")));
         
         buildLayout();
         openInventory();

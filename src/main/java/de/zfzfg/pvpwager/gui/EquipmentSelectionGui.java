@@ -45,7 +45,7 @@ public class EquipmentSelectionGui extends AbstractWagerGui {
     @Override
     public void open() {
         inventory = Bukkit.createInventory(null, SIZE,
-            MessageUtil.color(t("equipment-select-title")));
+            de.zfzfg.core.util.Text.of(t("equipment-select-title")));
         
         loadEquipment();
         buildLayout();

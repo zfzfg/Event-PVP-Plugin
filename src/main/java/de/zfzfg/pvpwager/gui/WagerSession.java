@@ -40,8 +40,7 @@ public class WagerSession {
     
     // Original-Items (Backup für Rollback)
     private final List<ItemStack> originalItems = new ArrayList<>();
-    private double originalMoney = 0.0;
-    
+
     public WagerSession(EventPlugin plugin, Player sender, Player target) {
         this.plugin = plugin;
         this.senderId = sender.getUniqueId();

@@ -57,7 +57,7 @@ public class NegotiationGui extends AbstractWagerGui {
     @Override
     public void open() {
         String title = isSender ? t("negotiation.title-sender") : t("negotiation.title-target");
-        inventory = Bukkit.createInventory(null, SIZE, MessageUtil.color(title));
+        inventory = Bukkit.createInventory(null, SIZE, de.zfzfg.core.util.Text.of(title));
         
         buildLayout();
         openInventory();

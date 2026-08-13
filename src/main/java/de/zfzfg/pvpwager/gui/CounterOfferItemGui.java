@@ -71,7 +71,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
     @Override
     public void open() {
         inventory = Bukkit.createInventory(null, SIZE,
-            MessageUtil.color(plugin.getCoreConfigManager().getMessages().getString("messages.pvp-wager-gui.counter-offer-title", "&6&lCreate Counter Offer")));
+            de.zfzfg.core.util.Text.of(plugin.getCoreConfigManager().getMessages().getString("messages.pvp-wager-gui.counter-offer-title", "&6&lCreate Counter Offer")));
         
         buildLayout();
         openInventory();

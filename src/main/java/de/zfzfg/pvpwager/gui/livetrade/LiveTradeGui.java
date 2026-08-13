@@ -123,12 +123,8 @@ public class LiveTradeGui {
         this.plugin = session.getPlugin();
     }
     
-    /**
-     * Erstellt und öffnet das GUI.
-     */
     public void open() {
-        String title = MessageUtil.color(getMsg("gui-title", "opponent", tradePlayer.getOtherPlayer().getPlayer().getName()));
-        inventory = Bukkit.createInventory(null, 54, title);
+        inventory = Bukkit.createInventory(null, 54, de.zfzfg.core.util.Text.of(getMsg("gui-title", "opponent", tradePlayer.getOtherPlayer().getPlayer().getName())));
         
         // GUI aufbauen
         buildGui();

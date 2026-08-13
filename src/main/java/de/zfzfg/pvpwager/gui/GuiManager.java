@@ -108,8 +108,8 @@ public class GuiManager {
     public boolean isWagerGui(Inventory inventory) {
         if (inventory == null || inventory.getHolder() != null) return false;
         
-        String title = inventory.getType().getDefaultTitle();
-        // Prüfe auf unsere GUI-Titel-Präfixe
+        // Identitaetsvergleich statt Titelvergleich: der frueher hier geholte
+        // getDefaultTitle() wurde nie ausgewertet und ist zudem deprecated.
         for (AbstractWagerGui gui : activeGuis.values()) {
             if (gui != null && gui.getInventory() != null && gui.getInventory().equals(inventory)) {
                 return true;

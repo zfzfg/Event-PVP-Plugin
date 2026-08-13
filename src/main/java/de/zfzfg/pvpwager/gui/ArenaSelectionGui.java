@@ -35,7 +35,7 @@ public class ArenaSelectionGui extends AbstractWagerGui {
     @Override
     public void open() {
         inventory = Bukkit.createInventory(null, SIZE,
-            MessageUtil.color(t("arena-select-title")));
+            de.zfzfg.core.util.Text.of(t("arena-select-title")));
         
         loadArenas();
         buildLayout();
@@ -199,7 +199,6 @@ public class ArenaSelectionGui extends AbstractWagerGui {
     
     private int getArenaIndexForSlot(int slot) {
         // Berechne welche Arena zu diesem Slot gehört
-        int index = 0;
         int checkSlot = ARENA_START_SLOT;
         
         for (int i = 0; i < availableArenas.size(); i++) {
