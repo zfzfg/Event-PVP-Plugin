@@ -34,7 +34,7 @@ public class CommandCooldownManager {
         this.messageProvider = provider;
     }
 
-    public boolean checkAndApply(Player player, String commandName) {
+    public synchronized boolean checkAndApply(Player player, String commandName) {
         UUID uuid = player.getUniqueId();
         long now = System.currentTimeMillis();
 
