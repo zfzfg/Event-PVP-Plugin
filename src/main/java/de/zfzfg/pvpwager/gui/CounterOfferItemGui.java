@@ -14,7 +14,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * GUI für Gegenangebot - Item und Geld Auswahl kombiniert.
@@ -130,10 +129,10 @@ public class CounterOfferItemGui extends AbstractWagerGui {
                 // Lore hinzufügen für Entfernen-Hinweis
                 ItemMeta meta = display.getItemMeta();
                 if (meta != null) {
-                    List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
-                    lore.add("");
-                    lore.add(t("counter-offer-remove-hint"));
-                    meta.setLore(lore);
+                    List<net.kyori.adventure.text.Component> lore = meta.hasLore() ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+                    lore.add(net.kyori.adventure.text.Component.empty());
+                    lore.add(de.zfzfg.core.util.Text.ofItem(t("counter-offer-remove-hint")));
+                    meta.lore(lore);
                     display.setItemMeta(meta);
                 }
                 inventory.setItem(slot, display);
@@ -192,10 +191,10 @@ public class CounterOfferItemGui extends AbstractWagerGui {
                 if (alreadySelected) {
                     ItemMeta meta = display.getItemMeta();
                     if (meta != null) {
-                        List<String> lore = meta.hasLore() ? new ArrayList<>(meta.getLore()) : new ArrayList<>();
-                        lore.add("");
-                        lore.add(t("counter-offer-already-selected"));
-                        meta.setLore(lore);
+                        List<net.kyori.adventure.text.Component> lore = meta.hasLore() ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+                        lore.add(net.kyori.adventure.text.Component.empty());
+                        lore.add(de.zfzfg.core.util.Text.ofItem(t("counter-offer-already-selected")));
+                        meta.lore(lore);
                         display.setItemMeta(meta);
                     }
                 }
@@ -366,7 +365,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
         
         // Vergleiche wichtige Meta-Eigenschaften (ohne Lore die wir hinzugefügt haben)
         if (metaA.hasDisplayName() != metaB.hasDisplayName()) return false;
-        if (metaA.hasDisplayName() && !metaA.getDisplayName().equals(metaB.getDisplayName())) return false;
+        if (metaA.hasDisplayName() && !metaA.displayName().equals(metaB.displayName())) return false;
         if (!metaA.getEnchants().equals(metaB.getEnchants())) return false;
         
         return true;
