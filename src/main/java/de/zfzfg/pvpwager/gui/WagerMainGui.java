@@ -68,12 +68,12 @@ public class WagerMainGui extends AbstractWagerGui {
             if (target != null) {
                 meta.setOwningPlayer(target);
             }
-            meta.setDisplayName(MessageUtil.color(t("challenge-to-title")));
-            meta.setLore(Arrays.asList(
-                MessageUtil.color(t("challenge-to-player", "player", session.getTargetName())),
-                "",
-                MessageUtil.color(t("challenge-to-line1")),
-                MessageUtil.color(t("challenge-to-line2"))
+            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("challenge-to-title")));
+            meta.lore(Arrays.asList(
+                de.zfzfg.core.util.Text.ofItem(t("challenge-to-player", "player", session.getTargetName())),
+                de.zfzfg.core.util.Text.ofItem(""),
+                de.zfzfg.core.util.Text.ofItem(t("challenge-to-line1")),
+                de.zfzfg.core.util.Text.ofItem(t("challenge-to-line2"))
             ));
             head.setItemMeta(meta);
         }
@@ -300,6 +300,14 @@ public class WagerMainGui extends AbstractWagerGui {
                     playErrorSound();
                     MessageUtil.sendMessage(player, MessageUtil.color(t("error-choose-arena-equipment")));
                 }
+                break;
+
+            case CANCEL_SLOT:
+                // Fehlte bisher: der Abbrechen-Button wurde zwar gezeichnet, aber nie
+                // ausgewertet - der Klick blieb wirkungslos und die Items steckten in der
+                // Session fest. Gleiche Behandlung wie in der ConfirmationGui.
+                playClickSound();
+                cancelAndClose();
                 break;
         }
         
