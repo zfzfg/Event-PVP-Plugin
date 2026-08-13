@@ -1,5 +1,6 @@
 package de.zfzfg.core.items;
 
+import de.zfzfg.core.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -197,16 +198,12 @@ public final class ConfiguredItemFactory {
 
         String displayName = source.string("name");
         if (displayName != null && !displayName.isEmpty()) {
-            meta.setDisplayName(color(displayName));
+            meta.displayName(Text.ofItem(displayName));
         }
 
         List<String> lore = source.strings("lore");
         if (!lore.isEmpty()) {
-            List<String> colored = new ArrayList<>(lore.size());
-            for (String line : lore) {
-                colored.add(color(line));
-            }
-            meta.setLore(colored);
+            meta.lore(lore.stream().map(Text::ofItem).toList());
         }
 
         applyEnchantments(item, meta, source.strings("enchantments"), logger, context);
