@@ -1,7 +1,7 @@
 package de.zfzfg.pvpwager.gui;
 
+import de.zfzfg.core.util.Text;
 import de.zfzfg.eventplugin.EventPlugin;
-import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -81,7 +81,7 @@ public abstract class AbstractWagerGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(" ");
+            meta.displayName(Text.ofItem(" "));
             item.setItemMeta(meta);
         }
         return item;
@@ -94,9 +94,9 @@ public abstract class AbstractWagerGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(MessageUtil.color(name));
+            meta.displayName(Text.ofItem(name));
             if (lore.length > 0) {
-                meta.setLore(MessageUtil.color(Arrays.asList(lore)));
+                meta.lore(Arrays.stream(lore).map(Text::ofItem).toList());
             }
             item.setItemMeta(meta);
         }
@@ -110,9 +110,9 @@ public abstract class AbstractWagerGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(MessageUtil.color(name));
+            meta.displayName(Text.ofItem(name));
             if (lore != null && !lore.isEmpty()) {
-                meta.setLore(MessageUtil.color(lore));
+                meta.lore(lore.stream().map(Text::ofItem).toList());
             }
             item.setItemMeta(meta);
         }
@@ -291,6 +291,6 @@ public abstract class AbstractWagerGui {
         if (item == null) return false;
         
         ItemMeta meta = item.getItemMeta();
-        return meta != null && " ".equals(meta.getDisplayName());
+        return meta != null && meta.hasDisplayName() && " ".equals(Text.plain(Text.toLegacy(meta.displayName())));
     }
 }
