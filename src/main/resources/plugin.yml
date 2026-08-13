@@ -1,0 +1,145 @@
+name: Event-PVP-Plugin
+version: ${project.version}
+main: de.zfzfg.eventplugin.EventPlugin
+api-version: 1.19
+author: zfzfg
+depend: [Vault, InventoryBackup, Multiverse-Core]
+softdepend: [AJLeaderboards, DecentHolograms, PlaceholderAPI, PvPManager]
+
+commands:
+  pvp:
+    description: Unified PvP command with sub-commands
+    usage: /<command> <challenge|accept|deny|spectate|leave|surrender|draw>
+    aliases: [pvpwager]
+  
+  pvpask:
+    description: Send a PvP Wager request to a player (clickable in chat)
+    usage: /<command> <player>
+    aliases: [pvpgui, wagergui, pvpchallenge]
+    permission: pvpwager.use
+
+  pvpaccept:
+    description: Accept a PvP Wager request and open the Wager GUI
+    usage: /<command> [player]
+    permission: pvpwager.use
+
+  pvpdeny:
+    description: Deny a PvP Wager request
+    usage: /<command> [player]
+    permission: pvpwager.use
+    
+  pvpa:
+    description: Send a PvP wager request with full configuration
+    usage: /<command> <player> <wager> <amount> <arena> <equipment>
+    aliases: [pvprequest]
+    
+  pvpanswer:
+    description: Respond to a PvP wager request
+    usage: /<command> <wager> <amount> [arena] [equipment]
+    
+  pvprespond:
+    description: Opens the response GUI for PvP wager requests
+    usage: /<command> gui
+    permission: pvpwager.use
+    
+  pvpyes:
+    description: Accept the counter-offer (old system)
+    usage: /<command>
+    aliases: [pvpconfirm]
+    
+  pvpno:
+    description: Decline the request/counter-offer (old system)
+    usage: /<command>
+    aliases: [pvpdecline, pvpcancel]
+    
+  pvpadmin:
+    description: Admin commands for PvPWager
+    usage: /<command> [reload|stopall|info]
+    permission: pvpwager.admin
+    aliases: [pvpwageradmin]
+    
+  surrender:
+    description: Surrender the current match
+    usage: /<command>
+    
+  draw:
+    description: Vote for a draw
+    usage: /<command>
+    
+  pvpainfo:
+    description: Show all available PvP commands and usage
+    usage: /<command>
+    aliases: [pvphelp, pvpinfo]
+
+  pvpstats:
+    description: Show PvP statistics and leaderboards
+    usage: /<command> me | /<command> top [N]
+
+  eventstats:
+    description: Zeige Event-Statistiken und Top-Sieger
+    usage: /<command> me | /<command> top [N] | /<command> reset <player> | /<command> add <player> <wins|participations> <n>
+
+  event:
+    description: Event Hauptbefehl
+    usage: /<command> <join|leave|start|stop|forcestart|list>
+    aliases: [ev, events]
+
+  eventpvp:
+    description: Unified Event+PvP Plugin command
+    usage: /<command> <reload|version|debug|rescue|webtoken>
+    aliases: [epvp, eventpvpreload]
+    permission: eventpvp.admin
+
+permissions:
+  pvpwager.admin:
+    description: Access to admin commands
+    default: op
+    
+  pvpwager.bypass.betlimit:
+    description: Bypass bet limits
+    default: op
+    
+  pvpwager.use:
+    description: Use PvP wager system
+    default: true
+    
+  pvpwager.spectate:
+    description: Spectate matches
+    default: true
+
+  pvpwager.spectate.all:
+    description: Spectate matches that are already at the spectator limit
+    default: op
+
+  pvpwager.nowager:
+    description: Start a match without any wager
+    default: op
+
+  pvpwager.command:
+    description: Use command-based PvP requests
+    default: true
+
+  eventplugin.admin:
+    description: Zugriff auf Event-Admin-Befehle
+    default: op
+  eventpvp.admin:
+    description: Zugriff auf Event+PvP Unified Admin-Befehle
+    default: op
+  eventplugin.join:
+    description: Erlaubt die Teilnahme an Events
+    default: true
+  eventpvp.opbypass:
+    description: OP-Bypass für Command-Restriktionen
+    default: op
+  eventpvp.debug:
+    description: Erlaubt /eventpvp debug (on | on full | off | status)
+    default: op
+  eventpvp.debug.receive:
+    description: Erhält Debug-Ausgaben zusätzlich zur Konsole im Chat
+    default: op
+  eventpvp.admin.web:
+    description: Zugriff auf das Web-Panel (/eventpvp webtoken)
+    default: op
+  eventpvp.admin.updatenotify:
+    description: Erhält Benachrichtigungen bei verfügbaren Plugin-Updates
+    default: op

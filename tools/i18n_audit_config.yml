@@ -1,0 +1,298 @@
+# Configuration for tools/i18n_audit.py
+#
+# Everything the two legacy scanners hardcoded at the top of their source lives
+# here, so tuning the audit is a reviewable config change.
+#
+# Inline escape hatches in Java source:
+#   // i18n-ignore        silences findings on that line
+#   // i18n-ignore-next   silences findings on the following line
+
+roots:
+  java: src/main/java
+  resources: src/main/resources
+  web: src/main/resources/web
+
+master_bundle: messages_en.yml
+bundle_glob: "messages*.yml"
+
+# Shipped but never loaded: every loader builds the name as messages_<lang>.yml.
+legacy_bundles:
+  - messages.yml
+
+# Produktentscheidung vom 06.08.2026: messages.yml bleibt ausgeliefert, wird aber
+# nicht mehr gepflegt -- keine neuen Keys dort. Der D8-Hinweis "delete it" ist damit
+# beantwortet und wird unterdrueckt. Die Datei bleibt in legacy_bundles, zaehlt also
+# weiterhin nicht in den Paritaetsvergleich hinein.
+legacy_bundles_accepted:
+  - messages.yml
+
+# A key written with one of these prefixes is already a full bundle path.
+absolute_key_prefixes:
+  - "messages."
+  - "settings."
+
+# A literal reaching one of these is shown to a player.
+# Includes the project's own wrappers: MessageUtil.error/sendMessage(s) and
+# TextUtil.send all end up in front of a player. Without them, 24 hardcoded
+# messages (14 of them German) stayed invisible while D6 reported zero.
+player_text_methods:
+  - error
+  - success
+  - warn
+  - send
+  - sendMessages
+  - sendMessage
+  - broadcast
+  - broadcastMessage
+  - sendTitle
+  - sendActionBar
+  - sendRawMessage
+  - setDisplayName
+  - setLore
+  - setCustomName
+  - setHeader
+  - setFooter
+  - setPlayerListName
+  - kickPlayer
+  - createInventory
+  - TextComponent
+  - ComponentBuilder
+
+# A literal reaching one of these is a message *key*, not message text.
+localization_methods:
+  - getMsg
+  - getMessage
+  - getHelpMsg
+  - getDebugMsg
+  - getGeneralMsg
+  - getWebtokenMsg
+  - getLangMsg
+  - getConsoleMsg
+  # The wager GUI helper: `t("back-title")` -> messages.gui.back-title.
+  # `tl(...)` takes a whole list of keys.
+  - t
+  - tl
+
+# Raw configuration accessors, used both to find helpers and to resolve keys.
+bundle_accessors:
+  - getString
+  - getStringList
+
+# `getString` reads whatever configuration it is invoked on, so the receiver
+# decides whether a literal is a message key at all. Without this,
+# `config.getString("settings.language")` and `section.getString("helmet")`
+# would be reported as message keys missing from the language files.
+message_receiver_patterns:
+  - message
+  - msg
+  - lang
+
+# Console output, never player facing.
+logger_methods:
+  - getLogger
+  - log
+  - info
+  - warning
+  - severe
+  - fine
+  - finer
+  - config
+  - println
+  - print
+  - printStackTrace
+  - debug
+
+# Getters through which enum display text reaches a message (detector D5).
+enum_display_getters:
+  - getDisplayName
+  - getDisplay
+  - getLabel
+  - getTitle
+
+# An enum exposing one of these resolves its label from the bundles, so its
+# baked-in string is only a neutral fallback. D5 then reports it solely when
+# the fallback itself is German.
+enum_translation_getters:
+  - getTranslationKey
+  - getMessageKey
+
+# Fallback only: used when a class has no discoverable message helper.
+# Carried over verbatim from the legacy verify_key_usage.py CLASS_PREFIX_MAP.
+class_prefix_map:
+  AbstractWagerGui.java: "messages.pvp-wager-gui."
+  PvPListener.java: "messages.pvp-listener."
+  DrawSubCommand.java: "messages.draw-subcommand."
+  LeaveSubCommand.java: "messages.leave-subcommand."
+  SurrenderSubCommand.java: "messages.surrender-subcommand."
+  ConfirmationGui.java: "messages.pvp-wager-gui."
+  CounterOfferItemGui.java: "messages.pvp-wager-gui."
+  ItemSelectionGui.java: "messages.pvp-wager-gui."
+  MoneySelectionGui.java: "messages.pvp-wager-gui."
+  NegotiationGui.java: "messages.pvp-wager-gui."
+  ResponseGui.java: "messages.pvp-wager-gui."
+  ResponseItemSelectionGui.java: "messages.pvp-wager-gui."
+  ResponseMoneySelectionGui.java: "messages.pvp-wager-gui."
+  WagerOverviewGui.java: "messages.pvp-wager-gui."
+  PvPAskCommand.java: "messages.pvpask."
+  PvPInfoCommand.java: "messages.info."
+  LiveTradeGui.java: "messages.livetrade."
+  LiveTradePlayer.java: "messages.livetrade."
+  LiveTradeSession.java: "messages.livetrade."
+  PvPWagerGuiCommand.java: "messages.pvpwager.help."
+
+# Subtrees whose keys are built at runtime, so no static reference exists.
+# Enum display names are resolved as "messages.debug.enums." + the constant's
+# translation key, which detector D9 cannot follow.
+dynamic_key_roots:
+  - "messages.debug.enums."
+
+# The web panel (web/lang/*.json, i18n.t() in app.js/editors.js/items.js/
+# index.html) is a second, independent translation system. D10/D11 mirror
+# D2/D9 for it -- see tools/i18naudit/webi18n.py for the full rationale.
+web:
+  lang_dir: lang
+  master_bundle: en.json
+  source_globs: ["*.js", "*.html"]
+  # A key that reaches i18n.t() only through the server's `messageKey` field
+  # (WebApiHandler.failure(...) and friends) -- no static scan can find that
+  # call site, the argument is a variable, not a literal. Same three families
+  # as the mv.error./inventory.error. entries under ignore.literal_prefixes
+  # below, which silence the *Java*-side literal for the opposite reason (it
+  # is a key being handed to the client, not display text shown to a player).
+  server_driven_prefixes:
+    - "mv.error."
+    - "inventory.error."
+    - "items.error."
+  ignore_keys: []
+
+ignore:
+  # Literals starting with these are never message text.
+  literal_prefixes:
+    - "SELECT "
+    - "INSERT "
+    - "UPDATE "
+    - "DELETE "
+    - "CREATE "
+    - "ALTER "
+    - "eventpvp."
+    - "messages."
+    - "settings."
+    # Keys der Web-Bundles (web/lang/*.json), die die Multiverse-Weltverwaltung als
+    # Fehlergrund zurueckgibt -- MvResult.fail("mv.error.notInstalled"), MvInputException.
+    # Der Java-Code fuehrt bewusst keinen fertigen Satz mehr, sondern nur diesen Key; das
+    # Panel loest ihn in der Sprache des Admins auf. Also ein Key, kein Anzeigetext.
+    - "mv.error."
+    # Dasselbe Muster fuer die Inventar-Verwaltung: WebApiHandler gibt als Fehlergrund nur
+    # den Bundle-Key zurueck (failure(response, "inventory.error.unknownBackup", ...)), das
+    # Panel loest ihn ueber web/lang/*.json in der Sprache des Admins auf. Also ein Key,
+    # kein Anzeigetext.
+    - "inventory.error."
+    # Und fuer den Item-Katalog: WebApiHandler.getMaterials() liefert bei Fehlern nur
+    # "items.error.catalogFailed" als messageKey, keinen fertigen Satz.
+    - "items.error."
+    - "http://"
+    - "https://"
+    - "jdbc:"
+    - "org.bukkit"
+    - "de.zfzfg"
+    # The project's own marker for a key that is missing from the bundle. It is
+    # a diagnostic, deliberately identical in every language, and must not be
+    # localized -- a translated marker would hide which key is broken.
+    - "&c[missing:"
+    - "[missing:"
+
+  literal_regex:
+    # Decorative chat dividers: colour codes, dashes, box drawing, spaces only.
+    #
+    # A colour code must be matched as the pair it is (`&6`, `§l`). Listing the
+    # code letters as a bare character class made every word built from them
+    # decoration too: "Cancel", "None", "Reload" and "Arena" consist only of
+    # a-f/k-o letters and were silently ignored by every detector.
+    - "^(?:[&§][0-9a-fk-orA-FK-OR]|[ 0-9\\s\\-=_~\\u2501\\u2500\\u25ac\\u00bb\\u00ab.*])*$"
+    # Number format patterns and single placeholders.
+    - "^[#0.,%:{}\\s\\-/]*$"
+    - "^\\{[A-Za-z0-9_]+\\}$"
+    # SimpleDateFormat patterns, e.g. "HH:mm:ss.SSS", "dd.MM.yyyy" or the
+    # file-name forms "yyyyMMdd_HHmmss" and "yyyyMMdd-HHmmss". Requires a
+    # : . / _ or - separator so ordinary short words are not swallowed; the
+    # letter class only holds pattern letters, so a hyphenated word such as
+    # "PvP-Wager" still does not match.
+    - "^(?=.*[:./_\\-])[yMdDHhmsSaEwWkKzZGT:./'_\\-\\s]+$"
+    # Enum constants and Bukkit Material/EntityType names: DIAMOND_SWORD,
+    # PVP_MATCH_PRE, PICKUP_ITEM. Code identifiers, never display text.
+    - "^[A-Z][A-Z0-9]*(_[A-Z0-9]+)+$"
+    # The suffix half of such a name, as used by Material matching in
+    # MaterialCatalog: name.endsWith("_SPAWN_EGG"), ("_PRESSURE_PLATE").
+    # A leading underscore makes the intent unambiguous -- no display text
+    # starts with one.
+    - "^_[A-Z0-9]+(_[A-Z0-9]+)*$"
+    # Relative resource paths, e.g. the zip-entry prefix
+    # "assets/minecraft/textures/item/". The absolute form is covered by the
+    # route pattern below; this is the same shape without the leading slash.
+    # No whitespace is allowed, so a sentence containing a slash still reports.
+    - "^[A-Za-z0-9_\\-]+(/[A-Za-z0-9_\\-{}.]+)+/?$"
+    # Dot-prefixed file names and extensions: ".pack-sha1", ".bak", ".yml".
+    - "^\\.[A-Za-z0-9_.\\-]+$"
+    # Bare command literals such as "/eventpvp webtoken" (at most a few tokens,
+    # so a sentence that merely starts with a slash is still reported).
+    - "^/[A-Za-z][A-Za-z0-9\\-]*(\\s+[A-Za-z0-9<>\\[\\]|\\-]+){0,3}$"
+    # --- HTTP protocol tokens (WebServer/WebApiHandler) -------------------
+    # These are wire format, not display text: renaming them breaks the
+    # protocol. Every pattern is anchored so prose is still reported -- a
+    # message that merely *contains* "Not Found" stays a finding.
+    # Route paths: "/api/auth/login", "/api/worlds/save".
+    - "^/[A-Za-z0-9_\\-]+(/[A-Za-z0-9_\\-{}.]+)+/?$"
+    # Header field names.
+    - "^(Content-Type|Content-Length|Content-Disposition|Set-Cookie|Cookie|Cache-Control|Authorization|Location|WWW-Authenticate|Access-Control-[A-Za-z-]+)$"
+    # MIME types, with optional charset: "application/json; charset=UTF-8".
+    - "^[a-z]+/[a-z0-9.+-]+(;\\s*charset=[A-Za-z0-9-]+)?$"
+    # HTTP status reason phrases, exactly as the RFC spells them.
+    - "^(OK|Created|Accepted|No Content|Bad Request|Unauthorized|Forbidden|Not Found|Method Not Allowed|Conflict|Payload Too Large|Too Many Requests|Internal Server Error|Not Implemented|Service Unavailable)$"
+    # Cookie attributes and cleared-cookie values.
+    - "^;?\\s*([A-Za-z_]+=;?\\s*)?(Path=/[^;]*|HttpOnly|Secure|SameSite=[A-Za-z]+|Max-Age=\\d+)(;\\s*(Path=/[^;]*|HttpOnly|Secure|SameSite=[A-Za-z]+|Max-Age=\\d+))*;?$"
+    # CORS value lists: "GET, POST, OPTIONS" / "Content-Type, Authorization".
+    - "^(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD)(,\\s*(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD))*$"
+    - "^Content-Type,\\s*Authorization$"
+    # Cache-Control directives: "public, max-age=3600", "no-store".
+    - "^(public|private|no-cache|no-store)(,\\s*(max-age|s-maxage)=\\d+)?$"
+
+  # Files excluded from every detector.
+  paths: []
+
+  # Substrings marking a config path rather than a message key (detectors D2/D9).
+  keys:
+    - ".default-group"
+    - "game-mode"
+    - "spawn-command"
+    - "equipment-group"
+    - "clone-source-world"
+    - "spawn-type"
+    - "display-name"
+    - "arena-world"
+
+  # Calls whose literals are never user-facing.
+  calls:
+    - valueOf
+    - equals
+    - equalsIgnoreCase
+    - hasPermission
+    - getConfig
+    - matches
+    - split
+    # getPlugin("Multiverse-Core") names a plugin on the server, not a label.
+    - getPlugin
+
+  # Constructor families recognised by the tail of their name instead of by an
+  # ever-growing list of class names. An exception message is written for the
+  # developer who reads the stack trace: `new IOException("Resource pack URL
+  # returned HTTP " + code)`. Where such a text does surface in the admin panel
+  # it arrives as the `detail` field next to a localized `messageKey` (see
+  # WebApiHandler.failure) -- the panel owns the wording, the exception does not.
+  call_suffixes:
+    - Exception
+    - Error
+
+# Per-rule severity override: critical | warning | info | off
+detectors: {}
+
+baseline: tools/i18n_audit_baseline.json

@@ -1,0 +1,175 @@
+<h1>Event-PVP-Plugin - Quick Description</h1>
+
+<p>A comprehensive Minecraft plugin that combines <strong>custom event management</strong> and <strong>PvP wager system</strong> into one unified solution.</p>
+
+<h2>Upgrading to 1.0.9</h2>
+
+<p>You <strong>do not need to replace your entire config.yml</strong>! The plugin automatically adds missing settings with default values.</p>
+
+<h3>Important Notes in 1.0.9</h3>
+<ul>
+<li><strong>True i18n Localization for Console &amp; Terminal Output</strong>: All logger, startup/shutdown, and server console messages now respect <code>settings.language</code> in all 7 languages via <code>messages.console.*</code>.</li>
+<li><strong>Automatic Fallbacks</strong>: Missing keys in custom or partial translation files now automatically display English text via embedded resource defaults instead of failing or printing raw keys.</li>
+<li><strong>Web Interface Live Server Sync Badge</strong>: Real-time status indicators in the top bar show whether your configuration changes are synchronized with the server (<code>🟢 Synced</code>, <code>🟡 Unsaved Changes</code>, <code>🔵 Saving</code>, <code>🔴 Out of Sync</code>).</li>
+<li><strong>Switchable Lobby Phase (<code>use-lobby</code>)</strong>: Events can now run with or without a lobby phase. When disabled, players join the event world immediately without needing a separate lobby world.</li>
+<li><strong>World Regeneration Safeguards</strong>: Redundant double-regenerations are automatically prevented, and <code>regenerate-event-world</code> is locked when the world is already set to regenerate globally in <code>worlds.yml</code>.</li>
+<li><strong>Zero Hardcoded Messages</strong>: Complete localization audit pass (0 findings across all 9 rules D1–D9).</li>
+</ul>
+
+<p><strong>🌍 Multilingual Support: Available in 7 Core Languages</strong> (English, German, Spanish, French, Japanese, Polish, Russian) with 100% key parity and full web interface translation.</p>
+
+<h2>What Does This Plugin Do?</h2>
+
+<h3>Event System</h3>
+<p>Host custom server events with:</p>
+<ul>
+<li>Multiple event types (PvP Arena, Capture the Flag, Free-for-All, etc.)</li>
+<li>Automated event scheduling</li>
+<li>Configurable spawn systems (single point, random, team-based)</li>
+<li>Custom rewards for winners and participants</li>
+<li>Statistics tracking and leaderboards</li>
+</ul>
+
+<h3>PvP Wager System</h3>
+<p>Let players bet on PvP matches:</p>
+<ul>
+<li>Challenge other players with item or money wagers</li>
+<li>Multiple arena configurations</li>
+<li>Pre-configured equipment sets</li>
+<li>Spectator mode for watching matches</li>
+<li>Match management (draw votes, surrender, timeouts)</li>
+</ul>
+
+<h3>Web Interface</h3>
+<p>Configure everything through a modern browser interface:</p>
+<ul>
+<li>Edit all YAML configurations visually (<code>config.yml</code>, <code>worlds.yml</code>, <code>equipment.yml</code>, <code>web-config.yml</code>) with deep-snapshot precision dirty-tracking</li>
+<li>Create events and equipment sets with live preview and server material validation</li>
+<li><strong>Dedicated 3-Tab Inventory Manager</strong>: Search backups, inspect with authentic Minecraft Canvas &amp; XP bar, 2-step restores, live session/guard monitoring</li>
+<li><strong>Multiverse World Management</strong>: Create, import, load, unload, delete, and backup/restore worlds directly in the browser</li>
+<li><strong>Server Resource Pack Textures</strong>: Automatically extracts and displays custom item textures from your server resource pack</li>
+<li><strong>Web Server Settings</strong>: Configurable port with pre-save safety warning dialog and public URL with automatic dynamic port binding for <code>/eventpvp webtoken</code></li>
+<li>Token-based secure access (<code>/eventpvp webtoken</code>) with rate-limiting protection</li>
+<li><strong>Multi-language support: 7 languages</strong> (EN, DE, FR, ES, RU, PL, JA) with real-time synchronization badges</li>
+</ul>
+
+<h2>Important Dependencies</h2>
+
+<h3>⚠️ InventoryBackup / InventoryRestore (REQUIRED)</h3>
+<p><strong>This plugin requires the plugin <code>InventoryBackup</code></strong> (from the InventoryRestore project) and will not start without it — it is listed under <code>depend</code> in <code>plugin.yml</code>, exactly like Vault.</p>
+
+<p>It is the storage behind all inventory safety: the backup taken before a player is teleported into an arena or lobby, the automatic restore afterwards, and the persistent queue that returns an inventory to a player who disconnected mid-match. Requires Paper/Spigot <strong>1.20+</strong>.</p>
+
+<h3>⚠️ Multiverse-Core (REQUIRED)</h3>
+<p><strong>This plugin requires Multiverse-Core</strong> for proper operation and will not start without it — it is listed under <code>depend</code> in <code>plugin.yml</code>:</p>
+<ul>
+<li><strong>World Loading</strong>: Loads event/arena worlds when matches start</li>
+<li><strong>World Cloning</strong>: Creates temporary world copies from templates</li>
+<li><strong>World Regeneration</strong>: Resets worlds after events/matches</li>
+<li><strong>World Unloading</strong>: Unloads worlds to save server resources</li>
+</ul>
+
+<p>Both Multiverse-Core 4 and 5 are supported.</p>
+
+<h3>✅ Inventory Management (no Multiverse-Inventories required)</h3>
+<p>The plugin manages inventory backups and restorations automatically through <code>InventoryBackup</code>:</p>
+<ul>
+<li><strong>After a match or event ends</strong>, including draws and cancellations</li>
+<li><strong>After a death</strong> in an arena, on respawn</li>
+<li><strong>After a disconnect</strong>: the restore is queued persistently and applied on the player's next login</li>
+<li><strong>After a crash</strong>: open sessions are written to <code>inventory-guard.yml</code> and restored on startup</li>
+</ul>
+
+<p><strong>Modes</strong> (<code>settings.inventory-management.provider</code>):</p>
+<ul>
+<li><code>auto</code> (default): Backup and automatic restore through InventoryBackup</li>
+<li><code>none</code>: <strong>Legacy</strong> mode for Multiverse-Inventories (plugin only writes safety backups)</li>
+</ul>
+
+<h3>Other Dependencies</h3>
+<ul>
+<li><strong>Vault</strong> (Required): For economy integration (money wagers)</li>
+<li><strong>InventoryBackup</strong> (Required): Inventory backup and restore</li>
+</ul>
+
+<h2>Essential Commands</h2>
+
+<h3>For Players</h3>
+
+<h4>Events:</h4>
+<pre><code>/event &lt;name&gt; join          - Join an event
+/event &lt;name&gt; leave         - Leave an event
+/event list                 - Show available events
+/eventstats me              - View your event statistics
+</code></pre>
+
+<h4>PvP Wagers:</h4>
+<pre><code>/pvpask &lt;player&gt;                                      - Challenge a player (GUI)
+/pvpa &lt;player&gt; &lt;wager&gt; &lt;amount&gt; &lt;arena&gt; &lt;equipment&gt;  - Challenge with full setup
+/pvpaccept [player]                                   - Accept a challenge
+/pvpdeny [player]                                     - Deny a challenge
+/surrender                                            - Surrender current match
+/draw                                                 - Vote for a draw
+/pvp spectate &lt;player&gt;                                - Spectate a match
+/pvpstats me                                          - View your PvP statistics
+</code></pre>
+
+<h3>For Admins</h3>
+
+<pre><code>/eventpvp reload            - Reload all configurations
+/eventpvp webtoken          - Generate web interface access token
+/eventpvp version           - Check plugin version and update status
+/eventpvp debug             - Toggle debug logging (on|on full|off|status)
+/eventpvp rescue            - Manage stuck sessions and stranded player return locations
+/event &lt;name&gt; start         - Start an event
+/event &lt;name&gt; stop          - Stop an event
+/event &lt;name&gt; forcestart    - Force start without minimum players
+/pvpadmin reload            - Reload PvP configuration
+/pvpadmin stopall           - Stop all active matches
+/inv &lt;player&gt;               - Inspect and restore player backups via InventoryBackup
+</code></pre>
+
+<h2>Quick Start</h2>
+
+<ol>
+<li><strong>Install Dependencies:</strong>
+<ul>
+<li>Multiverse-Core (Required)</li>
+<li>Vault (Required)</li>
+<li>InventoryBackup from InventoryRestore (Required)</li>
+</ul>
+</li>
+<li><strong>Configure the Plugin:</strong>
+<ul>
+<li>Edit <code>config.yml</code>, <code>worlds.yml</code>, <code>equipment.yml</code></li>
+<li>Or use the web interface: <code>/eventpvp webtoken</code></li>
+<li>Enable optional integrations (AJLeaderboards, DecentHolograms, PvPManager)</li>
+</ul>
+</li>
+<li><strong>Reload and Test:</strong>
+<pre><code>/eventpvp reload
+/event pvparena start
+</code></pre>
+</li>
+</ol>
+
+<h2>Server Requirements</h2>
+
+<ul>
+<li><strong>Platform</strong>: Paper/Spigot 1.19+ (InventoryBackup requires 1.20+)</li>
+<li><strong>RAM</strong>: 4GB+ recommended (depending on world size)</li>
+<li><strong>Required Plugins</strong>: Multiverse-Core (v4 or v5), Vault, InventoryBackup (from InventoryRestore)</li>
+<li><strong>Optional / Soft Integrations</strong>: PlaceholderAPI, AJLeaderboards, DecentHolograms, PvPManager</li>
+</ul>
+
+<h2>Need Help?</h2>
+
+<ul>
+<li>Check the full <code>README.md</code> for detailed documentation</li>
+<li>Review configuration examples in <code>CONFIG_EXAMPLES.md</code> (or <code>CONFIG_EXAMPLES_EN.md</code>)</li>
+<li>Test spawn configurations using <code>SpawnExamples.md</code></li>
+</ul>
+
+<hr>
+
+<p><strong>Remember</strong>: Multiverse-Core, Vault, and InventoryBackup are required dependencies. The plugin will not start without them!</p>

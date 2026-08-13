@@ -1,0 +1,684 @@
+# ============================================
+# Unified Event + PvP-Konfiguration
+# ============================================
+
+# Schema-Stand dieser Datei. Nicht von Hand aendern.
+# Das Plugin erkennt daran, welche Umschreibungen eine aus einer aelteren Version
+# stammende Datei noch braucht, und setzt den Wert danach selbst hoch. Vor jeder
+# Aenderung legt es eine Kopie config.yml.bak-<zeitstempel> daneben.
+config-version: 2
+
+settings:
+  # Sprache: "de" (Deutsch), "en" (Englisch), "fr" (Französisch), "ja" (Japanisch), "ru" (Russisch), "es" (Spanisch), "pl" (Polski)
+  # Default: "en"
+  language: "en"
+  
+  # Gemeinsames Prefix für alle Nachrichten
+  prefix: "&6[Event]&r"
+  main-world: "world"
+
+  # Debug-Ausgaben im Server-Log.
+  #   "off"  = aus (Standard)
+  #   "on"   = normal      - Match-Ablauf, Equipment, Config-Laden
+  #   "full" = ausfuehrlich - zusaetzlich Teleports, Spawn-Handling, Stack-Traces
+  # Die Ausgabe geht in die Konsole; OPs und Spieler mit eventpvp.debug.receive
+  # sehen sie zusaetzlich im Chat.
+  # Umschalten im Spiel: /eventpvp debug on | on full | off
+  debug: "off"
+
+  save-player-location: true
+  join-phase-duration: 30
+  lobby-countdown: 10
+
+  # INVENTAR-VERWALTUNG
+  #
+  # Legt fest, wer die Inventare der Spieler beim Wechsel in Arena- und Event-Welten
+  # verwaltet. Standard ist die eigene Verwaltung ueber das Plugin InventoryBackup:
+  # gesichert wird vor dem Teleport, zurueckgespielt nach Match, Event, Tod und Rejoin.
+  # Multiverse-Inventories wird dafuer nicht benoetigt.
+  inventory-management:
+    # auto = Sichern und Wiederherstellen ueber InventoryBackup (Standard, empfohlen)
+    # none = LEGACY: Multiverse-Inventories uebernimmt den Inventartausch. Das Plugin
+    #        stellt dann nichts automatisch wieder her, legt aber weiterhin
+    #        Sicherungskopien an (siehe legacy-safety-backups). Zweite Wahl - nur, wenn
+    #        es wirklich nicht anders geht.
+    #
+    # Der frueher moegliche Wert 'inventoryrestore' war immer gleichbedeutend mit 'auto'
+    # und wird beim naechsten Start automatisch darauf umgeschrieben.
+    provider: "auto"
+
+    # Nur im Legacy-Betrieb (provider: none): trotzdem vor jedem Arena- und Lobby-Teleport
+    # eine Kopie ueber InventoryBackup anlegen. Diese Kopien werden NIE automatisch
+    # zurueckgespielt - sie sind das Netz, aus dem ein Admin im Schadensfall von Hand
+    # wiederherstellt (Web-Panel oder /inv <spieler>).
+    legacy-safety-backups: true
+
+    # Automatische Wiederherstellung
+    auto-restore-on-match-end: true
+    auto-restore-on-event-end: true
+    auto-restore-on-respawn: true
+    auto-restore-on-rejoin: true
+
+    # Was passiert, wenn das Backup vor einem Match/Event nicht geschrieben werden konnte?
+    #   abort = Match bzw. Event-Beitritt abbrechen (sicherste Variante)
+    #   warn  = fortfahren und den Abzug im Arbeitsspeicher als Rueckfallebene nutzen
+    on-backup-failure: "abort"
+
+    # Temporaere Backups nach erfolgreichem Ende loeschen oder als Archiv behalten.
+    # Aus bedeutet: sie bleiben liegen und unterliegen dem Pruning von InventoryBackup.
+    # Dessen Aufbewahrungsdauer muss laenger sein als die laengste denkbare offene
+    # Sitzung, sonst verschwindet das Backup eines lange abwesenden Spielers.
+    cleanup-backups-after-match: false
+
+    # Crash-Wiederanlauf: offene Sitzungen werden in inventory-guard.yml gefuehrt und beim
+    # naechsten Serverstart abgearbeitet.
+    guard:
+      enabled: true
+      restore-orphans-on-start: true
+
+    # Warnen, wenn Multiverse-Inventories parallel zur eigenen Verwaltung laeuft.
+    # Die Meldung nennt Welt, Gruppe und den Befehl, der die Ueberschneidung aufloest.
+    warn-on-multiverse-inventories: true
+
+    # Umgang mit einem parallel laufenden Multiverse-Inventories
+    multiverse-inventories:
+      # Konfliktschutz: nach jeder Wiederherstellung wird einen Tick spaeter geprueft, ob
+      # noch der gewollte Zustand steht - hat ein anderes Plugin dazwischen getauscht,
+      # wird einmal nachgezogen. Zusaetzlich wird ein Weltwechsel mit offener Sitzung
+      # gegen fremde Aenderungen abgesichert. Aus bedeutet: bei einem Konflikt gewinnt,
+      # wer zufaellig zuletzt schreibt.
+      conflict-guard: true
+
+      # Wartezeit in Ticks zwischen Rueckteleport und Wiederherstellung. Wirkt nur, wenn
+      # Multiverse-Inventories installiert ist; ohne es wird ohne Verzoegerung
+      # wiederhergestellt. Reiner Puffer - die Zusage gibt conflict-guard.
+      restore-delay-ticks: 3
+
+  # Automatische Weltenverwaltung ueber Multiverse
+  world-management:
+    # Lobby- und Eventwelt beim Eventstart laden und nach dem Event entladen.
+    # WELCHE der beiden Welten ein Event braucht, entscheidet dessen 'use-lobby'.
+    # Die Hauptwelt (settings.main-world) wird nie entladen.
+    events: true
+
+    # Arenawelten nach dem Match entladen.
+    # Geladen werden sie bei Bedarf immer - sonst koennte kein Match starten.
+    arenas: true
+
+  # Befehle waehrend eines Events sperren (ausser /event leave).
+  # Betrifft nur Event-Teilnehmer; OPs und Traeger von eventpvp.opbypass sind
+  # ausgenommen. PvP-Matches sperren Befehle unabhaengig davon immer.
+  #   both  = Eventwelt + Lobbywelt      event = nur Eventwelt
+  #   lobby = nur Lobbywelt              none  = nicht sperren
+  command-restriction: "both"
+
+  # Zuschauer-System (PvP)
+  spectators:
+    enabled: true
+    max-spectators: 10
+    announce-join: true
+    announce-leave: true
+
+  # Match-Einstellungen (PvP)
+  match:
+    countdown-time: 10
+    max-duration: 600  # 10 Minuten
+    draw-vote-time: 30  # Zeit für Draw-Abstimmung
+    allow-no-wager: true
+
+  # Arena-Regeneration (PvP intern)
+  arena:
+    create-backups-on-startup: true
+    regeneration-delay: 7
+    notify-regeneration: true
+
+  # NEU: Arena-Regeneration-Flags (Events – WorldStateManager)
+  arena-regeneration:
+    backups: true        # Backups vor Regeneration erstellen
+    backup-async: true   # Backup asynchron ausführen (empfohlen)
+
+  # Auto-Event System (Events)
+  auto-events:
+    enabled: false
+    interval-min: 1800
+    interval-max: 3600
+    random-selection: true
+    check-online-players: true
+    # Event-Auswahl: Liste von Event-IDs die verwendet werden sollen
+    # Leer = alle aktivierten Events verwenden
+    # Bei random-selection: true  → zufällige Auswahl aus der Liste
+    # Bei random-selection: false → sequentielle Rotation in angegebener Reihenfolge
+    selected-events:
+      # - "pvparena"
+      # - "ctf"
+      # - "ffa"
+
+  # Sicherheitsüberprüfungen (PvP)
+  checks:
+    inventory-space: true
+    minimum-bet-items: 1
+    minimum-bet-money: 10
+    max-bet-money: 100000  # 0 = unlimited
+
+  # Update-Check (Modrinth API)
+  update-check:
+    enabled: true
+    check-on-startup: true
+    notify-admins-on-join: true
+    modrinth-project-id: "pqJQdZ6R"
+    startup-delay-ticks: 20  # 1 Sekunde Delay vor API-Request
+    # true = Vorabversionen (beta/alpha) werden ignoriert
+    stable-only: true
+    # Kontakt fuer den User-Agent der API-Anfrage (Modrinth verlangt eine
+    # erreichbare Adresse: E-Mail oder URL)
+    contact: "https://modrinth.com/plugin/pqJQdZ6R"
+
+  # Optional external integration support
+  integrations:
+    ajleaderboards:
+      enabled: false
+    decentholograms:
+      enabled: false
+    pvpmanager:
+      enabled: true
+    refresh-interval-ticks: 20
+
+# Hinweis: Nachrichten liegen in resources/messages.yml und werden ins Pluginverzeichnis kopiert.
+
+# Berechtigungen für spezielle Features
+permissions:
+  spectate-all: "pvpwager.spectate.all"
+  bypass-bet-limit: "pvpwager.bypass.betlimit"
+  no-wager: "pvpwager.nowager"
+
+# ============================================
+# Events – Definitionen (alle disabled außer PvPArena)
+# ============================================
+
+events:
+  # AKTIVES EVENT: PvPArena (Solo)
+  pvparena:
+    enabled: true
+    command: "pvparena"
+    display-name: "&c&lPvP Arena"
+    description: "&7Kämpfe bis zum letzten Mann!"
+
+    min-players: 2
+    max-players: 16
+    countdown-time: 45
+
+    worlds:
+      lobby-world: "EventLobby"
+      lobby-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+      event-world: "PvPArena"
+      clone-source-event-world: "PvPArena_original"
+      build-allowed: false
+      regenerate-event-world: false
+      regenerate-lobby-world: false
+
+    spawn-settings:
+      # Einfacher Start: Alle Spieler an einem Punkt (Beispiel)
+      spawn-type: "SINGLE_POINT"
+      single-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+
+    equipment-group: "pvp_starter"
+    give-equipment-in-lobby: true
+
+    mechanics:
+      game-mode: "SOLO"
+      pvp-enabled: true
+      hunger-enabled: true
+      win-condition:
+        type: "LAST_ALIVE"
+      death-handling:
+        eliminate-on-death: true
+        spectator-mode: true
+        allow-rejoin: false
+
+    rewards:
+      winner:
+        items:
+          enabled: false
+          items:
+            - "DIAMOND 10"
+        commands:
+          enabled: true
+          commands:
+            - "say Glückwunsch {player}!"
+            - "givespins {player} mystic 1"
+
+      team-winner:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: true
+          commands:
+            - "givespins {player} mystic 1"
+
+      participation:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: false
+          commands: []
+
+    messages:
+      start: "&c&lPVP ARENA STARTET!"
+      winner: "&6&l{player} IST DER CHAMPION!"
+      eliminated: "&7{player} wurde eliminiert!"
+      objective: "&7Ziel: &cÜberlebe als Letzter!"
+
+  # Zusätzliche Varianten mit gleicher Welt/Lobby und Settings, aber anderem Equipment
+  pvparena_standard:
+    enabled: true
+    command: "pvparena_standard"
+    display-name: "&e&lPvP Arena – Standard"
+    description: "&7Klassisches PvP mit Eisen-Set"
+
+    min-players: 2
+    max-players: 16
+    countdown-time: 45
+
+    worlds:
+      lobby-world: "EventLobby"
+      lobby-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+      event-world: "PvPArena"
+      clone-source-event-world: "PvPArena_original"
+      build-allowed: false
+      regenerate-event-world: false
+      regenerate-lobby-world: false
+
+    spawn-settings:
+      spawn-type: "SINGLE_POINT"
+      single-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+
+    equipment-group: "standard"
+    give-equipment-in-lobby: true
+
+    mechanics:
+      game-mode: "SOLO"
+      pvp-enabled: true
+      hunger-enabled: true
+      win-condition:
+        type: "LAST_ALIVE"
+      death-handling:
+        eliminate-on-death: true
+        spectator-mode: true
+        allow-rejoin: false
+
+    rewards:
+      winner:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: true
+          commands:
+            - "say Glückwunsch {player}!"
+
+    messages:
+      start: "&e&lSTANDARD ARENA STARTET!"
+      winner: "&6&l{player} GEWINNT DAS STANDARD-MATCH!"
+      eliminated: "&7{player} wurde eliminiert!"
+      objective: "&7Ziel: &eAusgeglichenes PvP"
+
+  pvparena_diamond:
+    enabled: true
+    command: "pvparena_diamond"
+    display-name: "&b&lPvP Arena – Diamond"
+    description: "&7Diamant-Set, moderat verstärkt"
+
+    min-players: 2
+    max-players: 16
+    countdown-time: 45
+
+    worlds:
+      lobby-world: "EventLobby"
+      lobby-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+      event-world: "PvPArena"
+      clone-source-event-world: "PvPArena_original"
+      build-allowed: false
+      regenerate-event-world: false
+      regenerate-lobby-world: false
+
+    spawn-settings:
+      spawn-type: "SINGLE_POINT"
+      single-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+
+    equipment-group: "diamond"
+    give-equipment-in-lobby: true
+
+    mechanics:
+      game-mode: "SOLO"
+      pvp-enabled: true
+      hunger-enabled: true
+      win-condition:
+        type: "LAST_ALIVE"
+      death-handling:
+        eliminate-on-death: true
+        spectator-mode: true
+        allow-rejoin: false
+
+    rewards:
+      winner:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: true
+          commands:
+            - "say GG {player}!"
+
+    messages:
+      start: "&b&lDIAMOND ARENA STARTET!"
+      winner: "&6&l{player} GEWINNT DIAMOND!"
+      eliminated: "&7{player} wurde eliminiert!"
+      objective: "&7Ziel: &bOffensives PvP"
+
+  pvparena_starter:
+    enabled: true
+    command: "pvparena_starter"
+    display-name: "&a&lPvP Arena – Starter"
+    description: "&7Einfaches Set für schnelle Runden"
+
+    min-players: 2
+    max-players: 16
+    countdown-time: 45
+
+    worlds:
+      lobby-world: "EventLobby"
+      lobby-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+      event-world: "PvPArena"
+      clone-source-event-world: "PvPArena_original"
+      build-allowed: false
+      regenerate-event-world: false
+      regenerate-lobby-world: false
+
+    spawn-settings:
+      spawn-type: "SINGLE_POINT"
+      single-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+
+    equipment-group: "pvp_starter"
+    give-equipment-in-lobby: true
+
+    mechanics:
+      game-mode: "SOLO"
+      pvp-enabled: true
+      hunger-enabled: true
+      win-condition:
+        type: "LAST_ALIVE"
+      death-handling:
+        eliminate-on-death: true
+        spectator-mode: true
+        allow-rejoin: false
+
+    rewards:
+      winner:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: true
+          commands:
+            - "say Sauber {player}!"
+
+    messages:
+      start: "&a&lSTARTER ARENA STARTET!"
+      winner: "&6&l{player} GEWINNT STARTER!"
+      eliminated: "&7{player} wurde eliminiert!"
+      objective: "&7Ziel: &aEinsteiger-PvP"
+
+  pvparena_team2_standard:
+    enabled: true
+    command: "pvparena_team2_standard"
+    display-name: "&e&lTeam Arena – Standard"
+    description: "&7Zwei Teams mit Eisen-Set"
+
+    min-players: 4
+    max-players: 16
+    countdown-time: 45
+
+    worlds:
+      lobby-world: "EventLobby"
+      lobby-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+      event-world: "PvPArena"
+      clone-source-event-world: "PvPArena_original"
+      build-allowed: false
+      regenerate-event-world: false
+      regenerate-lobby-world: false
+
+    spawn-settings:
+      spawn-type: "TEAM_SPAWNS"
+      team-spawns:
+        team1:
+          a: { x: 12, y: 65, z: 0, yaw: 90,  pitch: 0 }
+          b: { x: 14, y: 65, z: 2, yaw: 90,  pitch: 0 }
+        team2:
+          a: { x: -12, y: 65, z: 0, yaw: -90, pitch: 0 }
+          b: { x: -14, y: 65, z: -2, yaw: -90, pitch: 0 }
+
+    equipment-group: "standard"
+    give-equipment-in-lobby: true
+
+    mechanics:
+      game-mode: "TEAM_2"
+      pvp-enabled: true
+      hunger-enabled: true
+      win-condition:
+        type: "LAST_ALIVE"
+      death-handling:
+        eliminate-on-death: true
+        spectator-mode: true
+        allow-rejoin: false
+
+    rewards:
+      winner:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: true
+          commands:
+            - "say Team {player} gewinnt Standard!"
+
+    messages:
+      start: "&e&lTEAM STANDARD STARTET!"
+      winner: "&6&l{player} GEWINNT FÜR SEIN TEAM!"
+      eliminated: "&7{player} wurde eliminiert!"
+      objective: "&7Ziel: &eTeam-Play mit gleichen Höhen-Spawns"
+
+  pvparena_team2_diamond:
+    enabled: true
+    command: "pvparena_team2_diamond"
+    display-name: "&b&lTeam Arena – Diamond"
+    description: "&7Zwei Teams mit Diamant-Set"
+
+    min-players: 4
+    max-players: 16
+    countdown-time: 45
+
+    worlds:
+      lobby-world: "EventLobby"
+      lobby-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+      event-world: "PvPArena"
+      clone-source-event-world: "PvPArena_original"
+      build-allowed: false
+      regenerate-event-world: false
+      regenerate-lobby-world: false
+
+    spawn-settings:
+      spawn-type: "TEAM_SPAWNS"
+      team-spawns:
+        team1:
+          a: { x: 18, y: 65, z: 0, yaw: 90,  pitch: 0 }
+          b: { x: 20, y: 65, z: 3, yaw: 90,  pitch: 0 }
+        team2:
+          a: { x: -18, y: 65, z: 0, yaw: -90, pitch: 0 }
+          b: { x: -20, y: 65, z: -3, yaw: -90, pitch: 0 }
+
+    equipment-group: "diamond"
+    give-equipment-in-lobby: true
+
+    mechanics:
+      game-mode: "TEAM_2"
+      pvp-enabled: true
+      hunger-enabled: true
+      win-condition:
+        type: "LAST_ALIVE"
+      death-handling:
+        eliminate-on-death: true
+        spectator-mode: true
+        allow-rejoin: false
+
+    rewards:
+      winner:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: true
+          commands:
+            - "say Team {player} gewinnt Diamond!"
+
+    messages:
+      start: "&b&lTEAM DIAMOND STARTET!"
+      winner: "&6&l{player} GEWINNT FÜR SEIN TEAM!"
+      eliminated: "&7{player} wurde eliminiert!"
+      objective: "&7Ziel: &bTeam-Play mit Iron Equip"
+
+  pvparena_team3_standard:
+    enabled: true
+    command: "pvparena_team3_standard"
+    display-name: "&e&lTeam Arena – 3 Teams"
+    description: "&7Drei Teams mit Eisen-Set"
+
+    min-players: 6
+    max-players: 18
+    countdown-time: 45
+
+    worlds:
+      lobby-world: "EventLobby"
+      lobby-spawn:
+        x: 0.5
+        y: 65
+        z: 0.5
+        yaw: 0
+        pitch: 0
+      event-world: "PvPArena"
+      clone-source-event-world: "PvPArena_original"
+      build-allowed: false
+      regenerate-event-world: false
+      regenerate-lobby-world: false
+
+    spawn-settings:
+      spawn-type: "TEAM_SPAWNS"
+      team-spawns:
+        team1:
+          a: { x: 16, y: 65, z: 0, yaw: 90,  pitch: 0 }
+          b: { x: 18, y: 65, z: 2, yaw: 90,  pitch: 0 }
+        team2:
+          a: { x: -16, y: 65, z: 0, yaw: -90, pitch: 0 }
+          b: { x: -18, y: 65, z: -2, yaw: -90, pitch: 0 }
+        team3:
+          a: { x: 0, y: 65, z: 16, yaw: 180, pitch: 0 }
+          b: { x: 2, y: 65, z: 18, yaw: 180, pitch: 0 }
+
+    equipment-group: "standard"
+    give-equipment-in-lobby: true
+
+    mechanics:
+      game-mode: "TEAM_3"
+      pvp-enabled: true
+      hunger-enabled: true
+      win-condition:
+        type: "LAST_ALIVE"
+      death-handling:
+        eliminate-on-death: true
+        spectator-mode: true
+        allow-rejoin: false
+
+    rewards:
+      winner:
+        items:
+          enabled: false
+          items: []
+        commands:
+          enabled: true
+          commands:
+            - "say Team {player} gewinnt 3-Teams Standard!"
+
+    messages:
+      start: "&e&lTEAM 3 STARTET!"
+      winner: "&6&l{player} GEWINNT FÜR SEIN TEAM!"
+      eliminated: "&7{player} wurde eliminiert!"
+      objective: "&7Ziel: &e3 Teams – Iron Equip"
+
+  # BEISPIEL-Event (deaktiviert)
+  team2pvp:
+    enabled: false
+    command: "team2pvp"
+    display-name: "&c&l2 Team PvP (Beispiel)"
+    description: "&7Beispiel – deaktiviert"
+    min-players: 4
+    max-players: 16
+    countdown-time: 45
+    worlds:
+      lobby-world: "Team2Lobby"
+      event-world: "Team2Arena"
+    spawn-settings:
+      spawn-type: "TEAM_SPAWNS"
+    equipment-group: "team_pvp_starter"
+    mechanics:
+      game-mode: "TEAM_2"

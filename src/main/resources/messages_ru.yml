@@ -1,0 +1,1464 @@
+messages:
+  equipment:
+    debug-no-group: '&c[Debug] Не настроена корректная группа снаряжения: &e{group}'
+    debug-retrying: '&7[Debug] Снаряжение выдано не полностью, повторная попытка...'
+    debug-still-incomplete: '&c[Debug] Снаряжение всё ещё выдано не полностью.'
+    debug-applied: '&a[Debug] Снаряжение успешно выдано.'
+  request:
+    received: '
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &e&lPVP-ЗАПРОС
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      &e{player} &aхочет сразиться с вами!
+
+
+      &aНажмите здесь, чтобы принять:
+
+      '
+    accepted: '&aВы приняли запрос от &e{player}&a!'
+    denied: '&cВы отклонили запрос от &e{player}&c!'
+    expired: '&cЗапрос от &e{player} &cистек!'
+    no-request: '&cУ вас нет запроса от {player}!'
+    already-in-match: '&cЭтот игрок уже в бою!'
+    self-request: '&cНельзя отправить запрос самому себе!'
+    player-offline: '&cИгрок {player} не в сети!'
+    header: '
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &e&lPVP-ЗАПРОС
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      &e{player} &aхочет сразиться с вами!
+
+      '
+    accept-button: '&a&l[► ПРИНЯТЬ ◄]'
+    accept-hover: '&aНажмите, чтобы принять запрос!'
+    deny-button: ' &c&l[✖ ОТКЛОНИТЬ]'
+    deny-hover: '&cНажмите, чтобы отклонить запрос'
+    footer: '
+
+
+      &7Запрос истекает через &e60 секунд&7.
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    request-expired-sender: '&cВаш запрос игроку &e{target} &cистек!'
+    request-expired-target: '&cЗапрос от &e{sender} &cистек!'
+    challenge-header: '&e&lPVP ВЫЗОВ!'
+    challenge-message: '&e{player} &7вызвал вас на бой!'
+  wager:
+    not-enough-money: '&cНедостаточно денег! Нужно &6${amount}&c'
+  selection:
+    arena-selected: '&aАрена выбрана: &e{arena}'
+    equipment-selected: '&aЭкипировка выбрана: &e{equipment}'
+  command:
+    common:
+      player-only: '&cКоманду могут использовать только игроки!'
+      player-offline: '&cИгрок не найден: {player}'
+      self-target: '&cНельзя нацелиться на себя!'
+      already-in-match: '&cВы уже в матче!'
+      target-in-match: '&c{player} уже в матче!'
+      pending-self: '&cУ вас уже есть активный запрос!'
+      pending-target: '&cУ {player} уже есть активный запрос!'
+      not-spectating: '&cВы не наблюдаете ни один матч!'
+      match-full: '&cВ матче слишком много зрителей!'
+    pvpa:
+      player-only: '&cКоманду могут использовать только игроки!'
+      player-not-found: '&cИгрок не найден: {player}'
+      self-challenge: '&cНельзя вызвать самого себя!'
+      arena-not-found: '&cАрена не найдена: {arena}'
+      equipment-not-found: '&cЭкипировка не найдена: {equipment}'
+      amount-positive: '&cКоличество должно быть положительным!'
+      economy-disabled: '&cЭкономика не включена!'
+      not-enough-money: '&cНедостаточно денег! У вас: ${balance}'
+      invalid-money: '&cНеверная сумма: {amount}'
+      mismatch-items: '&cНесовпадение предметов и количеств!'
+      not-enough-items: '&cУ вас недостаточно: {item}'
+      invalid-item: '&cНеверный предмет: {item}'
+      wager-money: '&6$${amount}'
+      wager-items: '&e{count} предмет(ов)'
+      request-sent: '
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &a&lЗАПРОС ОТПРАВЛЕН!
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7Цель: &e{target}
+
+        &7Арена: &e{arena}
+
+        &7Снаряжение: &e{equipment}
+
+        &7Ставка: {wager}
+
+
+        &7Ожидание ответа от &e{target}&7...
+
+        '
+      usage: '
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &e&lКОМАНДА PVPA
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7Использование:
+
+        &e/pvpa <игрок> <ставка> <количество> <арена> <снаряжение>
+
+
+        &7Примеры:
+
+        &e/pvpa Steve DIAMOND_SWORD 1 desert diamond
+
+        &e/pvpa Steve MONEY 100 forest standard
+
+        &e/pvpa Steve DIAMOND_SWORD,GOLDEN_APPLE 1,5 colosseum netherite
+
+
+        &7Используйте &e/pvpa arenas &7для списка арен
+
+        &7Используйте &e/pvpa equipment &7для списка снаряжения
+
+        '
+      available-arenas: '&7Доступные арены:'
+      available-equipment: '&7Доступная экипировка:'
+    pvpyes:
+      player-only: '&cКоманду могут использовать только игроки!'
+      no-request: '&cНет активного запроса!'
+      waiting-response: '&cОжидание ответа {player}!'
+      sender-no-money: '&cУ вас больше нет достаточно денег!'
+      sender-no-items: '&cУ вас больше нет нужных предметов!'
+      target-no-money-player: '&c{player} больше не имеет достаточно денег!'
+      target-no-money-target: '&cУ вас недостаточно денег — запрос отменен!'
+      target-no-items-player: '&c{player} больше не имеет нужных предметов!'
+      target-no-items-target: '&cУ вас нет нужных предметов — запрос отменен!'
+    pvpadmin:
+      no-permission: '&cУ вас нет прав на эту команду!'
+      reload-success: '
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &a&lКОНФИГУРАЦИЯ ПЕРЕЗАГРУЖЕНА!
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7✓ Основной конфиг перезагружен
+
+        &7✓ Сообщения перезагружены
+
+        &7✓ Арены перезагружены: &e{arenaCount}
+
+        &7✓ Наборы снаряжения перезагружены: &e{equipmentCount}
+
+
+        &eПримечание: &7Текущие бои не затронуты
+
+        '
+      reload-error: '&cОшибка при перезагрузке: {error}'
+      stopall: '
+
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &e&lБОИ ОСТАНОВЛЕНЫ
+
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7Остановлено активных боёв: &e{count}
+
+        &7Все ставки возвращены
+
+        '
+      info: '
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &6&lPVPWAGER INFO
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7Версия: &e{version}
+
+        &7Активные бои: &e{active}
+
+        &7Загружено арен: &e{arenas}
+
+        &7Загружено снаряжения: &e{equipment}
+
+        &7Экономика: {economy}
+
+        '
+      enabled: '&aВключено'
+      disabled: '&cВыключено'
+      help: '
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &6&lPVPWAGER ADMIN
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &e/pvpadmin reload &8- &7Перезагрузить все конфигурации
+
+        &e/pvpadmin stopall &8- &7Остановить все активные бои
+
+        &e/pvpadmin info &8- &7Показать информацию о плагине
+
+        '
+    pvpanswer:
+      player-only: '&cКоманду могут использовать только игроки!'
+      no-request: '&cНет активного запроса!'
+      usage: '&cИспользование: /pvpanswer <ставка> <количество> [арена] [снаряжение]
+
+        &7Пример: /pvpanswer DIAMOND_SWORD 1
+
+        &7Пример: /pvpanswer MONEY 50 desert diamond
+
+        &7Пример: /pvpanswer SKIP
+
+        '
+      arena-not-found: '&cАрена не найдена: {arena}'
+      equipment-not-found: '&cЭкипировка не найдена: {equipment}'
+      missing-money: '&cНе указана сумма для MONEY!'
+      amount-positive: '&cСумма должна быть положительной!'
+      economy-disabled: '&cЭкономика не включена!'
+      not-enough-money: '&cНедостаточно денег!'
+      invalid-money: '&cНеверная сумма: {amount}'
+      missing-items: '&cНе указано количество для предметной ставки!'
+      mismatch-items: '&cНесовпадение предметов и количеств!'
+      not-enough-items: '&cУ вас недостаточно: {item}'
+      invalid-item: '&cНеверный предмет: {item}'
+      response-sent: '&a&lОТВЕТ ОТПРАВЛЕН!'
+      your-wager-money: '&7Ваша ставка: &6${amount}'
+      your-wager-items: '&7Ваша ставка: &e{items}'
+      arena-override: '&7Арена изменена на: &e{arena}'
+      equipment-override: '&7Экипировка изменена на: &e{equipment}'
+      waiting-confirm: '&7Ожидание подтверждения от &e{player}&7...'
+      challenger-header: '&e&l{player} ОТВЕТИЛ!'
+      their-wager-money: '&7Их ставка: &6${amount}'
+      their-wager-items: '&7Их ставка: &e{items}'
+      arena-changed: '&7Арена изменена на: &e{arena}'
+      equipment-changed: '&7Экипировка изменена на: &e{equipment}'
+      next-steps: '&aВведите &e/pvpyes &aдля принятия
+
+        &cВведите &e/pvpno &cдля отказа'
+    pvp:
+      help: '&e&lPvPWager &8» &7Использование:
+
+        &e/pvpa <игрок> &8- &7Отправить PvP-запрос со ставкой
+
+        &e/pvp accept <игрок> &8- &7Принять запрос
+
+        &e/pvp deny <игрок> &8- &7Отклонить запрос
+
+        &e/pvp spectate <игрок> &8- &7Смотреть бой
+
+        &e/pvp leave &8- &7Выйти из режима наблюдателя
+
+        '
+      accept:
+        success-self: '&aВы приняли PvP-запрос от &e{player}&a!'
+        success-other: '&e{player} &aпринял ваш PvP-запрос!'
+        no-request: '&cНет активного запроса от &e{player}&c!'
+        requires-skip: '&cНельзя принять: соперник не выбрал SKIP. Сначала укажите
+          свою ставку: &e/pvpanswer <ставка> <количество>&c.'
+      deny:
+        success-self: '&cВы отклонили PvP-запрос от &e{player}&c!'
+        success-other: '&e{player} &cотклонил ваш PvP-запрос!'
+        usage: '&cИспользование: /pvp deny <игрок>'
+      spectate:
+        usage: '&cИспользование: /pvp spectate <игрок>'
+        no-match: '&c{player} не в матче!'
+        joined: '&aВы наблюдаете &e{p1} &7против &e{p2}&a!'
+        announce: '&e{player} &7наблюдает за матчем!'
+        already-spectating: '&cВы уже наблюдаете!'
+      leave:
+        left: '&aВы покинули режим наблюдателя!'
+        announce: '&e{player} &7покинул режим наблюдателя!'
+    pvprequest:
+      usage: '&cИспользование: /pvpa <игрок>'
+      sent: '&aОтправлен PvP-запрос игроку &e{player}&a!'
+    pvpno:
+      no-request: '&cНет активного запроса!'
+      declined-self: '&cВы отклонили запрос с/к &e{player}'
+      declined-other: '&e{player} &cотклонил запрос!'
+    challenge:
+      usage: '&cИспользование: /pvp challenge <игрок> [ставка] [кол-во] [арена] [экипировка]'
+      no-config: '&cНет настроенных арен или экипировки!'
+      sent: '&aОтправлен PvP-запрос игроку &e{player}&a!'
+    draw:
+      player-only: '&cКоманду могут использовать только игроки!'
+      only-active: '&cГолосовать за ничью можно только в активном матче!'
+      no-active-vote: '&cНет активного голосования за ничью!'
+      initiator-wait: '&cВы инициировали голосование, дождитесь ответа противника!'
+      initiator-cannot-deny: '&cВы сами начали это голосование за ничью! Используйте
+        &e/draw &cещё раз, чтобы отменить.'
+      cancelled-self: '&cВы отменили голосование за ничью.'
+      cancelled-opponent: '&e{player} &cотменил голосование за ничью.'
+      already-active: '&e{opponent} &7уже проголосовал за ничью!
+
+        &7Введите &a/draw accept &7или &c/draw deny'
+      accepted: '&a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &a&lНИЧЬЯ ПРИНЯТА!
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7Оба игрока согласились на ничью.
+
+        &7Все ставки будут возвращены.'
+      denied: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &c&lНИЧЬЯ ОТКЛОНЕНА!
+
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &e{player} &7отклонил голосование за ничью.
+
+        &7Бой продолжается!'
+      started: "&e&l━━━━━━━━━━━━━━━━━━━━━━━\n&e&lНАЧАЛОСЬ ГОЛОСОВАНИЕ ЗА НИЧЬЮ\n\
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{initiator} &7хочет завершить бой вничью.\n\
+        \n&e{opponent}&7, введите:\n  &a/draw accept &7- Принять ничью\n  &c/draw\
+        \ deny &7- Отклонить ничью\n\n&7Ограничение времени: &e{time} секунд"
+      expired: '&c&lГолосование за ничью истекло!
+
+        &7Бой продолжается.'
+    surrender:
+      player-only: '&cКоманду могут использовать только игроки!'
+      only-active: '&cСдаться можно только во время активного матча!'
+      confirm: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &c&lВНИМАНИЕ: СДАЧА
+
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7Вы действительно хотите сдаться?
+
+        &cВы потеряете всю свою ставку!
+
+
+        &7Введите &e/surrender confirm &7для подтверждения
+
+        &7или подождите {timeout} секунд для отмены'
+      confirm-expired: '&cПодтверждение сдачи истекло! Введите &e/surrender &cснова.'
+      surrendered: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &c&l{player} СДАЛСЯ!
+
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &e{opponent} &aпобеждает в бою!'
+  match-display:
+    you-won-header: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    you-won: '&a&lВЫ ПОБЕДИЛИ!'
+    you-lost-header: '&c&l━━━━━━━━━━━━━━━━━━━━━━━'
+    you-lost: '&c&lВЫ ПРОИГРАЛИ!'
+    match-starting: '&a&lМАТЧ НАЧИНАЕТСЯ!'
+    vs-display: '&e{player1} &7против &e{player2}'
+    arena-display: '&7Арена: &e{arena}'
+    equipment-display: '&7Экипировка: &e{equipment}'
+    arena-countdown: '&eЗагрузка арены... &7(5 секунд)'
+    fight-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    fight: '&e&lВ БОЙ!'
+  end:
+    draw: '&eНичья!'
+    eliminated: '&7{player} выбыл!'
+    winner: '&6&l{player} ПОБЕДИЛ!'
+    team-winner: '&6&lКОМАНДА {team} ПОБЕДИЛА!'
+    all-eliminated: '&7Все игроки выбиты.'
+    no-winner: '&7Победитель не определен.'
+    thanks: '&7Спасибо за участие!'
+  surrender:
+    success: '
+
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &c&lВЫ СДАЛИСЬ!
+
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      &7Ваш соперник победил.
+
+      '
+  draw:
+    denied: '&cНичья отклонена — бой продолжается!'
+    timeout: '&cВремя голосования истекло — бой продолжается!'
+  error:
+    no-permission: '&cНет прав!'
+    no-equipment: '&cНабор экипировки не найден!'
+    equipment-not-available: '&cЭтот набор недоступен!'
+    already-in-match: '&cВы уже в матче!'
+    not-in-match: '&cВы не в матче!'
+    world-not-loaded: '&cНе удалось загрузить мир арены!'
+    command-blocked: '&cВо время боя команды заблокированы! Используйте &e/surrender
+      &cили &e/draw'
+  event-help:
+    header: '
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &e&lКОМАНДЫ PVP WAGER
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    join: '&e/event join <event> &7– Присоединиться к событию'
+    leave: '&e/event leave &7– Покинуть событие'
+    list: '&e/event list &7– Список доступных событий'
+    admin-header: '&eАдмин'
+    start: '&e/event start <event>'
+    stop: '&e/event stop <event>'
+    forcestart: '&e/event forcestart <event>'
+    reload: '&e/eventpvp reload'
+    footer: '&7Удачи!'
+  pvpstats:
+    player-not-found: '&cИгрок не найден: &e{player}'
+    usage: '&e/pvpstats me &7| &e/pvpstats top [N]'
+    admin-usage: '&7Админ: &e/pvpstats reset <игрок> &7| &e/pvpstats add <игрок>
+      <wins|losses|draws> <n>'
+    me-player-only: '&cТолько игроки могут использовать &e/pvpstats me&c.'
+    me-empty: '&7Статистики пока нет — сыграйте несколько матчей!'
+    me-header: '&6&lВаша PvP-статистика'
+    me-wins: '&7Победы: &a{wins}'
+    me-losses: '&7Поражения: &c{losses}'
+    me-draws: '&7Ничьи: &e{draws}'
+    top-header: '&6&lТоп PvP игроков (по победам)'
+    top-line: '&e{rank}. &f{name} &7- Победы: &a{wins}, &7Поражения: &c{losses},
+      &7Ничьи: &e{draws}'
+    top-empty: '&7Статистика пока отсутствует.'
+    no-permission: '&cНет прав.'
+    reset-usage: '&cИспользование: &e/pvpstats reset <игрок>'
+    add-usage: '&cИспользование: &e/pvpstats add <игрок> <wins|losses|draws> <n>'
+    invalid-number: '&cНеверное число.'
+    invalid-amount: '&cЧисло должно быть > 0.'
+    invalid-field: '&cПоле должно быть &ewins&c, &elosses&c или &edraws&c.'
+    reset-success: '&aСтатистика PvP сброшена для &f{name}'
+    add-success: '&aСтатистика PvP обновлена для &f{name}'
+    unknown-subcommand: '&cНеизвестная подкоманда.'
+  eventstats:
+    player-not-found: '&cИгрок не найден: &e{player}'
+    usage: '&e/eventstats me &7| &e/eventstats top [N]'
+    admin-usage: '&7Админ: &e/eventstats reset <игрок> &7| &e/eventstats add
+      <игрок> <wins|participations> <n>'
+    me-player-only: '&cТолько игроки могут использовать &e/eventstats me&c.'
+    me-empty: '&7Статистики событий пока нет — участвуйте!'
+    me-header: '&6&lВаша статистика событий'
+    me-participations: '&7Участия: &e{participations}'
+    me-wins: '&7Победы: &a{wins}'
+    top-header: '&6&lТоп игроков событий (по победам)'
+    top-line: '&e{rank}. &f{name} &7- Победы: &a{wins}, &7Участия: &e{participations}'
+    top-empty: '&7Статистика пока отсутствует.'
+    no-permission: '&cНет прав.'
+    reset-usage: '&cИспользование: &e/eventstats reset <игрок>'
+    add-usage: '&cИспользование: &e/eventstats add <игрок> <wins|participations> <n>'
+    invalid-number: '&cНеверное число.'
+    invalid-amount: '&cЧисло должно быть > 0.'
+    invalid-field: '&cПоле должно быть &ewins&c или &eparticipations&c.'
+    reset-success: '&aСтатистика событий сброшена для &f{name}'
+    add-success: '&aСтатистика событий обновлена для &f{name}'
+    unknown-subcommand: '&cНеизвестная подкоманда.'
+  general:
+    event-not-found: '&cСобытие «{event}» не найдено!'
+    player-only: '&cТолько игроки могут использовать эту команду!'
+    no-permission: '&cУ вас нет прав на эту команду!'
+    unknown-command: '&cНеизвестная команда: &e{command}'
+    cooldown: '&cПодождите еще {seconds} секунд!'
+  join:
+    joined: 'Вы присоединились к событию.'
+    already-joined: '&cВы уже участвуете в этом событии.'
+    event-running: '&cСобытие уже идет. Нельзя присоединиться.'
+    countdown-active: '&7Обратный отсчет активен, но вы еще можете войти.'
+    success: '&aВы успешно зарегистрировались на событие!'
+    event-full: '&cСобытие заполнено!'
+  leave:
+    not-in-event: '&cВы не на событии.'
+    success: '&7Вы покинули событие.'
+  lobby:
+    welcome: '&7Добро пожаловать в лобби события! Подготовьтесь.'
+  start:
+    join-button: '&a&l[НАЖМИТЕ, ЧТОБЫ ПРИСОЕДИНИТЬСЯ]'
+    join-hover: '&aНажмите, чтобы присоединиться к событию'
+    started-title: '&a&lСОБЫТИЕ НАЧАЛОСЬ!'
+    started-subtitle: '&7Удачи!'
+    cancelled-not-enough-players: '&cСобытие отменено — недостаточно игроков!'
+    team-size-mismatch: '&cВас исключили, потому что размер команды не совпадает!'
+    event-changing: '&eСмена события — подождите...'
+    already-running: '&cЭто событие уже идет.'
+    join-phase-started: '&aНабор на &e{event} &aначался! Используйте &e/event
+      join &7({time}с)'
+    join-phase-ending: '&eФаза входа закончится через &6{time} &eсекунд!'
+    join-phase-closed: '&cФаза входа закрыта — событие начинается!'
+    not-enough-players: '&cНедостаточно игроков. Минимум: &e{min}'
+    countdown: '&7Событие начнется через &e{time} &7секунд...'
+    auto-teleport: '&7Телепортация игроков в лобби/мир события...'
+    preparing-worlds: '&7Подготовка миров...'
+    regenerating: '&eРегистрация мира события — подождите...'
+  countdown:
+    preparing: '&7Подготовка...'
+    starting: '&eСтартуем...'
+    go: '&aВперед!'
+  event:
+    eliminated-spectator: '&7Вы были выбиты и теперь наблюдаете.'
+    leave-button: '&c&l[✖ ПОКИНУТЬ СОБЫТИЕ]'
+    leave-hover: 'Нажмите, чтобы вернуться в основной мир!'
+    usage-join: '&cИспользование: /event join <событие>'
+    usage-start: '&cИспользование: /event <имя> start'
+    usage-stop: '&cИспользование: /event <имя> stop'
+    usage-forcestart: '&cИспользование: /event <имя> forcestart'
+    not-open: '&cЭто событие в данный момент не открыто.'
+    join-phase-only: '&cВход возможен только во время фазы присоединения.'
+    create-error: '&cОшибка при создании события!'
+    no-active-event: '&cНет активного события с таким именем!'
+    no-countdown-active: '&cОтсчет не активен!'
+  inventory:
+    session-conflict: '&cУ вас ещё открыта сессия инвентаря из другого матча или события. Сейчас присоединиться нельзя.'
+    backup-degraded: '&eВаш инвентарь не удалось сохранить на диск. До конца события он хранится только в памяти.'
+    backup-failed-abort: '&cВас убрали из события: ваш инвентарь не удалось надёжно сохранить.'
+  rewards:
+    pending: '&aВаша награда ждёт и будет выдана, как только вернётся ваш инвентарь.'
+    delivered-on-join: '&aВаши отложенные награды выданы.'
+    winner-title: '&6&lПОБЕДА!'
+    winner-subtitle: '&aНаграды выдаются'
+    team-winner-subtitle: '&aВаша команда победила!'
+    item-received: '&aВы получили награду!'
+    command-executed: '&7Команда награды выполнена.'
+  admin:
+    event-stopped: '&cСобытие остановлено.'
+    force-start: '&a[Событие] событие запущено принудительно!'
+    reloaded: '&aКонфигурация перезагружена.'
+  pvp-help:
+    header: '&6&l━━━━━━━━━━━━━━━━━━━'
+    title: '&e&lPVP СПРАВКА'
+    usage: '&7Использование:'
+    wager-info: '&7Ставка: предмет, MONEY или &eSKIP&7 (без ставки)'
+    commands:
+      challenge: '&e/pvp challenge <игрок> [ставка] [кол-во] [арена] [экипировка]'
+      accept: '&e/pvp accept [игрок]'
+      deny: '&e/pvp deny [игрок]'
+      spectate: '&e/pvp spectate <игрок>'
+      leave: '&e/pvp leave'
+      surrender: '&e/pvp surrender [confirm]'
+      draw: '&e/pvp draw [accept|deny]'
+  world:
+    loading: '&7Загрузка мира... &e⏳'
+    loaded: '&aМир загружен! ✓'
+    load-failed: '&cНе удалось загрузить мир! ✗'
+  gui:
+    equipment-item-title: '{name}'
+    wager-title: '&6&lНастройка ставки'
+    arena-title: '&e&lВыбор арены'
+    equipment-title: '&e&lВыбор экипировки'
+    click-to-select: '&7Нажмите, чтобы выбрать'
+    back-title: '&c« Назад'
+    back-lore: '&7Нажмите, чтобы вернуться'
+    confirm-title: '&a✔ Подтвердить'
+    arena-select-title: '&6&lВыбор арены'
+    error-select-arena: '&cСначала выберите арену!'
+    available-arenas-count: '&7Доступные арены: &e{count}'
+    no-arenas-available-title: '&c&lНет доступных арен!'
+    no-arenas-available-lore: '&7Обратитесь к администратору.'
+    world-label: '&7Мир: &f{world}'
+    spawn-type-label: '&7Тип спавна: &f{type}'
+    boundaries-active: '&7Границы: &aВключены'
+    selected-check: '&a✔ Выбрано!'
+    arena-item-title: '{name}'
+    arena-selected-message: '&aАрена выбрана: &e{arena}'
+    equipment-select-title: '&6&lВыбор снаряжения'
+    error-select-equipment: '&cСначала выберите снаряжение!'
+    available-equipment-count: '&7Доступное снаряжение: &e{count}'
+    filter-arena: '&7Фильтр: Арена &e{arena}'
+    no-equipment-available-title: '&c&lНет доступного снаряжения!'
+    no-equipment-available-line-1: '&7Для этой арены не настроено снаряжение.'
+    no-equipment-available-line-2: '&7Обратитесь к администратору.'
+    no-equipment-available-lore: '&7Обратитесь к администратору.'
+    armor-label: '&7Броня:'
+    armor-piece-label: '  &8• &f{part}: {material}'
+    armor-helmet: Шлем
+    armor-chestplate: Нагрудник
+    armor-leggings: Поножи
+    armor-boots: Ботинки
+    inventory-label: '&7Инвентарь:'
+    inventory-more: '  &8• &7... и другое'
+    equipment-selected-message: '&aСнаряжение выбрано: &e{equipment}'
+    confirm-lore: '&7Нажмите, чтобы продолжить'
+    cancel-title: '&c✖ Отмена'
+    cancel-lore: '&7Нажмите, чтобы отменить'
+    challenge-to-title: '&e&lВызов для:'
+    challenge-to-player: '&f{player}'
+    challenge-to-line1: '&7Соберите свою ставку'
+    challenge-to-line2: '&7и выберите арену и снаряжение.'
+    click-to-edit: '&eНажмите, чтобы изменить'
+    items-title: '&6&l📦 Указать предметы'
+    item-selection.clear-title: '&c&lУдалить всё'
+    item-selection.clear-line1: '&7Удаляет все предметы'
+    item-selection.clear-line2: '&7из ставки.'
+    item-selection.info-title: '&e&lСправка'
+    item-selection.info-line1: '&7Нажмите на предметы ниже'
+    item-selection.info-line2: '&7чтобы добавить их.'
+    item-selection.info-line3: '&7Нажмите на выбранные предметы'
+    item-selection.info-line4: '&7чтобы удалить их.'
+    item-selection.info-line5: '&eЛевый клик: &f1 предмет'
+    item-selection.info-line6: '&eПравый клик: &fцелый стек'
+    item-selection.empty-slot-title: '&7Пустой слот'
+    item-selection.empty-slot-lore: '&7Добавьте предметы сюда!'
+    item-selection.remove-lore: '&c➤ Нажмите, чтобы удалить'
+    item-selection.add-lore: '&a➤ Нажмите, чтобы добавить'
+    item-selection.error-max-items: '&cМаксимум 7 стеков предметов!'
+    item-selection.cleared-message: '&eВсе предметы удалены.'
+    money-title: '&6&l💰 Ставка денег'
+    your-balance: '&7Ваш баланс: &6${balance}'
+    money-selection.choose-line1: '&7Выберите сумму'
+    money-selection.choose-line2: '&7или отрегулируйте её.'
+    money-selection.amount-select-line1: '&aНажмите, чтобы выбрать эту'
+    money-selection.amount-select-line2: '&aсумму.'
+    money-selection.amount-not-enough-money: '&cНедостаточно денег!'
+    money-selection.clear-title: '&c&lОчистить сумму'
+    money-selection.clear-line: '&7Устанавливает ставку в 0.'
+    money-selection.adjust-plus-lore: '&7Увеличивает ставку.'
+    money-selection.adjust-minus-lore: '&7Уменьшает ставку.'
+    money-selection.current-title: '&a&lТекущая ставка'
+    money-selection.current-label: '&7Текущая ставка:'
+    money-selection.remaining-balance: '&7Оставшийся баланс:'
+    money-selection.all-in-title: '&6&lВСЁ И СРАЗУ!'
+    money-selection.all-in-warning: '&c⚠ Ставит всё!'
+    current-wager-label: '&7Текущая ставка:'
+    no-items-selected: '&cПредметы не выбраны'
+    no-money-selected: '&cДеньги не поставлены'
+    no-arena-selected: '&c⚠ Арена не выбрана'
+    no-equipment-selected: '&c⚠ Снаряжение не выбрано'
+    required-field: '&7(Обязательно!)'
+    selected-label: '&aВыбрано:'
+    more-items: '&7... и ещё {count}'
+    overview-title: '&e&lОбзор'
+    overview.items-set: '&a✔ &fПредметы: &e{count}'
+    overview.items-none: '&7✗ &fПредметы: &cНет'
+    overview.money-set: '&a✔ &fДеньги: &6${amount}'
+    overview.money-none: '&7✗ &fДеньги: &cНет'
+    overview.arena-set: '&a✔ &fАрена: &e{arena}'
+    overview.arena-none: '&c✗ &fАрена: &cНе выбрана'
+    overview.equipment-set: '&a✔ &fСнаряжение: &e{equipment}'
+    overview.equipment-none: '&c✗ &fСнаряжение: &cНе выбрано'
+    overview.separator: '&7━━━━━━━━━━━━━━━━━━━━'
+    error-choose-arena-equipment: '&cСначала выберите арену и снаряжение!'
+    wager-cancelled: '&cЗапрос на ставку отменён.'
+    ready-to-send: '&a✔ Готово к отправке!'
+    not-ready-yet: '&c⚠ Ещё не готово!'
+    choose-arena: '&c- Выберите арену'
+    choose-equipment: '&c- Выберите снаряжение'
+    all-ready: '&aВсё готово!'
+    click-to-send-line-1: '&eНажмите, чтобы отправить запрос'
+    click-to-send-line-2: '&eсейчас!'
+    confirmation-title: '&6&lПодтверждение запроса'
+    confirmation.target-title: '&e&lВызов для:'
+    confirmation.target-player: '&f{player}'
+    confirmation.target-line1: '&7Этот запрос будет'
+    confirmation.target-line2: '&7отправлен игроку.'
+    confirmation.vs-player: '&7{player}'
+    confirmation.vs-against: '&7против'
+    confirmation.vs-target: '&7{target}'
+    confirmation.item-title: '&6&l📦 Ваша ставка предметов'
+    confirmation.items-in-wager: '&aПредметы в ставке:'
+    confirmation.item-line: '&7- &f{item}'
+    confirmation.no-items: '&7Нет поставленных предметов'
+    confirmation.money-title: '&6&l💰 Ваша денежная ставка'
+    confirmation.money-label: '&aДенежная ставка:'
+    confirmation.money-warning: '&c⚠ Теряется при поражении!'
+    confirmation.no-money: '&7Нет поставленных денег'
+    confirmation.arena-title: '&6&l🗺 Арена'
+    confirmation.arena-label: '&aАрена: &f{arena}'
+    confirmation.arena-world: '&7Мир: &f{world}'
+    confirmation.no-arena: '&cАрена не выбрана!'
+    confirmation.equipment-title: '&6&l⚔ Экипировка'
+    confirmation.equipment-label: '&aЭкипировка: &f{equipment}'
+    confirmation.equipment-line1: '&7Оба игрока получат'
+    confirmation.equipment-line2: '&7это снаряжение в бою.'
+    confirmation.no-equipment: '&cЭкипировка не выбрана!'
+    confirmation.edit-title: '&e&l✎ Редактировать'
+    confirmation.edit-line1: '&7Вернуться в главное меню'
+    confirmation.edit-line2: '&7чтобы внести изменения.'
+    confirmation.cancel-title: '&c&l✖ ОТМЕНИТЬ'
+    confirmation.cancel-line1: '&7Отменяет запрос.'
+    confirmation.cancel-line2: '&7Все предметы будут возвращены.'
+    confirmation.confirm-warning-title: '&c⚠ ПРЕДУПРЕЖДЕНИЕ:'
+    confirmation.confirm-warning-body: '&cВаша ставка будет заблокирована!'
+    confirmation.click-to-send: '&aНажмите, чтобы отправить запрос!'
+    confirmation.confirm-send-line1: '&7Отправляет запрос игроку:'
+    confirmation.confirm-send-target: '&f{target}'
+    confirmation.confirm-button-title: '&a&l✔ ОТПРАВИТЬ ЗАПРОС'
+    confirmation.sent-line1: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    confirmation.sent-line2: '&a&lЗАПРОС ОТПРАВЛЕН!'
+    confirmation.sent-line3: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    confirmation.sent-waiting: '&7Ожидание ответа от &e{target}&7...'
+    confirmation.sent-expire: '&7Запрос истечет через &e60 секунд&7.'
+    confirmation.error-player-offline: '&cИгрок больше не в сети!'
+    confirmation.error-already-in-match: '&cВы уже в матче!'
+    confirmation.error-target-in-match: '&c{target} уже в матче!'
+    confirmation.error-already-pending-request: '&cУ вас уже есть ожидающий запрос!'
+    confirmation.error-not-enough-money: '&cНедостаточно денег! Вам нужно: ${money}'
+    response.title: '&6&lОтветить на запрос'
+    response.challenge-from: '&e&lВызов от:'
+    response.challenge-subtitle: '&7Установите вашу контрставку'
+    response.opponent-sets: '&7Соперник ставит:'
+    response.no-items: '&8Нет предметов'
+    response.no-money: '&8Нет денег'
+    response.match-details: '&6&lДетали боя'
+    response.opponent-money-title: '&6&lДеньги соперника'
+    response.opponent-items-title: '&6&lПредметы соперника'
+    response.arena-label: '&7Арена: &f{arena}'
+    response.equipment-label: '&7Снаряжение: &f{equipment}'
+    response.your-items: '&aВаши предметы:'
+    response.more-items: '&7... и ещё'
+    response.no-items-set: '&7Предметы не выбраны'
+    response.click-to-edit: '&eНажмите, чтобы изменить'
+    response.your-items-title: '&a&lВаша ставка предметами'
+    response.your-money-label: '&aВаша ставка:'
+    response.no-money-set: '&7Деньги не установлены'
+    response.your-money-title: '&a&lВаша денежная ставка'
+    response.edit-items-title: '&e✎ Выбрать предметы'
+    response.edit-items-lore: '&7Открывает выбор предметов'
+    response.edit-money-title: '&e✎ Установить деньги'
+    response.edit-money-lore: '&7Открывает выбор денег'
+    response.accept-title: '&a&l✔ ПРИНЯТЬ'
+    response.accept-lore1: '&7Принимает запрос'
+    response.accept-lore2: '&7с вашей контрставкой.'
+    response.decline-title: '&c&l✖ ОТКЛОНИТЬ'
+    response.decline-lore1: '&7Отклоняет запрос.'
+    response.player-offline: '&cВызывающий больше не в сети!'
+    response.not-enough-money: '&cНедостаточно денег!'
+    response.wager-chosen: '&aСтавка выбрана! Ожидание подтверждения от {target}...'
+    response.other-chosen: '&e{player} &7уже выбрал свою ставку!'
+    response.review-offer: '&7Проверьте предложение...'
+    response.request-declined: '&c{player} отклонил ваш запрос!'
+    response.declined: '&cЗапрос отклонён.'
+    response-item-selection.title: '&6&lВыберите предметы'
+    response-item-selection.clear-title: '&c&lУдалить всё'
+    response-item-selection.clear-line1: '&7Удаляет все предметы'
+    response-item-selection.clear-line2: '&7из ставки.'
+    response-item-selection.info-title: '&e&lСправка'
+    response-item-selection.info-line1: '&7Нажмите на предметы ниже'
+    response-item-selection.info-line2: '&7чтобы добавить их.'
+    response-item-selection.info-line3: '&7Нажмите на выбранные предметы'
+    response-item-selection.info-line4: '&7чтобы убрать их.'
+    response-item-selection.info-line5: '&eЛевый клик: &f1 предмет'
+    response-item-selection.info-line6: '&eПравый клик: &fполный стек'
+    response-item-selection.empty-slot-title: '&7Пустой слот'
+    response-item-selection.empty-slot-lore: '&7Добавьте предметы сюда!'
+    response-item-selection.remove-lore: '&c➤ Нажмите, чтобы убрать'
+    response-item-selection.add-lore: '&a➤ Нажмите, чтобы добавить'
+    response-item-selection.error-max-items: '&cМаксимум 7 стеков предметов!'
+    response-item-selection.cleared-message: '&eВсе предметы удалены.'
+    response-money-selection.title: '&6&lВаша денежная ставка'
+    response-money-selection.clear-title: '&c&lОчистить сумму'
+    response-money-selection.clear-lore: '&7Устанавливает ставку в 0.'
+    response-money-selection.info-title: '&e&lДенежная ставка'
+    response-money-selection.info-balance: '&7Ваш баланс:'
+    response-money-selection.info-opponent: '&7Соперник ставит:'
+    response-money-selection.not-enough-money: '&cНедостаточно денег!'
+    response-money-selection.match-sender-title: '&e&lСравнить с соперником'
+    response-money-selection.match-sender-line1: '&7Ставка:'
+    response-money-selection.match-sender-line2: '&eНажмите, чтобы скопировать'
+    response-money-selection.match-sender-line3: '&eсумму соперника.'
+    response-money-selection.current-title: '&a&lТекущая ставка'
+    response-money-selection.current-label: '&7Текущая ставка:'
+    response-money-selection.remaining-balance: '&7Остаток:'
+    negotiation.title-sender: '&6&lПроверить предложение'
+    negotiation.title-target: '&6&lПроверить запрос'
+    negotiation.vs-title: '&c&l⚔ VS ⚔'
+    negotiation.vs-line1: '&7Согласуйте ставку'
+    negotiation.vs-line2: '&7!'
+    negotiation.arena-title: '&6&lАрена'
+    negotiation.equipment-title: '&6&lСнаряжение'
+    negotiation.opponent-title: '&c&lСоперник: {player}'
+    negotiation.opponent-lore1: '&7Это ставка'
+    negotiation.opponent-lore2: '&7вашего соперника.'
+    negotiation.opponent-items-title: '&c&lПредметы соперника'
+    negotiation.items-count: '&7Количество: &f{count}'
+    negotiation.opponent-money-title: '&c&lДеньги соперника'
+    negotiation.no-money: '&8Нет денег'
+    negotiation.you-title: '&a&lВы: {player}'
+    negotiation.you-lore: '&7Это ваша ставка.'
+    negotiation.your-items-title: '&a&lВаши предметы'
+    negotiation.your-money-title: '&a&lВаши деньги'
+    negotiation.decline-title: '&c&l✖ ОТКЛОНИТЬ'
+    negotiation.decline-line1: '&7Отклоняет предложение'
+    negotiation.decline-line2: '&7и завершает переговоры.'
+    negotiation.decline-line3: '&cПредметы возвращены.'
+    negotiation.counter-offer-title: '&6&l↻ КОНТРАПРЕДЛОЖЕНИЕ'
+    negotiation.counter-offer-line1: '&7Измените ставку'
+    negotiation.counter-offer-line2: '&7и отправьте контрпредложение.'
+    negotiation.counter-offer-line3: '&eДругой игрок может'
+    negotiation.counter-offer-line4: '&eзатем решить снова.'
+    negotiation.accept-title: '&a&l✔ ПРИНЯТЬ'
+    negotiation.accept-line1: '&7Принимает обе ставки'
+    negotiation.accept-line2: '&7и начинает бой!'
+    negotiation.accept-line3: '&a⚔ Бой начинается!'
+    send-button-ready-title: '&a&l➤ ОТПРАВИТЬ ЗАПРОС'
+    send-button-disabled-title: '&7➤ Отправить запрос'
+    economy-not-available: '&c⚠ Экономика недоступна'
+    pvpask:
+      not-online: '&cИгрок {player} не в сети!'
+      already-in-trade: '&cВы уже участвуете в обмене ставками!'
+      target-in-trade: '&c{player} уже участвует в обмене ставками!'
+      pending-request: '&cУ вас уже есть ожидающий запрос на ставку!'
+      pending-request-hint: '&7Отмените его или дождитесь ответа.'
+      target-pending: '&cУ {player} уже есть ожидающий запрос на ставку!'
+      trade-error: '&cНе удалось начать сессию обмена.'
+      self-request: '&cНельзя отправить запрос на ставку самому себе!'
+      usage: '&7Использование: &e/pvpask <игрок>'
+      help:
+        header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+        title: '&e&lPVP WAGER'
+        usage: '&e/pvpask <игрок>'
+        description1: '&7Открывает окно живого обмена, где оба'
+        description2: '&7игрока выбирают предметы, деньги,'
+        description3: '&7арену и снаряжение одновременно.'
+        countdown1: '&7Как только оба подтвердят, начинается'
+        countdown2: '&7&lобратный отсчёт 5 секунд&7 и стартует бой!'
+  update:
+    available: '&e&lДОСТУПНО ОБНОВЛЕНИЕ! &7Новая версия: &e{latest} &7(Ваша: &e{current}&7)'
+    download-link: '&7Скачать: &ehttps://modrinth.com/plugin/event-pvp-plugin'
+  webtoken:
+    player-only: '&cЭту команду могут выполнять только игроки!'
+    no-permission: '&cУ вас нет прав на веб-интерфейс!'
+    not-enabled: '&cВеб-интерфейс не включен!'
+    generation-failed: '&cНе удалось сгенерировать токен. Проверьте права!'
+    header: '&6&l  ВХОД В ВЕБ-ИНТЕРФЕЙС'
+    your-token: '&7  Ваш токен входа:'
+    click-to-copy: '&7(Нажмите, чтобы скопировать)'
+    hover-copy: '&aНажмите, чтобы скопировать токен'
+    valid-for: '&e  ⚠ Действителен &f{minutes} мин'
+    single-use: '&e  ⚠ Одноразовое использование'
+    click-to-open: '&7(Нажмите, чтобы открыть)'
+    hover-open: '&bНажмите, чтобы открыть веб-интерфейс'
+    help-description: '&e/eventpvp webtoken &7- Сгенерировать токен для веб-интерфейса'
+  command-help:
+    eventpvp:
+      header: '&8&m                    &r &6Команды Event-PVP &8&m                    '
+      reload: '&e/eventpvp reload &8- &7Перезагрузить все конфиги'
+      version: '&e/eventpvp version &8- &7Проверить версию и обновления'
+      debug: '&e/eventpvp debug &8- &7Управление режимом отладки'
+      rescue: '&e/{label} rescue &8- &7Восстановить застрявших игроков и инвентари'
+    pvp:
+      usage: '&7Использование: &e/pvpask <игрок>'
+      header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+      title: '&e&lPVP WAGER - LIVE TRADE'
+  pvpask:
+    not-online: '&cИгрок {player} не в сети!'
+    already-in-trade: '&cВы уже участвуете в обмене ставками!'
+    target-in-trade: '&c{player} уже участвует в обмене ставками!'
+    pending-request: '&cУ вас уже есть ожидающий запрос на ставку!'
+    pending-request-hint: '&7Отмените его или дождитесь ответа.'
+    target-pending: '&cУ {player} уже есть ожидающий запрос на ставку!'
+    trade-error: '&cНе удалось начать сессию обмена.'
+    self-request: '&cНельзя отправить запрос на ставку самому себе!'
+    usage: '&7Использование: &e/pvpask <игрок>'
+    help:
+      header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+      title: '&e&lPVP WAGER'
+      usage: '&e/pvpask <игрок>'
+      description1: '&7Открывает GUI живого обмена, где оба'
+      description2: '&7игрока могут одновременно выбирать предметы, деньги,'
+      description3: '&7арену и экипировку.'
+      countdown1: '&7Когда оба подтвердят,'
+      countdown2: '&7&l5-секундный отсчет&7 начнется и бой стартует!'
+  trade:
+    wager-cancelled: '&cЗапрос ставки отменен.'
+    economy-not-available: '&cЭкономика недоступна!'
+  negotiation:
+    offer-declined-other: '&c{player} отклонил предложение!'
+    opponent-offline: '&cДругой игрок больше не в сети!'
+    offer-accepted-other: '&a&l{player} принял предложение! Матч начинается...'
+    not-enough-money-other: '&cУ {player} недостаточно денег!'
+    not-enough-money: '&cНедостаточно денег!'
+    counter-offer-sent: '&aКонтрпредложение отправлено! Ожидание ответа...'
+    counter-offer-received: '&e{player} &7отправил &6контрпредложение&7!'
+  challenge:
+    header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+    title: '&e&lPVP ВЫЗОВ!'
+    accept-command: '&a/pvp accept {player} &7- Принять'
+    deny-command: '&c/pvp deny {player} &7- Отклонить'
+  response:
+    request-declined-other: '&c{player} отклонил ваш запрос!'
+    request-expired: '&cЗапрос уже истек!'
+    requester-offline: '&cЗапрашивающий больше не в сети!'
+  confirmation:
+    select-arena-equipment: '&cВыберите арену и экипировку!'
+    player-offline: '&cИгрок больше не в сети!'
+    request-sent-header: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+  match-system:
+    arena-load-failed: '&cОшибка: мир арены не удалось загрузить!'
+    arena-setup-failed: '&cОшибка: настройка арены не удалась!'
+    no-arenas: '&cНет доступных арен!'
+    not-enough-money: '&cНедостаточно денег!'
+    min-wager-not-met: '&cМинимальная ставка не достигнута! Нужно минимум {items}
+      предметов или ${money}.'
+    not-enough-inventory: '&cВ вашем инвентаре недостаточно места для предметов
+      соперника!'
+    opponent-not-enough-inventory: '&cУ вашего соперника недостаточно места
+      в инвентаре!'
+    arena-loading: '&eАрена загружается... &7(5 секунд)'
+    match-starting: '&e&lМАТЧ НАЧИНАЕТСЯ!'
+    fight-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    fight: '&e&lВ БОЙ!'
+    you-lost-header: '&c&l━━━━━━━━━━━━━━━━━━━━━━━'
+    you-lost: '&c&lВЫ ПРОИГРАЛИ!'
+  debug:
+    enums:
+      level-off: Выключено
+      level-basic: Обычный
+      level-full: Полный
+    help:
+      header: '&8&m                    &r &bКоманды Debug &8&m                    '
+      status: '&e/{label} debug &8- &7Показать текущий статус'
+      'on': '&e/{label} debug on &8- &7Включает отладку (обычная)'
+      on-full: '&e/{label} debug on full &8- &7Включает отладку (полная)'
+      'off': '&e/{label} debug off &8- &7Выключает отладку'
+      level-overview: '  &7off = выключено, &aon = обычный, &cfull = полный'
+    messages:
+      enabled: '&aОтладка включена: &e{level}'
+      disabled: '&cОтладка выключена.'
+      unknown-command: '&cНеизвестная команда: &e{command}'
+      use-help: '&7Используйте &e/{label} debug help &7для помощи.'
+      status-disabled: Выключено
+      status-enabled: Включено
+      status-label: '&7Статус: {status}'
+      level-label: '&7Уровень: &e{level}'
+      use-debug-help: '&7Используйте &e/{label} debug help &7для списка всех команд.'
+      status-header: '&8&m                    &r &bСтатус отладки &8&m                    '
+  livetrade:
+    gui-title: '&6&lPVP Ставка &8| &e{opponent}'
+    match-starting: '&e&lМАТЧ НАЧИНАЕТСЯ!'
+    items-label: '&7Предметы: &e{count}'
+    money-label: '&7Деньги: &6${amount}'
+    status-ready: '&a✔ Готов'
+    status-waiting: '&c✗ Ожидание...'
+    overview-title: '&6&lОБЗОР'
+    arena-selected: '&a✔ &fАрена: &e{arena}'
+    arena-not-selected: '&c✗ &fАрена: &cНе выбрана'
+    equipment-selected: '&a✔ &fЭкипировка: &e{equipment}'
+    equipment-not-selected: '&c✗ &fЭкипировка: &cНе выбрана'
+    ready-to-confirm: '&a✔ Готовы подтверждать!'
+    select-arena-equipment: '&c⚠ Выберите арену и экипировку'
+    arena-select-title: '&e&l🗺 ВЫБОР АРЕНЫ'
+    arena-current: '&aТекущая: &f{arena}'
+    arena-none-selected: '&cАрена не выбрана'
+    arena-left-click: '&e▶ ЛКМ: &7Следующая арена'
+    arena-right-click: '&e▶ ПКМ: &7Предыдущая арена'
+    arena-none-available: '&cНет доступных арен!'
+    equipment-select-title: '&b&l⚔ ВЫБОР ЭКИПИРОВКИ'
+    equipment-current: '&aТекущая: &f{equipment}'
+    equipment-none-selected: '&cЭкипировка не выбрана'
+    equipment-left-click: '&e▶ ЛКМ: &7Следующий набор'
+    equipment-right-click: '&e▶ ПКМ: &7Предыдущий набор'
+    equipment-none-available: '&cНет доступной экипировки!'
+    countdown-title: '&a&l⏱ ОБРАТНЫЙ ОТСЧЕТ: {seconds}'
+    countdown-match-starts: '&e&lМатч начнется через:'
+    countdown-seconds: '&6&l{seconds} &eсекунд'
+    countdown-both-ready: '&a&lОБА ГОТОВЫ!'
+    countdown-fight-soon: '&7Скоро бой...'
+    status-title: '&7&lСТАТУС'
+    status-both-must-confirm: '&7Оба игрока должны подтвердить'
+    status-waiting-short: '&c✗ Ожидание'
+    countdown-bar-info: '&7Подтверждение запускает отсчет'
+    money-stake: '&7Ставка: &6${amount}'
+    money-left-click: '&e▶ ЛКМ: &7+$10'
+    money-right-click: '&e▶ ПКМ: &7-$10'
+    money-shift-left: '&e▶ Shift+ЛКМ: &7+$100'
+    money-shift-right: '&e▶ Shift+ПКМ: &7-$100'
+    money-q-key: '&e▶ Q: &7+$1 / Shift+Q: +$1000'
+    economy-not-available: '&cЭкономика недоступна!'
+    confirm-title-ready: '&a&l✔ {player} ГОТОВ'
+    confirm-title-wait: '&e&l⬆ ПОДТВЕРДИТЕ'
+    confirm-title-disabled: '&7&l⬆ Подтвердите'
+    confirm-click-to-withdraw: '&7Нажмите, чтобы отозвать'
+    confirm-click-to-confirm: '&eНажмите, чтобы подтвердить!'
+    confirm-waiting-for: '&7Ожидание {player}'
+    confirm-select-first: '&cСначала выберите арену и экипировку!'
+    cancel-title: '&c&l✖ ОТМЕНА'
+    cancel-click: '&7Нажмите, чтобы отменить ставку'
+    cancel-items-returned: '&7Все предметы будут возвращены.'
+    max-items-reached: '&cДостигнут максимум предметов (12)!'
+    not-enough-money: '&cНедостаточно денег! Доступно: $%balance%'
+    select-arena-equipment-first: '&cСначала выберите арену и экипировку!'
+    session-started: '&a&lСтавка PVP начата с &e%player%'
+    broadcast-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    broadcast-both-ready: '&e&lОБА ГОТОВЫ!'
+    broadcast-match-starting: '&e&lМАТЧ НАЧИНАЕТСЯ!'
+    broadcast-change-detected: '&c&lОбнаружены изменения — подтверждения сброшены!'
+    broadcast-cancelled: '&c&lСтавка PVP отменена!'
+    broadcast-error-match-start: '&cОшибка запуска матча. Предметы возвращены.'
+  system:
+    no-event-open: '&cСейчас нет события, открытого для входа.'
+    join-available: '&7Вход доступен для: &a{list}'
+    use-join: '&7Используйте: &e/event join {subcommand}'
+    available-events: '&6Доступные события:'
+    event-entry: '&7- {status} &e{name} &8(&7/event join {command}&8)'
+    status-active: '&a[Активно]'
+    status-available: '&7[Доступно]'
+    reload-success: '&aВсе конфигурации перезагружены.'
+    no-friendly-fire: '&cНельзя атаковать союзников по команде!'
+    title: '&6&lEvent-PVP Plugin Версия'
+    current: '&7Текущая версия: &e{version}'
+    update-available: '&aДоступно обновление!'
+    latest: '&7Последняя версия: &e{version}'
+    download: '&7Скачать: &bhttps://modrinth.com/plugin/pqJQdZ6R'
+    up-to-date: '&aПлагин обновлён до последней версии.'
+    checking: '&7Проверка обновлений...'
+    check-failed: '&cНе удалось проверить обновления. Подробности в консоли сервера.'
+    void-protection-teleported: '&7[Защита] Вы были телепортированы в безопасное
+      место.'
+    spectator-mode-only: '&cБудучи зрителем, вы можете быть только в режиме Spectator.'
+    cooldown-wait: '&cПодождите еще {seconds} секунд!'
+    players-only: '&cТолько игроки могут использовать эту команду!'
+    unknown-subcommand: '&cНеизвестная подкоманда: {command}'
+    commands-disabled-event: '&cВо время события команды заблокированы! Используйте
+      /event leave для выхода.'
+    world-access-denied: '&cСейчас вам нельзя входить в этот мир. Телепортация
+      на спавн.'
+    lobby-world-not-found: '&cОшибка: мир лобби не найден!'
+    removed-from-event: '&cВы были удалены из события (не в мире лобби или события).'
+    unknown-command: '&cНеизвестная команда: &e{cmd}'
+    player-only: '&cЭту команду может выполнить только игрок.'
+    stranded-rescued: '&aВы возвращены: событие, в котором вы были, завершилось.'
+  info:
+    header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+    title: '&e&lPVP WAGER - ОБЗОР КОМАНД'
+    players-only: '&cКоманду могут использовать только игроки!'
+    basic-commands:
+      header: '&e&l⚔ ОСНОВНЫЕ КОМАНДЫ:'
+      pvp: '&7/pvp <player> &8- &7Вызвать игрока'
+      accept: '&7/pvp accept <player> &8- &7Принять вызов'
+      deny: '&7/pvp deny <player> &8- &7Отклонить вызов'
+      spectate: '&7/pvp spectate <player> &8- &7Смотреть матч'
+    match-commands:
+      header: '&c&l⚔ КОМАНДЫ МАТЧА:'
+      surrender: '&7/surrender &8- &7Сдаться'
+      draw: '&7/draw &8- &7Запрос ничьей (нужно согласие обоих)'
+    answer-commands:
+      header: '&a&l📋 КОМАНДЫ ОТВЕТА:'
+      pvpanswer: '&7/pvpanswer <ставка> <количество> <арена> <снаряжение> &8-
+        &7Ответить на вызов'
+      pvpyes: '&7/pvpyes &8- &7Подтвердить текущую ставку'
+      pvpno: '&7/pvpno &8- &7Отклонить текущую ставку'
+    examples:
+      header: '&b&l💡 ПРИМЕРЫ ДЛЯ /pvpanswer:'
+      money: '&7/pvpanswer money 100 &8- &7Поставить $100'
+      items: '&7/pvpanswer items &8- &7Поставить предметы из инвентаря'
+      money-arena: '&7/pvpanswer money 50 nether &8- &7$50 и арена Nether'
+      items-full: '&7/pvpanswer items forest diamond &8- &7Предметы + арена Forest
+        + снаряжение Diamond'
+    notices:
+      header: '&6&l⚠ ВАЖНО:'
+      world-loading: '&7• &eЗагрузка миров &7- некоторые арены нужно сначала загрузить'
+      confirmation: '&7• &eПодтверждение &7- оба игрока должны подтвердить выбор'
+      safety: '&7• &eБезопасность &7- все предметы возвращаются при отмене'
+    admin:
+      header: '&4&l🔧 АДМИН-КОМАНДЫ:'
+      reload: '&7/pvpadmin reload &8- &7Перезагрузить конфигурации'
+      stop: '&7/pvpadmin stop <player> &8- &7Остановить матч игрока'
+      arenas: '&7/pvpadmin arenas &8- &7Показать все арены'
+      equipment: '&7/pvpadmin equipment &8- &7Показать все наборы экипировки'
+    footer: '&eНужна помощь? Спросите админа или введите /help'
+  pvpwager:
+    help:
+      title: '&e&lPVP WAGER'
+      usage: '&e/pvpask <игрок>'
+      description1: '&7Отправляет запрос на ставку игроку.'
+      description2: '&7Игрок может нажать запрос в чате'
+      description3: '&7или использовать &e/pvpaccept &7для принятия.'
+      gui-description1: '&7При принятии откроется GUI, где'
+      gui-description2: '&7&lоба игрока одновременно&7 видят:'
+      feature1: '&8• &fПредметы каждого игрока'
+      feature2: '&8• &fДеньги каждого'
+      feature3: '&8• &fОбщий выбор арены'
+      feature4: '&8• &fОбщий выбор экипировки'
+      countdown1: '&7Когда оба подтвердят,'
+      countdown2: '&a&l5-секундный отсчет &7начнется и матч стартует!'
+  command-request:
+    arena: '&7Арена: &e{arena}'
+    equipment: '&7Экипировка: &e{equipment}'
+    their-wager-money: '&7Их ставка: &e${amount}'
+    their-wager-items: '&7Их ставка: &e{items}'
+    expires-in: '&7Запрос истекает через &e60 секунд'
+    accept-command: 'Принять'
+    deny-command: 'Отклонить'
+    alternative-response: '&7Или ответьте так:'
+    alternative-command: '&a/pvpanswer <ваша_ставка> <кол-во> &8[опц.: арена] [экипировка]'
+    btn-accept: '&a&l[► ПРИНЯТЬ ◄]'
+    btn-accept-hover: '&aНажмите, чтобы принять запрос!'
+    btn-deny: ' &c&l[✖ ОТКЛОНИТЬ]'
+    btn-deny-hover: '&cНажмите, чтобы отклонить'
+    btn-open-gui: '&b&l[📋 ОТКРЫТЬ GUI]'
+    btn-open-gui-hover: '&aНажмите, чтобы открыть GUI ответа'
+    arena-display: '&7Арена: &e{arena}'
+    equipment-display: '&7Снаряжение: &e{equipment}'
+  commands:
+    pvpdeny:
+      no-permission: '&cУ вас нет прав на эту команду!'
+      no-pending-requests: '&cУ вас нет активных запросов!'
+      request-removed-offline: '&7Запрос удален (игрок офлайн).'
+    pvpaccept:
+      no-permission: '&cУ вас нет прав на эту команду!'
+      no-pending-requests: '&cУ вас нет активных запросов!'
+      usage-hint: '&7Используйте &e/pvpaccept <player> &7для принятия конкретного запроса.'
+      player-offline: '&cИгрок больше не в сети!'
+    pvprespond:
+      request-expired: '&cЗапрос ставки уже истек!'
+      usage: '&7Использование: &e/pvprespond gui'
+      requester-offline: '&cЗапрашивающий больше не в сети!'
+  pvp-wager-gui:
+    counter-offer-title: '&6&lСоздать встречное предложение'
+    counter-offer-info-title: '&e&lВстречное предложение'
+    counter-offer-info-line1: '&7Измените свою ставку,'
+    counter-offer-info-line2: '&7чтобы отправить встречное предложение.'
+    counter-offer-info-line3: '&eНажимайте на предметы в инвентаре,'
+    counter-offer-info-line4: '&eчтобы добавить их.'
+    counter-offer-clear-items-title: '&c&l✖ Очистить предметы'
+    counter-offer-clear-items-lore: '&7Убирает все выбранные предметы'
+    counter-offer-clear-money-title: '&c&l✖ Деньги в 0'
+    counter-offer-clear-money-lore: '&7Сбрасывает сумму денег до 0'
+    counter-offer-remove-hint: '&cПравый клик, чтобы убрать'
+    counter-offer-money-button-lore: '&7Нажмите, чтобы изменить'
+    counter-offer-current-stake-label: '&7Текущая ставка:'
+    counter-offer-balance-label: '&7Ваш баланс: &f${amount}'
+    counter-offer-money-title: '&6&lДенежная ставка'
+    counter-offer-already-selected: '&a✓ Уже выбрано'
+    counter-offer-back-title: '&c&l← Отмена'
+    counter-offer-back-lore: '&7Назад без изменений'
+    counter-offer-send-items-label: '&7Предметы: &f{count}'
+    counter-offer-send-money-label: '&7Деньги: &6${amount}'
+    counter-offer-send-hint: '&aОтправляет встречное предложение!'
+    counter-offer-send-title: '&a&l➤ ОТПРАВИТЬ'
+    no-permission: '&cУ вас нет прав на эту команду!'
+    player-offline: '&cИгрок &e{player} &cне в сети!'
+    cannot-challenge-self: '&cНельзя вызвать себя!'
+    already-in-session: '&cВы уже в сессии ставки!'
+    target-in-session: '&c{player} уже в сессии ставки!'
+    already-in-match: '&cВы уже в бою!'
+    target-in-match: '&c{player} уже в бою!'
+    request-pending: '&cУ вас уже есть активный запрос ставки!'
+    request-pending-hint: '&7Подождите, пока он истечет или будет отклонен.'
+    no-arenas: '&cНет доступных арен!'
+    create-arenas-first: '&7Сначала создайте арены через &e/pvpadmin createarena'
+    no-equipment: '&cНет наборов экипировки!'
+    create-equipment-first: '&7Создайте экипировку через &e/pvpadmin createequipment'
+    request-sent-header: '&e&lЗАПРОС СТАВКИ ОТПРАВЛЕН'
+    challenge-sent: '&7Вы вызвали &e{player}&7!'
+    waiting-response: '&7Ожидание ответа...'
+    request-header: '§e§lPVP ЗАПРОС СТАВКИ'
+    challenge-message: '§e{player} §aхочет заключить с вами пари!'
+    accept-button: '§a§l[► ПРИНЯТЬ ◄]'
+    accept-hover: '§aНажмите, чтобы открыть GUI ставок!
+
+      §7Там вы вместе выберете предметы, деньги,
+
+      §7арену и снаряжение.'
+    deny-button: ' §c§l[✖ ОТКЛОНИТЬ]'
+    deny-hover: '§cНажмите, чтобы отклонить запрос'
+    request-footer: '
+
+
+      §7Запрос истекает через §e60 секунд§7.
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    accept-command: 'Принять'
+    deny-command: 'Отклонить'
+    request-expired-sender: '&cВаш запрос ставки к &e{player} &cистек.'
+    request-expired-target: '&cЗапрос ставки от &e{player} &cистек.'
+    both-in-session: '&cКто-то из игроков уже в сессии ставки!'
+    both-in-match: '&cКто-то из игроков уже в бою!'
+    session-start-failed: '&cНе удалось запустить сессию ставки!'
+    request-declined-other: '&c{player} отклонил ваш запрос ставки.'
+    request-declined-self: '&cВы отклонили запрос ставки от {player}.'
+    offer-declined-self: '&cВы отклонили предложение.'
+    offer-declined-other: '&c{player} отклонил предложение!'
+    opponent-offline: '&cДругой игрок больше не в сети!'
+    already-in-match-self: '&cВы уже в бою!'
+    already-in-match-other: '&c{player} уже в бою!'
+    offer-accepted-self: '&a&lПредложение принято! Начинаем бой...'
+    offer-accepted-other: '&a&l{player} принял предложение! Начинаем бой...'
+    not-enough-money-other: '&cУ {player} недостаточно денег!'
+    max-different-items: '&cМаксимум 7 разных предметов!'
+    not-enough-money-self: '&cНедостаточно денег!'
+    missing-items-self: '&cУ вас есть не все предметы!'
+    counter-offer-sent: '&aВстречное предложение отправлено! Ожидание ответа...'
+    counter-offer-received: '&e{player} &7отправил &6встречное предложение&7!'
+    request-cancelled: '&cЗапрос на ставку отменён.'
+  utility:
+    no-items: 'нет предметов'
+  match-manager:
+    inventory-session-conflict: '&cУ вас ещё открыта сессия инвентаря из другого матча или события. Матч не может начаться.'
+    inventory-backup-degraded: '&eВаш инвентарь не удалось сохранить на диск. До конца матча он хранится только в памяти.'
+    inventory-backup-failed-abort: '&cМатч отменён: ваш инвентарь не удалось надёжно сохранить.'
+    world-announcement: '&7Мир: &e{world}'
+    please-wait: '&7Подождите немного...'
+    arena-loading: '&6&lЗАГРУЗКА МИРА АРЕНЫ...'
+    arena-loaded: '&2&lМИР УСПЕШНО ЗАГРУЖЕН!'
+    arena-load-failed: '&cОшибка: мир арены не удалось загрузить!'
+    arena-teleport-failed: '&cОшибка: телепортация на арену не удалась!'
+    arena-setup-failed: '&cОшибка: настройка арены не удалась!'
+    arena-not-exists: '&cОшибка: выбранная арена больше не существует.'
+    teleport-countdown: '&eТелепортация на арену через &6&l{seconds} &eсекунд...'
+    match-countdown: '&eМатч начнется через &6&l{seconds} &eсекунд!'
+    spectate-header: '
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+      §e§lБОЙ: §f{player1} §7vs §f{player2}
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      '
+    spectate-button: '§b§l[► НАБЛЮДАТЬ ◄]'
+    spectate-footer: '
+
+
+      §7Также можно использовать §e/pvp spectate <игрок>§7.
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    spectate-simple: '&eНовый бой: &f{player1} &7vs &f{player2} &8- &7Используйте
+      &e/pvp spectate {player1}'
+    no-wager-mode: '&7Режим: &eБез ставки - просто для веселья!'
+    vs-display: '&e{player1} &7vs &e{player2}'
+    match-starting: '&a&lМАТЧ НАЧИНАЕТСЯ!'
+    arena-display: '&7Арена: &e{arena}'
+    equipment-display: '&7Экипировка: &e{equipment}'
+    fight-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    fight: '&e&lВ БОЙ!'
+    timeout-draw: '&7Матч завершился ничьей по таймеру.'
+    server-shutdown: '&cСервер выключается! Матч отменен.'
+    spectate-hover: '&aНажмите, чтобы смотреть бой'
+    time-up: '&c&lВРЕМЯ ВЫШЛО!'
+    match-ends-in: '&eБой закончится через &c{seconds} &eсекунд!'
+    received-from-opponent-items: '&7Получено от соперника: &e{items}'
+    own-stake-added-items: '&7Ваша собственная ставка добавлена: &e{items}'
+    received-from-opponent-money: '&7Получено от соперника: &6${amount}'
+    own-stake-added-money: '&7Ваша собственная ставка добавлена: &6${amount}'
+    you-lost-items: '&7Вы потеряли: &e{items}'
+    you-lost-money: '&7Вы потеряли: &6${amount}'
+    better-luck: '&7Повезёт в следующий раз!'
+    wager-returned: '&7Ваша ставка возвращена.'
+    no-wager-items: '&7Бой без ставки — нечего распределять.'
+    boundaries-warning: '&cВо время боя нельзя покидать границы арены!'
+  pvp-listener:
+    disconnected-cancelled: '&e{player} &cотключился! Бой отменён.'
+    disconnected-win: '&e{player} &cотключился! Вы побеждаете!'
+    spectator-no-attack: '&cЗрители не могут атаковать!'
+    match-not-started: '&cМатч еще не начался или уже завершен!'
+    draw-double-death: '&a&lНИЧЬЯ (обоюдная смерть)!'
+    both-died-simultaneously: '&7Оба игрока погибли почти одновременно.'
+    defeated-by: '&c{player} &7потерпел поражение от &c{killer} &7в PvP-бою!'
+    died-in-match: '&c{player} &7погиб {cause} &7в PvP-бою!'
+    stopped-spectating: '&7прекратил наблюдение.'
+    cause:
+      unknown: '&7по неизвестной причине'
+      fall: '&7при падении'
+      fire: '&7в огне'
+      lava: '&7в лаве'
+      drowning: '&7утонув'
+      suffocation: '&7от удушья'
+      starvation: '&7от голода'
+      void: '&7в бездне'
+      lightning: '&7от молнии'
+      explosion: '&7при взрыве'
+      magic: '&7от магии'
+      wither: '&7от иссушения'
+      contact: '&7от контакта'
+  pvp-accept:
+    player-offline: '&cИгрок &e{player} &cне в сети!'
+    no-request: '&cУ вас нет запроса ставки от &e{player}&c!'
+  pvp-deny:
+    player-offline: '&cИгрок &e{player} &cне в сети!'
+    no-request: '&cУ вас нет запроса ставки от &e{player}&c!'
+  pvp-respond:
+    usage: '&cИспользование: /pvprespond gui'
+    no-permission: '&cУ вас нет прав на эту команду!'
+  pvp:
+    gui-hint: '&7Совет: используйте &e/pvpask <игрок> &7для ставки через GUI'
+  console:
+    dependency-multiverse-missing: 'Multiverse-Core необходим для управления мирами, клонирования и регенерации, но не установлен или не включен! Отключение плагина.'
+    dependency-vault-missing: 'Vault необходим для ставок и экономики, но не установлен или не включен! Отключение плагина.'
+    dependency-inventorybackup-missing: 'InventoryBackup (из проекта InventoryRestore) необходим для управления инвентарем, но не установлен или не включен! Отключение плагина.'
+    migration-header: '&e--- Конфигурация обновлена до текущей версии ---'
+    migration-entry: '&e  {entry}'
+    migration-footer: '&eРядом с каждым изменённым файлом лежит копия <имя>.bak-<метка времени>. См. UPGRADE.md.'
+    inventory-provider-legacy-safety: 'Поставщик инвентарей: устаревший режим со страховочными копиями. Подменой занимается Multiverse-Inventories; копии пишутся через InventoryBackup, но никогда не восстанавливаются автоматически.'
+    inventory-provider-legacy-degraded: 'Устаревший режим активен, но API InventoryBackup недоступен — страховочные копии не создаются. Сейчас защищает только Multiverse-Inventories.'
+    inventory-safety-backup-failed: 'Не удалось записать страховочную копию для {player}.'
+    inventory-provider-unavailable: 'API InventoryBackup недоступен. Матчи и события отклоняются, чтобы ни один инвентарь не был очищен без резервной копии.'
+    inventory-provider-inventoryrestore: 'Провайдер инвентарей: InventoryBackup (API v{version}).'
+    inventory-provider-legacy: 'Поставщик инвентарей: устаревший режим. Подменой занимается Multiverse-Inventories; снимки собираются, но автоматически не восстанавливаются.'
+    inventory-provider-missing: 'Управление инвентарями включено, но API InventoryBackup не зарегистрировался. Матчи и события отклоняются до его появления - без резервной копии ничего не очищается.'
+    inventory-provider-invalid: 'Неизвестное значение settings.inventory-management.provider — используется ''auto''.'
+    inventory-provider-old-api: 'InventoryBackup предоставляет API v{running}, а плагин собран под v{expected}. Более новые вызовы недоступны.'
+    inventory-mvinv-conflict-header: 'Multiverse-Inventories установлен и делит {count} мир(ов) с собственным управлением инвентарями этого плагина. Если оба меняют инвентарь одновременно, результат непредсказуем.'
+    inventory-mvinv-conflict-entry: '  Мир ''{world}'' находится в группе Multiverse-Inventories ''{group}'' вместе с: {partners}. Устраните командой: {command}'
+    inventory-mvinv-guard-active: 'Защита от конфликтов активна: каждое восстановление проверяется через тик и применяется повторно, если другой плагин его перезаписал. Удалить группы миров выше по-прежнему чище.'
+    inventory-mvinv-guard-inactive: 'Защита от конфликтов выключена (settings.inventory-management.multiverse-inventories.conflict-guard). Побеждает тот, кто записал последним.'
+    inventory-mvinv-groups-unreadable: 'Не удалось прочитать groups.yml от Multiverse-Inventories: {error}. Диагностика конфликтов невозможна.'
+    inventory-mvinv-groups-unknown: 'Multiverse-Inventories установлен, но его группы миров прочитать не удалось. Неизвестно, конфликтуют ли они с мирами арен и событий - проверьте вручную.'
+    inventory-mvinv-worldchange-recovered: 'При переходе в мир {world} другой плагин подменил инвентарь игрока {player}, хотя сессия была открыта - состояние сессии восстановлено.'
+    inventory-mvinv-overwrite-recovered: 'Восстановленный инвентарь игрока {player} был перезаписан другим плагином и применён повторно.'
+    inventory-init-failed: 'Не удалось запустить управление инвентарями: {error}. Работа продолжается без резервных копий.'
+    inventory-backup-failed: 'Не удалось создать копию инвентаря {player}: {error}'
+    inventory-backup-not-persisted: 'Копия инвентаря {player} не записана. Сессия не переживёт перезапуск.'
+    inventory-restore-failed: 'Не удалось восстановить инвентарь {player}: {error}'
+    inventory-restore-degraded: 'Восстановление инвентаря {player} вернуло {reason} — пробуем копию из памяти.'
+    inventory-restore-fallback: 'Инвентарь {player} восстановлен из копии в памяти; файл резервной копии оказался непригоден.'
+    inventory-restore-orphaned: 'Инвентарь {player} восстановить не удалось, копии больше нет. Сессия остаётся открытой до следующего запуска.'
+    inventory-restore-queued: '{player} не в сети — инвентарь будет восстановлен при следующем входе.'
+    inventory-respawn-restore-failed: 'Не удалось восстановить инвентарь {player} после возрождения: {reason}'
+    inventory-queue-rejected: 'Поставщик отклонил отложенное восстановление для {player}.'
+    inventory-quit-queued: '{player} покинул матч — инвентарь поставлен в очередь до следующего входа.'
+    inventory-session-conflict: 'У {player} уже есть открытая сессия инвентаря — вторая копия обесценит первую.'
+    inventory-match-aborted: 'Матч отменён: не удалось записать копию инвентаря {player}.'
+    guard-recovery-summary: 'Страж инвентарей: восстановлено открытых сессий — {handled}, осиротевших — {orphaned}.'
+    guard-recovery-orphans: 'У {count} сессий инвентаря нет пригодной копии. Проверьте их командой /eventpvp rescue list.'
+    guard-backup-missing: 'Копия {backup} игрока {player} исчезла — сессия помечена как осиротевшая.'
+    guard-restore-failed: 'Защищённое восстановление для {player} не удалось: {reason}'
+    guard-entry-invalid: 'Некорректная запись в inventory-guard.yml, пропущена: {entry}'
+    guard-save-failed: 'Не удалось записать inventory-guard.yml: {error}'
+    guard-shutdown-open: 'Осталось открытых сессий инвентаря: {count} — они будут обработаны при следующем запуске.'
+    plugin-enabled: 'Event-PVP-Plugin включен за {time} мс: События и PvP-Wager объединены.'
+    plugin-disabled: 'Event-PVP-Plugin выключен за {time} мс.'
+    vault-hooked: 'Экономика Vault подключена: {status}'
+    vault-not-found: 'Vault не найден! Денежные ставки отключены.'
+    papi-registered: 'Расширение PlaceholderAPI зарегистрировано!'
+    pvpmanager-enabled: 'Интеграция с PvPManager включена!'
+    web-auth-enabled: 'Веб-аутентификация включена. Используйте /eventpvp webtoken для входа.'
+    web-disabled: 'Веб-интерфейс отключен.'
+    web-started: 'Веб-сервер запущен на порту {port} ({auth})'
+    web-stopped: 'Веб-сервер остановлен.'
+    stats-save-periodic: 'Периодическое сохранение статистики завершено.'
+    stats-save-error: 'Не удалось сохранить статистику: {error}'
+    stats-load-error: 'Не удалось загрузить статистику: {error}'
+    core-reload: 'Основные конфигурации перезагружены.'
+    core-reload-all: 'Все конфигурации и зависимые менеджеры перезагружены.'
+    lang-changed: 'Язык изменен на: {lang}'
+    lang-loaded: "Загружены сообщения для языка '{lang}' ({file})"
+    lang-save-error: 'Ошибка сохранения языка: {error}'
+    lang-fallback-error: 'Не удалось загрузить резервные сообщения: {error}'
+    event-loaded: 'Событие загружено: {event}'
+    event-auto-started: 'Система авто-событий запущена!'
+    event-auto-stopped: 'Система авто-событий остановлена!'
+    event-auto-next: 'Следующее авто-событие через {time} сек.'
+    event-auto-no-events: 'Нет доступных событий для авто-старта!'
+    event-auto-not-enough-players: 'Недостаточно игроков онлайн для {event} ({online}/{min})'
+    event-auto-starting: 'Запуск авто-события: {event}'
+    world-loading: 'Загрузка мира (асинхронно): {world}'
+    world-loaded: 'Мир загружен: {world} - {msg}'
+    world-unloading: 'Выгрузка мира: {world}'
+    world-load-failed: 'Ошибка загрузки мира: {world} - {msg}'
+    safe-teleport-player: '[SafeTeleport] Телепортация {player} обратно в: {world} @ {coords}'
+    safe-teleport-fallback: '[SafeTeleport] Сохраненный мир для {player} больше не загружен, используется основной мир.'
+    safe-teleport-no-location: '[SafeTeleport] Нет сохраненной локации для {player}, используется основной мир.'
+    safe-teleport-critical: '[SafeTeleport] КРИТИЧЕСКАЯ ОШИБКА: Нет доступного основного мира для {player}!'
+    safe-respawn-invalid-loc: '[SafeRespawn] Сохраненная локация для {player} недействительна!'
+    safe-respawn-unloaded-world: '[SafeRespawn] Мир {world} для {player} больше не загружен - используется спавн основного мира'
+    safe-respawn-wrong-world: '[SafeRespawn-Verify] КРИТИЧЕСКАЯ ОШИБКА: {player} находится в НЕПРАВИЛЬНОМ МИРЕ!'
+    safe-respawn-distance-warn: '[SafeRespawn-Verify] {player} находится в {distance} блоках от ожидаемой позиции!'
+    safe-respawn-correct: '[SafeRespawn-Verify] Корректно - {player} в {world} @ {coords} (Дистанция: {distance} блоков)'
+    safe-respawn-correction-failed: '[SafeRespawn-Verify] ОШИБКА: Корректирующая телепортация для {player} не удалась!'
+    safe-respawn-correction-success: '[SafeRespawn-Verify] Коррекция успешна - {player} теперь в {world}'
+    void-protection-rescued: '[VoidProtection] Игрок {player} спасен от смерти в пустоте в недопустимом мире ({reason}) -> основной мир'
+    void-protection-critical: '[VoidProtection] КРИТИЧЕСКАЯ ОШИБКА: Не найдено безопасное место для {player}!'
+    backup-created: 'Резервная копия создана: {file}'
+    backup-skipped: 'Резервное копирование пропущено: папка мира не найдена: {world}'
+    backup-failed: 'Резервное копирование не удалось: {error}'
+    equipment-loaded: 'Набор экипировки загружен: {set}'
+    equipment-all-loaded: 'Загружена экипировка: {sets}'
+    equipment-empty-error: 'Группы экипировки не найдены.'
+    equipment-not-found: "Группа экипировки '{group}' не найдена. Доступные ID: {available}"
+    equipment-lobby-not-found: "Группа экипировки не найдена для ID '{group}' (Лобби). Проверьте equipment.yml и config.yml."
+    equipment-lobby-retry: '[DEBUG] Экипировка в лобби применилась не полностью для {player}, повторная попытка...'
+    equipment-lobby-still-incomplete: '[DEBUG] Экипировка в лобби все еще не полностью применилась для {player}.'
+    equipment-lobby-applied: '[DEBUG] Экипировка в лобби успешно применилась после повторной попытки для {player}.'
+    equipment-event-not-found: "Группа экипировки не найдена для ID '{group}' (Команда). Проверьте equipment.yml и config.yml."
+    equipment-event-retry: '[DEBUG] Экипировка в событии применилась не полностью для {player}, повторная попытка...'
+    equipment-event-still-incomplete: '[DEBUG] Экипировка в событии все еще не полностью применилась для {player}.'
+    equipment-event-applied: '[DEBUG] Экипировка в событии успешно применилась после повторной попытки для {player}.'
+    stats-queue-error: 'Не удалось поставить статистику в очередь после события: {error}'
+    update-available-banner: 'ДОСТУПНО ОБНОВЛЕНИЕ!'
+    update-current-version: 'Текущая версия: {version}'
+    update-latest-version: 'Новейшая версия: {version}'
+    update-download-url: 'Скачать: {url}'
+    update-up-to-date: 'Плагин обновлен до последней версии ({version})'
+    update-check-failed-http: 'Ошибка проверки обновлений: HTTP {code}'
+    update-check-failed: 'Ошибка проверки обновлений: {error}'
+    update-invalid-response: 'Проверка обновлений: нет подходящей версии в ответе'
+    config-save-error: 'Не удалось сохранить конфигурацию в {file}: {error}'
+    admin-reload-failed: 'Ошибка перезагрузки администратора: {error}'
+    livetrade-session-expired: 'Сессия ставки PVP истекла: {session}'
+    zip-error: 'Ошибка сжатия: {error}'
+    livetrade-start-error: 'Ошибка запуска матча из LiveTrade'
+    teleport-error: 'Ошибка телепортации: {error}'
+    pvp-death-saved: '[PvPDeath] Сохранена исходная локация для {player}: {location}'
+    pvp-death-no-location: '[PvPDeath] ПРЕДУПРЕЖДЕНИЕ: Исходная локация для {player} не найдена!'
+    pvp-respawn-unloaded: '[SafeRespawn-PvP] Исходный мир не загружен: {world} - используется спавн основного мира'
+    pvp-respawn-no-location: '[SafeRespawn-PvP] Не найдена исходная локация для {player} - используется спавн основного мира'
+    spectator-recovered: 'Наблюдатель {player} телепортирован в основной мир.'
+    arena-world-loaded: 'Мир успешно загружен: {world} - {msg}'
+    arena-clone-reset: 'Сброс клона завершен для мира арены: {world}'
+    match-dead-player-gamemode: '[SafeTeleport-PvP] Игрок {player} мертв - телепортация обрабатывается через RespawnEvent.'
+    match-origin-saved: '[Match] Сохранена исходная локация для {player} из запроса: {location}'
+    match-origin-warning: '[Match] ПРЕДУПРЕЖДЕНИЕ: Нет исходной локации в запросе для {player}'
+    return-entry-invalid: 'Неверная запись в player-return-locations.yml: {entry}'
+    return-save-failed: 'Не удалось сохранить player-return-locations.yml: {error}'
+    return-shutdown-open: 'Осталось {count} позиций возврата - они будут применены при следующем запуске.'
+    return-stale-entries: '{count} позиций возврата старше {hours}ч. Проверьте: /eventpvp rescue list.'
+    guard-stale-sessions: '{count} сессий инвентаря открыты дольше {hours}ч. Проверьте: /eventpvp rescue list.'
+    safe-teleport-rejected: 'Телепорт для {player} был отклонён.'
+    safe-teleport-drift: '{player} не остался в точке назначения в {world} - остановлено после одной коррекции.'
+    world-unload-aborted: 'Выгрузка {world} отменена: {count} игрок(ов) не удалось вывести.'
+    world-unload-player-stuck: 'Не удалось вывести {player} из {world}.'
+    world-unload-player-error: 'Ошибка при выводе {player} из {world}: {error}'
+    managed-worlds-scan-failed: 'Не удалось определить список миров плагина: {error}'
+    stranded-check-failed: 'Проверка застревания для {player} не удалась: {error} - сессия считается активной.'
+    stranded-no-target: 'Не найдено безопасное место для застрявшего игрока {player}.'
+    stranded-rescue-failed: 'Не удалось вернуть {player} из {world}.'
+    stranded-rescued: '{player} возвращён: {from} -> {to}'
+  rescue:
+    header: '&8&m                    &r &bСпасение &8&m                    '
+    help-list: '&e/{label} rescue list &8- &7Показать открытые сессии и позиции возврата'
+    help-player: '&e/{label} rescue <игрок> &8- &7Восстановить инвентарь и вернуть игрока'
+    help-clean: '&e/{label} rescue clean &8- &7Отбросить осиротевшие записи без копии'
+    list-empty: '&aНичего не ожидает: нет открытых сессий и сохранённых позиций.'
+    list-sessions: '&7Открытые сессии инвентаря: &e{count}'
+    list-session-entry: '  &7- &f{player} &8| &e{phase} &8| &7{context} &8| &7{age}'
+    list-returns: '&7Сохранённые позиции возврата: &e{count}'
+    list-return-entry: '  &7- &f{player} &8| &7{world} &8| &7{age}'
+    player-offline: '&c{player} не в сети. Спасение работает только для игроков онлайн.'
+    inventory-result: '&7Инвентарь {player}: &f{outcome}'
+    teleport-done: '&a{player} возвращён.'
+    nothing-to-do: '&7Для &e{player} &7делать нечего.'
+    clean-done: '&aОтброшено записей: {count}.'
+
+

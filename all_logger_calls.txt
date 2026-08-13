@@ -1,0 +1,385 @@
+src/main/java\de\zfzfg\core\commands\WebTokenSubCommand.java:54: plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\core\commands\WebTokenSubCommand.java:121: plugin.getLogger().info("WebToken Command - URL from config: " + url);
+src/main/java\de\zfzfg\core\config\CoreConfigManager.java:98: plugin.getLogger().warning("Konnte Fallback-Nachrichten nicht laden: " + e.getMessage());
+src/main/java\de\zfzfg\core\config\CoreConfigManager.java:101: plugin.getLogger().info("Messages für Sprache '" + language + "' geladen (" + filename + ")");
+src/main/java\de\zfzfg\core\config\CoreConfigManager.java:113: plugin.getLogger().info("Core-Konfigurationen neu geladen.");
+src/main/java\de\zfzfg\core\config\CoreConfigManager.java:137: plugin.getLogger().info("Sprache geändert zu: " + language);
+src/main/java\de\zfzfg\core\config\CoreConfigManager.java:142: plugin.getLogger().severe("Fehler beim Speichern der Sprache: " + e.getMessage());
+src/main/java\de\zfzfg\core\monitoring\debug\DebugManager.java:48: this.logger = plugin.getLogger();
+src/main/java\de\zfzfg\core\service\ConfigurationService.java:44: try { core.reloadAll(); } catch (Exception e) { plugin.getLogger().warning("Core-Reload Fehler: " + e.getMessage()); }
+src/main/java\de\zfzfg\core\service\ConfigurationService.java:50: try { events.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("Event-Reload Fehler: " + e.getMessage()); }
+src/main/java\de\zfzfg\core\service\ConfigurationService.java:56: try { pvp.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("PvP-Reload Fehler: " + e.getMessage()); }
+src/main/java\de\zfzfg\core\service\ConfigurationService.java:62: try { arenas.reloadArenas(); } catch (Exception e) { plugin.getLogger().warning("Arenen-Reload Fehler: " + e.getMessage()); }
+src/main/java\de\zfzfg\core\service\ConfigurationService.java:66: try { equip.reloadEquipmentSets(); } catch (Exception e) { plugin.getLogger().warning("Equipment-Reload Fehler: " + e.getMessage()); }
+src/main/java\de\zfzfg\core\service\ConfigurationService.java:74: plugin.getLogger().info("Alle Konfigurationen und abhängigen Manager neu geladen.");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:43: plugin.getLogger().info("[Web-API] Speichere config.yml...");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:48: plugin.getLogger().info("[Web-API] config.yml gespeichert");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:52: plugin.getLogger().warning("[Web-API] Keine Daten empfangen für config.yml");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:57: plugin.getLogger().log(Level.SEVERE, "[Web-API] Fehler beim Speichern von config.yml", e);
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:82: plugin.getLogger().info("[Web-API] Speichere worlds.yml...");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:87: plugin.getLogger().info("[Web-API] worlds.yml gespeichert");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:91: plugin.getLogger().warning("[Web-API] Keine Daten empfangen für worlds.yml");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:96: plugin.getLogger().log(Level.SEVERE, "[Web-API] Fehler beim Speichern von worlds.yml", e);
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:121: plugin.getLogger().info("[Web-API] Speichere equipment.yml...");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:126: plugin.getLogger().info("[Web-API] equipment.yml gespeichert");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:130: plugin.getLogger().warning("[Web-API] Keine Daten empfangen für equipment.yml");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:135: plugin.getLogger().log(Level.SEVERE, "[Web-API] Fehler beim Speichern von equipment.yml", e);
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:185: plugin.getLogger().info("[Web-API] Reload angefordert...");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:192: plugin.getLogger().info("[Web-API] ConfigurationService.reloadAll() erfolgreich");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:196: plugin.getLogger().info("[Web-API] Fallback: WebConfigManager.reload()");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:200: plugin.getLogger().info("[Web-API] WebConfigManager.reload()");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:212: plugin.getLogger().log(Level.WARNING, "[Web-API] Reload Fehler: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:259: plugin.getLogger().info("[Web-API] getLanguage() returning: " + currentLang);
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:261: plugin.getLogger().warning("[Web-API] CoreConfigManager is null!");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:264: plugin.getLogger().warning("[Web-API] Plugin is not EventPlugin!");
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:289: plugin.getLogger().info("[Web-API] Sprache geändert zu: " + language);
+src/main/java\de\zfzfg\core\web\WebApiHandler.java:302: plugin.getLogger().log(Level.WARNING, "[Web-API] Fehler beim Speichern der Sprache", e);
+src/main/java\de\zfzfg\core\web\WebAuthManager.java:61: plugin.getLogger().log(Level.INFO, "Web-Token generiert für " + player.getName());
+src/main/java\de\zfzfg\core\web\WebAuthManager.java:75: plugin.getLogger().log(Level.WARNING, "Ungültiger Web-Token Versuch von " + clientIp);
+src/main/java\de\zfzfg\core\web\WebAuthManager.java:81: plugin.getLogger().log(Level.WARNING, "Abgelaufener Web-Token Versuch von " + clientIp);
+src/main/java\de\zfzfg\core\web\WebAuthManager.java:98: plugin.getLogger().log(Level.INFO, "Web-Session erstellt für " + authToken.playerName + " von " + clientIp);
+src/main/java\de\zfzfg\core\web\WebAuthManager.java:141: plugin.getLogger().log(Level.INFO, "Web-Session beendet für " + removed.playerName);
+src/main/java\de\zfzfg\core\web\WebAuthManager.java:179: plugin.getLogger().log(Level.FINE, "Cleanup: " + tokensRemoved + " Tokens, " + sessionsRemoved + " Sessions entfernt");
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:39: plugin.getLogger().info("web-config.yml nicht gefunden, erstelle neue Datei...");
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:45: plugin.getLogger().info("WebConfig geladen: enabled=" + webConfig.getBoolean("web.enabled", true)
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:57: plugin.getLogger().log(Level.SEVERE, "Fehler beim Speichern der web-config.yml", e);
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:113: plugin.getLogger().info("WebConfig - Loading public-url: '" + url + "' -> '" + finalUrl + "'");
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:162: plugin.getLogger().log(Level.SEVERE, "Fehler beim Speichern der worlds.yml", e);
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:185: plugin.getLogger().info("[Web-Config] Speichere equipment.yml nach: " + equipmentFile.getAbsolutePath());
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:186: plugin.getLogger().info("[Web-Config] Daten-Keys: " + data.keySet());
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:193: plugin.getLogger().info("[Web-Config] equipment.yml erfolgreich gespeichert!");
+src/main/java\de\zfzfg\core\web\WebConfigManager.java:195: plugin.getLogger().log(Level.SEVERE, "Fehler beim Speichern der equipment.yml", e);
+src/main/java\de\zfzfg\core\web\WebServer.java:127: plugin.getLogger().log(Level.INFO, "✓ Web-Server gestartet auf Port " + port + " (" + authStatus + ")");
+src/main/java\de\zfzfg\core\web\WebServer.java:129: plugin.getLogger().log(Level.SEVERE, "✗ Fehler beim Starten des Web-Servers", e);
+src/main/java\de\zfzfg\core\web\WebServer.java:139: plugin.getLogger().log(Level.INFO, "✓ Web-Server gestoppt");
+src/main/java\de\zfzfg\core\web\WebServer.java:189: plugin.getLogger().log(Level.WARNING, "Login Error: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\web\WebServer.java:215: plugin.getLogger().log(Level.WARNING, "Logout Error: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\web\WebServer.java:260: plugin.getLogger().log(Level.WARNING, "Auth Check Error: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\web\WebServer.java:304: plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\web\WebServer.java:348: plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\web\WebServer.java:452: plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\web\WebServer.java:494: plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);
+src/main/java\de\zfzfg\core\world\MultiverseHelper.java:52: plugin.getLogger().info("Clone-First: " + cloneSource.trim() + " -> " + worldName);
+src/main/java\de\zfzfg\core\world\MultiverseHelper.java:55: plugin.getLogger().info("Loading cloned world: " + worldName);
+src/main/java\de\zfzfg\core\world\MultiverseHelper.java:113: plugin.getLogger().info("Regeneration für Welt '" + worldName + "' läuft bereits – doppelter Aufruf übersprungen.");
+src/main/java\de\zfzfg\core\world\MultiverseHelper.java:255: plugin.getLogger().warning("Backup übersprungen: Weltordner nicht gefunden: " + worldName);
+src/main/java\de\zfzfg\core\world\MultiverseHelper.java:263: plugin.getLogger().info("Backup erstellt: " + zipFile.getName());
+src/main/java\de\zfzfg\core\world\MultiverseHelper.java:265: plugin.getLogger().log(java.util.logging.Level.SEVERE, "Backup fehlgeschlagen", e);
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:156: getLogger().warning("Konnte PvP-Statistiken nicht laden: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:166: getLogger().warning("Konnte Event-Statistiken nicht laden: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:171: getLogger().info("PlaceholderAPI Expansion registriert!");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:178: getLogger().warning("Vault nicht gefunden! Geld-Wetten sind deaktiviert.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:271: getLogger().info("Web-Authentifizierung aktiviert. Nutze /eventpvp webtoken für Login.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:274: getLogger().info("Web-Interface ist deaktiviert.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:282: getLogger().info("Periodic stats save completed.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:284: getLogger().log(java.util.logging.Level.WARNING, "Periodic stats save failed: " + e.getMessage(), e);
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:298: getLogger().info("Event-PVP-Plugin aktiviert in " + enableMs + " ms: Events & PvP-Wager kombiniert.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:356: getLogger().warning("Konnte PvP-Statistiken nicht speichern: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:361: getLogger().warning("Konnte Event-Statistiken nicht speichern: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:367: getLogger().warning("Konnte alte Inventar-Backups nicht bereinigen: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:371: getLogger().info("Event-PVP-Plugin deaktiviert in " + disableMs + " ms.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:377: getLogger().info("PvPManager Integration aktiviert!");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:393: getLogger().info("AJLeaderboards integration disabled: plugin not found or not loaded.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:403: getLogger().info("DecentHolograms integration disabled: plugin not found or not loaded.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:410: getLogger().info("External display integration enabled for " + activeBridges.size() + " plugin(s).");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:427: getLogger().warning("External display refresh failed: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:446: getLogger().info("Vault Economy eingebunden: " + (economy != null));
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:453: getLogger().warning("Command '" + name + "' not found in plugin.yml! Skipping registration.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:462: getLogger().warning("Command '" + name + "' not found in plugin.yml! Skipping registration.");
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:506: getLogger().info("EventPlugin.getWebPublicUrl() called, returning: " + url);
+src/main/java\de\zfzfg\eventplugin\EventPlugin.java:509: getLogger().warning("webConfigManager is NULL in getWebPublicUrl()!");
+src/main/java\de\zfzfg\eventplugin\commands\EventPvpCommand.java:93: plugin.getLogger().warning("Missing message key: " + path
+src/main/java\de\zfzfg\eventplugin\commands\InventoryRestoreCommand.java:107: plugin.getLogger().warning("[InventoryRestore] UUID mismatch: owner=" + ownerUuid + ", target=" + targetUuidStr + ", ID=" + idArg);
+src/main/java\de\zfzfg\eventplugin\integration\PluginDisplayBridge.java:40: plugin.getLogger().warning("Unable to initialize external display bridge for " + pluginName + ".");
+src/main/java\de\zfzfg\eventplugin\integration\PluginDisplayBridge.java:103: getLogger().warning("Error invoking method '" + methodName + "' on " + pluginName + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\integration\PluginDisplayBridge.java:111: getLogger().warning("Could not find any supported method for " + description + " on " + pluginName + " (checked: " + String.join(", ", methodNames) + ").");
+src/main/java\de\zfzfg\eventplugin\integration\PluginDisplayBridge.java:140: private Logger getLogger() {
+src/main/java\de\zfzfg\eventplugin\integration\PluginDisplayBridge.java:141: return plugin.getLogger();
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:48: plugin.getLogger().info("[EventDeath] Original-Location für " + player.getName() + " gespeichert: " +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:52: plugin.getLogger().warning("[EventDeath] WARNUNG: Keine gespeicherte Location für " + player.getName() + " gefunden!");
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:87: plugin.getLogger().info("[EventRespawn] " + player.getName() + " verwendet gespeicherte Location: " +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:108: plugin.getLogger().info("[EventRespawn] " + player.getName() + " (aus Session) soll zu " +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:122: plugin.getLogger().warning("[EventRespawn] Gespeicherte Location für " + playerName + " ist ungültig!");
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:130: plugin.getLogger().warning("[EventRespawn] Welt " + worldName + " für " + playerName +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:159: plugin.getLogger().warning("[EventRespawn-Verify] KRITISCH: " + player.getName() + " ist in FALSCHER WELT!");
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:160: plugin.getLogger().warning("  Erwartet: " + expectedWorld + " @ " + expectedCoords);
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:161: plugin.getLogger().warning("  Aktuell:  " + currentWorld + " @ " + currentCoords);
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:162: plugin.getLogger().info("[EventRespawn-Verify] Teleportiere " + player.getName() + " zur korrekten Welt...");
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:166: plugin.getLogger().warning("[EventRespawn-Verify] " + player.getName() + " ist " +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:168: plugin.getLogger().info("[EventRespawn-Verify] Teleportiere " + player.getName() + " zur korrekten Position...");
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:172: plugin.getLogger().info("[EventRespawn-Verify] ✓ " + player.getName() +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:194: plugin.getLogger().severe("[EventRespawn-Verify] FEHLER: Korrektur-Teleport für " + player.getName() +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:198: plugin.getLogger().info("[EventRespawn-Verify] ✓ Korrektur erfolgreich - " + player.getName() +
+src/main/java\de\zfzfg\eventplugin\listeners\EventListener.java:281: plugin.getLogger().info("[SafeRespawn] Event beendet/Welt entladen - " +
+src/main/java\de\zfzfg\eventplugin\listeners\VoidProtectionListener.java:194: plugin.getLogger().warning("[VoidProtection] " + player.getName() +
+src/main/java\de\zfzfg\eventplugin\listeners\VoidProtectionListener.java:210: plugin.getLogger().severe("[VoidProtection] KRITISCH: Kein sicherer Standort für " +
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:30: plugin.getLogger().info("Auto-Event System gestartet!");
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:38: plugin.getLogger().info("Auto-Event System gestoppt!");
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:46: plugin.getLogger().info("Nächstes Auto-Event in " + interval + " Sekunden");
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:65: plugin.getLogger().warning("Keine verfügbaren Events für Auto-Start!");
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:72: plugin.getLogger().warning("Kein Event konnte ausgewählt werden!");
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:79: plugin.getLogger().info("Nicht genug Spieler online für " + selectedEvent.getDisplayName() +
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:85: plugin.getLogger().info("Verwende Fallback-Event: " + selectedEvent.getDisplayName());
+src/main/java\de\zfzfg\eventplugin\manager\AutoEventManager.java:92: plugin.getLogger().info("Starte Auto-Event: " + selectedEvent.getDisplayName());
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:123: plugin.getLogger().warning("Einstellung 'settings.auto-events.interval-max' ist kleiner als 'interval-min'. Setze max = min.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:182: plugin.getLogger().warning("equipment.yml enthält keine gültigen Sektionen. Ersetze mit der Paket-Standarddatei.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:189: plugin.getLogger().severe("Konnte Standard 'equipment.yml' nicht bereitstellen: " + ex.getMessage());
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:228: plugin.getLogger().info("Event geladen: " + eventId);
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:234: plugin.getLogger().info("Lade Ausrüstungen aus: " + (equipmentFilePath != null ? equipmentFilePath : "<unbekannt>"));
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:244: plugin.getLogger().info("Equipment-Set '" + groupId + "' ist deaktiviert, überspringe...");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:249: plugin.getLogger().info("Equipment-Set geladen: " + groupId);
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:263: plugin.getLogger().info("Equipment '" + groupId + "' nicht für Events aktiviert, überspringe...");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:269: plugin.getLogger().info("Equipment für Events geladen: " + groupId);
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:284: plugin.getLogger().info("Legacy Equipment-Gruppe geladen: " + groupId);
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:290: plugin.getLogger().severe("Keine Ausrüstungs-Gruppen gefunden. Prüfe Inhalt von '" + (equipmentFilePath != null ? equipmentFilePath : "unbekannt") + "'. Erwartete Sektionen: 'equipment-sets' (primär), 'equipment' oder 'equipment-groups'.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:293: plugin.getLogger().info("Ausrüstungen geladen: " + ids);
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:311: plugin.getLogger().warning("Event '" + id + "': min-players < 2. Empfohlen: mindestens 2.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:314: plugin.getLogger().warning("Event '" + id + "': max-players < min-players. Bitte anpassen.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:317: plugin.getLogger().warning("Event '" + id + "': countdown-time < 1 Sekunde. Bitte erhöhen.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:325: plugin.getLogger().warning("Einstellung '" + key + "' war " + value + ", setze auf Mindestwert " + min + ".");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:329: plugin.getLogger().warning("Einstellung '" + key + "' war " + value + ", begrenze auf Maximalwert " + max + ".");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:337: plugin.getLogger().warning("Einstellung '" + key + "' fehlt oder ist null. Verwende Standard '" + defaultValue + "'.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:345: plugin.getLogger().warning("Einstellung '" + key + "' hat ungültigen Wert '" + value + "'. Erlaubt: " + String.join(", ", allowed) + ". Verwende '" + defaultValue + "'.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:359: plugin.getLogger().severe("Equipment group ID ist null. Bitte 'equipment-group' im Event-Config setzen.");
+src/main/java\de\zfzfg\eventplugin\manager\ConfigManager.java:373: plugin.getLogger().severe("Equipment group '" + groupId + "' nicht gefunden. Verfügbare IDs: " + String.join(", ", equipmentGroups.keySet()));
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:72: plugin.getLogger().warning("Failed to cancel task during cleanup: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:428: plugin.getLogger().info("Lade Lobby-Welt (asynchron): " + lobbyWorld);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:433: plugin.getLogger().info("Lobby-Welt geladen: " + lobbyWorld + " - " + message);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:436: plugin.getLogger().warning("Lobby-Welt Laden fehlgeschlagen: " + lobbyWorld + " - " + message);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:443: plugin.getLogger().info("Lade Event-Welt (asynchron): " + eventWorld);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:448: plugin.getLogger().info("Event-Welt geladen: " + eventWorld + " - " + message);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:459: plugin.getLogger().warning("Event-Welt Laden fehlgeschlagen: " + eventWorld + " - " + message);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:488: plugin.getLogger().info("Entlade Lobby-Welt: " + config.getLobbyWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:494: plugin.getLogger().info("Entlade Event-Welt: " + config.getEventWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:506: plugin.getLogger().warning("Event-Welt wird geladen: " + config.getEventWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:508: plugin.getLogger().info("Event-Welt gefunden: " + config.getEventWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:514: plugin.getLogger().warning("Lobby-Welt wird geladen: " + config.getLobbyWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:516: plugin.getLogger().info("Lobby-Welt gefunden: " + config.getLobbyWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:534: plugin.getLogger().warning("Konnte Pre-Event Inventory-Snapshot nicht einreihen für " + player.getName() + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:540: plugin.getLogger().info("Spieler " + player.getName() + " zur Lobby teleportiert: " + lobbySpawn);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:542: plugin.getLogger().warning("Lobby-Welt nicht geladen: " + config.getLobbyWorld() + " – versuche zu laden...");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:550: plugin.getLogger().warning("Failed to save inventory snapshot: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:555: plugin.getLogger().info("Spieler " + player.getName() + " zur Lobby teleportiert (nach Laden): " + lobbySpawn);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:557: plugin.getLogger().severe("Lobby-Welt weiterhin nicht verfügbar: " + config.getLobbyWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:572: plugin.getLogger().severe("Event-Welt nicht gefunden: " + config.getEventWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:606: plugin.getLogger().info("Teleportiere Spieler zur Event-Welt: " + config.getEventWorld());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:607: plugin.getLogger().info("Spawn-Type: " + config.getSpawnType());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:640: plugin.getLogger().warning("Failed to record participation: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:656: plugin.getLogger().warning("Spawn-Command ist leer!");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:665: plugin.getLogger().info("FÃƒÂ¼hre Spawn-Command aus: " + finalCommand);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:695: plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:714: plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:716: plugin.getLogger().info("Spieler " + player.getName() + " zu SINGLE_POINT teleportiert: " + spawn);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:733: plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:735: plugin.getLogger().info("Spieler " + player.getName() + " zu MULTIPLE_SPAWNS teleportiert: " + spawnLoc);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:753: plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:755: plugin.getLogger().info("Spieler " + player.getName() + " zu RANDOM_CUBE teleportiert: " + randomLoc);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:757: plugin.getLogger().warning("Konnte keinen Spawn fÃƒÂ¼r " + player.getName() + " finden!");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:776: plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:778: plugin.getLogger().info("Spieler " + player.getName() + " zu RANDOM_RADIUS teleportiert: " + randomLoc);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:797: plugin.getLogger().warning("Failed to set health/food level: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:799: plugin.getLogger().info("Spieler " + player.getName() + " zu RANDOM_AREA teleportiert: " + randomLoc);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:836: plugin.getLogger().warning("Konnte keine gÃƒÂ¼ltige RANDOM_CUBE Location finden!");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:904: plugin.getLogger().warning("Keine Ausrüstungsgruppe gefunden für ID '" + config.getEquipmentGroup() + "'. Prüfe equipment.yml und config.yml.");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:946: plugin.getLogger().warning("Keine Ausrüstungsgruppe gefunden für ID '" + config.getEquipmentGroup() + "' (Lobby). Prüfe equipment.yml und config.yml.");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:970: plugin.getLogger().warning("[DEBUG] Ausrüstung in Lobby nicht vollständig angewendet für " + player.getName() + ", versuche erneut...");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:988: plugin.getLogger().warning("[DEBUG] Ausrüstung in Lobby weiterhin nicht vollständig für " + player.getName() + ".");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:991: plugin.getLogger().info("[DEBUG] Ausrüstung in Lobby erfolgreich nach erneutem Versuch angewendet für " + player.getName() + ".");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1002: plugin.getLogger().warning("Keine Ausrüstungsgruppe gefunden für ID '" + config.getEquipmentGroup() + "' (Team). Prüfe equipment.yml und config.yml.");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1064: plugin.getLogger().warning("[DEBUG] Ausrüstung im Event nicht vollständig angewendet für " + player.getName() + ", versuche erneut...");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1112: plugin.getLogger().warning("[DEBUG] Ausrüstung im Event weiterhin nicht vollständig für " + player.getName() + ".");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1115: plugin.getLogger().info("[DEBUG] Ausrüstung im Event erfolgreich nach erneutem Versuch angewendet für " + player.getName() + ".");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1242: plugin.getLogger().warning("Failed to record win statistics: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1287: plugin.getLogger().warning("Failed to record team win statistics: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1415: plugin.getLogger().warning("UngÃƒÂ¼ltiges Item: " + itemStr);
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1462: plugin.getLogger().warning("Konnte Event-Statistiken nach Event nicht einreihen: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1582: plugin.getLogger().info("[SafeTeleport] " + player.getName() + " zurück zu: " +
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1586: plugin.getLogger().warning("[SafeTeleport] Gespeicherte Welt für " + player.getName() +
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1592: plugin.getLogger().warning("[SafeTeleport] Keine gespeicherte Location für " + player.getName() + ", nutze Hauptwelt.");
+src/main/java\de\zfzfg\eventplugin\session\EventSession.java:1623: plugin.getLogger().severe("[SafeTeleport] KRITISCH: Keine Hauptwelt verfügbar für " + player.getName());
+src/main/java\de\zfzfg\eventplugin\storage\EventStatsStorage.java:38: plugin.getLogger().warning("Failed to load Event stats: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\EventStatsStorage.java:56: plugin.getLogger().warning("Failed to save Event stats: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\EventStatsStorage.java:66: plugin.getLogger().warning("Async save Event stats failed: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:74: plugin.getLogger().warning("Failed to save inventory snapshot: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:76: plugin.getLogger().warning("Unexpected error saving inventory snapshot: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:130: plugin.getLogger().warning("Failed to save inventory snapshot (async): " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:132: plugin.getLogger().warning("Unexpected error saving inventory snapshot (async): " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:185: plugin.getLogger().warning("Failed to save inventory snapshot: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:187: plugin.getLogger().warning("Unexpected error saving inventory snapshot: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:243: plugin.getLogger().warning("Failed to save inventory snapshot (async): " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:245: plugin.getLogger().warning("Unexpected error saving inventory snapshot (async): " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:283: plugin.getLogger().warning("Failed to restore inventory by ID " + invId + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:288: plugin.getLogger().warning("Failed to schedule inventory restore by ID " + invId + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:323: plugin.getLogger().warning("Error finding inventory entry by ID: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:350: plugin.getLogger().warning("Error collecting snapshot players from " + fileName + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:375: plugin.getLogger().warning("Error collecting inventory IDs from " + fileName + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:403: plugin.getLogger().warning("Error finding snapshot owner by name in " + fileName + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:427: plugin.getLogger().warning("Error reading last known name from " + fileName + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:522: plugin.getLogger().warning("Failed to save inventory snapshot: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:524: plugin.getLogger().warning("Unexpected error saving inventory snapshot: " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:579: plugin.getLogger().warning("Failed to save inventory snapshot (async): " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:581: plugin.getLogger().warning("Unexpected error saving inventory snapshot (async): " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:657: plugin.getLogger().warning("Konnte leere " + label + " nicht löschen: " + file.getName());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:661: plugin.getLogger().warning("Failed to prune " + label + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\storage\InventorySnapshotStorage.java:663: plugin.getLogger().warning("Unexpected error pruning " + label + ": " + e.getMessage());
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:127: plugin.getLogger().info("========================================");
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:128: plugin.getLogger().info("UPDATE VERFÜGBAR!");
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:129: plugin.getLogger().info("Aktuelle Version: " + currentVersion);
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:130: plugin.getLogger().info("Neueste Version: " + latestVersion);
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:131: plugin.getLogger().info("Download: https://modrinth.com/plugin/" + modrinthProjectId);
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:132: plugin.getLogger().info("========================================");
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:134: plugin.getLogger().info("Plugin ist auf dem neuesten Stand (" + currentVersion + ")");
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:137: plugin.getLogger().warning("Update-Prüfung: keine verwertbare Version in der Antwort");
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:140: plugin.getLogger().warning("Update-Prüfung fehlgeschlagen: HTTP " + responseCode);
+src/main/java\de\zfzfg\eventplugin\util\UpdateChecker.java:145: plugin.getLogger().log(Level.WARNING, "Update-Prüfung fehlgeschlagen: " + e.getMessage(), e);
+src/main/java\de\zfzfg\eventplugin\world\WorldStateManager.java:98: plugin.getLogger().warning("Backup übersprungen: Weltordner nicht gefunden: " + worldName);
+src/main/java\de\zfzfg\eventplugin\world\WorldStateManager.java:109: plugin.getLogger().info("Backup erstellt: " + zipFile.getName());
+src/main/java\de\zfzfg\eventplugin\world\WorldStateManager.java:111: plugin.getLogger().log(java.util.logging.Level.SEVERE, "Backup fehlgeschlagen", e);
+src/main/java\de\zfzfg\eventplugin\world\WorldStateManager.java:126: plugin.getLogger().severe("Fehler beim Zippen: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\commands\PvPAdminCommand.java:70: plugin.getLogger().log(java.util.logging.Level.SEVERE, "Admin reload failed", e);
+src/main/java\de\zfzfg\pvpwager\commands\PvPAskCommand.java:41: plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\pvpwager\commands\PvPInfoCommand.java:23: plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\pvpwager\commands\PvPWagerGuiCommand.java:403: plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\pvpwager\gui\livetrade\LiveTradeGui.java:52: plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\pvpwager\gui\livetrade\LiveTradeManager.java:131: plugin.getLogger().info("PVP Wager Session expired: " + session.getSessionId());
+src/main/java\de\zfzfg\pvpwager\gui\livetrade\LiveTradePlayer.java:51: session.getPlugin().getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\pvpwager\gui\livetrade\LiveTradeSession.java:60: plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\pvpwager\gui\livetrade\LiveTradeSession.java:269: plugin.getLogger().log(java.util.logging.Level.SEVERE, "Fehler beim Starten des Matches aus LiveTrade", e);
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:41: plugin.getLogger().warning("Missing message key: " + path + " (check messages_*.yml)");
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:128: plugin.getLogger().info("[PvPDeath] Original-Location für " + player.getName() + " gespeichert: " +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:132: plugin.getLogger().warning("[PvPDeath] WARNUNG: Keine Original-Location für " + player.getName() + " gefunden!");
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:217: plugin.getLogger().info("[Respawn] " + player.getName() + " verwendet gespeicherte Location: " +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:237: plugin.getLogger().info("[Respawn] " + player.getName() + " (aus Match) soll zu " +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:252: plugin.getLogger().warning("[Respawn] Gespeicherte Location für " + playerName + " ist ungültig!");
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:260: plugin.getLogger().warning("[Respawn] Welt " + worldName + " für " + playerName +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:300: plugin.getLogger().warning("[Respawn-Verify] KRITISCH: " + player.getName() + " ist in FALSCHER WELT!");
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:301: plugin.getLogger().warning("  Erwartet: " + expectedWorld + " @ " + expectedCoords);
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:302: plugin.getLogger().warning("  Aktuell:  " + currentWorld + " @ " + currentCoords);
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:303: plugin.getLogger().info("[Respawn-Verify] Teleportiere " + player.getName() + " zur korrekten Welt...");
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:311: plugin.getLogger().warning("[Respawn-Verify] " + player.getName() + " ist " +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:313: plugin.getLogger().warning("  Erwartet: " + expectedWorld + " @ " + expectedCoords);
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:314: plugin.getLogger().warning("  Aktuell:  " + currentWorld + " @ " + currentCoords);
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:315: plugin.getLogger().info("[Respawn-Verify] Teleportiere " + player.getName() + " zur korrekten Position...");
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:322: plugin.getLogger().info("[Respawn-Verify] ✓ " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:344: plugin.getLogger().severe("[Respawn-Verify] FEHLER: Korrektur-Teleport für " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:346: plugin.getLogger().severe("  Erwartet: " + expectedWorld);
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:347: plugin.getLogger().severe("  Aktuell:  " + currentWorld);
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:351: plugin.getLogger().info("[Respawn-Verify] ✓ Korrektur erfolgreich - " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:406: plugin.getLogger().info("[SafeRespawn-PvP] " + reason + " - " +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:414: plugin.getLogger().warning("[SafeRespawn-PvP] Original-Welt nicht geladen: " +
+src/main/java\de\zfzfg\pvpwager\listeners\PvPListener.java:418: plugin.getLogger().warning("[SafeRespawn-PvP] Kein Original-Standort für " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\listeners\SpectatorRecoveryListener.java:48: plugin.getLogger().info("[SpectatorRecovery] " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\listeners\SpectatorRecoveryListener.java:64: plugin.getLogger().info("[SpectatorRecovery] " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:45: plugin.getLogger().info("World '" + worldId + "' not enabled for PvPWager, skipping...");
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:203: plugin.getLogger().info("Loaded PvP arena from worlds.yml: " + worldId + " (" + displayName + ") - SpawnType: " + spawnType);
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:206: plugin.getLogger().severe("Error loading PvP world '" + worldId + "': " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:223: plugin.getLogger().warning("No arenas/worlds found in worlds.yml (worlds.* or pvp.arenas) or arenas.yml (arenas)!");
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:235: plugin.getLogger().info("Arena '" + arenaId + "' is disabled, skipping...");
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:394: plugin.getLogger().info("Loaded arena: " + arenaId + " (" + displayName + ") - SpawnType: " + spawnType);
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:397: plugin.getLogger().severe("Error loading arena '" + arenaId + "': " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:404: plugin.getLogger().warning("No arenas loaded! Plugin may not work correctly.");
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:414: plugin.getLogger().warning("World '" + worldName + "' not found for arena spawn!");
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:427: plugin.getLogger().severe("Error parsing location: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:473: plugin.getLogger().info("Welt-Ladung erfolgreich: " + worldName + " - " + message);
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:475: plugin.getLogger().warning("Welt-Ladung fehlgeschlagen: " + worldName + " - " + message);
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:499: plugin.getLogger().info("Unloading arena world via Multiverse: " + worldName);
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:509: plugin.getLogger().warning("Clone-Reset übersprungen: ungültige Weltangaben.");
+src/main/java\de\zfzfg\pvpwager\managers\ArenaManager.java:519: plugin.getLogger().info("Clone-Reset abgeschlossen für Arena-Welt: " + targetWorld);
+src/main/java\de\zfzfg\pvpwager\managers\CommandRequestManager.java:208: plugin.getLogger().warning("Failed to cancel expiration task during cleanup: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\CommandRequestManager.java:230: plugin.getLogger().warning("Failed to cancel expiration task: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\CommandRequestManager.java:245: plugin.getLogger().warning("Failed to cancel expiration task: " + ex.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\ConfigManager.java:70: plugin.getLogger().info("All configurations reloaded!");
+src/main/java\de\zfzfg\pvpwager\managers\ConfigManager.java:77: plugin.getLogger().log(java.util.logging.Level.SEVERE, "Could not save config to " + file.getName(), e);
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:44: plugin.getLogger().info("Equipment '" + setId + "' not enabled for PvPWager, skipping...");
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:77: plugin.getLogger().warning("Error parsing inventory item in equipment '" + setId + "': " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:84: plugin.getLogger().info("Loaded PvP equipment: " + setId + " (" + displayName + ")");
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:87: plugin.getLogger().log(java.util.logging.Level.SEVERE, "Error loading equipment '" + setId + "'", e);
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:96: plugin.getLogger().warning("No equipment sets found in unified 'equipment' or legacy 'equipment-sets'!");
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:106: plugin.getLogger().info("Equipment set '" + setId + "' is disabled, skipping...");
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:144: plugin.getLogger().warning("Error parsing inventory item in set '" + setId + "': " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:152: plugin.getLogger().info("Loaded legacy equipment set: " + setId + " (" + displayName + ")");
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:155: plugin.getLogger().log(java.util.logging.Level.SEVERE, "Error loading equipment set '" + setId + "'", e);
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:161: plugin.getLogger().warning("No PvP equipment loaded! PvPWager may not work correctly.");
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:178: plugin.getLogger().warning("Invalid material: " + materialName);
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:206: plugin.getLogger().warning("Unknown enchantment: " + enchantName);
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:209: plugin.getLogger().warning("Error parsing enchantment: " + enchantString);
+src/main/java\de\zfzfg\pvpwager\managers\EquipmentManager.java:264: plugin.getLogger().warning("Failed to apply allowed worlds from section: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:257: plugin.getLogger().info("Starting DIRECT match in world: " + arenaWorld.getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:268: plugin.getLogger().warning("Players not in arena world after teleport!");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:278: plugin.getLogger().warning("Failed to save inventory snapshot for match " + match.getMatchId() + ": " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:350: plugin.getLogger().severe("Arena world not found after loading: " + arena.getArenaWorld());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:359: plugin.getLogger().info("Starting match in world: " + arenaWorld.getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:362: plugin.getLogger().info("Teleporting players with spawn-type: " + arena.getSpawnType());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:380: plugin.getLogger().warning("Players not in arena world after teleport!");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:381: plugin.getLogger().warning("P1 World: " + player1.getWorld().getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:382: plugin.getLogger().warning("P2 World: " + player2.getWorld().getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:383: plugin.getLogger().warning("Arena World: " + arenaWorld.getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:401: plugin.getLogger().info("Attempting emergency teleport...");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:419: plugin.getLogger().severe("Emergency teleport failed! Ending match.");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:430: plugin.getLogger().severe("Emergency teleport failed with exception: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:446: plugin.getLogger().warning("Failed to save inventory snapshot for match " + match.getMatchId() + ": " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:482: plugin.getLogger().info("Applying equipment to " + player.getName() + " in world: " + player.getWorld().getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:505: plugin.getLogger().info("Equipment applied to " + player.getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:557: plugin.getLogger().info("Equipment verified for " + player.getName() + " (attempt " + attempt + ")");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:563: plugin.getLogger().warning("Equipment could not be verified for " + player.getName() + " after " + maxAttempts + " attempts.");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:569: plugin.getLogger().warning("Equipment not applied correctly to " + player.getName() + ", retrying (attempt " + attempt + ")...");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:645: plugin.getLogger().warning("Pre-teleport callback failed: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:806: plugin.getLogger().warning("Failed to record match statistics: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:816: plugin.getLogger().info("Scheduling clone reset for arena world: " + worldName + " from " + cloneSource);
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:822: plugin.getLogger().info("Scheduling Multiverse regeneration for arena world: " + worldName);
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:886: plugin.getLogger().info("Teleported winner " + winner.getName() + " back to original location");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:997: plugin.getLogger().info("[SafeTeleport-PvP] Spieler " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1000: plugin.getLogger().warning("Failed to set gamemode for dead player " + player.getName() + ": " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1003: plugin.getLogger().warning("Failed to remove invisibility from dead player " + player.getName() + ": " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1023: plugin.getLogger().warning("[SafeTeleport-PvP] Original-Location für " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1028: plugin.getLogger().info("[SafeTeleport-PvP] Teleportiere " + player.getName() + " zurück zu: " +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1039: plugin.getLogger().warning("[SafeTeleport-PvP] Original-Welt für " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1044: plugin.getLogger().warning("[SafeTeleport-PvP] Keine Original-Location für " + player.getName() + ", nutze Hauptwelt.");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1071: plugin.getLogger().info("[SafeTeleport-PvP] Teleportiere " + player.getName() + " zu Hauptwelt-Spawn: " +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1075: plugin.getLogger().severe("[SafeTeleport-PvP] KRITISCH: Keine Hauptwelt verfügbar für " + player.getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1101: plugin.getLogger().warning("Teleport verification failed for " + player.getName() +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1185: plugin.getLogger().warning("Failed to cancel countdown task: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1190: plugin.getLogger().warning("Failed to cancel pre-teleport task: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1193: plugin.getLogger().warning("Failed to cancel timer task: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1220: plugin.getLogger().severe("Failed to return items on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1232: plugin.getLogger().severe("Failed to return money on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1238: plugin.getLogger().warning("Failed to set gamemode for player1 on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1241: plugin.getLogger().warning("Failed to set gamemode for player2 on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1244: plugin.getLogger().warning("Failed to remove invisibility from player1 on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1247: plugin.getLogger().warning("Failed to remove invisibility from player2 on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1257: plugin.getLogger().warning("Failed to teleport spectator on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1261: plugin.getLogger().warning("Failed to set gamemode for spectator on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1264: plugin.getLogger().warning("Failed to remove invisibility from spectator on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1275: plugin.getLogger().warning("Failed to record draw statistics on shutdown: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1298: plugin.getLogger().warning("Failed to cancel countdown task in cleanup: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1302: plugin.getLogger().warning("Failed to cancel pre-teleport task in cleanup: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1305: plugin.getLogger().warning("Failed to cancel timer task in cleanup: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1397: plugin.getLogger().info("[Match] Original-Location für " + player1.getName() + " aus Request gespeichert:");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1398: plugin.getLogger().info("  Welt: " + senderOriginal.getWorld().getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1399: plugin.getLogger().info("  Koordinaten: X=" + String.format("%.2f", senderOriginal.getX()) +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1402: plugin.getLogger().info("  Rotation: Yaw=" + String.format("%.1f", senderOriginal.getYaw()) +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1408: plugin.getLogger().warning("[Match] WARNUNG: Keine Original-Location im Request für " + player1.getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1409: plugin.getLogger().warning("  Fallback auf aktuelle Position: " +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1416: plugin.getLogger().info("[Match] Original-Location für " + player2.getName() + " aus Request gespeichert:");
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1417: plugin.getLogger().info("  Welt: " + targetOriginal.getWorld().getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1418: plugin.getLogger().info("  Koordinaten: X=" + String.format("%.2f", targetOriginal.getX()) +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1421: plugin.getLogger().info("  Rotation: Yaw=" + String.format("%.1f", targetOriginal.getYaw()) +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1427: plugin.getLogger().warning("[Match] WARNUNG: Keine Original-Location im Request für " + player2.getName());
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1428: plugin.getLogger().warning("  Fallback auf aktuelle Position: " +
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1467: plugin.getLogger().info("Loading arena world via /mvload: " + worldName);
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1474: plugin.getLogger().severe("Arena world failed to load: " + worldName);
+src/main/java\de\zfzfg\pvpwager\managers\MatchManager.java:1481: plugin.getLogger().info("Arena world loaded successfully: " + worldName);
+src/main/java\de\zfzfg\pvpwager\managers\RequestManager.java:185: plugin.getLogger().warning("Failed to cancel expiration task: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\RequestManager.java:195: plugin.getLogger().warning("Failed to cancel expiration task: " + ex.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:67: plugin.getLogger().severe("Teleport-Fehler: " + ex.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:74: plugin.getLogger().warning("Failed to teleport players to world spawn as fallback: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:197: plugin.getLogger().warning("Teleport command already in progress for " + player1.getName());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:202: plugin.getLogger().severe("Teleport-Command Fehler für " + player1.getName() + ": " + ex.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:216: plugin.getLogger().warning("Teleport command already in progress for " + player2.getName());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:221: plugin.getLogger().severe("Teleport-Command Fehler für " + player2.getName() + ": " + ex.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:242: plugin.getLogger().severe("Teleport fehlgeschlagen für " + player.getName() + ": " + ex.getMessage());
+src/main/java\de\zfzfg\pvpwager\managers\SpawnManager.java:248: plugin.getLogger().warning("Failed to teleport player to world spawn as fallback: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\storage\PvpStatsStorage.java:38: plugin.getLogger().warning("Failed to parse player stats for key '" + key + "': " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\storage\PvpStatsStorage.java:42: plugin.getLogger().warning("Failed to load PvP stats: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\storage\PvpStatsStorage.java:61: plugin.getLogger().warning("Failed to save PvP stats: " + e.getMessage());
+src/main/java\de\zfzfg\pvpwager\storage\PvpStatsStorage.java:71: plugin.getLogger().warning("Async save PvP stats failed: " + e.getMessage());

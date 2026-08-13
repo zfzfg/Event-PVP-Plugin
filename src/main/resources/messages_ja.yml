@@ -1,0 +1,1453 @@
+messages:
+  equipment:
+    debug-no-group: '&c[Debug] 有効な装備グループが設定されていません: &e{group}'
+    debug-retrying: '&7[Debug] 装備が完全に適用されていません。再試行します...'
+    debug-still-incomplete: '&c[Debug] 装備がまだ完全に適用されていません。'
+    debug-applied: '&a[Debug] 装備を正常に適用しました。'
+  request:
+    received: '
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &e&lPVP リクエスト
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      &e{player} &aがあなたに決闘を申し込みました！
+
+
+      &a承諾するにはここをクリック:
+
+      '
+    accepted: '&a&e{player} &aのリクエストを承諾しました！'
+    denied: '&c&e{player} &cのリクエストを拒否しました！'
+    expired: '&c&e{player} &cからのリクエストが期限切れになりました！'
+    no-request: '&c{player} からのリクエストはありません！'
+    already-in-match: '&cこのプレイヤーは既にマッチ中です！'
+    self-request: '&c自分自身にリクエストを送ることはできません！'
+    player-offline: '&cプレイヤー {player} はオフラインです！'
+    header: '
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &e&lPVP リクエスト
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      &e{player} &aがあなたに決闘を申し込みました！
+
+      '
+    accept-button: '&a&l[► 承試する ◄]'
+    accept-hover: '&aクリックしてリクエストを承試しましょう！'
+    deny-button: ' &c&l[✖ 拒否]'
+    deny-hover: '&cクリックしてリクエストを拒否します'
+    footer: '
+
+
+      &7リクエストは &e60 秒&7で期限切れになります。
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    request-expired-sender: '&c&e{target} &cへのリクエストが期限切れになりました！'
+    request-expired-target: '&c&e{sender} &cからのリクエストが期限切れになりました！'
+    challenge-header: '&e&lPVPチャレンジ！'
+    challenge-message: '&e{player} &7があなたに挑戦してきました！'
+  wager:
+    not-enough-money: '&cお金が足りません！（&6${amount} &c必要）'
+  selection:
+    arena-selected: '&aアリーナを選択: &e{arena}'
+    equipment-selected: '&a装備を選択: &e{equipment}'
+  command:
+    common:
+      player-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+      player-offline: '&cプレイヤーが見つかりません: {player}'
+      self-target: '&c自分自身に挑戦することはできません！'
+      already-in-match: '&c既にマッチ中です！'
+      target-in-match: '&c{player}は既にマッチ中です！'
+      pending-self: '&c既に保留中のリクエストがあります！'
+      pending-target: '&c{player}は既に保留中のリクエストがあります！'
+      not-spectating: '&c現在マッチを観戦していません！'
+      match-full: '&cこのマッチは観戦者数上限に達しています！'
+    pvpa:
+      player-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+      player-not-found: '&cプレイヤーが見つかりません: {player}'
+      self-challenge: '&c自分自身に挑戦することはできません！'
+      arena-not-found: '&cアリーナが見つかりません: {arena}'
+      equipment-not-found: '&c装備が見つかりません: {equipment}'
+      amount-positive: '&c金額は正の数である必要があります！'
+      economy-disabled: '&cエコノミーが有効になっていません！'
+      not-enough-money: '&cお金が足りません！残高: ${balance}'
+      invalid-money: '&c無効な金額: {amount}'
+      mismatch-items: '&cアイテム数と数量が一致しません！'
+      not-enough-items: '&c以下のアイテムが足りません: {item}'
+      invalid-item: '&c無効なアイテム: {item}'
+      wager-money: '&6${amount}'
+      wager-items: '&e{count}個のアイテム'
+      request-sent: '
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &a&lリクエストを送信しました！
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7相手: &e{target}
+
+        &7アリーナ: &e{arena}
+
+        &7装備: &e{equipment}
+
+        &7賭け: {wager}
+
+
+        &e{target} &7の返答を待っています...
+
+        '
+      usage: '
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &e&lPVPA コマンド
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7使い方:
+
+        &e/pvpa <プレイヤー> <賭け> <数量> <アリーナ> <装備>
+
+
+        &7例:
+
+        &e/pvpa Steve DIAMOND_SWORD 1 desert diamond
+
+        &e/pvpa Steve MONEY 100 forest standard
+
+        &e/pvpa Steve DIAMOND_SWORD,GOLDEN_APPLE 1,5 colosseum netherite
+
+
+        &7アリーナ一覧は &e/pvpa arenas
+
+        &7装備一覧は &e/pvpa equipment
+
+        '
+      available-arenas: '&7利用可能なアリーナ:'
+      available-equipment: '&7利用可能な装備セット:'
+    pvpyes:
+      player-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+      no-request: '&c保留中のリクエストはありません！'
+      waiting-response: '&c{player}の返答を待っています！'
+      sender-no-money: '&cお金が足りなくなりました！'
+      sender-no-items: '&c必要なアイテムがなくなりました！'
+      target-no-money-player: '&c{player}のお金が足りなくなりました！'
+      target-no-money-target: '&cお金が足りなくなりました – リクエストがキャンセルされました！'
+      target-no-items-player: '&c{player}の必要なアイテムがなくなりました！'
+      target-no-items-target: '&c必要なアイテムがなくなりました – リクエストがキャンセルされました！'
+    pvpadmin:
+      no-permission: '&cこのコマンドの権限がありません！'
+      reload-success: '
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &a&l設定を再読み込みしました！
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7✓ メイン設定を再読み込み
+
+        &7✓ メッセージを再読み込み
+
+        &7✓ アリーナを再読み込み: &e{arenaCount}
+
+        &7✓ 装備セットを再読み込み: &e{equipmentCount}
+
+
+        &e注意: &7進行中の試合には影響しません
+
+        '
+      reload-error: '&c再読み込みエラー: {error}'
+      stopall: '
+
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &e&l試合を停止しました
+
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &e{count} &7件の進行中の試合を停止しました
+
+        &7すべての賭けを返却しました
+
+        '
+      info: '
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &6&lPVPWAGER INFO
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7バージョン: &e{version}
+
+        &7進行中の試合: &e{active}
+
+        &7読み込み済みアリーナ: &e{arenas}
+
+        &7読み込み済み装備: &e{equipment}
+
+        &7経済: {economy}
+
+        '
+      enabled: '&a有効'
+      disabled: '&c無効'
+      help: '
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &6&lPVPWAGER ADMIN
+
+        &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &e/pvpadmin reload &8- &7すべての設定を再読み込み
+
+        &e/pvpadmin stopall &8- &7進行中の試合をすべて停止
+
+        &e/pvpadmin info &8- &7プラグイン情報を表示
+
+        '
+    pvpanswer:
+      player-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+      no-request: '&c保留中のリクエストはありません！'
+      usage: '&c使い方: /pvpanswer <賭け> <数量> [アリーナ] [装備]
+
+        &7例: /pvpanswer DIAMOND_SWORD 1
+
+        &7例: /pvpanswer MONEY 50 desert diamond
+
+        &7例: /pvpanswer SKIP
+
+        '
+      arena-not-found: '&cアリーナが見つかりません: {arena}'
+      equipment-not-found: '&c装備が見つかりません: {equipment}'
+      missing-money: '&cMONEYの金額が指定されていません！'
+      amount-positive: '&c金額は正の数である必要があります！'
+      economy-disabled: '&cエコノミーが有効になっていません！'
+      not-enough-money: '&cお金が足りません！'
+      invalid-money: '&c無効な金額: {amount}'
+      missing-items: '&cアイテム賭けの数量が指定されていません！'
+      mismatch-items: '&c数量とアイテムが一致しません！'
+      not-enough-items: '&c以下のアイテムが足りません: {item}'
+      invalid-item: '&c無効なアイテム: {item}'
+      response-sent: '&a&l返答を送信しました！'
+      your-wager-money: '&7あなたの賭け: &6${amount}'
+      your-wager-items: '&7あなたの賭け: &e{items}'
+      arena-override: '&7アリーナ変更: &e{arena}'
+      equipment-override: '&7装備変更: &e{equipment}'
+      waiting-confirm: '&e{player} &7の確認を待っています...'
+      challenger-header: '&e&l{player}が返答しました！'
+      their-wager-money: '&7相手の賭け: &6${amount}'
+      their-wager-items: '&7相手の賭け: &e{items}'
+      arena-changed: '&7アリーナ変更: &e{arena}'
+      equipment-changed: '&7装備変更: &e{equipment}'
+      next-steps: '&a承諾するには &e/pvpyes &aと入力
+
+        &c拒否するには &e/pvpno &cと入力'
+    pvp:
+      help: '&e&lPvPWager &8» &7使い方:
+
+        &e/pvpa <プレイヤー> &8- &7PvP 賭けリクエストを送信
+
+        &e/pvp accept <プレイヤー> &8- &7リクエストを承諾
+
+        &e/pvp deny <プレイヤー> &8- &7リクエストを拒否
+
+        &e/pvp spectate <プレイヤー> &8- &7試合を観戦
+
+        &e/pvp leave &8- &7観戦モードを終了
+
+        '
+      accept:
+        success-self: '&a&e{player} &aからのPvP賭けを承諾しました！'
+        success-other: '&e{player} &aがあなたのPvP賭けを承諾しました！'
+        no-request: '&c&e{player} &cからの保留中のリクエストはありません！'
+        requires-skip: '&c承諾できません: 挑戦者が SKIP を選んでいません。先に &e/pvpanswer <賭け> <数量>
+          &cで賭けを設定してください。'
+      deny:
+        success-self: '&c&e{player} &cからのPvP賭けを拒否しました！'
+        success-other: '&e{player} &cがあなたのPvP賭けを拒否しました！'
+        usage: '&c使用方法: /pvp deny <プレイヤー>'
+      spectate:
+        usage: '&c使用方法: /pvp spectate <プレイヤー>'
+        no-match: '&c{player}はマッチ中ではありません！'
+        joined: '&a&e{p1} &7vs &e{p2} &aを観戦中！'
+        announce: '&e{player} &7がマッチを観戦しています！'
+        already-spectating: '&c既に観戦中です！'
+      leave:
+        left: '&a観戦モードを終了しました！'
+        announce: '&e{player} &7が観戦モードを終了しました！'
+    pvprequest:
+      usage: '&c使用方法: /pvpa <プレイヤー>'
+      sent: '&a&e{player} &aにPvP賭けを送信しました！'
+    pvpno:
+      no-request: '&c保留中のリクエストはありません！'
+      declined-self: '&c&e{player} &cへの/からのリクエストを拒否しました'
+      declined-other: '&e{player} &cがリクエストを拒否しました！'
+    challenge:
+      usage: '&c使用方法: /pvp challenge <プレイヤー> [賭け] [数量] [アリーナ] [装備]'
+      no-config: '&cアリーナまたは装備が設定されていません！'
+      sent: '&a&e{player} &aにPvP賭けを送信しました！'
+    draw:
+      player-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+      only-active: '&c引き分け投票はマッチ中のみ可能です！'
+      no-active-vote: '&cアクティブな引き分け投票がありません！'
+      initiator-wait: '&c投票を開始しました、相手の返答を待ってください！'
+      initiator-cannot-deny: '&cこの引き分け投票はあなたが開始しました！ 取り消すにはもう一度 &e/draw &cを使用してください。'
+      cancelled-self: '&c引き分け投票をキャンセルしました。'
+      cancelled-opponent: '&e{player} &cが引き分け投票をキャンセルしました。'
+      already-active: '&e{opponent} &7はすでに引き分けに投票しています！
+
+        &7&a/draw accept &7または &c/draw deny &7と入力してください'
+      accepted: '&a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &a&l引き分けが成立しました！
+
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7両プレイヤーが引き分けに同意しました。
+
+        &7すべての賭けは返却されます。'
+      denied: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &c&l引き分けが拒否されました！
+
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &e{player} &7が引き分け投票を拒否しました。
+
+        &7試合は続行されます！'
+      started: "&e&l━━━━━━━━━━━━━━━━━━━━━━━\n&e&l引き分け投票を開始しました\n&e&l━━━━━━━━━━━━━━━━━━━━━━━\n\
+        \n&e{initiator} &7が試合を引き分けで終えたいと提案しています。\n\n&e{opponent}&7、次を入力してください:\n\
+        \  &a/draw accept &7- 引き分けを承諾\n  &c/draw deny &7- 引き分けを拒否\n\n&7制限時間: &e{time}\
+        \ 秒"
+      expired: '&c&l引き分け投票の期限が切れました！
+
+        &7試合は続行されます。'
+    surrender:
+      player-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+      only-active: '&c降参はマッチ中のみ可能です！'
+      confirm: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &c&l警告: 降参
+
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &7本当に降参しますか？
+
+        &c賭けたものをすべて失います！
+
+
+        &7確定するには &e/surrender confirm &7と入力
+
+        &7または {timeout} 秒待つとキャンセルされます'
+      confirm-expired: '&c確認の期限が切れました！もう一度 &e/surrender &cを入力してください。'
+      surrendered: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+        &c&l{player} が降参しました！
+
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+        &e{opponent} &aの勝利です！'
+  match-display:
+    you-won-header: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    you-won: '&a&l勝利しました！'
+    you-lost-header: '&c&l━━━━━━━━━━━━━━━━━━━━━━━'
+    you-lost: '&c&l敗北しました！'
+    match-starting: '&a&lマッチ開始！'
+    vs-display: '&e{player1} &7vs &e{player2}'
+    arena-display: '&7アリーナ: &e{arena}'
+    equipment-display: '&7装備: &e{equipment}'
+    arena-countdown: '&eアリーナを読み込み中... &7(5秒)'
+    fight-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    fight: '&e&l戦え！'
+  end:
+    draw: '&e引き分けです！'
+    eliminated: '&7{player}が脱落しました！'
+    winner: '&6&l{player}の優勝！'
+    team-winner: '&6&lチーム{team}の優勝！'
+    all-eliminated: '&7全プレイヤーが脱落しました。'
+    no-winner: '&7勝者なし。'
+    thanks: '&7参加ありがとうございました！'
+  surrender:
+    success: '
+
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &c&lあなたは降参しました！
+
+      &c&l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      &7相手の勝利です。
+
+      '
+  draw:
+    denied: '&c引き分けが拒否されました - 戦闘続行！'
+    timeout: '&c投票が期限切れ - 戦闘続行！'
+  error:
+    no-permission: '&c権限がありません！'
+    no-equipment: '&c装備セットが見つかりません！'
+    equipment-not-available: '&cこの装備セットは利用できません！'
+    already-in-match: '&c既にマッチ中です！'
+    not-in-match: '&cマッチに参加していません！'
+    world-not-loaded: '&cアリーナワールドを読み込めませんでした！'
+    command-blocked: '&c試合中はコマンドが使用できません！ &e/surrender &cまたは &e/draw &cを使用してください'
+  event-help:
+    header: '
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      &e&lPVP WAGER コマンド
+
+      &6&l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    join: '&e/event join <event> &7– イベントに参加'
+    leave: '&e/event leave &7– イベントから退出'
+    list: '&e/event list &7– 利用可能なイベントを表示'
+    admin-header: '&e管理者'
+    start: '&e/event start <event>'
+    stop: '&e/event stop <event>'
+    forcestart: '&e/event forcestart <event>'
+    reload: '&e/eventpvp reload'
+    footer: '&7楽しんでください！'
+  pvpstats:
+    player-not-found: '&cプレイヤーが見つかりません: &e{player}'
+    usage: '&e/pvpstats me &7| &e/pvpstats top [N]'
+    admin-usage: '&7管理者: &e/pvpstats reset <プレイヤー> &7| &e/pvpstats add <プレイヤー>
+      <wins|losses|draws> <n>'
+    me-player-only: '&cプレイヤーのみ &e/pvpstats me &cを使用できます。'
+    me-empty: '&7まだ統計がありません – いくつかマッチをプレイしてください！'
+    me-header: '&6&lあなたのPvP統計'
+    me-wins: '&7勝利: &a{wins}'
+    me-losses: '&7敗北: &c{losses}'
+    me-draws: '&7引き分け: &e{draws}'
+    top-header: '&6&lトップPvPプレイヤー（勝利数）'
+    top-line: '&e{rank}. &f{name} &7- 勝: &a{wins}, &7敗: &c{losses}, &7分: &e{draws}'
+    top-empty: '&7まだ統計がありません。'
+    no-permission: '&c権限がありません。'
+    reset-usage: '&c使用方法: &e/pvpstats reset <プレイヤー>'
+    add-usage: '&c使用方法: &e/pvpstats add <プレイヤー> <wins|losses|draws> <数>'
+    invalid-number: '&c無効な数値です。'
+    invalid-amount: '&c数値は0より大きくなければなりません。'
+    invalid-field: '&cフィールドは &ewins&c、&elosses&c、または &edraws &cである必要があります。'
+    reset-success: '&a&f{name}&aのPvP統計をリセットしました'
+    add-success: '&a&f{name}&aのPvP統計を更新しました'
+    unknown-subcommand: '&c不明なサブコマンドです。'
+  eventstats:
+    player-not-found: '&cプレイヤーが見つかりません: &e{player}'
+    usage: '&e/eventstats me &7| &e/eventstats top [N]'
+    admin-usage: '&7管理者: &e/eventstats reset <プレイヤー> &7| &e/eventstats add <プレイヤー>
+      <wins|participations> <n>'
+    me-player-only: '&cプレイヤーのみ &e/eventstats me &cを使用できます。'
+    me-empty: '&7まだイベント統計がありません – イベントに参加してください！'
+    me-header: '&6&lあなたのイベント統計'
+    me-participations: '&7参加数: &e{participations}'
+    me-wins: '&7勝利: &a{wins}'
+    top-header: '&6&lトップイベントプレイヤー（勝利数）'
+    top-line: '&e{rank}. &f{name} &7- 勝利: &a{wins}, &7参加: &e{participations}'
+    top-empty: '&7まだ統計がありません。'
+    no-permission: '&c権限がありません。'
+    reset-usage: '&c使用方法: &e/eventstats reset <プレイヤー>'
+    add-usage: '&c使用方法: &e/eventstats add <プレイヤー> <wins|participations> <数>'
+    invalid-number: '&c無効な数値です。'
+    invalid-amount: '&c数値は0より大きくなければなりません。'
+    invalid-field: '&cフィールドは &ewins&c または &eparticipations &cである必要があります。'
+    reset-success: '&a&f{name}&aのイベント統計をリセットしました'
+    add-success: '&a&f{name}&aのイベント統計を更新しました'
+    unknown-subcommand: '&c不明なサブコマンドです。'
+  general:
+    event-not-found: '&cイベント「{event}」が見つかりません！'
+    player-only: '&cプレイヤーのみがこのコマンドを使用できます！'
+    no-permission: '&cこのコマンドの権限がありません！'
+    unknown-command: '&c不明なコマンド: &e{command}'
+    cooldown: '&cあと{seconds}秒お待ちください！'
+  join:
+    joined: '&aイベントに参加しました。頑張ってください！'
+    already-joined: '&c既にイベントに参加しています。'
+    event-running: '&cイベントは既に進行中です。参加できません。'
+    countdown-active: '&7カウントダウンが進行中ですが、まだ参加できます。'
+    success: '&aイベントに正常に登録されました！'
+    event-full: '&cイベントは満員です！'
+  leave:
+    not-in-event: '&cイベントに参加していません。'
+    success: '&7イベントから退出しました。'
+  lobby:
+    welcome: '&7イベントロビーへようこそ！準備してください。'
+  start:
+    join-button: '&a&l[ここをクリックして参加]'
+    join-hover: '&aクリックしてイベントに参加'
+    started-title: '&a&lイベント開始！'
+    started-subtitle: '&7頑張ってください！'
+    cancelled-not-enough-players: '&cプレイヤーが足りないためイベントは中止されました！'
+    team-size-mismatch: '&cチーム人数が合わないため除外されました！'
+    event-changing: '&eイベントを切り替えています。お待ちください...'
+    already-running: '&cこのイベントは既に進行中です。'
+    join-phase-started: '&a&e{event} &aの参加受付が始まりました！ &e/event join &7({time}秒)'
+    join-phase-ending: '&e参加フェーズは &6{time} &e秒後に終了！'
+    join-phase-closed: '&c参加フェーズ終了 – イベント開始！'
+    not-enough-players: '&cプレイヤーが足りません。最小: &e{min}'
+    countdown: '&7イベント開始まで &e{time} &7秒...'
+    auto-teleport: '&7プレイヤーをロビー/イベントワールドにテレポート中...'
+    preparing-worlds: '&7ワールドを準備中...'
+    regenerating: '&eイベントワールドを再生成中 – お待ちください...'
+  countdown:
+    preparing: '&7準備中...'
+    starting: '&e開始中...'
+    go: '&aスタート！'
+  event:
+    eliminated-spectator: '&7脱落しました。観戦モードになりました。'
+    leave-button: '&c&l[✖ イベントを去る]'
+    leave-hover: 'クリックしてメインワールドに戻る！'
+    usage-join: '&c使用方法: /event join <イベント>'
+    usage-start: '&c使用方法: /event <イベント名> start'
+    usage-stop: '&c使用方法: /event <イベント名> stop'
+    usage-forcestart: '&c使用方法: /event <イベント名> forcestart'
+    not-open: '&cこのイベントは現在開催されていません。'
+    join-phase-only: '&c参加受付期間中のみ参加可能です。'
+    create-error: '&cイベントの作成に失敗しました！'
+    no-active-event: '&cこの名前の有効なイベントはありません！'
+    no-countdown-active: '&cカウントダウンは開始されていません！'
+  inventory:
+    session-conflict: '&c別の試合かイベントのインベントリセッションが残っています。今は参加できません。'
+    backup-degraded: '&eインベントリをディスクに保存できませんでした。イベントが終わるまでメモリ上にのみ保持されます。'
+    backup-failed-abort: '&cイベントから外されました: インベントリを安全に保存できませんでした。'
+  rewards:
+    pending: '&a報酬は保留中です。インベントリが戻り次第お渡しします。'
+    delivered-on-join: '&a保留中の報酬をお渡ししました。'
+    winner-title: '&6&l勝利！'
+    winner-subtitle: '&a報酬を配布中'
+    team-winner-subtitle: '&aチームの勝利！'
+    item-received: '&a報酬を受け取りました！'
+    command-executed: '&7報酬コマンドを実行しました。'
+  admin:
+    event-stopped: '&cイベントを停止しました。'
+    force-start: '&a[イベント] イベントが強制開始されました！'
+    reloaded: '&a設定を再読み込みしました。'
+  pvp-help:
+    header: '&6&l━━━━━━━━━━━━━━━━━━━'
+    title: '&e&lPVP ヘルプ'
+    usage: '&7使用方法:'
+    wager-info: '&7賭け: アイテム、MONEY または &eSKIP&7 (賭けなし)'
+    commands:
+      challenge: '&e/pvp challenge <player> [wager] [amount] [arena] [equipment]'
+      accept: '&e/pvp accept [player]'
+      deny: '&e/pvp deny [player]'
+      spectate: '&e/pvp spectate <player>'
+      leave: '&e/pvp leave'
+      surrender: '&e/pvp surrender [confirm]'
+      draw: '&e/pvp draw [accept|deny]'
+  world:
+    loading: '&7ワールドを読み込み中... &e⏳'
+    loaded: '&aワールドを読み込みました！ ✓'
+    load-failed: '&cワールドを読み込めませんでした！ ✗'
+  gui:
+    equipment-item-title: '{name}'
+    wager-title: '&6&l賭けを設定'
+    arena-title: '&e&lアリーナを選択'
+    equipment-title: '&e&l装備を選択'
+    click-to-select: '&7クリックして選択'
+    back-title: '&c« 戻る'
+    back-lore: '&7クリックして戻る'
+    confirm-title: '&a✔ 確定'
+    arena-select-title: '&6&lアリーナを選択'
+    error-select-arena: '&c先にアリーナを選択してください！'
+    available-arenas-count: '&7利用可能なアリーナ: &e{count}'
+    no-arenas-available-title: '&c&l利用可能なアリーナがありません！'
+    no-arenas-available-lore: '&7管理者にお問い合わせください。'
+    world-label: '&7ワールド: &f{world}'
+    spawn-type-label: '&7スポーン種別: &f{type}'
+    boundaries-active: '&7境界: &a有効'
+    selected-check: '&a✔ 選択しました！'
+    arena-item-title: '{name}'
+    arena-selected-message: '&aアリーナを選択しました: &e{arena}'
+    equipment-select-title: '&6&l装備を選択'
+    error-select-equipment: '&c先に装備を選択してください！'
+    available-equipment-count: '&7利用可能な装備: &e{count}'
+    filter-arena: '&7フィルター: アリーナ &e{arena}'
+    no-equipment-available-title: '&c&l利用可能な装備がありません！'
+    no-equipment-available-line-1: '&7このアリーナには装備が設定されていません。'
+    no-equipment-available-line-2: '&7管理者にお問い合わせください。'
+    no-equipment-available-lore: '&7管理者にお問い合わせください。'
+    armor-label: '&7防具:'
+    armor-piece-label: '  &8• &f{part}: {material}'
+    armor-helmet: ヘルメット
+    armor-chestplate: チェストプレート
+    armor-leggings: レギンス
+    armor-boots: ブーツ
+    inventory-label: '&7インベントリ:'
+    inventory-more: '  &8• &7... ほか'
+    equipment-selected-message: '&a装備を選択しました: &e{equipment}'
+    confirm-lore: '&7クリックして続行'
+    cancel-title: '&c✖ キャンセル'
+    cancel-lore: '&7クリックしてキャンセル'
+    challenge-to-title: '&e&l挑戦相手:'
+    challenge-to-player: '&f{player}'
+    challenge-to-line1: '&7賭ける内容を決めて'
+    challenge-to-line2: '&7アリーナと装備を選んでください。'
+    click-to-edit: '&eクリックして編集'
+    items-title: '&6&l📦 アイテムを設定'
+    item-selection.clear-title: '&c&lすべて削除'
+    item-selection.clear-line1: '&7すべてのアイテムを削除します'
+    item-selection.clear-line2: '&7賭けから。'
+    item-selection.info-title: '&e&lガイド'
+    item-selection.info-line1: '&7下のアイテムをクリック'
+    item-selection.info-line2: '&7して追加します。'
+    item-selection.info-line3: '&7選択したアイテムをクリック'
+    item-selection.info-line4: '&7して削除します。'
+    item-selection.info-line5: '&e左クリック: &f1アイテム'
+    item-selection.info-line6: '&e右クリック: &fスタック全体'
+    item-selection.empty-slot-title: '&7空のスロット'
+    item-selection.empty-slot-lore: '&7ここにアイテムを追加してください！'
+    item-selection.remove-lore: '&c➤ 削除するにはクリック'
+    item-selection.add-lore: '&a➤ 追加するにはクリック'
+    item-selection.error-max-items: '&c最大7スタックのアイテムまでです！'
+    item-selection.cleared-message: '&eすべてのアイテムが削除されました。'
+    money-title: '&6&l💰 お金の賭け'
+    your-balance: '&7残高: &6${balance}'
+    money-selection.choose-line1: '&7金額を選択'
+    money-selection.choose-line2: '&7または調整してください。'
+    money-selection.amount-select-line1: '&aこの金額を選択するにはクリック'
+    money-selection.amount-select-line2: '&aしてください。'
+    money-selection.amount-not-enough-money: '&cお金が足りません！'
+    money-selection.clear-title: '&c&l金額をクリア'
+    money-selection.clear-line: '&7賭け金を0に設定します。'
+    money-selection.adjust-plus-lore: '&7賭け金を増やします。'
+    money-selection.adjust-minus-lore: '&7賭け金を減らします。'
+    money-selection.current-title: '&a&l現在の賭け'
+    money-selection.current-label: '&7現在の賭け:'
+    money-selection.remaining-balance: '&7残りの残高:'
+    money-selection.all-in-title: '&6&lオールイン!'
+    money-selection.all-in-warning: '&c⚠ 全額を賭けます!'
+    current-wager-label: '&7現在の賭け:'
+    no-items-selected: '&cアイテムが選択されていません'
+    no-money-selected: '&cお金を賭けていません'
+    no-arena-selected: '&c⚠ アリーナが選択されていません'
+    no-equipment-selected: '&c⚠ 装備が選択されていません'
+    required-field: '&7(必須です！)'
+    selected-label: '&a選択済み:'
+    more-items: '&7... ほか {count} 個'
+    overview-title: '&e&l概要'
+    overview.items-set: '&a✔ &fアイテム: &e{count}'
+    overview.items-none: '&7✗ &fアイテム: &cなし'
+    overview.money-set: '&a✔ &fお金: &6${amount}'
+    overview.money-none: '&7✗ &fお金: &cなし'
+    overview.arena-set: '&a✔ &fアリーナ: &e{arena}'
+    overview.arena-none: '&c✗ &fアリーナ: &c未選択'
+    overview.equipment-set: '&a✔ &f装備: &e{equipment}'
+    overview.equipment-none: '&c✗ &f装備: &c未選択'
+    overview.separator: '&7━━━━━━━━━━━━━━━━━━━━'
+    error-choose-arena-equipment: '&c先にアリーナと装備を選択してください！'
+    wager-cancelled: '&c賭けのリクエストをキャンセルしました。'
+    ready-to-send: '&a✔ 送信準備完了！'
+    not-ready-yet: '&c⚠ まだ準備ができていません！'
+    choose-arena: '&c- アリーナを選んでください'
+    choose-equipment: '&c- 装備を選んでください'
+    all-ready: '&aすべて準備完了！'
+    click-to-send-line-1: '&eクリックしてリクエストを'
+    click-to-send-line-2: '&e今すぐ送信！'
+    confirmation-title: '&6&lリクエストの確認'
+    confirmation.target-title: '&e&l挑戦先:'
+    confirmation.target-player: '&f{player}'
+    confirmation.target-line1: '&7このリクエストは'
+    confirmation.target-line2: '&7プレイヤーに送信されます。'
+    confirmation.vs-player: '&7{player}'
+    confirmation.vs-against: '&7対'
+    confirmation.vs-target: '&7{target}'
+    confirmation.item-title: '&6&l📦 あなたのアイテム賭け'
+    confirmation.items-in-wager: '&a賭けにあるアイテム:'
+    confirmation.item-line: '&7- &f{item}'
+    confirmation.no-items: '&7賭けアイテムなし'
+    confirmation.money-title: '&6&l💰 あなたのお金の賭け'
+    confirmation.money-label: '&aお金の賭け:'
+    confirmation.money-warning: '&c⚠ 敗北すると失います！'
+    confirmation.no-money: '&7お金は賭けられていません'
+    confirmation.arena-title: '&6&l🗺 アリーナ'
+    confirmation.arena-label: '&aアリーナ: &f{arena}'
+    confirmation.arena-world: '&7ワールド: &f{world}'
+    confirmation.no-arena: '&c選択されたアリーナがありません！'
+    confirmation.equipment-title: '&6&l⚔ 装備'
+    confirmation.equipment-label: '&a装備: &f{equipment}'
+    confirmation.equipment-line1: '&7両方のプレイヤーが受け取ります'
+    confirmation.equipment-line2: '&7戦闘中にこの装備を。'
+    confirmation.no-equipment: '&c選択された装備がありません！'
+    confirmation.edit-title: '&e&l✎ 編集'
+    confirmation.edit-line1: '&7メインメニューに戻る'
+    confirmation.edit-line2: '&7変更を加えるため。'
+    confirmation.cancel-title: '&c&l✖ キャンセル'
+    confirmation.cancel-line1: '&7リクエストをキャンセルします。'
+    confirmation.cancel-line2: '&7すべてのアイテムが返却されます。'
+    confirmation.confirm-warning-title: '&c⚠ 注意:'
+    confirmation.confirm-warning-body: '&cあなたの賭けはロックされます！'
+    confirmation.click-to-send: '&aリクエストを送信するにはクリック!'
+    confirmation.confirm-send-line1: '&7リクエストを送信します:'
+    confirmation.confirm-send-target: '&f{target}'
+    confirmation.confirm-button-title: '&a&l✔ リクエストを送信'
+    confirmation.sent-line1: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    confirmation.sent-line2: '&a&lリクエストを送信しました！'
+    confirmation.sent-line3: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    confirmation.sent-waiting: '&7&e{target}&7からの返答を待っています...'
+    confirmation.sent-expire: '&7リクエストは&e60秒&7で期限切れになります。'
+    confirmation.error-player-offline: '&cプレイヤーはもうオンラインではありません！'
+    confirmation.error-already-in-match: '&cあなたは既に試合中です！'
+    confirmation.error-target-in-match: '&c{target}は既に試合中です！'
+    confirmation.error-already-pending-request: '&c既に保留中のリクエストがあります！'
+    confirmation.error-not-enough-money: '&cお金が足りません！必要: ${money}'
+    response.title: '&6&l依頼に返信'
+    response.challenge-from: '&e&l挑戦者:'
+    response.challenge-subtitle: '&7反対賭けを設定'
+    response.opponent-sets: '&7相手の賭け:'
+    response.no-items: '&8アイテムなし'
+    response.no-money: '&8お金なし'
+    response.match-details: '&6&l試合詳細'
+    response.opponent-money-title: '&6&l相手のお金'
+    response.opponent-items-title: '&6&l相手のアイテム'
+    response.arena-label: '&7アリーナ: &f{arena}'
+    response.equipment-label: '&7装備: &f{equipment}'
+    response.your-items: '&aあなたのアイテム:'
+    response.more-items: '&7... ほか'
+    response.no-items-set: '&7アイテムは設定されていません'
+    response.click-to-edit: '&eクリックして編集'
+    response.your-items-title: '&a&lあなたのアイテム賭け'
+    response.your-money-label: '&aあなたの賭け:'
+    response.no-money-set: '&7お金は設定されていません'
+    response.your-money-title: '&a&lあなたのお金賭け'
+    response.edit-items-title: '&e✎ アイテム選択'
+    response.edit-items-lore: '&7アイテム選択画面を開く'
+    response.edit-money-title: '&e✎ 金額設定'
+    response.edit-money-lore: '&7お金設定画面を開く'
+    response.accept-title: '&a&l✔ 承諾'
+    response.accept-lore1: '&7依頼を承諾します'
+    response.accept-lore2: '&7反対賭けで。'
+    response.decline-title: '&c&l✖ 却下'
+    response.decline-lore1: '&7依頼を拒否します。'
+    response.player-offline: '&c挑戦者はもうオンラインではありません！'
+    response.not-enough-money: '&cお金が足りません！'
+    response.wager-chosen: '&a賭けを選択しました！ {target} の承認を待っています...'
+    response.other-chosen: '&e{player} &7が賭けを選びました!'
+    response.review-offer: '&7内容を確認...'
+    response.request-declined: '&c{player} が依頼を拒否しました!'
+    response.declined: '&c依頼を拒否しました。'
+    response-item-selection.title: '&6&lアイテムを選択'
+    response-item-selection.clear-title: '&c&lすべて削除'
+    response-item-selection.clear-line1: '&7すべてのアイテムを削除'
+    response-item-selection.clear-line2: '&7賭けから外します。'
+    response-item-selection.info-title: '&e&lガイド'
+    response-item-selection.info-line1: '&7下のアイテムをクリック'
+    response-item-selection.info-line2: '&7して追加します。'
+    response-item-selection.info-line3: '&7選択済みアイテムをクリック'
+    response-item-selection.info-line4: '&7して外します。'
+    response-item-selection.info-line5: '&e左クリック: &f1個'
+    response-item-selection.info-line6: '&e右クリック: &fスタック全体'
+    response-item-selection.empty-slot-title: '&7空スロット'
+    response-item-selection.empty-slot-lore: '&7ここにアイテムを追加!'
+    response-item-selection.remove-lore: '&c➤ クリックして削除'
+    response-item-selection.add-lore: '&a➤ クリックして追加'
+    response-item-selection.error-max-items: '&c最大7スタックまでです!'
+    response-item-selection.cleared-message: '&eすべてのアイテムを削除しました。'
+    response-money-selection.title: '&6&lあなたのお金賭け'
+    response-money-selection.clear-title: '&c&l金額をクリア'
+    response-money-selection.clear-lore: '&7賭け額を0にします。'
+    response-money-selection.info-title: '&e&l金額賭け'
+    response-money-selection.info-balance: '&7残高:'
+    response-money-selection.info-opponent: '&7相手の賭け:'
+    response-money-selection.not-enough-money: '&cお金が足りません!'
+    response-money-selection.match-sender-title: '&e&l相手に合わせる'
+    response-money-selection.match-sender-line1: '&7次の額に設定:'
+    response-money-selection.match-sender-line2: '&eクリックして相手の'
+    response-money-selection.match-sender-line3: '&e金額をコピーします。'
+    response-money-selection.current-title: '&a&l現在の賭け'
+    response-money-selection.current-label: '&7現在の賭け:'
+    response-money-selection.remaining-balance: '&7残り残高:'
+    negotiation.title-sender: '&6&l提案を確認'
+    negotiation.title-target: '&6&l依頼を確認'
+    negotiation.vs-title: '&c&l⚔ VS ⚔'
+    negotiation.vs-line1: '&7賭けを交渉'
+    negotiation.vs-line2: '&7してください!'
+    negotiation.arena-title: '&6&lアリーナ'
+    negotiation.equipment-title: '&6&l装備'
+    negotiation.opponent-title: '&c&l相手: {player}'
+    negotiation.opponent-lore1: '&7これは相手の'
+    negotiation.opponent-lore2: '&7賭けです。'
+    negotiation.opponent-items-title: '&c&l相手のアイテム'
+    negotiation.items-count: '&7個数: &f{count}'
+    negotiation.opponent-money-title: '&c&l相手のお金'
+    negotiation.no-money: '&8所持金なし'
+    negotiation.you-title: '&a&lあなた: {player}'
+    negotiation.you-lore: '&7これはあなたの賭けです。'
+    negotiation.your-items-title: '&a&lあなたのアイテム'
+    negotiation.your-money-title: '&a&lあなたのお金'
+    negotiation.decline-title: '&c&l✖ 却下'
+    negotiation.decline-line1: '&7提案を拒否して'
+    negotiation.decline-line2: '&7交渉を終了します。'
+    negotiation.decline-line3: '&cアイテムは返却されます。'
+    negotiation.counter-offer-title: '&6&l↻ カウンターオファー'
+    negotiation.counter-offer-line1: '&7賭けを調整して'
+    negotiation.counter-offer-line2: '&7カウンターオファーを送る。'
+    negotiation.counter-offer-line3: '&e相手プレイヤーも'
+    negotiation.counter-offer-line4: '&eもう一度決定できます。'
+    negotiation.accept-title: '&a&l✔ 承諾'
+    negotiation.accept-line1: '&7両方の賭けを受け入れ'
+    negotiation.accept-line2: '&7戦闘を開始します!'
+    negotiation.accept-line3: '&a⚔ 試合開始!'
+    send-button-ready-title: '&a&l➤ リクエストを送信'
+    send-button-disabled-title: '&7➤ リクエストを送信'
+    economy-not-available: '&c⚠ 経済システムを利用できません'
+    pvpask:
+      not-online: '&cプレイヤー {player} はオンラインではありません！'
+      already-in-trade: '&cすでに賭けトレード中です！'
+      target-in-trade: '&c{player} はすでに賭けトレード中です！'
+      pending-request: '&cすでに保留中の賭けリクエストがあります！'
+      pending-request-hint: '&7キャンセルするか、返答をお待ちください。'
+      target-pending: '&c{player} にはすでに保留中の賭けリクエストがあります！'
+      trade-error: '&cトレードセッションを開始できませんでした。'
+      self-request: '&c自分自身に賭けリクエストは送れません！'
+      usage: '&7使い方: &e/pvpask <プレイヤー>'
+      help:
+        header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+        title: '&e&lPVP WAGER'
+        usage: '&e/pvpask <プレイヤー>'
+        description1: '&7ライブトレード GUI が開き、両プレイヤーが'
+        description2: '&7アイテム・お金・アリーナ・装備を'
+        description3: '&7同時に選べます。'
+        countdown1: '&7両者が確定すると'
+        countdown2: '&7&l5 秒のカウントダウン&7の後に試合が始まります！'
+  update:
+    available: '&e&lアップデートあり！ &7新しいバージョン: &e{latest} &7(現在: &e{current}&7)'
+    download-link: '&7ダウンロード: &ehttps://modrinth.com/plugin/event-pvp-plugin'
+  webtoken:
+    player-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+    no-permission: '&cウェブインターフェースへのアクセス権限がありません！'
+    not-enabled: '&cウェブインターフェースが有効になっていません！'
+    generation-failed: '&cトークンを生成できませんでした。権限を確認してください！'
+    header: '&6&l  ウェブインターフェース ログイン'
+    your-token: '&7  あなたのログイントークン：'
+    click-to-copy: '&7（クリックしてコピー）'
+    hover-copy: '&aクリックしてトークンをコピー'
+    valid-for: '&e  ⚠ 有効期限：&f{minutes}分'
+    single-use: '&e  ⚠ 一度のみ使用可能'
+    click-to-open: '&7（クリックして開く）'
+    hover-open: '&bクリックしてウェブインターフェースを開く'
+    help-description: '&e/eventpvp webtoken &7- ウェブインターフェース用ログイントークンを生成'
+  command-help:
+    eventpvp:
+      header: '&8&m                    &r &6Event-PVP コマンド &8&m                    '
+      reload: '&e/eventpvp reload &8- &7全ての設定を再読み込み'
+      version: '&e/eventpvp version &8- &7プラグインのバージョンと更新を確認'
+      debug: '&e/eventpvp debug &8- &7デバッグモードを管理'
+      rescue: '&e/{label} rescue &8- &7取り残されたプレイヤーとインベントリを復旧'
+    pvp:
+      usage: '&7使用方法: &e/pvpask <プレイヤー>'
+      header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+      title: '&e&lPVP WAGER - ライブトレード'
+  pvpask:
+    not-online: '&cプレイヤー {player} はオフラインです！'
+    already-in-trade: '&cすでに賭けトレード中です！'
+    target-in-trade: '&c{player} はすでに賭けトレード中です！'
+    pending-request: '&cすでに保留中の賭けリクエストがあります！'
+    pending-request-hint: '&7キャンセルするか、返答をお待ちください。'
+    target-pending: '&c{player} にはすでに保留中の賭けリクエストがあります！'
+    trade-error: '&cトレードセッションを開始できませんでした。'
+    self-request: '&c自分自身に賭けリクエストは送れません！'
+    usage: '&7使い方: &e/pvpask <プレイヤー>'
+    help:
+      header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+      title: '&e&lPVP WAGER'
+      usage: '&e/pvpask <プレイヤー>'
+      description1: '&7両プレイヤーが同時に'
+      description2: '&7アイテム、お金、アリーナ、装備を'
+      description3: '&7選択できるライブトレードGUIを開きます。'
+      countdown1: '&7両者が確認すると、'
+      countdown2: '&7&l5秒のカウントダウン&7が始まり試合開始！'
+  trade:
+    wager-cancelled: '&cワージャーリクエストがキャンセルされました。'
+    economy-not-available: '&cエコノミーが利用できません！'
+  negotiation:
+    offer-declined-other: '&c{player}がオファーを断りました！'
+    opponent-offline: '&c相手プレイヤーはもうオンラインではありません！'
+    offer-accepted-other: '&a&l{player}がオファーを承諾しました！マッチを開始します...'
+    not-enough-money-other: '&c{player}は十分なお金がありません！'
+    not-enough-money: '&c十分なお金がありません！'
+    counter-offer-sent: '&aカウンターオファーを送信しました！返答をお待ちください...'
+    counter-offer-received: '&e{player} &7が&6カウンターオファー&7を送信しました！'
+  challenge:
+    header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
+    title: '&e&lPVPチャレンジ！'
+    accept-command: '&a/pvp accept {player} &7- 承諾'
+    deny-command: '&c/pvp deny {player} &7- 拒否'
+  response:
+    request-declined-other: '&c{player}があなたのリクエストを断りました！'
+    request-expired: '&cワージャーリクエストは既に期限切れです！'
+    requester-offline: '&cリクエスト者はもうオンラインではありません！'
+  confirmation:
+    select-arena-equipment: '&cアリーナと装備を選択してください！'
+    player-offline: '&cプレイヤーはもうオンラインではありません！'
+    request-sent-header: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+  match-system:
+    arena-load-failed: '&cエラー: アリーナワールドをロードできませんでした！'
+    arena-setup-failed: '&cエラー: アリーナのセットアップに失敗しました！'
+    no-arenas: '&c利用可能なアリーナがありません！'
+    not-enough-money: '&cお金が足りません！'
+    min-wager-not-met: '&c最低賭け額に達していません！ 少なくとも {items} 個のアイテムまたは ${money} が必要です。'
+    not-enough-inventory: '&c相手のアイテムを受け取るインベントリの空きが足りません！'
+    opponent-not-enough-inventory: '&c相手のインベントリに空きが足りません！'
+    arena-loading: '&eアリーナを読み込み中... &7(5秒)'
+    match-starting: '&e&lマッチ開始！'
+    fight-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    fight: '&e&l戦え！'
+    you-lost-header: '&c&l━━━━━━━━━━━━━━━━━━━━━━━'
+    you-lost: '&c&l敗北しました！'
+  debug:
+    enums:
+      level-off: オフ
+      level-basic: 通常
+      level-full: 詳細
+    help:
+      header: '&8&m                    &r &bデバッグコマンド &8&m                    '
+      status: '&e/{label} debug &8- &7現在のステータスを表示'
+      'on': '&e/{label} debug on &8- &7デバッグを有効化 (通常)'
+      on-full: '&e/{label} debug on full &8- &7デバッグを有効化 (詳細)'
+      'off': '&e/{label} debug off &8- &7デバッグを無効化'
+      level-overview: '  &7off = オフ, &aon = 通常, &cfull = 詳細'
+    messages:
+      enabled: '&aデバッグを有効化しました: &e{level}'
+      disabled: '&cデバッグを無効化しました。'
+      unknown-command: '&c不明なコマンド: &e{command}'
+      use-help: '&7ヘルプは &e/{label} debug help &7で表示します。'
+      status-disabled: 無効
+      status-enabled: 有効
+      status-label: '&7ステータス: {status}'
+      level-label: '&7レベル: &e{level}'
+      use-debug-help: '&7すべてのコマンドは &e/{label} debug help &7で確認できます。'
+      status-header: '&8&m                    &r &bデバッグ状態 &8&m                    '
+  livetrade:
+    gui-title: '&6&lPVP Wager &8| &e{opponent}'
+    match-starting: '&e&lマッチを開始します！'
+    items-label: '&7アイテム: &e{count}'
+    money-label: '&7お金: &6${amount}'
+    status-ready: '&a✔ 準備完了'
+    status-waiting: '&c✗ 待機中...'
+    overview-title: '&6&l概要'
+    arena-selected: '&a✔ &fアリーナ: &e{arena}'
+    arena-not-selected: '&c✗ &fアリーナ: &c未選択'
+    equipment-selected: '&a✔ &f装備: &e{equipment}'
+    equipment-not-selected: '&c✗ &f装備: &c未選択'
+    ready-to-confirm: '&a✔ 確認準備完了！'
+    select-arena-equipment: '&c⚠ アリーナと装備を選択'
+    arena-select-title: '&e&l🗺 アリーナを選択'
+    arena-current: '&a現在: &f{arena}'
+    arena-none-selected: '&cアリーナ未選択'
+    arena-left-click: '&e▶ 左クリック: &7次のアリーナ'
+    arena-right-click: '&e▶ 右クリック: &7前のアリーナ'
+    arena-none-available: '&cアリーナがありません！'
+    equipment-select-title: '&b&l⚔ 装備を選択'
+    equipment-current: '&a現在: &f{equipment}'
+    equipment-none-selected: '&c装備未選択'
+    equipment-left-click: '&e▶ 左クリック: &7次の装備'
+    equipment-right-click: '&e▶ 右クリック: &7前の装備'
+    equipment-none-available: '&c装備がありません！'
+    countdown-title: '&a&l⏱ カウントダウン: {seconds}'
+    countdown-match-starts: '&e&lマッチ開始まで:'
+    countdown-seconds: '&6&l{seconds} &e秒'
+    countdown-both-ready: '&a&l両者準備完了！'
+    countdown-fight-soon: '&7間もなく戦闘開始...'
+    status-title: '&7&lステータス'
+    status-both-must-confirm: '&7両プレイヤーの確認が必要'
+    status-waiting-short: '&c✗ 待機中'
+    countdown-bar-info: '&7確認でカウントダウン開始'
+    money-stake: '&7ステーク: &6${amount}'
+    money-left-click: '&e▶ 左クリック: &7+$10'
+    money-right-click: '&e▶ 右クリック: &7-$10'
+    money-shift-left: '&e▶ Shift+左: &7+$100'
+    money-shift-right: '&e▶ Shift+右: &7-$100'
+    money-q-key: '&e▶ Qキー: &7+$1 / Shift+Q: +$1000'
+    economy-not-available: '&cエコノミーが利用できません！'
+    confirm-title-ready: '&a&l✔ {player} 準備完了'
+    confirm-title-wait: '&e&l⬆ 確認'
+    confirm-title-disabled: '&7&l⬆ 確認'
+    confirm-click-to-withdraw: '&7クリックで取り消し'
+    confirm-click-to-confirm: '&eクリックで確認！'
+    confirm-waiting-for: '&7{player}を待っています'
+    confirm-select-first: '&c先にアリーナと装備を選択！'
+    cancel-title: '&c&l✖ キャンセル'
+    cancel-click: '&7クリックでワージャーをキャンセル'
+    cancel-items-returned: '&7全アイテムが返却されます。'
+    max-items-reached: '&c最大アイテム数に達しました (12)！'
+    not-enough-money: '&cお金が足りません！残高: $%balance%'
+    select-arena-equipment-first: '&c先にアリーナと装備を選択してください！'
+    session-started: '&a&lPVP賭けが &e%player% &a&lと開始しました'
+    broadcast-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    broadcast-both-ready: '&e&l両者準備完了！'
+    broadcast-match-starting: '&e&lマッチ開始！'
+    broadcast-change-detected: '&c&l変更検出 - 確認がリセットされました！'
+    broadcast-cancelled: '&c&lPVP賭けがキャンセルされました！'
+    broadcast-error-match-start: '&cマッチ開始エラー。アイテムは返却されました。'
+  system:
+    no-event-open: '&c現在、参加できるイベントはありません。'
+    join-available: '&7参加できるイベント: &a{list}'
+    use-join: '&7使用: &e/event join {subcommand}'
+    available-events: '&6利用可能なイベント:'
+    event-entry: '&7- {status} &e{name} &8(&7/event join {command}&8)'
+    status-active: '&a[開催中]'
+    status-available: '&7[利用可能]'
+    reload-success: '&aすべての設定を再読み込みしました。'
+    no-friendly-fire: '&c味方チームのメンバーは攻撃できません！'
+    title: '&6&lEvent-PVP プラグイン バージョン'
+    current: '&7現在のバージョン: &e{version}'
+    update-available: '&aアップデートがあります！'
+    latest: '&7最新バージョン: &e{version}'
+    download: '&7ダウンロード: &bhttps://modrinth.com/plugin/pqJQdZ6R'
+    up-to-date: '&aプラグインは最新です。'
+    checking: '&7アップデートを確認中...'
+    check-failed: '&cアップデートの確認に失敗しました。詳細はサーバーコンソールを確認してください。'
+    void-protection-teleported: '&7[保護] 安全な場所へテレポートしました。'
+    spectator-mode-only: '&c観戦者はスペクテイターモードのみ使用できます。'
+    cooldown-wait: '&cあと {seconds} 秒お待ちください！'
+    players-only: '&cプレイヤーのみがこのコマンドを使用できます！'
+    unknown-subcommand: '&c不明なサブコマンド: {command}'
+    commands-disabled-event: '&cイベント中はコマンドが使用できません！ 退出するには /event leave を使用してください。'
+    world-access-denied: '&c現在このワールドには入れません。スポーンへテレポートしました。'
+    lobby-world-not-found: '&cエラー: ロビーワールドが見つかりません！'
+    removed-from-event: '&cイベントから除外されました (ロビー／イベントワールドにいませんでした)。'
+    unknown-command: '&c不明なコマンドです: &e{cmd}'
+    player-only: '&cこのコマンドはプレイヤーのみ実行できます。'
+    stranded-rescued: '&a参加していたイベントが終了したため、元の場所に戻しました。'
+  info:
+    header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+    title: '&e&lPVP WAGER - コマンド概要'
+    players-only: '&cこのコマンドはプレイヤーのみ使用できます！'
+    basic-commands:
+      header: '&e&l⚔ 基本コマンド:'
+      pvp: '&7/pvp <プレイヤー> &8- &7戦いを挑む'
+      accept: '&7/pvp accept <プレイヤー> &8- &7挑戦を受け入れる'
+      deny: '&7/pvp deny <プレイヤー> &8- &7挑戦を拒否する'
+      spectate: '&7/pvp spectate <プレイヤー> &8- &7試合を観戦する'
+    match-commands:
+      header: '&c&l⚔ 試合コマンド:'
+      surrender: '&7/surrender &8- &7現在の試合を諦める'
+      draw: '&7/draw &8- &7引き分けを提案する（両者が同意必要）'
+    answer-commands:
+      header: '&a&l📋 応答コマンド:'
+      pvpanswer: '&7/pvpanswer <賭け> <数量> <アリーナ> <装備> &8- &7挑戦に返答する'
+      pvpyes: '&7/pvpyes &8- &7現在の賭けを確認する'
+      pvpno: '&7/pvpno &8- &7現在の賭けを拒否する'
+    examples:
+      header: '&b&l💡 /pvpanswerの例:'
+      money: '&7/pvpanswer money 100 &8- &7$100を賭ける'
+      items: '&7/pvpanswer items &8- &7インベントリのアイテムを賭ける'
+      money-arena: '&7/pvpanswer money 50 nether &8- &7$50を賭けてネザーアリーナを選ぶ'
+      items-full: '&7/pvpanswer items forest diamond &8- &7アイテム + Forest アリーナ
+        + Diamond 装備'
+    notices:
+      header: '&6&l⚠ 重要な注意事項:'
+      world-loading: '&7• &eワールド読み込み &7- 一部のアリーナは事前に読み込みが必要'
+      confirmation: '&7• &e確認 &7- 両プレイヤーが選択を確認する必要がある'
+      safety: '&7• &e安全性 &7- 中断時にすべてのアイテムが返却される'
+    admin:
+      header: '&4&l🔧 管理者コマンド:'
+      reload: '&7/pvpadmin reload &8- &7すべての設定を再読み込み'
+      stop: '&7/pvpadmin stop <プレイヤー> &8- &7プレイヤーの試合を停止'
+      arenas: '&7/pvpadmin arenas &8- &7すべてのアリーナを表示'
+      equipment: '&7/pvpadmin equipment &8- &7すべての装備セットを表示'
+    footer: '&eさらにヘルプが必要？管理者に尋ねるか /help と入力してください'
+  pvpwager:
+    help:
+      title: '&e&lPVP WAGER'
+      usage: '&e/pvpask <プレイヤー>'
+      description1: '&7プレイヤーに賭けリクエストを送信します。'
+      description2: '&7プレイヤーはチャットでリクエストをクリック'
+      description3: '&7するか &e/pvpaccept &7で受け入れることができます。'
+      gui-description1: '&7受け入れるとGUIが開き、'
+      gui-description2: '&7&l両プレイヤーが同時に&7以下を見ることができます:'
+      feature1: '&8• &f各プレイヤーが設定するアイテム'
+      feature2: '&8• &f各プレイヤーが設定するお金'
+      feature3: '&8• &f共有アリーナ選択'
+      feature4: '&8• &f共有装備選択'
+      countdown1: '&7両者が確認すると、'
+      countdown2: '&a&l5秒のカウントダウン &7が始まり試合開始！'
+  command-request:
+    arena: '&7アリーナ: &e{arena}'
+    equipment: '&7装備: &e{equipment}'
+    their-wager-money: '&7相手の賭け金: &e${amount}'
+    their-wager-items: '&7相手の賭けアイテム: &e{items}'
+    expires-in: '&7リクエストは &e60秒 &7で期限切れです'
+    accept-command: '承諾する'
+    deny-command: '拒否'
+    alternative-response: '&7または以下のコマンドで返答:'
+    alternative-command: '&a/pvpanswer <your_wager> <amount> &8[オプション: arena] [equipment]'
+    btn-accept: '&a&l[► 承諾 ◄]'
+    btn-accept-hover: '&aクリックしてリクエストを承諾！'
+    btn-deny: ' &c&l[✖ 拒否]'
+    btn-deny-hover: '&cクリックして拒否'
+    btn-open-gui: '&b&l[📋 GUI を開く]'
+    btn-open-gui-hover: '&aクリックして返答用 GUI を開く'
+    arena-display: '&7アリーナ: &e{arena}'
+    equipment-display: '&7装備: &e{equipment}'
+  commands:
+    pvpdeny:
+      no-permission: '&cこのコマンドの権限がありません！'
+      no-pending-requests: '&c保留中の賭けリクエストがありません！'
+      request-removed-offline: '&7リクエストを削除しました（プレイヤーオフライン）。'
+    pvpaccept:
+      no-permission: '&cこのコマンドの権限がありません！'
+      no-pending-requests: '&c保留中の賭けリクエストがありません！'
+      usage-hint: '&7&e/pvpaccept <プレイヤー> &7で特定のリクエストを承諾できます。'
+      player-offline: '&cプレイヤーはオンラインではありません！'
+    pvprespond:
+      request-expired: '&c賭けリクエストは既に期限切れです！'
+      usage: '&7使い方: &e/pvprespond gui'
+      requester-offline: '&cリクエスト送信者はオンラインではありません！'
+  pvp-wager-gui:
+    counter-offer-title: '&6&lカウンターオファーを作成'
+    counter-offer-info-title: '&e&lカウンターオファー'
+    counter-offer-info-line1: '&7自分の賭けを調整して'
+    counter-offer-info-line2: '&7カウンターオファーを送ります。'
+    counter-offer-info-line3: '&eインベントリのアイテムを'
+    counter-offer-info-line4: '&eクリックすると追加できます。'
+    counter-offer-clear-items-title: '&c&l✖ アイテムをクリア'
+    counter-offer-clear-items-lore: '&7選択したアイテムをすべて外します'
+    counter-offer-clear-money-title: '&c&l✖ お金を 0 に'
+    counter-offer-clear-money-lore: '&7金額を 0 に戻します'
+    counter-offer-remove-hint: '&c右クリックで削除'
+    counter-offer-money-button-lore: '&7クリックして変更'
+    counter-offer-current-stake-label: '&7現在の賭け:'
+    counter-offer-balance-label: '&7所持金: &f${amount}'
+    counter-offer-money-title: '&6&lお金の賭け'
+    counter-offer-already-selected: '&a✓ 選択済み'
+    counter-offer-back-title: '&c&l← キャンセル'
+    counter-offer-back-lore: '&7変更せずに戻る'
+    counter-offer-send-items-label: '&7アイテム: &f{count}'
+    counter-offer-send-money-label: '&7お金: &6${amount}'
+    counter-offer-send-hint: '&aカウンターオファーを送信します！'
+    counter-offer-send-title: '&a&l➤ 送信'
+    no-permission: '&cこのコマンドの権限がありません！'
+    player-offline: '&cプレイヤー &e{player} &cはオンラインではありません！'
+    cannot-challenge-self: '&c自分自身に挑戦することはできません！'
+    already-in-session: '&c既に賭けセッション中です！'
+    target-in-session: '&c{player}は既に賭けセッション中です！'
+    already-in-match: '&c既に戦闘中です！'
+    target-in-match: '&c{player}は既に戦闘中です！'
+    request-pending: '&c既に保留中の賭けリクエストがあります！'
+    request-pending-hint: '&7期限切れまたは拒否されるまでお待ちください。'
+    no-arenas: '&c利用可能なアリーナがありません！'
+    create-arenas-first: '&7まず &e/pvpadmin createarena &7でアリーナを作成してください'
+    no-equipment: '&c利用可能な装備セットがありません！'
+    create-equipment-first: '&7まず &e/pvpadmin createequipment &7で装備を作成してください'
+    request-sent-header: '&e&l賭けリクエスト送信'
+    challenge-sent: '&7&e{player} &7に挑戦しました！'
+    waiting-response: '&7返答を待っています...'
+    request-header: '§e§lPVP賭けリクエスト'
+    challenge-message: '§e{player} §aがあなたと賭けたがっています！'
+    accept-button: '§a§l[► 承諾する ◄]'
+    accept-hover: '§aクリックして賭け GUI を開きます！
+
+      §7そこでアイテム・お金・アリーナ・装備を
+
+      §7一緒に選べます。'
+    deny-button: ' §c§l[✖ 拒否]'
+    deny-hover: '§cクリックしてリクエストを拒否'
+    request-footer: '
+
+
+      §7リクエストは §e60 秒§7で期限切れになります。
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    accept-command: '承諾する'
+    deny-command: '拒否'
+    request-expired-sender: '&c&e{player} &cへの賭けリクエストが期限切れになりました。'
+    request-expired-target: '&c&e{player} &cからの賭けリクエストが期限切れになりました。'
+    both-in-session: '&cプレイヤーの一人が既に賭けセッション中です！'
+    both-in-match: '&cプレイヤーの一人が既に戦闘中です！'
+    session-start-failed: '&c賭けセッションを開始できませんでした！'
+    request-declined-other: '&c{player}があなたの賭けリクエストを拒否しました。'
+    request-declined-self: '&c{player}からの賭けリクエストを拒否しました。'
+    offer-declined-self: '&cオファーを拒否しました。'
+    offer-declined-other: '&c{player} がオファーを拒否しました！'
+    opponent-offline: '&c相手のプレイヤーはオフラインになりました！'
+    already-in-match-self: '&cすでに試合中です！'
+    already-in-match-other: '&c{player} はすでに試合中です！'
+    offer-accepted-self: '&a&lオファーを承諾しました！ 試合を開始します...'
+    offer-accepted-other: '&a&l{player} がオファーを承諾しました！ 試合を開始します...'
+    not-enough-money-other: '&c{player} の所持金が足りません！'
+    max-different-items: '&c異なるアイテムは最大 7 種類までです！'
+    not-enough-money-self: '&c所持金が足りません！'
+    missing-items-self: '&cアイテムがすべて揃っていません！'
+    counter-offer-sent: '&aカウンターオファーを送信しました！ 返答を待っています...'
+    counter-offer-received: '&e{player} &7が &6カウンターオファー&7 を送信しました！'
+    request-cancelled: '&c賭けのリクエストをキャンセルしました。'
+  utility:
+    no-items: 'アイテムなし'
+  match-manager:
+    inventory-session-conflict: '&c別の試合かイベントのインベントリセッションが残っています。試合を開始できません。'
+    inventory-backup-degraded: '&eインベントリをディスクに保存できませんでした。試合が終わるまでメモリ上にのみ保持されます。'
+    inventory-backup-failed-abort: '&c試合は中止されました: インベントリを安全に保存できませんでした。'
+    world-announcement: '&7ワールド: &e{world}'
+    please-wait: '&7少々お待ちください...'
+    arena-loading: '&6&lアリーナ世界読み込み中...'
+    arena-loaded: '&2&l世界の読み込みが成功しました！'
+    arena-load-failed: '&cエラー: アリーナ世界を読み込めませんでした！'
+    arena-teleport-failed: '&cエラー: アリーナへのテレポートに失敗しました！'
+    arena-setup-failed: '&cエラー: アリーナセットアップに失敗しました！'
+    arena-not-exists: '&cエラー: 選択されたアリーナはもう存在しません。'
+    teleport-countdown: '&eアリーナへのテレポートまで &6&l{seconds} &e秒...'
+    match-countdown: '&eマッチ開始まで &6&l{seconds} &e秒！'
+    spectate-header: '
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+      §e§l試合: §f{player1} §7vs §f{player2}
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+
+      '
+    spectate-button: '§b§l[► 観戦 ◄]'
+    spectate-footer: '
+
+
+      §7§e/pvp spectate <プレイヤー>§7 でも観戦できます。
+
+      §6§l━━━━━━━━━━━━━━━━━━━━━━━
+
+      '
+    spectate-simple: '&e新しい試合: &f{player1} &7vs &f{player2} &8- &7&e/pvp spectate
+      {player1} &7で観戦'
+    no-wager-mode: '&7モード: &e賭けなし - お楽しみだけ！'
+    vs-display: '&e{player1} &7vs &e{player2}'
+    match-starting: '&a&lマッチ開始！'
+    arena-display: '&7アリーナ: &e{arena}'
+    equipment-display: '&7装備: &e{equipment}'
+    fight-divider: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
+    fight: '&e&l戦え！'
+    timeout-draw: '&7タイムアウトによりマッチは引き分けで終了しました。'
+    server-shutdown: '&cサーバーシャットダウン！マッチをキャンセルしました。'
+    spectate-hover: '&aクリックして試合を観戦'
+    time-up: '&c&l時間切れ！'
+    match-ends-in: '&e試合はあと &c{seconds} &e秒で終了します！'
+    received-from-opponent-items: '&7相手から受け取り: &e{items}'
+    own-stake-added-items: '&7自分の賭けを追加: &e{items}'
+    received-from-opponent-money: '&7相手から受け取り: &6${amount}'
+    own-stake-added-money: '&7自分の賭けを追加: &6${amount}'
+    you-lost-items: '&7失ったもの: &e{items}'
+    you-lost-money: '&7失ったもの: &6${amount}'
+    better-luck: '&7次回に期待しましょう！'
+    wager-returned: '&7賭けたものが返却されました。'
+    no-wager-items: '&7賭けなしの試合のため、分配するアイテムはありません。'
+    boundaries-warning: '&c試合中はアリーナの境界から出られません！'
+  pvp-listener:
+    disconnected-cancelled: '&e{player} &cが切断しました！ 試合を中止します。'
+    disconnected-win: '&e{player} &cが切断しました！ あなたの勝利です！'
+    spectator-no-attack: '&c観戦者として攻撃することはできません！'
+    match-not-started: '&c試合はまだ始まっていないか、既に終了しています！'
+    draw-double-death: '&a&l引き分け (相打ち)！'
+    both-died-simultaneously: '&7両プレイヤーがほぼ同時に死亡しました。'
+    defeated-by: '&c{player} &7は PvP 試合で &c{killer} &7に敗れました！'
+    died-in-match: '&c{player} &7は PvP 試合で {cause} &7死亡しました！'
+    stopped-spectating: '&7が観戦をやめました。'
+    cause:
+      unknown: '&7原因不明で'
+      fall: '&7落下により'
+      fire: '&7炎の中で'
+      lava: '&7溶岩の中で'
+      drowning: '&7溺れて'
+      suffocation: '&7窒息して'
+      starvation: '&7飢えて'
+      void: '&7奈落で'
+      lightning: '&7落雷により'
+      explosion: '&7爆発により'
+      magic: '&7魔法により'
+      wither: '&7衰弱により'
+      contact: '&7接触により'
+  pvp-accept:
+    player-offline: '&cプレイヤー &e{player} &cはオンラインではありません！'
+    no-request: '&e{player}&cからの賭けリクエストはありません！'
+  pvp-deny:
+    player-offline: '&cプレイヤー &e{player} &cはオンラインではありません！'
+    no-request: '&e{player}&cからの賭けリクエストはありません！'
+  pvp-respond:
+    usage: '&c使用法: /pvprespond gui'
+    no-permission: '&cこのコマンドの権限がありません！'
+  pvp:
+    gui-hint: '&7ヒント: GUI で賭けるには &e/pvpask <プレイヤー> &7を使用'
+  console:
+    dependency-multiverse-missing: 'Multiverse-Coreはワールド管理、クローン、再生成に必須ですが、インストールまたは有効化されていません！プラグインを無効化します。'
+    dependency-vault-missing: 'Vaultは賭けと経済機能に必須ですが、インストールまたは有効化されていません！プラグインを無効化します。'
+    dependency-inventorybackup-missing: 'InventoryBackup (InventoryRestoreプロジェクト)はインベントリ管理に必須ですが、インストールまたは有効化されていません！プラグインを無効化します。'
+    migration-header: '&e--- 設定を現在のバージョンへ移行しました ---'
+    migration-entry: '&e  {entry}'
+    migration-footer: '&e変更した各ファイルの横に <名前>.bak-<タイムスタンプ> のコピーがあります。UPGRADE.md を参照してください。'
+    inventory-provider-legacy-safety: 'インベントリプロバイダー: 保護コピー付きレガシーモード。入れ替えは Multiverse-Inventories が担当し、コピーは InventoryBackup 経由で保存されますが自動復元はされません。'
+    inventory-provider-legacy-degraded: 'レガシーモードですが InventoryBackup の API を利用できないため、保護コピーは保存されていません。現在の保護は Multiverse-Inventories のみです。'
+    inventory-safety-backup-failed: '{player} の保護コピーを保存できませんでした。'
+    inventory-provider-unavailable: 'InventoryBackup の API を利用できません。バックアップなしでインベントリが消えないよう、試合とイベントを拒否します。'
+    inventory-provider-inventoryrestore: 'インベントリプロバイダ: InventoryBackup (API v{version})。'
+    inventory-provider-legacy: 'インベントリプロバイダー: レガシーモード。入れ替えは Multiverse-Inventories が担当し、スナップショットは保存されますが自動復元は行いません。'
+    inventory-provider-missing: 'インベントリ管理は有効ですが、InventoryBackup の API が登録されていません。利用可能になるまでマッチとイベントは拒否されます。バックアップなしでインベントリを消すことはありません。'
+    inventory-provider-invalid: 'settings.inventory-management.provider の値が不明です。''auto'' を使用します。'
+    inventory-provider-old-api: 'InventoryBackup の API は v{running} ですが、このプラグインは v{expected} 向けにビルドされています。新しい呼び出しは利用できません。'
+    inventory-mvinv-conflict-header: 'Multiverse-Inventories が導入されており、このプラグインのインベントリ管理と {count} 個のワールドを共有しています。両方が同時に入れ替えると結果は予測できません。'
+    inventory-mvinv-conflict-entry: '  ワールド ''{world}'' は Multiverse-Inventories のグループ ''{group}'' に次のワールドと一緒に入っています: {partners}。解消するには: {command}'
+    inventory-mvinv-guard-active: '競合ガードは有効です。復元は 1 ティック後に検査され、他のプラグインが上書きしていた場合は再適用されます。上記のワールドグループを解除するほうが根本的な解決です。'
+    inventory-mvinv-guard-inactive: '競合ガードは無効です (settings.inventory-management.multiverse-inventories.conflict-guard)。最後に書き込んだ側が勝ちます。'
+    inventory-mvinv-groups-unreadable: 'Multiverse-Inventories の groups.yml を読み込めませんでした: {error}。競合の診断はできません。'
+    inventory-mvinv-groups-unknown: 'Multiverse-Inventories は導入されていますが、ワールドグループを読み込めませんでした。アリーナ/イベントワールドと衝突するかは不明です。手動で確認してください。'
+    inventory-mvinv-worldchange-recovered: 'セッションが開いている状態で {world} へワールド移動した際、他のプラグインが {player} のインベントリを入れ替えました。セッションの状態を復元しました。'
+    inventory-mvinv-overwrite-recovered: '{player} の復元済みインベントリが他のプラグインに上書きされたため、再適用しました。'
+    inventory-init-failed: 'インベントリ管理を初期化できませんでした: {error}。バックアップなしで続行します。'
+    inventory-backup-failed: '{player} のインベントリバックアップに失敗しました: {error}'
+    inventory-backup-not-persisted: '{player} のインベントリバックアップを書き込めませんでした。再起動をまたいで保持できません。'
+    inventory-restore-failed: '{player} のインベントリ復元に失敗しました: {error}'
+    inventory-restore-degraded: '{player} のインベントリ復元が {reason} を返しました。メモリ上の控えを試します。'
+    inventory-restore-fallback: 'バックアップファイルが使えなかったため、{player} のインベントリをメモリ上の控えから復元しました。'
+    inventory-restore-orphaned: '{player} のインベントリを復元できず、控えも残っていません。セッションは次回起動まで開いたままにします。'
+    inventory-restore-queued: '{player} はオフラインです。次回ログイン時にインベントリを復元します。'
+    inventory-respawn-restore-failed: '{player} のリスポーン後の復元に失敗しました: {reason}'
+    inventory-queue-rejected: '{player} の復元予約がプロバイダーに拒否されました。'
+    inventory-quit-queued: '{player} が試合中に退出しました。インベントリは次回ログイン時に復元されます。'
+    inventory-session-conflict: '{player} には未完了のインベントリセッションがあります。2 つ目のバックアップは 1 つ目を無効にします。'
+    inventory-match-aborted: '試合を中止しました: {player} のインベントリバックアップを書き込めませんでした。'
+    guard-recovery-summary: 'インベントリガード: 未完了セッション {handled} 件を復元、{orphaned} 件が孤立。'
+    guard-recovery-orphans: '{count} 件のインベントリセッションに使えるバックアップがありません。/eventpvp rescue list で確認してください。'
+    guard-backup-missing: '{player} のバックアップ {backup} が見つかりません。セッションを孤立として記録します。'
+    guard-restore-failed: '{player} の保護付き復元に失敗しました: {reason}'
+    guard-entry-invalid: 'inventory-guard.yml に不正なエントリがあり、スキップしました: {entry}'
+    guard-save-failed: 'inventory-guard.yml を書き込めませんでした: {error}'
+    guard-shutdown-open: '{count} 件のインベントリセッションが未完了です。次回起動時に処理します。'
+    plugin-enabled: 'Event-PVP-Plugin が {time} ms で有効化されました: イベント＆PvP-Wager 統合。'
+    plugin-disabled: 'Event-PVP-Plugin が {time} ms で無効化されました。'
+    vault-hooked: 'Vault エコノミーが接続されました: {status}'
+    vault-not-found: 'Vault が見つかりません！マネー賭けは無効化されています。'
+    papi-registered: 'PlaceholderAPI 拡張が登録されました！'
+    pvpmanager-enabled: 'PvPManager 連携が有効化されました！'
+    web-auth-enabled: 'Web認証が有効です。ログインには /eventpvp webtoken を使用してください。'
+    web-disabled: 'Webインターフェースは無効です。'
+    web-started: 'Webサーバーがポート {port} ({auth}) で起動しました。'
+    web-stopped: 'Webサーバーが停止しました。'
+    stats-save-periodic: '定期的な統計情報の保存が完了しました。'
+    stats-save-error: '統計を保存できませんでした: {error}'
+    stats-load-error: '統計を読み込めませんでした: {error}'
+    core-reload: 'コア設定が再読み込みされました。'
+    core-reload-all: 'すべての設定および関連マネージャーが再読み込みされました。'
+    lang-changed: '言語が {lang} に変更されました。'
+    lang-loaded: "言語 '{lang}' のメッセージを読み込みました ({file})"
+    lang-save-error: '言語の保存エラー: {error}'
+    lang-fallback-error: 'フォールバックメッセージを読み込めませんでした: {error}'
+    event-loaded: 'イベントを読み込みました: {event}'
+    event-auto-started: 'オートイベントシステムが開始されました！'
+    event-auto-stopped: 'オートイベントシステムが停止しました！'
+    event-auto-next: '次のオートイベントまで {time} 秒です。'
+    event-auto-no-events: '自動開始できるイベントがありません！'
+    event-auto-not-enough-players: '{event} に必要なオンラインプレイヤーが不足しています ({online}/{min})'
+    event-auto-starting: 'オートイベントを開始します: {event}'
+    world-loading: 'ワールドを読み込み中 (非同期): {world}'
+    world-loaded: 'ワールドが読み込まれました: {world} - {msg}'
+    world-unloading: 'ワールドをアンロード中: {world}'
+    world-load-failed: 'ワールドの読み込みに失敗しました: {world} - {msg}'
+    safe-teleport-player: '[SafeTeleport] {player} を {world} @ {coords} にテレポートします'
+    safe-teleport-fallback: '[SafeTeleport] {player} の保存ワールドが読み込まれていません。メインワールドを使用します。'
+    safe-teleport-no-location: '[SafeTeleport] {player} の保存場所がありません。メインワールドを使用します。'
+    safe-teleport-critical: '[SafeTeleport] 致命的: {player} 用のメインワールドがありません！'
+    safe-respawn-invalid-loc: '[SafeRespawn] {player} の保存場所が無効です！'
+    safe-respawn-unloaded-world: '[SafeRespawn] {player} のワールド {world} は読み込まれていません - メインスポーンを使用します'
+    safe-respawn-wrong-world: '[SafeRespawn-Verify] 致命的: {player} が間違ったワールドにいます！'
+    safe-respawn-distance-warn: '[SafeRespawn-Verify] {player} は想定位置から {distance} ブロック離れています！'
+    safe-respawn-correct: '[SafeRespawn-Verify] 正確 - {player} が {world} @ {coords} にいます (距離: {distance} ブロック)'
+    safe-respawn-correction-failed: '[SafeRespawn-Verify] エラー: {player} の修正テレポートに失敗しました！'
+    safe-respawn-correction-success: '[SafeRespawn-Verify] 修正完了 - {player} は現在 {world} にいます'
+    void-protection-rescued: '[VoidProtection] プレイヤー {player} が無効なワールドの奈落死から救出されました ({reason}) -> メインワールド'
+    void-protection-critical: '[VoidProtection] 致命的: {player} の安全な場所が見つかりませんでした！'
+    backup-created: 'バックアップを作成しました: {file}'
+    backup-skipped: 'バックアップをスキップしました: ワールドフォルダが見つかりません: {world}'
+    backup-failed: 'バックアップに失敗しました: {error}'
+    equipment-loaded: '装備セットを読み込みました: {set}'
+    equipment-all-loaded: '装備を読み込みました: {sets}'
+    equipment-empty-error: '装備グループが見つかりませんでした。'
+    equipment-not-found: "装備グループ '{group}' が見つかりません。利用可能なID: {available}"
+    equipment-lobby-not-found: "ID '{group}' (ロビー) の装備グループが見つかりません。equipment.yml と config.yml を確認してください。"
+    equipment-lobby-retry: '[DEBUG] ロビーでの装備適用が不完全です ({player})。再試行中...'
+    equipment-lobby-still-incomplete: '[DEBUG] ロビーでの装備適用が依然として不完全です ({player})。'
+    equipment-lobby-applied: '[DEBUG] 再試行後、ロビーでの装備適用に成功しました ({player})。'
+    equipment-event-not-found: "ID '{group}' (チーム) の装備グループが見つかりません。equipment.yml と config.yml を確認してください。"
+    equipment-event-retry: '[DEBUG] イベントでの装備適用が不完全です ({player})。再試行中...'
+    equipment-event-still-incomplete: '[DEBUG] イベントでの装備適用が依然として不完全です ({player})。'
+    equipment-event-applied: '[DEBUG] 再試行後、イベントでの装備適用に成功しました ({player})。'
+    stats-queue-error: 'イベント後の統計キュー追加に失敗しました: {error}'
+    update-available-banner: 'アップデートが利用可能です！'
+    update-current-version: '現在のバージョン: {version}'
+    update-latest-version: '最新バージョン: {version}'
+    update-download-url: 'ダウンロード: {url}'
+    update-up-to-date: 'プラグインは最新の状態です ({version})'
+    update-check-failed-http: 'アップデート確認に失敗しました: HTTP {code}'
+    update-check-failed: 'アップデート確認に失敗しました: {error}'
+    update-invalid-response: 'アップデート確認: 応答に使用可能なバージョンがありません'
+    config-save-error: '設定を {file} に保存できませんでした: {error}'
+    admin-reload-failed: '管理者リロードに失敗しました: {error}'
+    livetrade-session-expired: 'PVP 賭けセッションの有効期限が切れました: {session}'
+    zip-error: 'ZIP 圧縮エラー: {error}'
+    livetrade-start-error: 'LiveTrade からのマッチ開始エラー'
+    teleport-error: 'テレポートエラー: {error}'
+    pvp-death-saved: '[PvPDeath] {player} の元の位置を保存しました: {location}'
+    pvp-death-no-location: '[PvPDeath] 警告: {player} の元の位置が見つかりません！'
+    pvp-respawn-unloaded: '[SafeRespawn-PvP] 元のワールドが読み込まれていません: {world} - メインスポーンを使用します'
+    pvp-respawn-no-location: '[SafeRespawn-PvP] {player} の元の位置が見つかりません - メインスポーンを使用します'
+    spectator-recovered: '観戦者 {player} をメインワールドにテレポートしました。'
+    arena-world-loaded: 'ワールドが正常に読み込まれました: {world} - {msg}'
+    arena-clone-reset: 'アリーナワールドのクローンリセットが完了しました: {world}'
+    match-dead-player-gamemode: '[SafeTeleport-PvP] プレイヤー {player} は死亡しています - テレポートは RespawnEvent で処理されます。'
+    match-origin-saved: '[Match] リクエストから {player} の元の位置を保存しました: {location}'
+    match-origin-warning: '[Match] 警告: リクエストに {player} の元の位置がありません'
+    return-entry-invalid: 'player-return-locations.yml の項目が不正です: {entry}'
+    return-save-failed: 'player-return-locations.yml を保存できませんでした: {error}'
+    return-shutdown-open: '{count} 件の帰還位置が未処理です。次回の起動時に適用されます。'
+    return-stale-entries: '{count} 件の帰還位置が {hours} 時間以上残っています。/eventpvp rescue list で確認してください。'
+    guard-stale-sessions: '{count} 件のインベントリセッションが {hours} 時間以上開いています。/eventpvp rescue list で確認してください。'
+    safe-teleport-rejected: '{player} のテレポートが拒否されました。'
+    safe-teleport-drift: '{player} が {world} の目的地に留まりませんでした。1 回の修正後に中止します。'
+    world-unload-aborted: '{world} のアンロードを中止しました: {count} 人を外に出せませんでした。'
+    world-unload-player-stuck: '{player} を {world} から移動できませんでした。'
+    world-unload-player-error: '{player} を {world} から移動中にエラー: {error}'
+    managed-worlds-scan-failed: 'プラグインのワールド一覧を取得できませんでした: {error}'
+    stranded-check-failed: '{player} の取り残し判定に失敗しました: {error} - セッションは進行中として扱います。'
+    stranded-no-target: '取り残された {player} の安全な移動先が見つかりません。'
+    stranded-rescue-failed: '{player} を {world} から救出できませんでした。'
+    stranded-rescued: '{player} を救出しました: {from} -> {to}'
+  rescue:
+    header: '&8&m                    &r &bレスキュー &8&m                    '
+    help-list: '&e/{label} rescue list &8- &7未処理のセッションと帰還位置を表示'
+    help-player: '&e/{label} rescue <プレイヤー> &8- &7インベントリを復元して連れ戻す'
+    help-clean: '&e/{label} rescue clean &8- &7バックアップのない孤立項目を破棄'
+    list-empty: '&a未処理はありません。開いているセッションも保存された位置もありません。'
+    list-sessions: '&7開いているインベントリセッション: &e{count}'
+    list-session-entry: '  &7- &f{player} &8| &e{phase} &8| &7{context} &8| &7{age}'
+    list-returns: '&7保存された帰還位置: &e{count}'
+    list-return-entry: '  &7- &f{player} &8| &7{world} &8| &7{age}'
+    player-offline: '&c{player} はオンラインではありません。レスキューはオンラインのプレイヤーのみ対象です。'
+    inventory-result: '&7{player} のインベントリ: &f{outcome}'
+    teleport-done: '&a{player} を連れ戻しました。'
+    nothing-to-do: '&7{player} に対して行うことはありません。'
+    clean-done: '&a{count} 件の孤立項目を破棄しました。'
+
+

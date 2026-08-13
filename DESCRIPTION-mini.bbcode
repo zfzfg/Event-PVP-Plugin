@@ -1,0 +1,111 @@
+[size=6][b]Event-PVP-Plugin — Quick Overview[/b][/size]
+
+A lightweight, powerful all-in-one Minecraft plugin that unifies [b]custom automated event management[/b] and a [b]PvP wager betting system[/b] with an interactive [b]browser-based web configurator[/b].
+
+[hr]
+
+[size=5][b]What Can You Do?[/b][/size]
+
+[size=4][b]Custom Event System[/b][/size]
+[list]
+[*][b]3 Game Modes[/b]: Solo (Free-For-All), 2-Team, and 3-Team.
+[*][b]4 Win Conditions[/B]: Last Standing, Pickup Item, Kill Count, and Time Survival — combinable with every game mode.
+[*][b]Switchable Lobby Phase[/b]: Run events with an optional pre-event lobby world or teleport directly into the arena.
+[*][b]7 Spawn Types[/b]: Single point, random radius, random area, random cube, multiple spawns, team spawns, and command-based spawns.
+[*][b]Automated Scheduling[/b]: Automatically launch events on intervals with random or sequential rotation.
+[*][b]Custom Rewards & Leaderboards[/b]: Distribute item and command payouts to winners and participants; track stats with PlaceholderAPI, AJLeaderboards, and DecentHolograms.
+[/list]
+
+[size=4][b]PvP Wager System[/b][/size]
+[list]
+[*][b]Betting Mechanics[/b]: Challenge players to duels with money wagers (Vault / VaultUnlocked) or item wagers.
+[*][b]Pre-Configured Equipment Kits[/b]: Design custom armor, weapons, off-hand items, and inventories.
+[*][b]Arena Management[/b]: Multiple custom arena presets with automatic resets and world protection.
+[*][b]Interactive Match Flow[/b]: GUI challenge creation, counter-offers, draw voting, surrendering, and spectator mode.
+[/list]
+
+[size=4][b]Modern Web Configurator[/b][/size]
+[list]
+[*][b]Visual YAML Editor[/b]: Edit [font=courier new]config.yml[/font], [font=courier new]worlds.yml[/font], [font=courier new]equipment.yml[/font], and [font=courier new]web-config.yml[/font] in real time with deep-snapshot precision dirty-tracking.
+[*][b]Dedicated 3-Tab Inventory Manager[/b]: [i]Explorer[/i] (search and inspect backups on an authentic Minecraft canvas with XP bar, restore after a confirmation prompt), [i]Sessions[/i] (live crash-guard sessions), and [i]Settings[/i].
+[*][b]Multiverse World Management[/b]: Create, import, load, unload, delete (with safety checks), and backup/restore worlds directly in the browser.
+[*][b]Server Item Textures[/b]: Optionally extracts and displays custom item textures from your server resource pack (off by default); ~1650 vanilla item icons ship with the plugin, no internet required.
+[*][b]Secure Token Login[/b]: Access the panel via one-time tokens ([font=courier new]/eventpvp webtoken[/font]) with per-IP rate limiting; restores are additionally capped at 10 per minute.
+[*][b]Web Server Settings[/b]: Configurable port with pre-save safety warning dialog, bind address for reverse-proxy setups, and a public URL with automatic [font=courier new]{port}[/font] substitution.
+[/list]
+
+[size=4][b]Crash Protection & Inventory Safety[/b][/size]
+[list]
+[*][b]Powered by [font=courier new]InventoryBackup[/font][/b]: Full automatic backup before every teleport and restore on match/event end, respawn, or rejoin.
+[*][b]Anti-Strand Recovery[/b]: Players stranded in an arena or event world after a server crash/disconnect are returned safely on reconnect via [font=courier new]player-return-locations.yml[/font].
+[*][b]Persistent Payout Queue[/b]: Queues wager winnings and event rewards for players who disconnect before payout.
+[/list]
+
+[size=4][b]100% Multilingual (7 Languages)[/b][/size]
+[list]
+[*]Fully translated in [b]English[/b], [b]German[/b], [b]Spanish[/b], [b]French[/b], [b]Japanese[/b], [b]Polish[/b], and [b]Russian[/b] with 100% key parity (1097 keys).
+[*]Full console and logger localization via [font=courier new]messages.console.*[/font].
+[*]Automatic fallback to embedded English defaults for missing custom keys.
+[/list]
+
+[hr]
+
+[size=5][b]Quick Start & Dependencies[/b][/size]
+
+[size=4][b]1. Requirements[/b][/size]
+[list]
+[*][b]Server[/b]: Paper / Spigot [b]1.19+[/b], Java 17+ — in practice [b]1.20+[/b], because the mandatory InventoryBackup requires it.
+[*][b]Mandatory Plugins[/b]:
+  [list]
+  [*][url=https://modrinth.com/project/3wmN97b8]Multiverse-Core[/url] (v4 or v5)
+  [*][url=https://modrinth.com/project/ayRaM8J7]VaultUnlocked[/url] — recommended; the classic [url=https://www.spigotmc.org/resources/vault.34315/]Vault[/url] from SpigotMC also works
+  [*][url=https://modrinth.com/project/rpKY25cW]InventoryBackup[/url]
+  [/list]
+[*][b]Optional Integrations[/b]: PlaceholderAPI, AJLeaderboards, DecentHolograms, PvPManager
+[/list]
+
+[size=4][b]2. Setup[/b][/size]
+[list=1]
+[*]Put [font=courier new]Event-PVP-Plugin.jar[/font], [font=courier new]Multiverse-Core[/font], [font=courier new]VaultUnlocked[/font] (or [font=courier new]Vault[/font]), and [font=courier new]InventoryBackup[/font] into your [font=courier new]plugins/[/font] folder.
+[*]Start the server (configurations migrate automatically).
+[*]Run [font=courier new]/eventpvp webtoken[/font] in-game to log into the web interface and start customizing!
+[/list]
+
+[size=4][b]3. Upgrading from 1.0.8[/b][/size]
+[list=1]
+[*][b]Stop the server.[/b]
+[*][b]Install the new mandatory plugins first[/b]: [font=courier new]Multiverse-Core[/font] and [font=courier new]InventoryBackup[/font] were optional or non-existent in 1.0.8. If one is missing, Spigot will not load the plugin at all ([font=courier new]Unknown dependency ...[/font] in the log).
+[*][b]Replace the jar[/b], then start the server. [font=courier new]config.yml[/font], [font=courier new]worlds.yml[/font], [font=courier new]equipment.yml[/font], [font=courier new]web-config.yml[/font], and your language file migrate automatically; a [font=courier new]<file>.bak-<timestamp>[/font] copy is written before every change and your own values are never overwritten.
+[*][b]Clean up your permission plugin[/b]: [font=courier new]eventpvp.inventory.restore[/font] and [font=courier new]eventpvp.inventory.restore.any[/font] no longer exist.
+[*][b]Check for Multiverse-Inventories[/b]: running it in parallel on event/arena worlds causes inventory loss — either exclude those worlds or set [font=courier new]settings.inventory-management.provider: "none"[/font].
+[*][b]Review the migration log block[/b] printed on first start, and see [b]UPGRADE.md[/b] for the full details (including how to roll back to 1.0.8).
+[/list]
+
+[hr]
+
+[size=5][b]Essential Commands[/b][/size]
+
+[size=4][b]For Players[/b][/size]
+[code]
+/event join <name>            - Join an event
+/event leave                  - Leave the current event
+/event list                   - View available events
+/pvpask <player>              - Send a PvP challenge via GUI
+/pvpaccept | /pvpdeny         - Accept or decline challenges
+/surrender | /draw            - Surrender or vote for a draw in a match
+/pvp spectate <player>        - Spectate an ongoing PvP duel
+[/code]
+
+[size=4][b]For Admins[/b][/size]
+[code]
+/eventpvp webtoken            - Generate a secure web interface token
+/eventpvp rescue <list|player|clean> - Manage and rescue stuck players
+/eventpvp reload              - Reload all configurations and language bundles
+/eventpvp debug <on|on full|off|status> - Toggle persistent debug logging
+/event start <name>           - Start an event
+/event stop <name>            - Stop an event
+/event forcestart <name>      - Skip the remaining join countdown
+/inv <player>                 - Inspect and restore player backups (provided by InventoryBackup)
+[/code]
+
+[quote]The reversed order [font=courier new]/event <name> join|leave|start|stop|forcestart[/font] works as well.[/quote]

@@ -1,0 +1,234 @@
+[CENTER][SIZE=6][B]Changelog[/B][/SIZE][/CENTER]
+
+[SIZE=5][B][[COLOR=#5b9bd5]1.0.9[/COLOR]] - 2026-08-11[/B][/SIZE]
+[HR][/HR]
+
+[SIZE=4][COLOR=#57bb57][B]» Added & Highlight Features[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]Integrated Inventory Management via InventoryBackup (Required Dependency):[/B]
+  [LIST]
+  [*]Replaced legacy snapshot files with [ICODE]InventoryBackup[/ICODE] ([ICODE]InventoryBackup.jar[/ICODE] from InventoryRestore)
+  [*]Automatic backups taken before match/event teleports and restored on match/event end, respawn, or rejoin
+  [*]Crash-safe [ICODE]inventory-guard.yml[/ICODE] journal ensuring players never lose items across crashes
+  [/LIST]
+[*][B]Player Location Safety & Stranded Player Protection:[/B]
+  [LIST]
+  [*]Synchronously persisted return positions in [ICODE]player-return-locations.yml[/ICODE]
+  [*]Automatic return for players stranded in event/arena worlds on join when no match is active
+  [*]Unified [ICODE]SafeLocationResolver[/ICODE] preventing void teleports and world unload traps
+  [*]New admin rescue command: [ICODE]/eventpvp rescue (list|<player>|clean)[/ICODE]
+  [*]Offline payout queue in [ICODE]pending-payouts.yml[/ICODE] for event rewards and wager winnings
+  [/LIST]
+[*][B]Web Interface Enhancements & Multiverse World Management:[/B]
+  [LIST]
+  [*]Full Multiverse world management from the web panel (create, import, load, unload, delete with safety checks, and backup/restore)
+  [*]Dedicated 3-tab Inventory Manager (Backup Explorer, Minecraft Canvas inventory & XP renderer, 2-stage restores, live guard monitor)
+  [*]Server Resource Pack item texture integration via [ICODE]ResourcePackTextureService[/ICODE]
+  [*]Dynamic Server Material & Enchantment catalog via [ICODE]/api/materials[/ICODE]
+  [*]Deep-snapshot dirty-state tracking ([ICODE]CONFIG_BASELINE[/ICODE] & [ICODE]isDeepEqual[/ICODE]) eliminating false-positive unsaved change flags
+  [*]Configurable Public URL with transparent [ICODE]:{port}[/ICODE] binding for dynamic [ICODE]/eventpvp webtoken[/ICODE] resolution
+  [*]Pre-save safety confirmation warning dialog before changing the web server port
+  [*]Rate limiting protection against token brute-force and restore abuse
+  [/LIST]
+[*][B]Zero Hardcoded Messages & True i18n Localization:[/B]
+  [LIST]
+  [*]100% key parity across all 7 language bundles (1097 keys per [ICODE]messages_*.yml[/ICODE], 764 keys per [ICODE]web/lang/*.json[/ICODE])
+  [*]Fully localized console and logger output across all 7 languages via [ICODE]messages.console.*[/ICODE]
+  [*]Embedded resource default fallback system preventing raw key displays on partial translation files
+  [*]Automated quality & localization test suite ([ICODE]tools/i18n_audit.py[/ICODE]) with 0 findings across rules D1–D11
+  [/LIST]
+[*][B]Streamlined Debug Mode & World Management Switches:[/B]
+  [LIST]
+  [*]Persistent 3-state debug system: [ICODE]/eventpvp debug (on | on full | off | status)[/ICODE] saved to [ICODE]settings.debug[/ICODE]
+  [*]Decoupled world loading into [ICODE]settings.world-management.events[/ICODE] and [ICODE]settings.world-management.arenas[/ICODE]
+  [*]Automatic config migration rewriting obsolete 1.0.8 settings in place on first start
+  [/LIST]
+[/LIST]
+
+[SIZE=4][COLOR=#e8a838][B]» Changed & Removed[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]Hard Dependencies:[/B] [ICODE]Multiverse-Core[/ICODE] (v4 or v5) and [ICODE]InventoryBackup[/ICODE] are now mandatory in [ICODE]plugin.yml[/ICODE] alongside [ICODE]Vault[/ICODE]
+[*][B]Removed Command:[/B] [ICODE]/inventoryrestore[/ICODE] and permissions [ICODE]eventpvp.inventory.restore*[/ICODE] (replaced by [ICODE]/inv <player>[/ICODE] and Web Panel)
+[*][B]New Permissions:[/B] [ICODE]eventpvp.admin.web[/ICODE], [ICODE]eventpvp.debug[/ICODE], [ICODE]eventpvp.debug.receive[/ICODE], [ICODE]pvpwager.spectate.all[/ICODE], [ICODE]pvpwager.nowager[/ICODE]
+[/LIST]
+
+[HR][/HR]
+
+[SIZE=5][B][[COLOR=#5b9bd5]1.0.7[/COLOR]] - 2026-05-24[/B][/SIZE]
+[HR][/HR]
+
+[SIZE=4][COLOR=#e8a838][B]» Geändert[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]Code Refactoring:[/B] Removed the wrapper class [ICODE]de.zfzfg.pvpwager.utils.MultiverseHelper.java[/ICODE]
+[*]The Multiverse functionality now uses the central [ICODE]de.zfzfg.core.world.MultiverseHelper[/ICODE] class directly
+[*]This change simplifies the codebase by removing an unnecessary abstraction layer
+[/LIST]
+
+[SIZE=4][COLOR=#57bb57][B]» Hinzugefügt[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]Version Check Command:[/B] Added [ICODE]/epvp version[/ICODE] and [ICODE]/eventpvp version[/ICODE] commands
+  [LIST]
+  [*]Requires [ICODE]eventpvp.admin[/ICODE] permission (same as reload/debug)
+  [*]Displays current plugin version
+  [*]Triggers update check and shows update status
+  [*]Shows download link if update is available
+  [*]Added to help menu and tab completion
+  [/LIST]
+[*][B]Command Cooldown System:[/B] Integrated [ICODE]CommandCooldownManager[/ICODE] into the main plugin
+  [LIST]
+  [*]Applied to [ICODE]/pvp challenge[/ICODE] command with 3-second default cooldown
+  [*]Includes memory leak prevention with automatic player cleanup on quit
+  [*]Customizable cooldown messages via message provider
+  [/LIST]
+[*][B]Web Server Rate Limiting:[/B] Added rate limiting to the embedded HTTP server
+  [LIST]
+  [*]Prevents API abuse with per-IP rate counters (100 requests per window)
+  [*][COLOR=#e8a838][B]Note:[/B][/COLOR] Rate limit counters are not automatically cleared - may require future cleanup mechanism
+  [*]Improves security and stability of the web interface
+  [/LIST]
+[*][B]Text Utility Performance:[/B] Added color caching to [ICODE]TextUtil[/ICODE]
+  [LIST]
+  [*]Caches colored text to improve performance
+  [*]Reduces redundant color code processing
+  [*][COLOR=#e8a838][B]Note:[/B][/COLOR] Cache has no size limit - may require monitoring for memory usage with many unique messages
+  [/LIST]
+[*][B]Improved Task Management:[/B] Enhanced countdown task handling in [ICODE]MatchManager[/ICODE]
+  [LIST]
+  [*]Changed from single task to task list for better management
+  [*]Allows multiple concurrent countdown operations
+  [/LIST]
+[*][B]Memory Management:[/B] Added player cleanup method to prevent memory leaks
+  [LIST]
+  [*][ICODE]CommandCooldownManager.removePlayer()[/ICODE] called on player quit
+  [*]Ensures proper cleanup of player-specific data
+  [/LIST]
+[*][B]Update Reminder System:[/B] Added automatic update checking via Modrinth API
+  [LIST]
+  [*]Checks for newer plugin versions on server startup with configurable delay
+  [*]Notifies admins with [ICODE]eventpvp.admin.updatenotify[/ICODE] permission on join
+  [*]Console logging when updates are available
+  [*]Caching mechanism to prevent repeated API calls
+  [*]Configurable via [ICODE]settings.update-check[/ICODE] in config.yml
+  [*]Supports all languages: German, English, Spanish, French, Japanese, Polish, Russian
+  [*]Includes proper User-Agent header for Modrinth API compliance
+  [*]SemVer-based version comparison
+  [*]Uses Modrinth project ID [ICODE]pqJQdZ6R[/ICODE]
+  [/LIST]
+[/LIST]
+
+[SIZE=4][COLOR=#e05252][B]» Gefixt[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]Missing Help Message Keys:[/B] Fixed YAML key collision causing help messages to be missing
+  [LIST]
+  [*]Root cause: Multiple duplicate [ICODE]help:[/ICODE] sections in YAML files caused key collision (YAML only keeps last instance)
+  [*]Renamed sections to [ICODE]event-help:[/ICODE], [ICODE]pvp-help:[/ICODE], and [ICODE]command-help:[/ICODE] in all language files
+  [*]Updated [ICODE]EventCommand.java[/ICODE] to use [ICODE]event-help.[/ICODE] prefix for all help message lookups
+  [*]Fixed [ICODE]/event help[/ICODE] command showing raw message keys instead of actual text
+  [*]Applied to all languages: German, English, Spanish, French, Japanese, Polish, and Russian
+  [/LIST]
+[*][B]Incorrect Command Documentation:[/B] Updated PvP help to show correct command syntax
+  [LIST]
+  [*]Changed [ICODE]/pvp <spieler>[/ICODE] to [ICODE]/pvpask <spieler>[/ICODE] in all language files
+  [*]Updated [ICODE]help.challenge[/ICODE] entries to reference the correct command with Wager-GUI hint
+  [*]Applied to all languages with appropriate translations
+  [/LIST]
+[*][B]Win/Loss Screen Placeholders:[/B] Fixed YAML key collision causing win/loss messages to show as placeholders
+  [LIST]
+  [*]Root cause: Multiple duplicate [ICODE]match:[/ICODE] sections in YAML files caused key collision
+  [*]Renamed sections to [ICODE]match-display:[/ICODE], [ICODE]match-system:[/ICODE], and [ICODE]match-manager:[/ICODE] in all language files
+  [*]Updated [ICODE]MatchManager.java[/ICODE] [ICODE]getMsg()[/ICODE] method to route keys to correct YAML section based on key name
+  [*]Fixed [ICODE]you-won-header[/ICODE], [ICODE]you-won[/ICODE], [ICODE]you-lost-header[/ICODE], and [ICODE]you-lost[/ICODE] keys not being found
+  [*]Applied to all language files
+  [/LIST]
+[*][B]Draw Vote Expiration Bug:[/B] Fixed "expired" message showing after draw is accepted
+  [LIST]
+  [*]Added [ICODE]match.isDrawVoteActive()[/ICODE] check in [ICODE]DrawSubCommand.java[/ICODE] timeout task
+  [*]Prevents showing expired message when draw vote has already been accepted and deactivated
+  [*]Resolves race condition where timeout task fires after draw acceptance
+  [/LIST]
+[*][B]Update Checker Version Parsing:[/B] Fixed version comparison failing with non-numeric suffixes
+  [LIST]
+  [*]Updated [ICODE]UpdateChecker.java[/ICODE] to extract numeric part before parsing (e.g., [ICODE]"1.0.6-Multilingual" -> "1.0.6"[/ICODE])
+  [*]Prevents [ICODE]NumberFormatException[/ICODE] when comparing versions with suffixes like [ICODE]-Multilingual[/ICODE]
+  [/LIST]
+[*][B]Error Handling Improvements:[/B] Added logging to all previously empty catch blocks
+  [LIST]
+  [*][ICODE]MatchManager[/ICODE]: Added warning logs for task cancellation failures, snapshot save errors, and statistics recording failures
+  [*][ICODE]EventSession[/ICODE]: Added warning logs for task cleanup failures, inventory snapshot errors, and health/food level setting errors
+  [*][ICODE]EquipmentManager[/ICODE]: Added warning logs for allowed worlds parsing errors
+  [*][ICODE]PvpStatsStorage[/ICODE]: Added warning logs for UUID parsing errors
+  [*][ICODE]SpawnManager[/ICODE]: Added warning logs for teleport fallback failures
+  [*][ICODE]RequestManager[/ICODE] & [ICODE]CommandRequestManager[/ICODE]: Added warning logs for task cancellation errors
+  [*][ICODE]InventorySnapshotStorage[/ICODE]: Added comment for regex error handling (expected fallback behavior)
+  [/LIST]
+[*][B]Enum Switch Completeness:[/B] Added missing [ICODE]COMMAND[/ICODE] case to spawn type switch in [ICODE]EventSession[/ICODE]
+  [LIST]
+  [*]Resolves compiler warning about unhandled enum constant
+  [*]Delegates to [ICODE]executeSpawnCommand()[/ICODE] method for command-based spawning
+  [/LIST]
+[*][B]Material Caching:[/B] Added material name cache to [ICODE]EquipmentManager[/ICODE]
+  [LIST]
+  [*]Caches [ICODE]Material.valueOf()[/ICODE] lookups to avoid repeated parsing
+  [*]Cache is cleared on equipment reload to ensure consistency
+  [/LIST]
+[*][B]Enchantment Caching:[/B] Added enchantment cache to [ICODE]EquipmentManager[/ICODE]
+  [LIST]
+  [*]Caches [ICODE]Registry.ENCHANTMENT.get()[/ICODE] lookups for enchantment names
+  [*]Cache is cleared on equipment reload to ensure consistency
+  [/LIST]
+[*][B]HashMap Cloning Reduction:[/B] Replaced defensive copies with unmodifiable views
+  [LIST]
+  [*][ICODE]MatchManager.getMatches()[/ICODE] now returns [ICODE]Collections.unmodifiableMap()[/ICODE]
+  [*][ICODE]StatsManager.toMap()[/ICODE] now returns [ICODE]Collections.unmodifiableMap()[/ICODE]
+  [*]Reduces memory allocation for admin/debug commands
+  [/LIST]
+[/LIST]
+
+[SIZE=4][COLOR=#aa7fce][B]» Deprecated[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]PvPAcceptCommand:[/B] Marked as deprecated
+  [LIST]
+  [*]Users should use [ICODE]/pvp accept[/ICODE] instead
+  [*]Old command kept for backward compatibility
+  [/LIST]
+[/LIST]
+
+[SIZE=4][COLOR=#888888][B]» Technische Details[/B][/COLOR][/SIZE]
+
+[LIST]
+[*]The old wrapper class at [ICODE]src/main/java/de/zfzfg/pvpwager/utils/MultiverseHelper.java[/ICODE] has been removed
+[*]Code that previously used the wrapper now imports and uses [ICODE]de.zfzfg.core.world.MultiverseHelper[/ICODE] directly
+[*]This refactoring improves code maintainability and reduces complexity
+[*]Various code cleanups and optimizations across multiple files
+[*]Improved command registration with helper method in [ICODE]EventPlugin[/ICODE]
+[/LIST]
+
+[SIZE=4][COLOR=#888888][B]» Kompatibilität[/B][/COLOR][/SIZE]
+
+[LIST]
+[*]No breaking changes for end users
+[*]All existing functionality remains intact
+[*]Plugin configuration and commands work exactly as before
+[*]Deprecated commands continue to function but users should migrate to new syntax
+[/LIST]
+
+[SIZE=4][COLOR=#e8a838][B]» Upgrade Hinweise[/B][/COLOR][/SIZE]
+
+[QUOTE][B]Language Files:[/B] Language files are NOT automatically replaced when updating the plugin. If you have customized language files ([ICODE]messages_*.yml[/ICODE]), you need to delete them from the plugin data folder and restart the server to let the plugin regenerate them with the new update notification messages, then manually reapply your customizations.[/QUOTE]
+
+[HR][/HR]
+
+[SIZE=5][B][[COLOR=#888888]1.0.6-Multilingual[/COLOR]] - Previous Version[/B][/SIZE]
+
+[LIST]
+[*]Multilingual support for German, English, Spanish, French, Japanese, Polish, and Russian
+[*]Event and PvP wager system integration
+[*]Web interface for configuration
+[*]Multiverse-Core integration for world management
+[/LIST]
