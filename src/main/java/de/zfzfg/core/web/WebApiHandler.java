@@ -1087,30 +1087,18 @@ public class WebApiHandler {
         return response;
     }
 
-    // Cached reflection objects for TPS retrieval
-    private static java.lang.reflect.Method cachedGetServerMethod;
-    private static java.lang.reflect.Field cachedRecentTpsField;
-    private static boolean tpsReflectionFailed = false;
-
     /**
      * Berechnet die Server-TPS (Ticks per Second)
      */
     private double getTps() {
-        if (tpsReflectionFailed) return 20.0;
         try {
-            if (cachedGetServerMethod == null) {
-                cachedGetServerMethod = plugin.getServer().getClass().getMethod("getServer");
+            double[] tps = org.bukkit.Bukkit.getServer().getTPS();
+            if (tps != null && tps.length > 0) {
+                return Math.round(Math.min(20.0, tps[0]) * 100.0) / 100.0;
             }
-            Object server = cachedGetServerMethod.invoke(plugin.getServer());
-            if (cachedRecentTpsField == null) {
-                cachedRecentTpsField = server.getClass().getField("recentTps");
-            }
-            double[] recentTps = (double[]) cachedRecentTpsField.get(server);
-            return Math.round(recentTps[0] * 100.0) / 100.0;
-        } catch (Exception e) {
-            tpsReflectionFailed = true;
-            return 20.0; // Default TPS
+        } catch (Throwable ignored) {
         }
+        return 20.0;
     }
 
     /**
