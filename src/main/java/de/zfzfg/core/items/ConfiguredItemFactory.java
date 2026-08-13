@@ -358,6 +358,16 @@ public final class ConfiguredItemFactory {
         return material;
     }
 
+    static int parseAmount(String raw, int def, int maxStack) {
+        if (raw == null || raw.isBlank()) return def;
+        try {
+            int parsed = Integer.parseInt(raw.trim());
+            return Math.max(1, Math.min(parsed, maxStack));
+        } catch (NumberFormatException e) {
+            return def;
+        }
+    }
+
     static String normalizeEnchantKey(String raw) {
         if (raw == null || raw.isBlank()) return null;
         String key = raw.trim().toLowerCase(Locale.ROOT);
