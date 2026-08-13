@@ -31,6 +31,8 @@ class MvWorldInputValidationTest {
         assertThrows(MvInputException.class, () -> MvWorldService.requireValidWorldName("world/../.."));
         assertThrows(MvInputException.class, () -> MvWorldService.requireValidWorldName("foo\\bar"));
         assertThrows(MvInputException.class, () -> MvWorldService.requireValidWorldName("world.dat"));
+        assertThrows(MvInputException.class, () -> MvWorldService.requireValidWorldName("world;rm -rf /"));
+        assertThrows(MvInputException.class, () -> MvWorldService.requireValidWorldName("world\nkill"));
     }
 
     @Test

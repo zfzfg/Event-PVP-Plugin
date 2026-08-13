@@ -69,5 +69,7 @@ class TextureOverridePathTest {
         assertFalse(ResourcePackTextureService.isValidOverrideFileName("DIAMOND_SWORD.png\0"));
         assertFalse(ResourcePackTextureService.isValidOverrideFileName("DIAMOND\nSWORD.png"));
         assertFalse(ResourcePackTextureService.isValidOverrideFileName("DIAMOND SWORD.png"));
+        assertFalse(ResourcePackTextureService.isValidOverrideFileName("DIAMOND\r\nSWORD.png"));
+        assertFalse(ResourcePackTextureService.isValidOverrideFileName("DIAMOND_SWORD.PNG"));
     }
 }
