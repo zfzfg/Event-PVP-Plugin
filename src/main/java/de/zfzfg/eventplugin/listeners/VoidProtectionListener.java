@@ -7,6 +7,7 @@ import de.zfzfg.pvpwager.models.MatchState;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -198,7 +199,12 @@ public class VoidProtectionListener implements Listener {
             
             // Schaden heilen falls nötig
             if (player.getHealth() < 4) {
-                player.setHealth(Math.min(player.getHealth() + 10, player.getMaxHealth()));
+                double maxHealth = 20.0;
+                var attr = player.getAttribute(Attribute.MAX_HEALTH);
+                if (attr != null) {
+                    maxHealth = attr.getValue();
+                }
+                player.setHealth(Math.min(player.getHealth() + 10, maxHealth));
             }
             
             player.sendMessage(org.bukkit.ChatColor.translateAlternateColorCodes('&', 
@@ -217,11 +223,6 @@ public class VoidProtectionListener implements Listener {
      */
     private Location findSafeLocation(Player player) {
         return plugin.getSafeLocations().resolve(player);
-    }
-
-    /** Ob eine Location benutzbar ist. Delegiert an die gemeinsame Pruefung. */
-    private boolean isLocationSafe(Location loc) {
-        return plugin.getSafeLocations().isSafe(loc);
     }
 
     /**
