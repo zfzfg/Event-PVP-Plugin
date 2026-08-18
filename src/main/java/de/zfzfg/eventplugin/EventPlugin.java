@@ -340,7 +340,7 @@ public class EventPlugin extends JavaPlugin {
         // === Update-Check ===
         // Der Checker wird immer angelegt, damit /eventpvp version ihn benutzen
         // kann; nur der Abruf beim Start haengt an der Konfiguration.
-        updateChecker = new UpdateChecker(this, getPluginMeta().getVersion(),
+        updateChecker = new UpdateChecker(this, getDescription().getVersion(),
                 configManager.getModrinthProjectId());
         if (configManager.isUpdateCheckEnabled() && configManager.shouldCheckOnStartup()) {
             updateChecker.checkForUpdates();

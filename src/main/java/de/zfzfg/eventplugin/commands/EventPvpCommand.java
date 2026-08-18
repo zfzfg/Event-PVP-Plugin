@@ -192,7 +192,7 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage("");
         
         // Current version
-        String currentVersion = plugin.getPluginMeta().getVersion();
+        String currentVersion = plugin.getDescription().getVersion();
         sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("current", "version", currentVersion)));
         
         final UpdateChecker checker = plugin.getUpdateChecker();

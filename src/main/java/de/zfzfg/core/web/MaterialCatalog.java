@@ -299,12 +299,13 @@ final class MaterialCatalog {
 
     @SuppressWarnings("deprecation")
     private static boolean isTreasure(Enchantment enchantment) {
-        try {
-            var tagValues = Registry.ENCHANTMENT.getTagValues(io.papermc.paper.registry.keys.tags.EnchantmentTagKeys.TREASURE);
-            if (tagValues != null) {
-                return tagValues.contains(enchantment);
-            }
-        } catch (Throwable ignored) {
+        if (de.zfzfg.core.util.Platform.isPaper()) {
+            try {
+                Boolean paperResult = PaperRegistryHelper.isTreasure(enchantment);
+                if (paperResult != null) {
+                    return paperResult;
+                }
+            } catch (Throwable ignored) {}
         }
         try {
             return enchantment.isTreasure();
@@ -315,12 +316,13 @@ final class MaterialCatalog {
 
     @SuppressWarnings("deprecation")
     private static boolean isCursed(Enchantment enchantment) {
-        try {
-            var tagValues = Registry.ENCHANTMENT.getTagValues(io.papermc.paper.registry.keys.tags.EnchantmentTagKeys.CURSE);
-            if (tagValues != null) {
-                return tagValues.contains(enchantment);
-            }
-        } catch (Throwable ignored) {
+        if (de.zfzfg.core.util.Platform.isPaper()) {
+            try {
+                Boolean paperResult = PaperRegistryHelper.isCursed(enchantment);
+                if (paperResult != null) {
+                    return paperResult;
+                }
+            } catch (Throwable ignored) {}
         }
         try {
             return enchantment.isCursed();
