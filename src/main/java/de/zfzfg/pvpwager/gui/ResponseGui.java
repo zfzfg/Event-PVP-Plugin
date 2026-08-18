@@ -44,7 +44,7 @@ public class ResponseGui extends AbstractWagerGui {
     
     @Override
     public void open() {
-        inventory = Bukkit.createInventory(null, SIZE,
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, SIZE,
             de.zfzfg.core.util.Text.of(t("response.title")));
         
         buildLayout();
@@ -84,8 +84,8 @@ public class ResponseGui extends AbstractWagerGui {
             if (sender != null && sender.isOnline()) {
                 meta.setOwningPlayer(sender);
             }
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("response.challenge-from")));
-            meta.lore(java.util.Arrays.asList(
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(t("response.challenge-from")));
+            de.zfzfg.core.util.ItemUtil.setLore(meta, java.util.Arrays.asList(
                 de.zfzfg.core.util.Text.ofItem("&f&l" + incomingRequest.getSender().getName()),
                 de.zfzfg.core.util.Text.ofItem(""),
                 de.zfzfg.core.util.Text.ofItem(t("response.challenge-subtitle"))

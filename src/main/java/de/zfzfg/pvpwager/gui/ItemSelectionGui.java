@@ -47,7 +47,7 @@ public class ItemSelectionGui extends AbstractWagerGui {
     
     @Override
     public void open() {
-        inventory = Bukkit.createInventory(null, SIZE, 
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, SIZE, 
             de.zfzfg.core.util.Text.of(t("items-title")));
         
         buildLayout();
@@ -141,10 +141,10 @@ public class ItemSelectionGui extends AbstractWagerGui {
     private void addRemoveLore(ItemStack item) {
         org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<net.kyori.adventure.text.Component> lore = meta.hasLore() ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+            List<net.kyori.adventure.text.Component> lore = de.zfzfg.core.util.ItemUtil.getLore(meta);
             lore.add(net.kyori.adventure.text.Component.empty());
             lore.add(de.zfzfg.core.util.Text.ofItem(t("item-selection.remove-lore")));
-            meta.lore(lore);
+            de.zfzfg.core.util.ItemUtil.setLore(meta, lore);
             item.setItemMeta(meta);
         }
     }
@@ -152,10 +152,10 @@ public class ItemSelectionGui extends AbstractWagerGui {
     private void addClickToAddLore(ItemStack item) {
         org.bukkit.inventory.meta.ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            List<net.kyori.adventure.text.Component> lore = meta.hasLore() ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+            List<net.kyori.adventure.text.Component> lore = de.zfzfg.core.util.ItemUtil.getLore(meta);
             lore.add(net.kyori.adventure.text.Component.empty());
             lore.add(de.zfzfg.core.util.Text.ofItem(t("item-selection.add-lore")));
-            meta.lore(lore);
+            de.zfzfg.core.util.ItemUtil.setLore(meta, lore);
             item.setItemMeta(meta);
         }
     }

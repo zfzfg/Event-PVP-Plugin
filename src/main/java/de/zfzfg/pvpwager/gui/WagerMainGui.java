@@ -35,7 +35,7 @@ public class WagerMainGui extends AbstractWagerGui {
     @Override
     public void open() {
         // Erstelle 6-Reihen Inventar
-        inventory = Bukkit.createInventory(null, 54, 
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, 54, 
             de.zfzfg.core.util.Text.of(t("wager-title", "target", session.getTargetName())));
         
         // Fülle Hintergrund
@@ -68,8 +68,8 @@ public class WagerMainGui extends AbstractWagerGui {
             if (target != null) {
                 meta.setOwningPlayer(target);
             }
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("challenge-to-title")));
-            meta.lore(Arrays.asList(
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(t("challenge-to-title")));
+            de.zfzfg.core.util.ItemUtil.setLore(meta, Arrays.asList(
                 de.zfzfg.core.util.Text.ofItem(t("challenge-to-player", "player", session.getTargetName())),
                 de.zfzfg.core.util.Text.ofItem(""),
                 de.zfzfg.core.util.Text.ofItem(t("challenge-to-line1")),

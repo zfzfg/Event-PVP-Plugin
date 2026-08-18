@@ -70,7 +70,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
     
     @Override
     public void open() {
-        inventory = Bukkit.createInventory(null, SIZE,
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, SIZE,
             de.zfzfg.core.util.Text.of(plugin.getCoreConfigManager().getMessages().getString("messages.pvp-wager-gui.counter-offer-title", "&6&lCreate Counter Offer")));
         
         buildLayout();
@@ -129,10 +129,10 @@ public class CounterOfferItemGui extends AbstractWagerGui {
                 // Lore hinzufügen für Entfernen-Hinweis
                 ItemMeta meta = display.getItemMeta();
                 if (meta != null) {
-                    List<net.kyori.adventure.text.Component> lore = meta.hasLore() ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+                    List<net.kyori.adventure.text.Component> lore = de.zfzfg.core.util.ItemUtil.getLore(meta);
                     lore.add(net.kyori.adventure.text.Component.empty());
                     lore.add(de.zfzfg.core.util.Text.ofItem(t("counter-offer-remove-hint")));
-                    meta.lore(lore);
+                    de.zfzfg.core.util.ItemUtil.setLore(meta, lore);
                     display.setItemMeta(meta);
                 }
                 inventory.setItem(slot, display);
@@ -191,10 +191,10 @@ public class CounterOfferItemGui extends AbstractWagerGui {
                 if (alreadySelected) {
                     ItemMeta meta = display.getItemMeta();
                     if (meta != null) {
-                        List<net.kyori.adventure.text.Component> lore = meta.hasLore() ? new ArrayList<>(meta.lore()) : new ArrayList<>();
+                        List<net.kyori.adventure.text.Component> lore = de.zfzfg.core.util.ItemUtil.getLore(meta);
                         lore.add(net.kyori.adventure.text.Component.empty());
                         lore.add(de.zfzfg.core.util.Text.ofItem(t("counter-offer-already-selected")));
-                        meta.lore(lore);
+                        de.zfzfg.core.util.ItemUtil.setLore(meta, lore);
                         display.setItemMeta(meta);
                     }
                 }
@@ -365,7 +365,7 @@ public class CounterOfferItemGui extends AbstractWagerGui {
         
         // Vergleiche wichtige Meta-Eigenschaften (ohne Lore die wir hinzugefügt haben)
         if (metaA.hasDisplayName() != metaB.hasDisplayName()) return false;
-        if (metaA.hasDisplayName() && !metaA.displayName().equals(metaB.displayName())) return false;
+        if (metaA.hasDisplayName() && !java.util.Objects.equals(de.zfzfg.core.util.ItemUtil.getDisplayName(metaA), de.zfzfg.core.util.ItemUtil.getDisplayName(metaB))) return false;
         if (!metaA.getEnchants().equals(metaB.getEnchants())) return false;
         
         return true;

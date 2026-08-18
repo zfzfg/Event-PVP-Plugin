@@ -57,7 +57,7 @@ public class NegotiationGui extends AbstractWagerGui {
     @Override
     public void open() {
         String title = isSender ? t("negotiation.title-sender") : t("negotiation.title-target");
-        inventory = Bukkit.createInventory(null, SIZE, de.zfzfg.core.util.Text.of(title));
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, SIZE, de.zfzfg.core.util.Text.of(title));
         
         buildLayout();
         openInventory();
@@ -142,8 +142,8 @@ public class NegotiationGui extends AbstractWagerGui {
         org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) head.getItemMeta();
         if (meta != null && opponent != null) {
             meta.setOwningPlayer(opponent);
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("negotiation.opponent-title", "player", opponent.getName())));
-            meta.lore(java.util.Arrays.asList(
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(t("negotiation.opponent-title", "player", opponent.getName())));
+            de.zfzfg.core.util.ItemUtil.setLore(meta, java.util.Arrays.asList(
                 de.zfzfg.core.util.Text.ofItem(""),
                 de.zfzfg.core.util.Text.ofItem(t("negotiation.opponent-lore1")),
                 de.zfzfg.core.util.Text.ofItem(t("negotiation.opponent-lore2"))
@@ -186,8 +186,8 @@ public class NegotiationGui extends AbstractWagerGui {
         org.bukkit.inventory.meta.SkullMeta meta = (org.bukkit.inventory.meta.SkullMeta) head.getItemMeta();
         if (meta != null) {
             meta.setOwningPlayer(player);
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("negotiation.you-title", "player", player.getName())));
-            meta.lore(java.util.Arrays.asList(
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(t("negotiation.you-title", "player", player.getName())));
+            de.zfzfg.core.util.ItemUtil.setLore(meta, java.util.Arrays.asList(
                 de.zfzfg.core.util.Text.ofItem(""),
                 de.zfzfg.core.util.Text.ofItem(t("negotiation.you-lore"))
             ));

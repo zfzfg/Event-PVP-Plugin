@@ -124,7 +124,7 @@ public class LiveTradeGui {
     }
     
     public void open() {
-        inventory = Bukkit.createInventory(null, 54, de.zfzfg.core.util.Text.of(getMsg("gui-title", "opponent", tradePlayer.getOtherPlayer().getPlayer().getName())));
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, 54, de.zfzfg.core.util.Text.of(getMsg("gui-title", "opponent", tradePlayer.getOtherPlayer().getPlayer().getName())));
         
         // GUI aufbauen
         buildGui();
@@ -222,7 +222,7 @@ public class LiveTradeGui {
         SkullMeta meta1 = (SkullMeta) head1.getItemMeta();
         if (meta1 != null) {
             meta1.setOwningPlayer(player1.getPlayer());
-            meta1.displayName(de.zfzfg.core.util.Text.ofItem("&a&l" + player1.getPlayer().getName()));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta1, de.zfzfg.core.util.Text.ofItem("&a&l" + player1.getPlayer().getName()));
             List<net.kyori.adventure.text.Component> lore1 = new ArrayList<>();
             lore1.add(net.kyori.adventure.text.Component.empty());
             lore1.add(de.zfzfg.core.util.Text.ofItem(getMsg("items-label", "count", String.valueOf(player1.getWagerItemCount()))));
@@ -231,7 +231,7 @@ public class LiveTradeGui {
             lore1.add(player1.hasConfirmed() ? 
                 de.zfzfg.core.util.Text.ofItem(getMsg("status-ready")) : 
                 de.zfzfg.core.util.Text.ofItem(getMsg("status-waiting")));
-            meta1.lore(lore1);
+            de.zfzfg.core.util.ItemUtil.setLore(meta1, lore1);
             head1.setItemMeta(meta1);
         }
         inventory.setItem(PLAYER1_HEAD_SLOT, head1);
@@ -241,7 +241,7 @@ public class LiveTradeGui {
         SkullMeta meta2 = (SkullMeta) head2.getItemMeta();
         if (meta2 != null) {
             meta2.setOwningPlayer(player2.getPlayer());
-            meta2.displayName(de.zfzfg.core.util.Text.ofItem("&c&l" + player2.getPlayer().getName()));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta2, de.zfzfg.core.util.Text.ofItem("&c&l" + player2.getPlayer().getName()));
             List<net.kyori.adventure.text.Component> lore2 = new ArrayList<>();
             lore2.add(net.kyori.adventure.text.Component.empty());
             lore2.add(de.zfzfg.core.util.Text.ofItem(getMsg("items-label", "count", String.valueOf(player2.getWagerItemCount()))));
@@ -250,7 +250,7 @@ public class LiveTradeGui {
             lore2.add(player2.hasConfirmed() ? 
                 de.zfzfg.core.util.Text.ofItem(getMsg("status-ready")) : 
                 de.zfzfg.core.util.Text.ofItem(getMsg("status-waiting")));
-            meta2.lore(lore2);
+            de.zfzfg.core.util.ItemUtil.setLore(meta2, lore2);
             head2.setItemMeta(meta2);
         }
         inventory.setItem(PLAYER2_HEAD_SLOT, head2);
@@ -872,7 +872,7 @@ public class LiveTradeGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(" "));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(" "));
             item.setItemMeta(meta);
         }
         return item;
@@ -882,9 +882,9 @@ public class LiveTradeGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(name));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(name));
             if (lore.length > 0) {
-                meta.lore(java.util.Arrays.stream(lore).map(de.zfzfg.core.util.Text::ofItem).toList());
+                de.zfzfg.core.util.ItemUtil.setLore(meta, java.util.Arrays.stream(lore).map(de.zfzfg.core.util.Text::ofItem).toList());
             }
             item.setItemMeta(meta);
         }
@@ -895,9 +895,9 @@ public class LiveTradeGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(name));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(name));
             if (lore != null && !lore.isEmpty()) {
-                meta.lore(lore.stream().map(de.zfzfg.core.util.Text::ofItem).toList());
+                de.zfzfg.core.util.ItemUtil.setLore(meta, lore.stream().map(de.zfzfg.core.util.Text::ofItem).toList());
             }
             item.setItemMeta(meta);
         }

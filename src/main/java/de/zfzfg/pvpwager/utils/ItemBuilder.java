@@ -24,7 +24,7 @@ public class ItemBuilder {
     public ItemBuilder setName(String name) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.ofItem(name));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, Text.ofItem(name));
             item.setItemMeta(meta);
         }
         return this;
@@ -37,7 +37,7 @@ public class ItemBuilder {
     public ItemBuilder setLore(List<String> lore) {
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.lore(lore.stream().map(Text::ofItem).toList());
+            de.zfzfg.core.util.ItemUtil.setLoreFromStrings(meta, lore);
             item.setItemMeta(meta);
         }
         return this;

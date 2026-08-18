@@ -141,12 +141,12 @@ public final class ConfiguredItemFactory {
 
         String displayName = section.getString(prefix + "-name");
         if (displayName != null && !displayName.isEmpty()) {
-            meta.displayName(Text.ofItem(displayName));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, Text.ofItem(displayName));
         }
 
         List<String> lore = section.getStringList(prefix + "-lore");
         if (!lore.isEmpty()) {
-            meta.lore(lore.stream().map(Text::ofItem).toList());
+            de.zfzfg.core.util.ItemUtil.setLoreFromStrings(meta, lore);
         }
 
         applyEnchantments(item, meta, section.getStringList(prefix + "-enchantments"), logger, context);
@@ -195,12 +195,12 @@ public final class ConfiguredItemFactory {
 
         String displayName = source.string("name");
         if (displayName != null && !displayName.isEmpty()) {
-            meta.displayName(Text.ofItem(displayName));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, Text.ofItem(displayName));
         }
 
         List<String> lore = source.strings("lore");
         if (!lore.isEmpty()) {
-            meta.lore(lore.stream().map(Text::ofItem).toList());
+            de.zfzfg.core.util.ItemUtil.setLoreFromStrings(meta, lore);
         }
 
         applyEnchantments(item, meta, source.strings("enchantments"), logger, context);

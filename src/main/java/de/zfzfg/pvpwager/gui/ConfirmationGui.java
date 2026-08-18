@@ -38,7 +38,7 @@ public class ConfirmationGui extends AbstractWagerGui {
     
     @Override
     public void open() {
-        inventory = Bukkit.createInventory(null, SIZE,
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, SIZE,
             de.zfzfg.core.util.Text.of(t("confirmation-title")));
         
         buildLayout();
@@ -80,8 +80,8 @@ public class ConfirmationGui extends AbstractWagerGui {
             if (target != null) {
                 meta.setOwningPlayer(target);
             }
-            meta.displayName(de.zfzfg.core.util.Text.ofItem(t("confirmation.target-title")));
-            meta.lore(java.util.Arrays.asList(
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, de.zfzfg.core.util.Text.ofItem(t("confirmation.target-title")));
+            de.zfzfg.core.util.ItemUtil.setLore(meta, java.util.Arrays.asList(
                 de.zfzfg.core.util.Text.ofItem(t("confirmation.target-player", "player", session.getTargetName())),
                 de.zfzfg.core.util.Text.ofItem(""),
                 de.zfzfg.core.util.Text.ofItem(t("confirmation.target-line1")),

@@ -51,7 +51,7 @@ public class MoneySelectionGui extends AbstractWagerGui {
     
     @Override
     public void open() {
-        inventory = Bukkit.createInventory(null, SIZE, 
+        inventory = de.zfzfg.core.util.GuiUtil.createInventory(null, SIZE, 
             de.zfzfg.core.util.Text.of(t("money-title")));
         
         buildLayout();

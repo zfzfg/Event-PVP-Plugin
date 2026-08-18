@@ -82,7 +82,7 @@ public abstract class AbstractWagerGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.ofItem(" "));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, Text.ofItem(" "));
             item.setItemMeta(meta);
         }
         return item;
@@ -95,9 +95,9 @@ public abstract class AbstractWagerGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.ofItem(name));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, Text.ofItem(name));
             if (lore.length > 0) {
-                meta.lore(Arrays.stream(lore).map(Text::ofItem).toList());
+                de.zfzfg.core.util.ItemUtil.setLore(meta, Arrays.stream(lore).map(Text::ofItem).toList());
             }
             item.setItemMeta(meta);
         }
@@ -111,9 +111,9 @@ public abstract class AbstractWagerGui {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.ofItem(name));
+            de.zfzfg.core.util.ItemUtil.setDisplayName(meta, Text.ofItem(name));
             if (lore != null && !lore.isEmpty()) {
-                meta.lore(lore.stream().map(Text::ofItem).toList());
+                de.zfzfg.core.util.ItemUtil.setLore(meta, lore.stream().map(Text::ofItem).toList());
             }
             item.setItemMeta(meta);
         }
@@ -292,6 +292,6 @@ public abstract class AbstractWagerGui {
         if (item == null) return false;
         
         ItemMeta meta = item.getItemMeta();
-        return meta != null && meta.hasDisplayName() && " ".equals(Text.plain(Text.toLegacy(meta.displayName())));
+        return meta != null && meta.hasDisplayName() && " ".equals(Text.plain(de.zfzfg.core.util.ItemUtil.getDisplayName(meta)));
     }
 }

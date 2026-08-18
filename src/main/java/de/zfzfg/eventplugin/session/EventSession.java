@@ -1892,7 +1892,7 @@ plugin.getEventManager().removeSession(config.getId());
                             java.time.Duration.ofMillis(stay * 50L),
                             java.time.Duration.ofMillis(fadeOut * 50L))));
         } else {
-            player.sendTitle(TextUtil.color(title), TextUtil.color(subtitle), fadeIn, stay, fadeOut);
+            player.sendTitle(de.zfzfg.core.util.TextUtil.color(title), de.zfzfg.core.util.TextUtil.color(subtitle), fadeIn, stay, fadeOut);
         }
     }
     
