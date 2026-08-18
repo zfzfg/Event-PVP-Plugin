@@ -5,6 +5,15 @@
     // teilweise, wodurch rund 175 Falschmeldungen entstehen ("needs unchecked
     // conversion to conform to '@NonNull ...'", "Potential null pointer access" auf
     // Werten, die nie null sind). Maven/javac melden davon nichts - es ist reine
-    // Editor-Anzeige. Deshalb aus.
-    "java.compile.nullAnalysis.mode": "disabled"
+    "java.compile.nullAnalysis.mode": "disabled",
+    "java.import.exclusions": [
+        "**/node_modules/**",
+        "**/.metadata/**",
+        "**/archetype-resources/**",
+        "**/META-INF/maven/**",
+        "**/old-files/**"
+    ],
+    "files.watcherExclude": {
+        "**/old-files/**": true
+    }
 }

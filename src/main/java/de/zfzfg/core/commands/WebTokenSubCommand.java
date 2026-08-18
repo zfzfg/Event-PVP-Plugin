@@ -64,6 +64,7 @@ public class WebTokenSubCommand extends SubCommand {
         return "§c[missing: " + key + "]"; // i18n-ignore: missing key fallback marker
     }
     
+    @SuppressWarnings("unused")
     private String msg(String key, String placeholder, String value) {
         String msg = msg(key);
         String val = value != null ? value : "";
