@@ -5,6 +5,7 @@ import de.zfzfg.eventplugin.manager.TeamManager;
 import de.zfzfg.eventplugin.model.EventConfig;
 import de.zfzfg.eventplugin.model.EquipmentGroup;
 import de.zfzfg.core.util.Text;
+import de.zfzfg.core.util.TextUtil;
 import de.zfzfg.eventplugin.util.ColorUtil;
 import org.bukkit.*;
 import org.bukkit.entity.Firework;
@@ -1871,30 +1872,13 @@ plugin.getEventManager().removeSession(config.getId());
         for (UUID uuid : validParticipants) {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                showTitle(player, title, subtitle, 10, 40, 10);
+                TextUtil.sendTitle(player, title, subtitle, 10, 40, 10);
             }
         }
     }
     
     private void sendTitleToPlayer(Player player, String title, String subtitle) {
-        showTitle(player, title, subtitle, 10, 60, 10);
-    }
-
-    @SuppressWarnings("deprecation")
-    private static void showTitle(Player player, String title, String subtitle,
-                                  int fadeIn, int stay, int fadeOut) {
-        if (player == null) return;
-        if (de.zfzfg.core.util.Platform.isPaper()) {
-            player.showTitle(net.kyori.adventure.title.Title.title(
-                    Text.of(title),
-                    Text.of(subtitle),
-                    net.kyori.adventure.title.Title.Times.times(
-                            java.time.Duration.ofMillis(fadeIn * 50L),
-                            java.time.Duration.ofMillis(stay * 50L),
-                            java.time.Duration.ofMillis(fadeOut * 50L))));
-        } else {
-            player.sendTitle(de.zfzfg.core.util.TextUtil.color(title), de.zfzfg.core.util.TextUtil.color(subtitle), fadeIn, stay, fadeOut);
-        }
+        TextUtil.sendTitle(player, title, subtitle, 10, 60, 10);
     }
     
     private void playSound(Sound sound, float volume, float pitch) {

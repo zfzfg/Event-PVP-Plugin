@@ -58,4 +58,22 @@ public final class Platform {
     public static boolean isPurpur() {
         return IS_PURPUR;
     }
+
+    /**
+     * Gibt die Plugin-Version plattformunabhängig zurück.
+     */
+    @SuppressWarnings("deprecation")
+    public static String getPluginVersion(org.bukkit.plugin.Plugin plugin) {
+        if (plugin == null) return "";
+        return plugin.getDescription().getVersion();
+    }
+
+    /**
+     * Gibt den Plugin-Namen plattformunabhängig zurück.
+     */
+    @SuppressWarnings("deprecation")
+    public static String getPluginName(org.bukkit.plugin.Plugin plugin) {
+        if (plugin == null) return "";
+        return plugin.getDescription().getName();
+    }
 }

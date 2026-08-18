@@ -75,4 +75,31 @@ public class TextUtil {
             player.sendMessage(Text.toLegacy(message));
         }
     }
+
+    /**
+     * Sendet einen Titel plattformunabhängig an einen Spieler.
+     * Auf Paper/Purpur wird Adventure Title mit RGB genutzt, auf Spigot die Bukkit-Titelmethode.
+     */
+    @SuppressWarnings("deprecation")
+    public static void sendTitle(Player player, String title, String subtitle, int fadeIn, int stay, int fadeOut) {
+        if (player == null) return;
+        if (Platform.isPaper()) {
+            player.showTitle(net.kyori.adventure.title.Title.title(
+                    Text.of(title != null ? title : ""),
+                    Text.of(subtitle != null ? subtitle : ""),
+                    net.kyori.adventure.title.Title.Times.times(
+                            java.time.Duration.ofMillis(fadeIn * 50L),
+                            java.time.Duration.ofMillis(stay * 50L),
+                            java.time.Duration.ofMillis(fadeOut * 50L))));
+        } else {
+            player.sendTitle(color(title), color(subtitle), fadeIn, stay, fadeOut);
+        }
+    }
+
+    /**
+     * Sendet einen Titel mit Standard-Timing (10 Ticks FadeIn, 60 Ticks Stay, 10 Ticks FadeOut).
+     */
+    public static void sendTitle(Player player, String title, String subtitle) {
+        sendTitle(player, title, subtitle, 10, 60, 10);
+    }
 }
