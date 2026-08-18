@@ -284,7 +284,7 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         Component tokenComponent = Text.of("  &a&l➤ " + token + " " + getWebtokenMsg("click-to-copy"))
             .clickEvent(ClickEvent.copyToClipboard(token))
             .hoverEvent(HoverEvent.showText(Text.of(getWebtokenMsg("hover-copy"))));
-        player.sendMessage(tokenComponent);
+        de.zfzfg.core.util.TextUtil.send(player, tokenComponent);
         
         player.sendMessage("");
         player.sendMessage(ColorUtil.color(getWebtokenMsg("valid-for", "minutes", "10")));
@@ -299,7 +299,7 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
             url,
             getWebtokenMsg("hover-open")
         );
-        player.sendMessage(urlComponent);
+        de.zfzfg.core.util.TextUtil.send(player, urlComponent);
         
         player.sendMessage(ColorUtil.color("&8&m                                                &r"));
         player.sendMessage("");

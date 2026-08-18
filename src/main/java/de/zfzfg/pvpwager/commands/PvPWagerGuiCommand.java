@@ -220,9 +220,9 @@ public class PvPWagerGuiCommand implements CommandExecutor, TabCompleter {
             Component footer = Text.of(getGuiMsg("request-footer"));
             
             // An Target senden
-            target.sendMessage(message.append(acceptButton).append(denyButton).append(footer));
+            de.zfzfg.core.util.TextUtil.send(target, message.append(acceptButton).append(denyButton).append(footer));
             
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // Fallback
             MessageUtil.sendMessage(target, "");
             MessageUtil.sendMessage(target, "&6&l━━━━━━━━━━━━━━━━━━━━━━━");

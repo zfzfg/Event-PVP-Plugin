@@ -855,9 +855,9 @@ public class MatchManager {
             for (Player online : Bukkit.getOnlinePlayers()) {
                 // Don't send to match participants; they already see match messages
                 if (online.equals(p1) || online.equals(p2)) continue;
-                online.sendMessage(fullMessage);
+                de.zfzfg.core.util.TextUtil.send(online, fullMessage);
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             // Fallback simple broadcast
             for (Player online : Bukkit.getOnlinePlayers()) {
                 Player p1 = match.getPlayer1();

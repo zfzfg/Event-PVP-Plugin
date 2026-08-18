@@ -111,7 +111,7 @@ public class WebTokenSubCommand extends SubCommand {
         Component tokenComponent = Text.of("  §a§l➤ " + token + " " + msg("click-to-copy"))
             .clickEvent(ClickEvent.copyToClipboard(token))
             .hoverEvent(HoverEvent.showText(Text.of(msg("hover-copy"))));
-        player.sendMessage(tokenComponent);
+        TextUtil.send(player, tokenComponent);
         
         player.sendMessage("");
         player.sendMessage(msg("valid-for", "minutes", String.valueOf(authManager.getTokenValidityMinutes())));
@@ -129,7 +129,7 @@ public class WebTokenSubCommand extends SubCommand {
             url,
             msg("hover-open")
         );
-        player.sendMessage(urlComponent);
+        TextUtil.send(player, urlComponent);
         
         player.sendMessage("§8§m                                                §r");
         player.sendMessage("");

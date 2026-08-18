@@ -39,18 +39,40 @@ public class TextUtil {
     }
 
     public static void send(CommandSender sender, String message) {
-        if (sender == null) return;
-        sender.sendMessage(Text.of(message));
+        if (sender == null || message == null) return;
+        if (Platform.isPaper()) {
+            sender.sendMessage(Text.of(message));
+        } else {
+            sender.sendMessage(color(message));
+        }
     }
 
     public static void send(Player player, String message) {
-        if (player == null) return;
-        player.sendMessage(Text.of(message));
+        if (player == null || message == null) return;
+        if (Platform.isPaper()) {
+            player.sendMessage(Text.of(message));
+        } else {
+            player.sendMessage(color(message));
+        }
     }
 
     /** Direktversand einer fertigen Component. */
     public static void send(CommandSender sender, Component message) {
         if (sender == null || message == null) return;
-        sender.sendMessage(message);
+        if (Platform.isPaper()) {
+            sender.sendMessage(message);
+        } else {
+            sender.sendMessage(Text.toLegacy(message));
+        }
+    }
+
+    /** Direktversand einer fertigen Component an einen Player. */
+    public static void send(Player player, Component message) {
+        if (player == null || message == null) return;
+        if (Platform.isPaper()) {
+            player.sendMessage(message);
+        } else {
+            player.sendMessage(Text.toLegacy(message));
+        }
     }
 }

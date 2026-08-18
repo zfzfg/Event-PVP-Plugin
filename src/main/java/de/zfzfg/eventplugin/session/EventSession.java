@@ -1882,13 +1882,18 @@ plugin.getEventManager().removeSession(config.getId());
 
     private static void showTitle(Player player, String title, String subtitle,
                                   int fadeIn, int stay, int fadeOut) {
-        player.showTitle(net.kyori.adventure.title.Title.title(
-                Text.of(title),
-                Text.of(subtitle),
-                net.kyori.adventure.title.Title.Times.times(
-                        java.time.Duration.ofMillis(fadeIn * 50L),
-                        java.time.Duration.ofMillis(stay * 50L),
-                        java.time.Duration.ofMillis(fadeOut * 50L))));
+        if (player == null) return;
+        if (de.zfzfg.core.util.Platform.isPaper()) {
+            player.showTitle(net.kyori.adventure.title.Title.title(
+                    Text.of(title),
+                    Text.of(subtitle),
+                    net.kyori.adventure.title.Title.Times.times(
+                            java.time.Duration.ofMillis(fadeIn * 50L),
+                            java.time.Duration.ofMillis(stay * 50L),
+                            java.time.Duration.ofMillis(fadeOut * 50L))));
+        } else {
+            player.sendTitle(TextUtil.color(title), TextUtil.color(subtitle), fadeIn, stay, fadeOut);
+        }
     }
     
     private void playSound(Sound sound, float volume, float pitch) {

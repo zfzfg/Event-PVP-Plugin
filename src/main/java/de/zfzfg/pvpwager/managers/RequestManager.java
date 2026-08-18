@@ -74,8 +74,8 @@ public class RequestManager {
             );
             Component footer = Text.of(getMsg("request.footer"));
             
-            target.sendMessage(message.append(acceptButton).append(denyButton).append(footer));
-        } catch (Exception e) {
+            de.zfzfg.core.util.TextUtil.send(target, message.append(acceptButton).append(denyButton).append(footer));
+        } catch (Throwable e) {
             // Fallback to simple message if chat components fail
             MessageUtil.sendMessage(target, 
                 plugin.getPvpConfigManager().getMessage("request.received", "player", sender.getName()));

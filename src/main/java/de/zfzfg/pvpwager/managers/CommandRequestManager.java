@@ -143,8 +143,8 @@ public class CommandRequestManager {
                 Component accept = Text.button(getMsg("btn-accept"), "/pvp accept " + request.getSender().getName(), getMsg("btn-accept-hover"));
                 Component deny = Text.button(getMsg("btn-deny"), "/pvp deny " + request.getSender().getName(), getMsg("btn-deny-hover"));
 
-                target.sendMessage(accept.append(Component.space()).append(deny));
-            } catch (Exception ignored) {
+                de.zfzfg.core.util.TextUtil.send(target, accept.append(Component.space()).append(deny));
+            } catch (Throwable ignored) {
                 // Fallback to plain text
                 MessageUtil.sendMessage(target, "&a/pvp accept " + request.getSender().getName() + " &7- " + getMsg("accept-command")); // i18n-ignore
                 MessageUtil.sendMessage(target, "&c/pvp deny " + request.getSender().getName() + " &7- " + getMsg("deny-command")); // i18n-ignore
@@ -158,8 +158,8 @@ public class CommandRequestManager {
                 Component guiBtn = Text.button(getMsg("btn-open-gui"), "/pvprespond gui", getMsg("btn-open-gui-hover"));
                 Component denyBtn = Text.button(getMsg("btn-deny"), "/pvp deny " + request.getSender().getName(), getMsg("btn-deny-hover"));
 
-                target.sendMessage(guiBtn.append(Component.space()).append(denyBtn));
-            } catch (Exception ignored) {
+                de.zfzfg.core.util.TextUtil.send(target, guiBtn.append(Component.space()).append(denyBtn));
+            } catch (Throwable ignored) {
                 // Fallback
             }
             MessageUtil.sendMessage(target, "");
