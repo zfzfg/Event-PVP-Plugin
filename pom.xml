@@ -3,7 +3,7 @@
 
   <groupId>de.zfzfg</groupId>
   <artifactId>event-pvp-plugin</artifactId>
-  <version>1.1.0-beta</version>
+  <version>1.1.0</version>
   <name>Event-PVP-Plugin</name>
   <description>Kombiniertes Event- und PvP-Wager-Plugin</description>
 
