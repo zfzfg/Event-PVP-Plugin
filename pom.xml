@@ -49,14 +49,35 @@
     <!--
       Purpur-API 26.2 (Superset von Paper- und Bukkit-API) - passend zum Zielserver
       C:\Users\zfzfg\Documents\servers\purpur-26-2 (Build 2618).
-      Bringt Adventure 5.2.0 transitiv mit; deshalb ist hier KEINE eigene
-      net.kyori-Dependency noetig und auch nicht erwuenscht (siehe P1.5).
     -->
     <dependency>
       <groupId>org.purpurmc.purpur</groupId>
       <artifactId>purpur-api</artifactId>
       <version>${purpur.api.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <!--
+      Adventure-Dependencies (compile scope + relocation im Shade-Plugin),
+      damit das Plugin auch auf Spigot-Servern (wo Adventure im Server fehlt)
+      vollstaendig lauffaehig ist.
+    -->
+    <dependency>
+      <groupId>net.kyori</groupId>
+      <artifactId>adventure-api</artifactId>
+      <version>5.2.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.kyori</groupId>
+      <artifactId>adventure-text-serializer-legacy</artifactId>
+      <version>5.2.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.kyori</groupId>
+      <artifactId>adventure-text-serializer-plain</artifactId>
+      <version>5.2.0</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.github.MilkBowl</groupId>
@@ -176,7 +197,6 @@
             <configuration>
               <artifactSet>
                 <excludes>
-                  <exclude>net.kyori:*</exclude>
                   <exclude>org.purpurmc.purpur:*</exclude>
                   <exclude>io.papermc.paper:*</exclude>
                   <exclude>org.spigotmc:*</exclude>
@@ -185,6 +205,10 @@
                 </excludes>
               </artifactSet>
               <relocations>
+                <relocation>
+                  <pattern>net.kyori</pattern>
+                  <shadedPattern>de.zfzfg.eventplugin.libs.kyori</shadedPattern>
+                </relocation>
                 <relocation>
                   <pattern>de.zfzfg.pvpwager</pattern>
                   <shadedPattern>de.zfzfg.eventplugin.pvp</shadedPattern>
