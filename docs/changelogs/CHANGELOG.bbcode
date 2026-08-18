@@ -1,5 +1,42 @@
 [CENTER][SIZE=6][B]Changelog[/B][/SIZE][/CENTER]
 
+[SIZE=5][B][[COLOR=#5b9bd5]1.1.0[/COLOR]] - 2026-08-18[/B][/SIZE]
+[HR][/HR]
+
+[SIZE=4][COLOR=#57bb57][B]» Highlights & Major Features[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]Full Dual-Platform Compatibility (Purpur 26.2 & Spigot 26.2):[/B]
+  [LIST]
+  [*]Dynamic runtime platform detection ([ICODE]Platform.java[/ICODE]) optimizing performance for Paper/Purpur while guaranteeing 100% crash-free fallback on vanilla Spigot.
+  [*]Shaded & relocated Kyori Adventure 5.2.0 library ([ICODE]de.zfzfg.eventplugin.libs.kyori[/ICODE]) for zero-dependency Adventure support on Spigot.
+  [*]Universal dual-dispatch bridges for Text ([ICODE]TextUtil[/ICODE]), GUI inventories ([ICODE]GuiUtil[/ICODE]), ItemMeta ([ICODE]ItemUtil[/ICODE]), and Asynchronous Teleportation ([ICODE]TeleportUtil[/ICODE]).
+  [*]Isolated Paper Registry helper ([ICODE]PaperRegistryHelper[/ICODE]) preventing ClassNotFound errors on Spigot when resolving 1.21+ [ICODE]EnchantmentTagKeys[/ICODE].
+  [/LIST]
+[*][B]Complete GUI System Modernization & Legacy Archive:[/B]
+  [LIST]
+  [*]Retired and archived 16 legacy GUI classes to [ICODE]old-files/[/ICODE] ([ICODE].java.old[/ICODE]) to eliminate technical debt.
+  [*]Introduced [ICODE]LiveTradeBridge[/ICODE] linking command-based challenges directly to the modern, interactive [ICODE]LiveTradeGui[/ICODE].
+  [*]Modernized [ICODE]/pvprespond[/ICODE] command handler with direct LiveTrade GUI integration.
+  [/LIST]
+[*][B]Interactive Chat & SubCommand Unification:[/B]
+  [LIST]
+  [*]Interactive click buttons in chat for challenges ([ICODE][► ACCEPT ◄][/ICODE], [ICODE][✖ DENY][/ICODE], [ICODE][📋 OPEN GUI][/ICODE]), spectator invites, and web token copying.
+  [*]Unified subcommands ([ICODE]AcceptSubCommand[/ICODE], [ICODE]DenySubCommand[/ICODE], [ICODE]RespondSubCommand[/ICODE]) replacing duplicate legacy alias code paths.
+  [*]Centralized full-RGB title, subtitle, and actionbar delivery.
+  [/LIST]
+[*][B]100% Clean Localization Audit (i18n D1–D11):[/B]
+  [LIST]
+  [*]All 11 detectors report 0 Critical and 0 Warnings.
+  [*]Safely pruned 284 dead keys from retired legacy GUIs across all 7 language bundles ([ICODE]de[/ICODE], [ICODE]en[/ICODE], [ICODE]es[/ICODE], [ICODE]fr[/ICODE], [ICODE]ja[/ICODE], [ICODE]pl[/ICODE], [ICODE]ru[/ICODE]) with 100% key parity (815 master keys).
+  [/LIST]
+[*][B]Deprecation Cleanup under Java 21 LTS:[/B]
+  [LIST]
+  [*]Removed [ICODE]bungeecord-chat[/ICODE], migrated [ICODE]ChatColor[/ICODE] to [ICODE]Text[/ICODE] delegates, modernized [ICODE]Attribute.MAX_HEALTH[/ICODE], [ICODE]getRespawnLocation()[/ICODE], [ICODE]URI.create().toURL()[/ICODE], [ICODE]Registry.POTION_EFFECT_TYPE[/ICODE], and native TPS metrics.
+  [*]182 passed automated unit and integration tests (100% green).
+  [/LIST]
+[/LIST]
+
 [SIZE=5][B][[COLOR=#5b9bd5]1.0.9[/COLOR]] - 2026-08-11[/B][/SIZE]
 [HR][/HR]
 

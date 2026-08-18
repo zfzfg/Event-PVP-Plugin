@@ -2,10 +2,14 @@
 
 ## [1.1.0] - 2026-08-18
 
-- **Full Dual-Platform Compatibility (Purpur 26.2 & Spigot 26.2)**: Added dynamic runtime platform detection (`Platform.java`), Kyori Adventure 5.2.0 shading with safe namespace relocation, cross-platform Component/String bridges (`TextUtil`, `GuiUtil`, `ItemUtil`, `TeleportUtil`), and isolated Paper Registry helpers (`PaperRegistryHelper`).
-- **Complete GUI Modernization**: Retired and archived 16 legacy GUI classes to `old-files/`, created `LiveTradeBridge` to connect wager command requests directly into the interactive `LiveTradeSession`, and modernized `PvPRespondCommand`.
+- **Full Dual-Platform Compatibility (Purpur 26.2 & Spigot 26.2)**: Added dynamic runtime platform detection (`Platform.java`), Kyori Adventure 5.2.0 shading with safe namespace relocation (`de.zfzfg.eventplugin.libs.kyori`), cross-platform Component/String bridges (`TextUtil`, `GuiUtil`, `ItemUtil`, `TeleportUtil`), and isolated Paper Registry helpers (`PaperRegistryHelper`).
+- **Complete GUI Modernization & Archive**: Retired and archived 16 legacy GUI classes to `old-files/` (`.java.old`), created `LiveTradeBridge` to connect wager command requests directly into the interactive `LiveTradeSession` and `LiveTradeGui`, and modernized `PvPRespondCommand`.
+- **Interactive Chat & SubCommand Unification**: Standardized interactive chat buttons (`[► ACCEPT ◄]`, `[✖ DENY]`, `[📋 OPEN GUI]`) to delegate directly to testable subcommands (`AcceptSubCommand`, `DenySubCommand`, `RespondSubCommand`), eliminating duplicate legacy code paths.
 - **Adventure Text & True RGB**: Complete migration of in-game messages, hover tooltips, clickable actions, and countdown/victory titles to Adventure 5.2.0.
+- **100% Clean Localization Audit (i18n D1–D11)**: All 11 detectors report 0 Critical and 0 Warnings. Safely pruned 284 dead keys from retired GUIs across all 7 languages (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) while preserving 100% bundle parity (815 keys per language).
+- **Deprecation & Java 21 LTS Cleanup**: Total removal of `bungeecord-chat`, replacement of `org.bukkit.ChatColor` with `Text` delegates, modernization to `Attribute.MAX_HEALTH`, `getRespawnLocation()`, `URI.create().toURL()`, `Registry.POTION_EFFECT_TYPE`, and `Bukkit.getServer().getTPS()`.
 - **Java 21 LTS & Clean Build**: 100% clean compilation, zero compiler warnings, and 182 automated unit and integration tests passing.
+
 
 ## [1.0.9] - 2026-08-08
 

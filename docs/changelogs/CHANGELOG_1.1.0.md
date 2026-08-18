@@ -2,25 +2,27 @@
 
 ## [1.1.0] - 2026-08-18
 
-This is the official stable release of **Event-PVP-Plugin 1.1.0**, featuring full **dual-platform compatibility for Purpur 26.2 and Vanilla Spigot 26.2**, a complete overhaul of the GUI/trading system, modern **Kyori Adventure 5.2.0** text formatting with true RGB color support, and extensive architectural refactorings for maximum performance, stability, and maintainability under **Java 21**.
+This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dual-platform compatibility for Purpur 26.2 and Vanilla Spigot 26.2**, a complete overhaul of the GUI/trading system, modern **Kyori Adventure 5.2.0** text formatting with true RGB color support, total deprecation cleanup under **Java 21 LTS**, unified sub-command handling, and 100% clean localization across all 7 supported languages.
 
 ---
 
 ### 🌟 Release Highlights
 
 - **Full Dual-Platform Compatibility (Purpur 26.2 & Spigot 26.2):** Native support for Purpur and Paper features (asynchronous teleportation, Adventure components, Paper Registry TagKeys) with seamless, zero-crash fallback to Spigot standard APIs.
-- **Modern LiveTrade GUI System:** The legacy 16-class GUI system has been completely retired and replaced by a unified, real-time `LiveTrade` architecture and `LiveTradeBridge`.
+- **Modern LiveTrade GUI System:** The legacy 16-class GUI system has been completely retired and archived into `old-files/`, replaced by a unified, real-time `LiveTrade` architecture and `LiveTradeBridge`.
 - **Adventure Text & True RGB:** Complete migration of all chat messages, titles, hover tooltips, and clickable actions to Kyori Adventure 5.2.0 (shaded & relocated to prevent server classloader collisions).
-- **Zero-Warning Codebase:** 100% clean compilation against Java 21, resolving all compiler deprecation and platform-specific warnings.
-- **Automated Test Suite:** 182 comprehensive unit and integration tests verifying dual-platform adapters, trade bridges, item migrations, and world backup recovery.
+- **Interactive Chat & SubCommand Unification:** Clickable chat action buttons for challenges, invites, and tokens now delegate directly to unified subcommands (`AcceptSubCommand`, `DenySubCommand`, `RespondSubCommand`).
+- **100% Clean Localization Audit (i18n D1–D11):** All 11 detectors report 0 Critical and 0 Warnings. 284 legacy orphaned GUI keys safely pruned across all 7 language bundles (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) while preserving 100% key parity (815 master keys per language).
+- **Total Deprecation & Warning Cleanup:** 100% clean compilation against Java 21 LTS, resolving all compiler deprecation and platform-specific warnings.
+- **Automated Test Suite:** 182 comprehensive unit and integration tests verifying dual-platform adapters, trade bridges, item migrations, concurrency, and world backup recovery.
 
 ---
 
-### 🚀 Major Improvements & Features
+### 🚀 Detailed Changes & Features
 
 #### 1. Dual-Platform Compatibility Engine
 - **Runtime Platform Detection (`Platform.java`):** Automatically detects whether the host server is running Purpur, Paper, or Vanilla Spigot and activates platform-optimized code paths dynamically.
-- **Shaded Adventure Library:** `net.kyori:adventure-api` (5.2.0), `adventure-text-serializer-legacy`, and `adventure-text-serializer-plain` are now shaded and relocated to `de.zfzfg.eventplugin.libs.kyori`, guaranteeing Adventure support on vanilla Spigot without external dependencies.
+- **Shaded Adventure Library:** `net.kyori:adventure-api` (5.2.0), `adventure-text-serializer-legacy`, and `adventure-text-serializer-plain` are shaded and relocated to `de.zfzfg.eventplugin.libs.kyori`, guaranteeing Adventure support on vanilla Spigot without external dependencies or classloader collisions.
 - **Universal Text Dispatch (`TextUtil.java`):** Sends native Adventure `Component` objects on Paper/Purpur while automatically serializing to formatted legacy strings on Spigot.
 - **Cross-Platform GUI Factory (`GuiUtil.java`):** Creates custom inventories using modern Component titles on Purpur and formatted string titles on Spigot.
 - **Cross-Platform Item Metadata (`ItemUtil.java`):** Manages ItemMeta display names and lores using clean Component pipelines on Purpur (eliminating default italic formatting artifacts) and compatible String lists on Spigot.
@@ -28,20 +30,44 @@ This is the official stable release of **Event-PVP-Plugin 1.1.0**, featuring ful
 - **Isolated Paper Registry Helper (`PaperRegistryHelper.java`):** Isolates Paper 1.21+ `EnchantmentTagKeys` (`TREASURE`, `CURSE`) so that the classloader on Spigot servers never encounters missing class definitions when querying `MaterialCatalog`.
 
 #### 2. GUI System Modernization & Legacy Archive
-- **Retired Legacy GUI System:** Archived 16 old GUI classes and legacy response handlers into `old-files/` to eliminate technical debt, code duplication, and stale listeners.
+- **Retired Legacy GUI System:** Archived 16 old GUI classes and legacy response handlers into `old-files/` and renamed them to `.java.old` to prevent classpath pollution in IDEs and build tools.
 - **New `LiveTradeBridge`:** Bridges command-based wager invitations directly into the modern `LiveTradeSession` and `LiveTradeGui`, pre-filling items and money wagers automatically.
 - **Modernized `/pvprespond`:** Overhauled command handler to utilize `LiveTradeBridge`, giving players a fluid, visual counter-offer and trade interface.
 - **Streamlined Plugin Lifecycle:** Cleaned `EventPlugin` and `MatchManager` to remove deprecated `GuiManager` and `GuiListener` references.
 
-#### 3. Interactive Chat & Title Formatting
-- **Interactive Action Buttons:** Clickable chat buttons for wager requests (Accept / Decline / Counter), event broadcast joins, spectator invites, and web authentication.
+#### 3. Interactive Chat, Action Buttons & Title Formatting
+- **Interactive Action Buttons:** Clickable chat buttons for wager requests (`[► ACCEPT ◄]`, `[✖ DENY]`, `[📋 OPEN GUI]`), event broadcast joins, spectator invites, and web authentication.
+- **Unified Subcommands:** Consolidated all challenge responses into dedicated, testable subcommands (`AcceptSubCommand`, `DenySubCommand`, `RespondSubCommand`), eliminating duplicate logic across legacy `/pvpyes`, `/pvpno`, and `/pvpdeny` commands.
 - **Centralized Title Dispatching (`TextUtil#sendTitle`):** Full RGB title and subtitle delivery with configurable fade-in, stay, and fade-out timings.
 - **Web Token URL Integration:** In-game `/eventpvp webtoken` command features one-click clipboard copying and direct browser link integration.
 
-#### 4. Safety, World Management & Inventory Protection
+#### 4. Localization & Quality Audit Suite
+- **Full D1–D11 Detection Suite:** Comprehensive audit tool (`tools/i18n_audit.py`) validating key lookups, boolean YAML parsers, placeholder mismatches, hardcoded messages, and web-panel translations.
+- **Orphaned Key Pruning (D9):** Removed 284 dead message keys resulting from the retirement of legacy GUIs across all 7 language files (`messages_de.yml`, `messages_en.yml`, `messages_es.yml`, `messages_fr.yml`, `messages_ja.yml`, `messages_pl.yml`, `messages_ru.yml`).
+- **Complete Parity (D8):** 100% key parity across all 7 languages (815 keys per bundle).
+- **Console & Logger Localization:** All terminal outputs standardized in English and routed through `CoreConfigManager.getConsoleMsg` with placeholder support.
+- **Safety Backups:** Pre-cleanup configuration archives preserved under `reports/backup_pre_cleanup_1.1.0/`.
+
+#### 5. Deprecation & Modern Bukkit API Migration
+- **BungeeCord Chat Removal:** Removed `net.md-5:bungeecord-chat` dependency and all `player.spigot().sendMessage(...)` invocations.
+- **`ChatColor` Replacement:** Replaced all `org.bukkit.ChatColor` usages with `Text` delegates.
+- **Modern Attribute System:** Migrated `player.getMaxHealth()` to `player.getAttribute(Attribute.MAX_HEALTH).getValue()`.
+- **Modern Respawn API:** Migrated `player.getBedSpawnLocation()` to `player.getRespawnLocation()`.
+- **URL Constructor Modernization:** Migrated `new URL(...)` to `URI.create(...).toURL()`.
+- **Potion Effect Registries:** Migrated deprecated `PotionEffectType` methods to `org.bukkit.Registry.POTION_EFFECT_TYPE`.
+- **Enchantment Tag Keys:** Migrated `isTreasure()` and `isCursed()` to Paper `EnchantmentTagKeys`.
+- **Native TPS Metric:** Removed reflection in `WebApiHandler` and replaced with native `Bukkit.getServer().getTPS()`.
+- **PlayerMoveEvent Optimization:** Throttled move listeners in `WorldChangeListener` and `VoidProtectionListener` using `ignoreCancelled = true` and `hasChangedBlock()`.
+- **Thread-Safe Cooldowns:** `CommandCooldownManager` synchronized with thread-safe access patterns.
+
+#### 6. Safety, World Management & Inventory Protection
 - **Multiverse Integration:** Compatible with Multiverse-Core world cloning, arena resetting, and automatic world loading/unloading policies.
 - **Synchronous Safety Stores:** Protected against server crashes and disconnections via `inventory-guard.yml`, `player-return-locations.yml`, and `pending-payouts.yml`.
 - **Stranded Player Recovery:** Automatic detection and safe relocation of players remaining in unloaded or orphaned event/arena worlds upon server join.
+
+#### 7. Architecture Documentation
+- **Server Compatibility Matrix:** Comprehensive reference guide in `docs/SERVER_COMPATIBILITY.md`.
+- **Conceptual Analysis & Roadmap:** System architecture evaluation and feature roadmap in `docs/PROJEKT_KONZEPT_ANALYSE.md`.
 
 ---
 
@@ -54,8 +80,9 @@ This is the official stable release of **Event-PVP-Plugin 1.1.0**, featuring ful
 | **Target API** | `purpur-api:26.2.build.2618-stable` |
 | **Supported Server Engines** | Purpur 26.2+, Paper 1.21.x / 1.20.5+, Pufferfish 1.21.x, Spigot 26.2 / 1.21.x |
 | **Unsupported Engines** | Folia (requires regionised scheduler rebuild), 1.19.4 & older |
-| **Kyori Adventure** | `5.2.0` (Shaded & Relocated) |
-| **Test Suite** | 182 Passed Unit & Integration Tests |
+| **Kyori Adventure** | `5.2.0` (Shaded & Relocated to `de.zfzfg.eventplugin.libs.kyori`) |
+| **Test Suite** | 182 Passed Unit & Integration Tests (100% Green) |
+| **Localization** | 7 Languages (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) – 815 Master Keys |
 
 ---
 
