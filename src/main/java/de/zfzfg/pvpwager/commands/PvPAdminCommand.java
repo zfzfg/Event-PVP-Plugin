@@ -77,6 +77,7 @@ public class PvPAdminCommand implements CommandExecutor {
         MessageUtil.sendMessage(sender, cfg.getMessage("messages.command.pvpadmin.stopall", "count", String.valueOf(count)));
     }
     
+    @SuppressWarnings("deprecation")
     private void handleInfo(CommandSender sender) {
         var cfg = plugin.getPvpConfigManager();
         int activeMatches = plugin.getMatchManager().getActiveMatchCount();

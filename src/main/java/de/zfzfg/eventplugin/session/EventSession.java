@@ -1880,6 +1880,7 @@ plugin.getEventManager().removeSession(config.getId());
         showTitle(player, title, subtitle, 10, 60, 10);
     }
 
+    @SuppressWarnings("deprecation")
     private static void showTitle(Player player, String title, String subtitle,
                                   int fadeIn, int stay, int fadeOut) {
         if (player == null) return;

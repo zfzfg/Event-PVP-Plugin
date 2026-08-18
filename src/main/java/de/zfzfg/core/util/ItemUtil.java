@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
  * (ohne Kursiv-Standard-Artefakte und mit voller RGB-Präzision).
  * Auf Vanilla Spigot wird automatisch auf die String-basierten Methoden zurückgegriffen.</p>
  */
+@SuppressWarnings("deprecation")
 public final class ItemUtil {
 
     private ItemUtil() {}

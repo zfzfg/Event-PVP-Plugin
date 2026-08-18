@@ -53,6 +53,7 @@ public class UpdateChecker {
         checkForUpdates(0L, onDone);
     }
 
+    @SuppressWarnings("deprecation")
     public void checkForUpdates(long delayTicks, Runnable onDone) {
         Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, () -> {
             try {

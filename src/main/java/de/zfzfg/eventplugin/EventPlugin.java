@@ -99,6 +99,7 @@ public class EventPlugin extends JavaPlugin {
     private int externalDisplayRefreshTaskId = -1;
 
     @Override
+    @SuppressWarnings("deprecation")
     public void onEnable() {
         long t0 = System.nanoTime();
         instance = this;

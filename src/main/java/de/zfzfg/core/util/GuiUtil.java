@@ -13,6 +13,7 @@ import org.bukkit.inventory.InventoryHolder;
  * Methode aufgerufen, um volle RGB/Adventure-Unterstützung im GUI-Titel zu gewährleisten.
  * Auf Vanilla Spigot wird automatisch die String-basierte Methode mit Legacy-Farbcodes genutzt.</p>
  */
+@SuppressWarnings("deprecation")
 public final class GuiUtil {
 
     private GuiUtil() {}

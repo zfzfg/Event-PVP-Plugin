@@ -1002,6 +1002,7 @@ public class WebApiHandler {
     /**
      * GET /api/status - Gibt den Plugin-Status zurück
      */
+    @SuppressWarnings("deprecation")
     public Map<String, Object> getStatus() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);

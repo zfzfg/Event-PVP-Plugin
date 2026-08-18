@@ -11,6 +11,7 @@ import org.bukkit.enchantments.Enchantment;
  * auf reinem Spigot beim Laden von {@link MaterialCatalog} versucht, nicht existierende
  * Paper-Klassen (wie {@code EnchantmentTagKeys}) zu linken.</p>
  */
+@SuppressWarnings("deprecation")
 final class PaperRegistryHelper {
 
     private PaperRegistryHelper() {}

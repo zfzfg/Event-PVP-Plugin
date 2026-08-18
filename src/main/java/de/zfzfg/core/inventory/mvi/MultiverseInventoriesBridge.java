@@ -57,6 +57,7 @@ public final class MultiverseInventoriesBridge {
     }
 
     /** Erkennung und Diagnose neu ausfuehren - beim Start und nach jedem Config-Reload. */
+    @SuppressWarnings("deprecation")
     public void refresh() {
         Plugin mvi = Bukkit.getPluginManager().getPlugin(MVI_PLUGIN);
         this.installed = mvi != null;

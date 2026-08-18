@@ -180,6 +180,7 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
+    @SuppressWarnings("deprecation")
     private boolean handleVersion(CommandSender sender) {
         if (!Permission.EVENTPVP_ADMIN.check(sender)) {
             sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("general.no-permission")));

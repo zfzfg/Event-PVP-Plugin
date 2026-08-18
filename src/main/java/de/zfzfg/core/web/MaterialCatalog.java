@@ -1,7 +1,6 @@
 package de.zfzfg.core.web;
 
 import org.bukkit.Material;
-import org.bukkit.Registry;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
@@ -297,7 +296,6 @@ final class MaterialCatalog {
         return list;
     }
 
-    @SuppressWarnings("deprecation")
     private static boolean isTreasure(Enchantment enchantment) {
         if (de.zfzfg.core.util.Platform.isPaper()) {
             try {
@@ -314,7 +312,6 @@ final class MaterialCatalog {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private static boolean isCursed(Enchantment enchantment) {
         if (de.zfzfg.core.util.Platform.isPaper()) {
             try {
