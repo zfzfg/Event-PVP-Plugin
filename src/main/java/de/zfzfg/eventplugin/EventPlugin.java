@@ -12,8 +12,6 @@ import de.zfzfg.eventplugin.manager.EventManager;
 import de.zfzfg.eventplugin.security.PlayerModeListener;
 import de.zfzfg.eventplugin.util.UpdateChecker;
 import de.zfzfg.pvpwager.commands.*;
-import de.zfzfg.pvpwager.gui.GuiListener;
-import de.zfzfg.pvpwager.gui.GuiManager;
 import de.zfzfg.pvpwager.gui.livetrade.LiveTradeListener;
 import de.zfzfg.pvpwager.gui.livetrade.LiveTradeManager;
 import de.zfzfg.pvpwager.listeners.PvPListener;
@@ -70,7 +68,6 @@ public class EventPlugin extends JavaPlugin {
     private TaskManager taskManager;
     private de.zfzfg.core.world.mv.MvWorldService mvWorldService;
     private DebugManager debugManager;
-    private GuiManager guiManager;
     private LiveTradeManager liveTradeManager;
     private PvPWagerGuiCommand pvpWagerGuiCommand;
     // Keep reference to PvP WorldChangeListener for cleanup
@@ -185,7 +182,6 @@ public class EventPlugin extends JavaPlugin {
         matchManager = new MatchManager(this);
         requestManager = new RequestManager(this);
         commandRequestManager = new CommandRequestManager(this);
-        guiManager = new GuiManager(this);
         liveTradeManager = new LiveTradeManager(this);
         statsManager = new StatsManager();
         // Load persistent PvP stats
@@ -299,8 +295,6 @@ public class EventPlugin extends JavaPlugin {
         getServer().getPluginManager().registerEvents(pvpWorldChangeListener, this);
         // Cleanup pending requests on player quit
         getServer().getPluginManager().registerEvents(new de.zfzfg.pvpwager.listeners.RequestCleanupListener(this), this);
-        // GUI-Listener für Wager-GUIs
-        getServer().getPluginManager().registerEvents(new GuiListener(this), this);
         // Live Trade GUI Listener
         getServer().getPluginManager().registerEvents(new LiveTradeListener(liveTradeManager), this);
 
@@ -606,9 +600,6 @@ public class EventPlugin extends JavaPlugin {
         if (commandRequestManager != null) {
             commandRequestManager.cleanup();
         }
-        if (guiManager != null) {
-            guiManager.cleanup();
-        }
         if (liveTradeManager != null) {
             liveTradeManager.shutdown();
         }
@@ -824,7 +815,6 @@ public class EventPlugin extends JavaPlugin {
 
     public de.zfzfg.core.world.mv.MvWorldService getMvWorldService() { return mvWorldService; }
     public DebugManager getDebugManager() { return debugManager; }
-    public GuiManager getGuiManager() { return guiManager; }
     public LiveTradeManager getLiveTradeManager() { return liveTradeManager; }
     public PvPWagerGuiCommand getPvpWagerGuiCommand() { return pvpWagerGuiCommand; }
     public CommandCooldownManager getCommandCooldownManager() { return commandCooldownManager; }

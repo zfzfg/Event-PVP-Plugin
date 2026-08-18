@@ -1,7 +1,9 @@
 package de.zfzfg.pvpwager.commands;
 
 import de.zfzfg.eventplugin.EventPlugin;
-import de.zfzfg.pvpwager.gui.livetrade.LiveTradeBridge;
+import de.zfzfg.pvpwager.gui.GuiManager;
+import de.zfzfg.pvpwager.gui.ResponseGui;
+import de.zfzfg.pvpwager.gui.WagerSession;
 import de.zfzfg.pvpwager.models.CommandRequest;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.command.Command;
@@ -10,17 +12,15 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 /**
- * Moderner Befehl zum Öffnen des LiveTrade-GUIs als Antwort auf eine Wager-Herausforderung.
+ * Command to open the response GUI for answering wager requests.
  * Usage: /pvprespond gui
  */
 public class PvPRespondCommand implements CommandExecutor {
     
     private final EventPlugin plugin;
-    private final LiveTradeBridge bridge;
     
     public PvPRespondCommand(EventPlugin plugin) {
         this.plugin = plugin;
-        this.bridge = new LiveTradeBridge(plugin);
     }
     
     private String getMsg(String key) {
@@ -82,11 +82,13 @@ public class PvPRespondCommand implements CommandExecutor {
             return true;
         }
         
-        // Starte synchrone LiveTrade-Session direkt aus dem Request
-        boolean success = bridge.startSessionFromRequest(pendingRequest);
-        if (!success) {
-            MessageUtil.sendMessage(player, getMsg("session-start-failed"));
-        }
+        // Create a response session
+        GuiManager guiManager = plugin.getGuiManager();
+        WagerSession session = guiManager.getOrCreateSession(player, pendingRequest.getSender());
+        
+        // Open the response GUI
+        ResponseGui responseGui = new ResponseGui(plugin, player, session, pendingRequest);
+        responseGui.open();
         
         return true;
     }

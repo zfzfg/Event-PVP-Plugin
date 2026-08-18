@@ -1563,9 +1563,6 @@ public class MatchManager {
         Player player1 = request.getSender();
         Player player2 = request.getTarget();
 
-        // Clean up GUI sessions for both players (no item return needed - items already handled)
-        cleanupGuiSessionsForMatch(player1, player2);
-
         // Validate arena and equipment BEFORE deducting wagers to prevent item/money loss
         Arena arena = plugin.getArenaManager().getArenaOptional(request.getFinalArenaId()).orElse(null);
         EquipmentSet p1Equipment = plugin.getEquipmentManager().getEquipmentSet(request.getFinalEquipmentId());
@@ -1736,32 +1733,6 @@ public class MatchManager {
     public void markTeleported(Player player) {
         if (player != null) {
             teleportedPlayers.add(player.getUniqueId());
-        }
-    }
-    
-    /**
-     * Cleans up GUI sessions for both players when a match starts.
-     * This prevents duplicate "already have wager request" messages.
-     * Items are NOT returned here - they're already handled by the request flow.
-     */
-    private void cleanupGuiSessionsForMatch(Player player1, Player player2) {
-        // Clean up sessions without returning items (items are already in the request)
-        de.zfzfg.pvpwager.gui.GuiManager guiManager = plugin.getGuiManager();
-        
-        // Player 1 session cleanup
-        de.zfzfg.pvpwager.gui.WagerSession session1 = guiManager.getSession(player1);
-        if (session1 != null) {
-            session1.cancel(); // Mark as cancelled, don't return items
-            session1.cleanup();
-            guiManager.removeSession(player1);
-        }
-        
-        // Player 2 session cleanup  
-        de.zfzfg.pvpwager.gui.WagerSession session2 = guiManager.getSession(player2);
-        if (session2 != null) {
-            session2.cancel(); // Mark as cancelled, don't return items
-            session2.cleanup();
-            guiManager.removeSession(player2);
         }
     }
 }
