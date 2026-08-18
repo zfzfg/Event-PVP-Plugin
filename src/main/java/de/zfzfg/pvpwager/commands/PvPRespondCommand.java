@@ -25,7 +25,7 @@ public class PvPRespondCommand implements CommandExecutor {
     }
     
     private String getMsg(String key) {
-        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.commands.pvprespond." + key, null);
+        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.command.pvp.accept." + key, null);
         if (msg == null) {
             msg = plugin.getCoreConfigManager().getMessages().getString("messages.request." + key, null);
         }
@@ -74,14 +74,14 @@ public class PvPRespondCommand implements CommandExecutor {
         // Check if request has expired
         if (pendingRequest.isExpired()) {
             plugin.getCommandRequestManager().removeRequest(pendingRequest.getSender());
-            MessageUtil.sendMessage(player, getMsg("request-expired"));
+            MessageUtil.sendMessage(player, getMsg("expired"));
             return true;
         }
         
         // Check if sender is still online
         if (!pendingRequest.getSender().isOnline()) {
             plugin.getCommandRequestManager().removeRequest(pendingRequest.getSender());
-            MessageUtil.sendMessage(player, getMsg("requester-offline"));
+            MessageUtil.sendMessage(player, getMsg("player-offline"));
             return true;
         }
         

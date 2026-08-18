@@ -2,7 +2,8 @@
 
 Willkommen in der Dokumentation des **Event-PVP-Plugins**. Alle Dokumente, Anleitungen und Release-Texte sind thematisch in folgende Unterordner strukturiert:
 
-👉 **[🌐 Server- & Versions-Kompatibilität (Kompatibilitätsmatrix)](SERVER_COMPATIBILITY.md)**
+👉 **[🌐 Server- & Versions-Kompatibilität (Kompatibilitätsmatrix)](SERVER_COMPATIBILITY.md)**  
+👉 **[📊 Projektkonzept-Analyse & Feature-Roadmap](PROJEKT_KONZEPT_ANALYSE.md)**  
 
 ---
 

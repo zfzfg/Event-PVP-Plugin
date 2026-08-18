@@ -58,7 +58,7 @@ public class AcceptSubCommand extends SubCommand {
                 // Bei Wetteinsätzen direkt die synchrone LiveTradeSession öffnen
                 boolean started = new LiveTradeBridge(plugin).startSessionFromRequest(request);
                 if (!started) {
-                    MessageUtil.sendMessage(player, cfg.getMessage("messages.commands.pvprespond.session-start-failed"));
+                    MessageUtil.sendMessage(player, cfg.getMessage("messages.command.pvp.accept.session-start-failed"));
                 }
             }
             return true;

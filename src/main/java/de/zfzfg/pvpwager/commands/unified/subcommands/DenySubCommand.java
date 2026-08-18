@@ -74,9 +74,9 @@ public class DenySubCommand extends SubCommand {
                 MessageUtil.sendMessage(target, cfg.getMessage("messages.command.pvp.deny.success-other", "player", player.getName()));
             }
         } else if (found) {
-            MessageUtil.sendMessage(player, cfg.getMessage("messages.commands.pvpdeny.request-cancelled"));
+            MessageUtil.sendMessage(player, cfg.getMessage("messages.command.pvp.deny.request-cancelled"));
         } else {
-            MessageUtil.sendMessage(player, cfg.getMessage("messages.commands.pvpdeny.no-request"));
+            MessageUtil.sendMessage(player, cfg.getMessage("messages.command.pvp.deny.no-request"));
         }
         return true;
     }

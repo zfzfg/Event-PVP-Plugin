@@ -29,7 +29,7 @@ public final class Platform {
 
         boolean purpur = false;
         try {
-            Class.forName("org.purpurmc.purpur.PurpurConfig");
+            Class.forName("org.purpurmc.purpur.PurpurConfig"); // i18n-ignore: class name check
             purpur = true;
         } catch (Throwable ignored) {
             try {

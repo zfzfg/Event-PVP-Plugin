@@ -1,59 +1,42 @@
 messages:
   equipment:
-    debug-no-group: '&c[Debug] Keine gültige Ausrüstungsgruppe konfiguriert:
-      &e{group}'
-    debug-retrying: '&7[Debug] Ausrüstung nicht vollständig angewendet, neuer
-      Versuch...'
+    debug-no-group: '&c[Debug] Keine gültige Ausrüstungsgruppe konfiguriert: &e{group}'
+    debug-retrying: '&7[Debug] Ausrüstung nicht vollständig angewendet, neuer Versuch...'
     debug-still-incomplete: '&c[Debug] Ausrüstung wurde immer noch nicht vollständig
       angewendet.'
     debug-applied: '&a[Debug] Ausrüstung erfolgreich angewendet.'
   request:
-    received: '
+    received: |2
 
       &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
       &e&lPVP-ANFRAGE
-
       &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
       &e{player} &awill gegen dich kämpfen!
 
-
       &aKlicke hier zum Annehmen:
-
-      '
     accepted: '&aDu hast die Anfrage von &e{player} &aangenommen!'
-    denied: '&cDu hast die Anfrage von &e{player} &cabgelehnt!'
     expired: '&cDie Anfrage von &e{player} &cist abgelaufen!'
     no-request: '&cDu hast keine Anfrage von {player}!'
     already-in-match: '&cDieser Spieler ist bereits in einem Match!'
     self-request: '&cDu kannst dir selbst keine Anfrage senden!'
     player-offline: '&cSpieler {player} ist offline!'
-    header: '
+    header: |2
 
       &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
       &e&lPVP-ANFRAGE
-
       &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
       &e{player} &awill gegen dich kämpfen!
-
-      '
     accept-button: '§a§l[► ANNEHMEN ◄]'
     accept-hover: '§aKlicke um die Anfrage anzunehmen!'
     deny-button: ' §c§l[✖ ABLEHNEN]'
-    deny-hover: '§cKlicke um die Anfrage abzulehnen'
-    footer: '
+    deny-hover: §cKlicke um die Anfrage abzulehnen
+    footer: |2
 
 
       &7Die Anfrage läuft in &e60 Sekunden&7 ab.
-
       &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
-      '
     request-expired-sender: '&cDeine Anfrage an &e{target} &cist abgelaufen!'
     request-expired-target: '&cAnfrage von &e{sender} &cist abgelaufen!'
     challenge-header: '&e&lPVP-HERAUSFORDERUNG!'
@@ -89,55 +72,34 @@ messages:
       invalid-item: '&cUngültiges Item: {item}'
       wager-money: '&6${amount}'
       wager-items: '&e{count} Item(s)'
-      request-sent: '
+      request-sent: |2
 
         &a&l━━━━━━━━━━━━━━━━━━━━━━━
-
         &a&lANFRAGE GESENDET!
-
         &a&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
         &7Ziel: &e{target}
-
         &7Arena: &e{arena}
-
         &7Ausrüstung: &e{equipment}
-
         &7Einsatz: {wager}
 
-
         &7Warte auf die Antwort von &e{target}&7...
-
-        '
-      usage: '
+      usage: |2
 
         &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
         &e&lPVPA-BEFEHL
-
         &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
         &7Verwendung:
-
         &e/pvpa <spieler> <einsatz> <menge> <arena> <ausrüstung>
 
-
         &7Beispiele:
-
         &e/pvpa Steve DIAMOND_SWORD 1 desert diamond
-
         &e/pvpa Steve MONEY 100 forest standard
-
         &e/pvpa Steve DIAMOND_SWORD,GOLDEN_APPLE 1,5 colosseum netherite
 
-
         &7Nutze &e/pvpa arenas &7für die Arena-Liste
-
         &7Nutze &e/pvpa equipment &7für die Ausrüstungs-Liste
-
-        '
       available-arenas: '&7Verfügbare Arenen:'
       available-equipment: '&7Verfügbare Equipment-Sets:'
     pvpyes:
@@ -149,95 +111,61 @@ messages:
       target-no-money-player: '&c{player} hat nicht mehr genug Geld!'
       target-no-money-target: '&cDu hast nicht mehr genug Geld – Anfrage abgebrochen!'
       target-no-items-player: '&c{player} hat nicht mehr die benötigten Items!'
-      target-no-items-target: '&cDu hast nicht mehr die benötigten Items – Anfrage abgebrochen!'
+      target-no-items-target: '&cDu hast nicht mehr die benötigten Items – Anfrage
+        abgebrochen!'
     pvpadmin:
       no-permission: '&cDu hast keine Berechtigung für diesen Befehl!'
-      reload-success: '
+      reload-success: |2
 
         &a&l━━━━━━━━━━━━━━━━━━━━━━━
-
         &a&lKONFIGURATION NEU GELADEN!
-
         &a&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
         &7✓ Hauptkonfiguration neu geladen
-
         &7✓ Nachrichten neu geladen
-
         &7✓ Arenen neu geladen: &e{arenaCount}
-
         &7✓ Ausrüstungssets neu geladen: &e{equipmentCount}
 
-
         &eHinweis: &7Laufende Matches sind nicht betroffen
-
-        '
       reload-error: '&cFehler beim Reload: {error}'
-      stopall: '
+      stopall: |2
 
         &e&l━━━━━━━━━━━━━━━━━━━━━━━
-
         &e&lMATCHES GESTOPPT
-
         &e&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
         &e{count} &7laufende(s) Match(es) gestoppt
-
         &7Alle Einsätze wurden zurückgegeben
-
-        '
-      info: '
+      info: |2
 
         &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
         &6&lPVPWAGER INFO
-
         &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
         &7Version: &e{version}
-
         &7Laufende Matches: &e{active}
-
         &7Geladene Arenen: &e{arenas}
-
         &7Geladene Ausrüstung: &e{equipment}
-
         &7Wirtschaft: {economy}
-
-        '
       enabled: '&aAktiviert'
       disabled: '&cDeaktiviert'
-      help: '
+      help: |2
 
         &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
         &6&lPVPWAGER ADMIN
-
         &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
         &e/pvpadmin reload &8- &7Alle Konfigurationen neu laden
-
         &e/pvpadmin stopall &8- &7Alle laufenden Matches stoppen
-
         &e/pvpadmin info &8- &7Plugin-Informationen anzeigen
-
-        '
     pvpanswer:
       player-only: '&cNur Spieler können diesen Befehl nutzen!'
       no-request: '&cKeine ausstehende Anfrage!'
-      usage: '&cVerwendung: /pvpanswer <einsatz> <menge> [arena] [ausrüstung]
-
+      usage: |
+        &cVerwendung: /pvpanswer <einsatz> <menge> [arena] [ausrüstung]
         &7Beispiel: /pvpanswer DIAMOND_SWORD 1
-
         &7Beispiel: /pvpanswer MONEY 50 desert diamond
-
         &7Beispiel: /pvpanswer SKIP
-
-        '
       arena-not-found: '&cArena nicht gefunden: {arena}'
       equipment-not-found: '&cAusrüstung nicht gefunden: {equipment}'
       missing-money: '&cBetrag für MONEY fehlt!'
@@ -260,34 +188,28 @@ messages:
       their-wager-items: '&7Ihr Einsatz: &e{items}'
       arena-changed: '&7Arena geändert zu: &e{arena}'
       equipment-changed: '&7Ausrüstung geändert zu: &e{equipment}'
-      next-steps: '&aSchreibe &e/pvpyes &azum Annehmen
-
-        &cSchreibe &e/pvpno &czum Ablehnen'
+      next-steps: |-
+        &aSchreibe &e/pvpyes &azum Annehmen
+        &cSchreibe &e/pvpno &czum Ablehnen
     pvp:
-      help: '&e&lPvPWager &8» &7Verwendung:
-
+      help: |
+        &e&lPvPWager &8» &7Verwendung:
         &e/pvpa <spieler> &8- &7PvP-Einsatzanfrage senden
-
         &e/pvp accept <spieler> &8- &7Anfrage annehmen
-
         &e/pvp deny <spieler> &8- &7Anfrage ablehnen
-
         &e/pvp spectate <spieler> &8- &7Match zuschauen
-
         &e/pvp leave &8- &7Zuschauermodus verlassen
-
-        '
       accept:
         success-self: '&aDu hast die PvP-Wette von &e{player} &aangenommen!'
         success-other: '&e{player} &ahat deine PvP-Wette angenommen!'
         no-request: '&cKeine ausstehende Anfrage von &e{player}&c!'
-        requires-skip: '&cAnnehmen nicht möglich: Der Herausforderer hat kein SKIP
-          gewählt. Lege zuerst mit &e/pvpanswer <einsatz> <menge> &cdeinen Einsatz
-          fest.'
+        session-start-failed: '&cLiveTrade-Sitzung konnte nicht gestartet werden!'
       deny:
         success-self: '&cDu hast die PvP-Wette von &e{player} &cabgelehnt!'
         success-other: '&e{player} &chat deine PvP-Wette abgelehnt!'
         usage: '&cBenutzung: /pvp deny <spieler>'
+        no-request: '&cKeine ausstehende Anfrage zum Ablehnen vorhanden!'
+        request-cancelled: '&aPvP-Wetteinsatz-Anfrage abgebrochen!'
       spectate:
         usage: '&cBenutzung: /pvp spectate <spieler>'
         no-match: '&c{player} ist in keinem Match!'
@@ -310,71 +232,66 @@ messages:
       sent: '&aPvP-Wette an &e{player} &agesendet!'
     draw:
       player-only: '&cNur Spieler können diesen Befehl nutzen!'
-      only-active: '&cDu kannst nur während eines laufenden Matches für ein Unentschieden stimmen!'
+      only-active: '&cDu kannst nur während eines laufenden Matches für ein Unentschieden
+        stimmen!'
       no-active-vote: '&cKeine aktive Unentschieden-Abstimmung!'
       initiator-wait: '&cDu hast die Abstimmung gestartet, warte auf deinen Gegner!'
       initiator-cannot-deny: '&cDu hast diese Unentschieden-Abstimmung gestartet!
         Nutze erneut &e/draw&c, um sie abzubrechen.'
       cancelled-self: '&cDu hast deine Unentschieden-Abstimmung abgebrochen.'
       cancelled-opponent: '&e{player} &chat die Unentschieden-Abstimmung abgebrochen.'
-      already-active: '&e{opponent} &7hat bereits für ein Unentschieden gestimmt!
-
-        &7Schreibe &a/draw accept &7oder &c/draw deny'
-      accepted: '&a&l━━━━━━━━━━━━━━━━━━━━━━━
-
+      already-active: |-
+        &e{opponent} &7hat bereits für ein Unentschieden gestimmt!
+        &7Schreibe &a/draw accept &7oder &c/draw deny
+      accepted: |-
+        &a&l━━━━━━━━━━━━━━━━━━━━━━━
         &a&lUNENTSCHIEDEN ANGENOMMEN!
-
         &a&l━━━━━━━━━━━━━━━━━━━━━━━
 
-
         &7Beide Spieler haben einem Unentschieden zugestimmt.
-
-        &7Alle Einsätze werden zurückgegeben.'
-      denied: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
-
+        &7Alle Einsätze werden zurückgegeben.
+      denied: |-
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
         &c&lUNENTSCHIEDEN ABGELEHNT!
-
         &c&l━━━━━━━━━━━━━━━━━━━━━━━
 
-
         &e{player} &7hat die Unentschieden-Abstimmung abgelehnt.
+        &7Das Match geht weiter!
+      started: |-
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
+        &e&lUNENTSCHIEDEN-ABSTIMMUNG GESTARTET
+        &e&l━━━━━━━━━━━━━━━━━━━━━━━
 
-        &7Das Match geht weiter!'
-      started: "&e&l━━━━━━━━━━━━━━━━━━━━━━━\n&e&lUNENTSCHIEDEN-ABSTIMMUNG GESTARTET\n\
-        &e&l━━━━━━━━━━━━━━━━━━━━━━━\n\n&e{initiator} &7möchte das Match unentschieden\
-        \ beenden.\n\n&e{opponent}&7, schreibe:\n  &a/draw accept &7- Unentschieden\
-        \ annehmen\n  &c/draw deny &7- Unentschieden ablehnen\n\n&7Zeitlimit:\
-        \ &e{time} Sekunden"
-      expired: '&c&lUnentschieden-Abstimmung abgelaufen!
+        &e{initiator} &7möchte das Match unentschieden beenden.
 
-        &7Das Match geht weiter.'
+        &e{opponent}&7, schreibe:
+          &a/draw accept &7- Unentschieden annehmen
+          &c/draw deny &7- Unentschieden ablehnen
+
+        &7Zeitlimit: &e{time} Sekunden
+      expired: |-
+        &c&lUnentschieden-Abstimmung abgelaufen!
+        &7Das Match geht weiter.
     surrender:
       player-only: '&cNur Spieler können diesen Befehl nutzen!'
       only-active: '&cDu kannst nur während eines laufenden Matches aufgeben!'
-      confirm: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
-
-        &c&lWARNUNG: AUFGEBEN
-
+      confirm: |-
         &c&l━━━━━━━━━━━━━━━━━━━━━━━
-
+        &c&lWARNUNG: AUFGEBEN
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
 
         &7Willst du wirklich aufgeben?
-
         &cDu verlierst deinen gesamten Einsatz!
 
-
         &7Schreibe &e/surrender confirm &7zum Bestätigen
-
-        &7oder warte {timeout} Sekunden zum Abbrechen'
+        &7oder warte {timeout} Sekunden zum Abbrechen
       confirm-expired: '&cBestätigung abgelaufen! Tippe &e/surrender &cnoch einmal.'
-      surrendered: '&c&l━━━━━━━━━━━━━━━━━━━━━━━
-
+      surrendered: |-
+        &c&l━━━━━━━━━━━━━━━━━━━━━━━
         &c&l{player} HAT AUFGEGEBEN!
-
         &c&l━━━━━━━━━━━━━━━━━━━━━━━
 
-
-        &e{opponent} &agewinnt das Match!'
+        &e{opponent} &agewinnt das Match!
   match-display:
     you-won-header: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
     you-won: '&a&lDU HAST GEWONNEN!'
@@ -396,20 +313,14 @@ messages:
     no-winner: '&7Kein Gewinner ermittelt.'
     thanks: '&7Danke fürs Mitmachen!'
   surrender:
-    success: '
+    success: |2
 
       &c&l━━━━━━━━━━━━━━━━━━━━━━━
-
       &c&lDU HAST AUFGEGEBEN!
-
       &c&l━━━━━━━━━━━━━━━━━━━━━━━
-
 
       &7Dein Gegner hat gewonnen.
-
-      '
   draw:
-    denied: '&cUnentschieden abgelehnt - Kampf geht weiter!'
     timeout: '&cAbstimmung abgelaufen - Kampf geht weiter!'
   error:
     no-permission: '&cKeine Berechtigung!'
@@ -421,15 +332,11 @@ messages:
     command-blocked: '&cBefehle sind während eines Matches gesperrt! Nutze &e/surrender
       &coder &e/draw'
   event-help:
-    header: '
+    header: |2
 
       &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
       &e&lPVP-WAGER BEFEHLE
-
       &6&l━━━━━━━━━━━━━━━━━━━━━━━
-
-      '
     join: '&e/event join <event> &7– Event beitreten'
     leave: '&e/event leave &7– Event verlassen'
     list: '&e/event list &7– verfügbare Events'
@@ -466,8 +373,8 @@ messages:
   eventstats:
     player-not-found: '&cSpieler nicht gefunden: &e{player}'
     usage: '&e/eventstats me &7| &e/eventstats top [N]'
-    admin-usage: '&7Admin: &e/eventstats reset <spieler> &7| &e/eventstats add
-      <spieler> <wins|participations> <n>'
+    admin-usage: '&7Admin: &e/eventstats reset <spieler> &7| &e/eventstats add <spieler>
+      <wins|participations> <n>'
     me-player-only: '&cNur Spieler können &e/eventstats me &cnutzen.'
     me-empty: '&7Noch keine Event-Statistiken – nimm an Events teil!'
     me-header: '&6&lDeine Event-Statistiken'
@@ -539,11 +446,15 @@ messages:
     no-active-event: '&cKein aktives Event mit diesem Namen!'
     no-countdown-active: '&cKein Countdown aktiv!'
   inventory:
-    session-conflict: '&cDu hast noch eine offene Inventar-Sitzung aus einem anderen Match oder Event. Du kannst gerade nicht beitreten.'
-    backup-degraded: '&eDein Inventar konnte nicht auf die Platte gesichert werden. Es liegt bis zum Event-Ende nur im Arbeitsspeicher.'
-    backup-failed-abort: '&cDu wurdest aus dem Event entfernt: dein Inventar konnte nicht sicher gesichert werden.'
+    session-conflict: '&cDu hast noch eine offene Inventar-Sitzung aus einem anderen
+      Match oder Event. Du kannst gerade nicht beitreten.'
+    backup-degraded: '&eDein Inventar konnte nicht auf die Platte gesichert werden.
+      Es liegt bis zum Event-Ende nur im Arbeitsspeicher.'
+    backup-failed-abort: '&cDu wurdest aus dem Event entfernt: dein Inventar konnte
+      nicht sicher gesichert werden.'
   rewards:
-    pending: '&aDeine Belohnung wartet und wird uebergeben, sobald dein Inventar zurueck ist.'
+    pending: '&aDeine Belohnung wartet und wird uebergeben, sobald dein Inventar zurueck
+      ist.'
     delivered-on-join: '&aDeine offenen Belohnungen wurden dir übergeben.'
     winner-title: '&6&lGEWONNEN!'
     winner-subtitle: '&aBelohnungen werden ausgezahlt'
@@ -572,256 +483,21 @@ messages:
     loaded: '&aWelt geladen! ✓'
     load-failed: '&cWelt konnte nicht geladen werden! ✗'
   gui:
-    equipment-item-title: '{name}'
-    wager-title: '&6&lWetteinsatz einrichten'
-    arena-title: '&e&lArena auswählen'
-    equipment-title: '&e&lEquipment auswählen'
-    click-to-select: '&7Klicke zum Auswählen'
-    back-title: '&c« Zurück'
-    back-lore: '&7Klicke um zurückzugehen'
-    confirm-title: '&a✔ Bestätigen'
     arena-select-title: '&6&lArena auswählen'
-    error-select-arena: '&cWähle erst eine Arena!'
-    available-arenas-count: '&7Verfügbare Arenas: &e{count}'
-    no-arenas-available-title: '&c&lKeine Arenas verfügbar!'
-    no-arenas-available-lore: '&7Bitte einen Admin kontaktieren.'
-    world-label: '&7Welt: &f{world}'
     spawn-type-label: '&7Spawn-Typ: &f{type}'
-    boundaries-active: '&7Grenzen: &aAktiv'
-    selected-check: '&a✔ Ausgewählt!'
-    arena-item-title: '{name}'
-    arena-selected-message: '&aArena ausgewählt: &e{arena}'
     equipment-select-title: '&6&lEquipment auswählen'
-    error-select-equipment: '&cWähle erst eine Ausrüstung!'
-    available-equipment-count: '&7Verfügbare Ausrüstungen: &e{count}'
-    filter-arena: '&7Filter: Arena &e{arena}'
-    no-equipment-available-title: '&c&lKeine Ausrüstung verfügbar!'
-    no-equipment-available-line-1: '&7Für diese Arena ist keine Ausrüstung konfiguriert.'
-    no-equipment-available-line-2: '&7Bitte einen Admin kontaktieren.'
-    no-equipment-available-lore: '&7Bitte einen Admin kontaktieren.'
-    armor-label: '&7Rüstung:'
-    armor-piece-label: '  &8• &f{part}: {material}'
-    armor-helmet: 'Helm'
-    armor-chestplate: 'Brust'
-    armor-leggings: 'Beine'
-    armor-boots: 'Schuhe'
-    inventory-label: '&7Inventar:'
-    inventory-more: '  &8• &7... und weitere'
-    equipment-selected-message: '&aAusrüstung ausgewählt: &e{equipment}'
-    confirm-lore: '&7Klicke um fortzufahren'
     cancel-title: '&c✖ Abbrechen'
-    cancel-lore: '&7Klicke um abzubrechen'
-    challenge-to-title: '&e&lHerausforderung an:'
-    challenge-to-player: '&f{player}'
-    challenge-to-line1: '&7Stelle deinen Einsatz zusammen'
-    challenge-to-line2: '&7und wähle Arena & Ausrüstung.'
-    click-to-edit: '&eKlicke zum Bearbeiten'
-    items-title: '&6&l📦 Items Einsetzen'
-    item-selection.clear-title: '&c&lAlles Entfernen'
-    item-selection.clear-line1: '&7Entfernt alle Items'
-    item-selection.clear-line2: '&7aus dem Wager.'
-    item-selection.info-title: '&e&lAnleitung'
-    item-selection.info-line1: '&7Klicke auf Items unten'
-    item-selection.info-line2: '&7um sie hinzuzufügen.'
-    item-selection.info-line3: '&7Klicke auf ausgewählte Items'
-    item-selection.info-line4: '&7um sie zu entfernen.'
-    item-selection.info-line5: '&eLinks-Klick: &f1 Item'
-    item-selection.info-line6: '&eRechts-Klick: &fGanzer Stack'
-    item-selection.empty-slot-title: '&7Leerer Slot'
-    item-selection.empty-slot-lore: '&7Füge Items hinzu!'
-    item-selection.remove-lore: '&c➤ Klicke zum Entfernen'
-    item-selection.add-lore: '&a➤ Klicke zum Hinzufügen'
-    item-selection.error-max-items: '&cMaximal 7 Item-Stacks erlaubt!'
-    item-selection.cleared-message: '&eAlle Items entfernt.'
-    money-title: '&6&l💰 Geld Einsetzen'
-    your-balance: '&7Dein Guthaben: &6${balance}'
-    money-selection.choose-line1: '&7Wähle einen Betrag aus'
-    money-selection.choose-line2: '&7oder passe ihn an.'
-    money-selection.amount-select-line1: '&aKlicke um diesen'
-    money-selection.amount-select-line2: '&aBetrag zu wählen.'
-    money-selection.amount-not-enough-money: '&cNicht genug Geld!'
-    money-selection.clear-title: '&c&lBetrag löschen'
-    money-selection.clear-line: '&7Setzt den Einsatz auf 0.'
-    money-selection.adjust-plus-lore: '&7Erhöht den Einsatz.'
-    money-selection.adjust-minus-lore: '&7Verringert den Einsatz.'
-    money-selection.current-title: '&a&lAktueller Einsatz'
-    money-selection.current-label: '&7Aktueller Einsatz:'
-    money-selection.remaining-balance: '&7Verbleibendes Guthaben:'
-    money-selection.all-in-title: '&6&lALLES SETZEN!'
-    money-selection.all-in-warning: '&c⚠ Setzt alles ein!'
-    current-wager-label: '&7Aktueller Einsatz:'
-    no-items-selected: '&cKeine Items ausgewählt'
-    no-money-selected: '&cKein Geld eingesetzt'
-    no-arena-selected: '&c⚠ Keine Arena ausgewählt'
-    no-equipment-selected: '&c⚠ Keine Ausrüstung ausgewählt'
-    required-field: '&7(Pflichtfeld!)'
-    selected-label: '&aAusgewählt:'
-    more-items: '&7... und {count} weitere'
     overview-title: '&e&lÜbersicht'
-    overview.items-set: '&a✔ &fItems: &e{count}'
-    overview.items-none: '&7✗ &fItems: &cKeine'
-    overview.money-set: '&a✔ &fGeld: &6${amount}'
-    overview.money-none: '&7✗ &fGeld: &cKein'
-    overview.arena-set: '&a✔ &fArena: &e{arena}'
-    overview.arena-none: '&c✗ &fArena: &cNicht gewählt'
-    overview.equipment-set: '&a✔ &fAusrüstung: &e{equipment}'
-    overview.equipment-none: '&c✗ &fAusrüstung: &cNicht gewählt'
-    overview.separator: '&7━━━━━━━━━━━━━━━━━━━━'
-    error-choose-arena-equipment: '&cWähle zuerst Arena und Ausrüstung!'
-    wager-cancelled: '&cWetteinsatz-Anfrage abgebrochen.'
-    ready-to-send: '&a✔ Bereit zum Senden!'
-    not-ready-yet: '&c⚠ Noch nicht bereit!'
-    choose-arena: '&c- Wähle eine Arena'
-    choose-equipment: '&c- Wähle eine Ausrüstung'
-    all-ready: '&aAlles bereit!'
-    click-to-send-line-1: '&eKlicke um die Anfrage'
-    click-to-send-line-2: '&ezu senden!'
-    confirmation-title: '&6&lAnfrage bestätigen'
-    confirmation.target-title: '&e&lHerausforderung an:'
-    confirmation.target-player: '&f{player}'
-    confirmation.target-line1: '&7Diese Anfrage wird an'
-    confirmation.target-line2: '&7den Spieler gesendet.'
-    confirmation.vs-player: '&7{player}'
-    confirmation.vs-against: '&7gegen'
-    confirmation.vs-target: '&7{target}'
-    confirmation.item-title: '&6&l📦 Dein Item-Einsatz'
-    confirmation.items-in-wager: '&aItems im Einsatz:'
-    confirmation.item-line: '&7- &f{item}'
-    confirmation.no-items: '&7Keine Items eingesetzt'
-    confirmation.money-title: '&6&l💰 Dein Geld-Einsatz'
     confirmation.money-label: '&aGeld-Einsatz:'
-    confirmation.money-warning: '&c⚠ Wird bei Niederlage verloren!'
-    confirmation.no-money: '&7Kein Geld eingesetzt'
-    confirmation.arena-title: '&6&l🗺 Kampfarena'
-    confirmation.arena-label: '&aArena: &f{arena}'
     confirmation.arena-world: '&7Welt: &f{world}'
-    confirmation.no-arena: '&cKeine Arena ausgewählt!'
-    confirmation.equipment-title: '&6&l⚔ Kampfausrüstung'
-    confirmation.equipment-label: '&aAusrüstung: &f{equipment}'
-    confirmation.equipment-line1: '&7Beide Spieler erhalten'
-    confirmation.equipment-line2: '&7diese Ausrüstung im Kampf.'
     confirmation.no-equipment: '&cKeine Ausrüstung ausgewählt!'
-    confirmation.edit-title: '&e&l✎ Bearbeiten'
-    confirmation.edit-line1: '&7Zurück zum Hauptmenü'
-    confirmation.edit-line2: '&7um Änderungen vorzunehmen.'
     confirmation.cancel-title: '&c&l✖ ABBRECHEN'
-    confirmation.cancel-line1: '&7Bricht die Anfrage ab.'
-    confirmation.cancel-line2: '&7Alle Items werden zurückgegeben.'
-    confirmation.confirm-warning-title: '&c⚠ ACHTUNG:'
-    confirmation.confirm-warning-body: '&cDein Einsatz wird eingefroren!'
-    confirmation.click-to-send: '&aKlicke um die Anfrage zu senden!'
-    confirmation.confirm-send-line1: '&7Sendet die Anfrage an:'
-    confirmation.confirm-send-target: '&f{target}'
-    confirmation.confirm-button-title: '&a&l✔ ANFRAGE SENDEN'
-    confirmation.sent-line1: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
-    confirmation.sent-line2: '&a&lANFRAGE GESENDET!'
-    confirmation.sent-line3: '&a&l━━━━━━━━━━━━━━━━━━━━━━━'
-    confirmation.sent-waiting: '&7Warte auf Antwort von &e{target}&7...'
-    confirmation.sent-expire: '&7Die Anfrage läuft in &e60 Sekunden &7ab.'
-    confirmation.error-player-offline: '&cDer Spieler ist nicht mehr online!'
-    confirmation.error-already-in-match: '&cDu bist bereits in einem Kampf!'
-    confirmation.error-target-in-match: '&c{target} ist bereits in einem Kampf!'
-    confirmation.error-already-pending-request: '&cDu hast bereits eine ausstehende Anfrage!'
-    confirmation.error-not-enough-money: '&cNicht genug Geld! Du brauchst: ${money}'
     response.title: '&6&lAnfrage beantworten'
-    response.challenge-from: '&e&lHerausforderung von:'
-    response.challenge-subtitle: '&7Setze deinen Gegeneinsatz'
-    response.opponent-sets: '&7Gegner setzt:'
-    response.no-items: '&8Keine Items'
-    response.no-money: '&8Kein Geld'
-    response.match-details: '&6&lKampf-Details'
-    response.opponent-money-title: '&6&lGegner Geld'
-    response.opponent-items-title: '&6&lGegner-Items'
-    response.arena-label: '&7Arena: &f{arena}'
-    response.equipment-label: '&7Ausrüstung: &f{equipment}'
-    response.your-items: '&aDeine Items:'
-    response.more-items: '&7... und weitere'
-    response.no-items-set: '&7Keine Items gesetzt'
-    response.click-to-edit: '&eKlicke zum Bearbeiten'
-    response.your-items-title: '&a&lDein Item-Einsatz'
-    response.your-money-label: '&aDein Einsatz:'
-    response.no-money-set: '&7Kein Geld gesetzt'
-    response.your-money-title: '&a&lDein Geld-Einsatz'
-    response.edit-items-title: '&e✎ Items wählen'
-    response.edit-items-lore: '&7Öffnet die Item-Auswahl'
-    response.edit-money-title: '&e✎ Geld setzen'
-    response.edit-money-lore: '&7Öffnet die Geld-Auswahl'
-    response.accept-title: '&a&l✔ ANNEHMEN'
-    response.accept-lore1: '&7Akzeptiert die Anfrage'
-    response.accept-lore2: '&7mit deinem Gegeneinsatz.'
-    response.decline-title: '&c&l✖ ABLEHNEN'
-    response.decline-lore1: '&7Lehnt die Anfrage ab.'
     response.player-offline: '&cDer Herausforderer ist nicht mehr online!'
     response.not-enough-money: '&cNicht genug Geld!'
-    response.wager-chosen: '&aEinsatz gewählt! Warte auf Bestätigung von {target}...'
-    response.other-chosen: '&e{player} &7hat seinen Einsatz gewählt!'
-    response.review-offer: '&7Überprüfe das Angebot...'
-    response.request-declined: '&c{player} hat deine Anfrage abgelehnt!'
-    response.declined: '&cAnfrage abgelehnt.'
     response-item-selection.title: '&6&lDeine Items wählen'
-    response-item-selection.clear-title: '&c&lAlles Entfernen'
-    response-item-selection.clear-line1: '&7Entfernt alle Items'
-    response-item-selection.clear-line2: '&7aus dem Wager.'
-    response-item-selection.info-title: '&e&lAnleitung'
-    response-item-selection.info-line1: '&7Klicke auf Items unten'
-    response-item-selection.info-line2: '&7um sie hinzuzufügen.'
-    response-item-selection.info-line3: '&7Klicke auf ausgewählte Items'
-    response-item-selection.info-line4: '&7um sie zu entfernen.'
-    response-item-selection.info-line5: '&eLinks-Klick: &f1 Item'
-    response-item-selection.info-line6: '&eRechts-Klick: &fGanzer Stack'
-    response-item-selection.empty-slot-title: '&7Leerer Slot'
-    response-item-selection.empty-slot-lore: '&7Füge Items hinzu!'
-    response-item-selection.remove-lore: '&c➤ Klicke zum Entfernen'
-    response-item-selection.add-lore: '&a➤ Klicke zum Hinzufügen'
-    response-item-selection.error-max-items: '&cMaximal 7 Item-Stacks erlaubt!'
-    response-item-selection.cleared-message: '&eAlle Items entfernt.'
     response-money-selection.title: '&6&lDein Geld-Einsatz'
-    response-money-selection.clear-title: '&c&lBetrag löschen'
-    response-money-selection.clear-lore: '&7Setzt auf 0.'
-    response-money-selection.info-title: '&e&lGeld-Einsatz'
-    response-money-selection.info-balance: '&7Dein Guthaben:'
-    response-money-selection.info-opponent: '&7Gegner setzt:'
     response-money-selection.not-enough-money: '&cNicht genug Geld!'
-    response-money-selection.match-sender-title: '&e&lGegner angleichen'
-    response-money-selection.match-sender-line1: '&7Setzt auf:'
-    response-money-selection.match-sender-line2: '&eKlicke um den Betrag des'
-    response-money-selection.match-sender-line3: '&eGegners zu übernehmen.'
-    response-money-selection.current-title: '&a&lAktueller Einsatz'
-    response-money-selection.current-label: '&7Aktueller Einsatz:'
-    response-money-selection.remaining-balance: '&7Verbleibendes Guthaben:'
-    negotiation.title-sender: '&6&lÜberprüfe Angebot'
-    negotiation.title-target: '&6&lAnfrage prüfen'
-    negotiation.vs-title: '&c&l⚔ VS ⚔'
-    negotiation.vs-line1: '&7Verhandle über'
-    negotiation.vs-line2: '&7den Einsatz!'
-    negotiation.arena-title: '&6&lArena'
-    negotiation.equipment-title: '&6&lAusrüstung'
-    negotiation.opponent-title: '&c&lGegner: {player}'
-    negotiation.opponent-lore1: '&7Das ist der Einsatz'
-    negotiation.opponent-lore2: '&7deines Gegners.'
-    negotiation.opponent-items-title: '&c&lGegner Items'
-    negotiation.items-count: '&7Anzahl: &f{count}'
-    negotiation.opponent-money-title: '&c&lGegner Geld'
-    negotiation.no-money: '&8Kein Geld'
-    negotiation.you-title: '&a&lDu: {player}'
-    negotiation.you-lore: '&7Das ist dein Einsatz.'
-    negotiation.your-items-title: '&a&lDeine Items'
-    negotiation.your-money-title: '&a&lDein Geld'
-    negotiation.decline-title: '&c&l✖ ABLEHNEN'
-    negotiation.decline-line1: '&7Lehnt das Angebot ab'
-    negotiation.decline-line2: '&7und bricht die Verhandlung ab.'
-    negotiation.decline-line3: '&cItems werden zurückgegeben.'
-    negotiation.counter-offer-title: '&6&l↻ GEGENANGEBOT'
-    negotiation.counter-offer-line1: '&7Passe deinen Einsatz an'
-    negotiation.counter-offer-line2: '&7und sende ein Gegenangebot.'
-    negotiation.counter-offer-line3: '&eDer andere Spieler kann'
-    negotiation.counter-offer-line4: '&edann wieder entscheiden.'
-    negotiation.accept-title: '&a&l✔ ANNEHMEN'
-    negotiation.accept-line1: '&7Akzeptiert beide Einsätze'
-    negotiation.accept-line2: '&7und startet den Kampf!'
-    negotiation.accept-line3: '&a⚔ Match beginnt!'
-    send-button-ready-title: '&a&l➤ ANFRAGE SENDEN'
-    send-button-disabled-title: '&7➤ Anfrage Senden'
     economy-not-available: '&c⚠ Economy nicht verfügbar'
     pvpask:
       not-online: '&cSpieler {player} ist nicht online!'
@@ -890,16 +566,9 @@ messages:
       countdown1: '&7Wenn beide bestätigen, startet ein'
       countdown2: '&7&l5-Sekunden-Countdown&7 und das Match beginnt!'
   trade:
-    wager-cancelled: '&cWager-Anfrage abgebrochen.'
     economy-not-available: '&cEconomy ist nicht verfügbar!'
   negotiation:
-    offer-declined-other: '&c{player} hat das Angebot abgelehnt!'
-    opponent-offline: '&cDer andere Spieler ist nicht mehr online!'
-    offer-accepted-other: '&a&l{player} hat das Angebot angenommen! Match startet...'
-    not-enough-money-other: '&c{player} hat nicht genug Geld!'
     not-enough-money: '&cNicht genug Geld!'
-    counter-offer-sent: '&aGegenangebot gesendet! Warte auf Antwort...'
-    counter-offer-received: '&e{player} &7hat ein &6Gegenangebot &7gesendet!'
   challenge:
     header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━'
     title: '&e&lPVP-HERAUSFORDERUNG!'
@@ -907,8 +576,6 @@ messages:
     deny-command: '&c/pvp deny {player} &7- Ablehnen'
   response:
     request-declined-other: '&c{player} hat deine Anfrage abgelehnt!'
-    request-expired: '&cDie Wager-Anfrage ist bereits abgelaufen!'
-    requester-offline: '&cDer Anfragende ist nicht mehr online!'
   confirmation:
     select-arena-equipment: '&cWähle Arena und Ausrüstung!'
     player-offline: '&cDer Spieler ist nicht mehr online!'
@@ -918,10 +585,10 @@ messages:
     arena-setup-failed: '&cFehler: Arena-Setup fehlgeschlagen!'
     no-arenas: '&cKeine Arenas verfügbar!'
     not-enough-money: '&cDu hast nicht genug Geld!'
-    min-wager-not-met: '&cMindesteinsatz nicht erreicht! Mindestens {items}
-      Items oder ${money} erforderlich.'
-    not-enough-inventory: '&cDu hast nicht genug Platz im Inventar für die Items
-      deines Gegners!'
+    min-wager-not-met: '&cMindesteinsatz nicht erreicht! Mindestens {items} Items
+      oder ${money} erforderlich.'
+    not-enough-inventory: '&cDu hast nicht genug Platz im Inventar für die Items deines
+      Gegners!'
     opponent-not-enough-inventory: '&cDein Gegner hat nicht genug Platz im Inventar!'
     arena-loading: '&eArena wird geladen... &7(5 Sekunden)'
     match-starting: '&e&lMATCH BEGINNT!'
@@ -931,9 +598,9 @@ messages:
     you-lost: '&c&lDU HAST VERLOREN!'
   debug:
     enums:
-      level-off: 'Aus'
-      level-basic: 'Normal'
-      level-full: 'Ausführlich'
+      level-off: Aus
+      level-basic: Normal
+      level-full: Ausführlich
     help:
       header: '&8&m                    &r &bDebug-Befehle &8&m                    '
       status: '&e/{label} debug &8- &7Zeigt den aktuellen Status'
@@ -946,8 +613,8 @@ messages:
       disabled: '&cDebug deaktiviert.'
       unknown-command: '&cUnbekannter Befehl: &e{command}'
       use-help: '&7Nutze &e/{label} debug help &7für Hilfe.'
-      status-disabled: 'Deaktiviert'
-      status-enabled: 'Aktiviert'
+      status-disabled: Deaktiviert
+      status-enabled: Aktiviert
       status-label: '&7Status: {status}'
       level-label: '&7Stufe: &e{level}'
       use-debug-help: '&7Nutze &e/{label} debug help &7für alle Befehle.'
@@ -1013,7 +680,10 @@ messages:
     broadcast-match-starting: '&e&lMATCH WIRD GESTARTET!'
     broadcast-change-detected: '&c&lÄnderung erkannt - Bestätigungen zurückgesetzt!'
     broadcast-cancelled: '&c&lPVP Wager abgebrochen!'
-    broadcast-error-match-start: '&cFehler beim Starten des Matches. Items wurden zurückgegeben.'
+    broadcast-error-match-start: '&cFehler beim Starten des Matches. Items wurden
+      zurückgegeben.'
+    both-in-session: '&cEiner der Spieler befindet sich bereits in einer aktiven LiveTrade-Sitzung!'
+    both-in-match: '&cEiner der Spieler befindet sich bereits in einem aktiven PvP-Kampf!'
   system:
     no-event-open: '&cDerzeit ist kein Event geöffnet.'
     join-available: '&7Beitritt verfügbar für: &a{list}'
@@ -1037,13 +707,16 @@ messages:
     cooldown-wait: '&cBitte warte noch {seconds} Sekunden!'
     players-only: '&cNur Spieler können diesen Befehl nutzen!'
     unknown-subcommand: '&cUnbekannter Sub-Command: {command}'
-    commands-disabled-event: '&cBefehle sind während des Events gesperrt! Nutze /event leave zum Verlassen.'
-    world-access-denied: '&cDu darfst diese Welt derzeit nicht betreten. Zum Spawn teleportiert.'
+    commands-disabled-event: '&cBefehle sind während des Events gesperrt! Nutze /event
+      leave zum Verlassen.'
+    world-access-denied: '&cDu darfst diese Welt derzeit nicht betreten. Zum Spawn
+      teleportiert.'
     lobby-world-not-found: '&cFehler: Lobby-Welt nicht gefunden!'
     removed-from-event: '&cDu wurdest aus dem Event entfernt (nicht in Lobby/Event-Welt).'
     unknown-command: '&cUnbekannter Befehl: &e{cmd}'
     player-only: '&cDieser Befehl ist nur für Spieler.'
-    stranded-rescued: '&aDu wurdest zurueckgeholt - das Event, in dem du warst, ist vorbei.'
+    stranded-rescued: '&aDu wurdest zurueckgeholt - das Event, in dem du warst, ist
+      vorbei.'
   info:
     header: '&6&l━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
     title: '&e&lPVP WAGER - BEFEHLSÜBERSICHT'
@@ -1060,8 +733,8 @@ messages:
       draw: '&7/draw &8- &7Bitte um Unentschieden (beide müssen zustimmen)'
     answer-commands:
       header: '&a&l📋 ANTWORT-BEFEHLE:'
-      pvpanswer: '&7/pvpanswer <einsatz> <menge> <arena> <ausrüstung> &8- &7Auf
-        eine Herausforderung antworten'
+      pvpanswer: '&7/pvpanswer <einsatz> <menge> <arena> <ausrüstung> &8- &7Auf eine
+        Herausforderung antworten'
       pvpyes: '&7/pvpyes &8- &7Bestätige deine aktuelle Wette'
       pvpno: '&7/pvpno &8- &7Lehne deine aktuelle Wette ab'
     examples:
@@ -1069,8 +742,7 @@ messages:
       money: '&7/pvpanswer money 100 &8- &7Setze 100$ als Wette'
       items: '&7/pvpanswer items &8- &7Setze Items aus deinem Inventar als Wette'
       money-arena: '&7/pvpanswer money 50 nether &8- &7Setze 50$ und wähle die Nether-Arena'
-      items-full: '&7/pvpanswer items forest diamond &8- &7Items + Wald-Arena
-        + Diamant-Ausrüstung'
+      items-full: '&7/pvpanswer items forest diamond &8- &7Items + Wald-Arena + Diamant-Ausrüstung'
     notices:
       header: '&6&l⚠ WICHTIGE HINWEISE:'
       world-loading: '&7• &eWelt-Ladung &7- manche Arenen müssen vorher geladen werden'
@@ -1104,8 +776,8 @@ messages:
     their-wager-money: '&7Ihr Einsatz: &e${amount}'
     their-wager-items: '&7Ihr Einsatz: &e{items}'
     expires-in: '&7Anfrage läuft in &e60 Sekunden &7ab'
-    accept-command: 'Annehmen'
-    deny-command: 'Ablehnen'
+    accept-command: Annehmen
+    deny-command: Ablehnen
     alternative-response: '&7Oder antworte mit:'
     alternative-command: '&a/pvpanswer <dein_einsatz> <menge> &8[optional: arena]
       [ausrüstung]'
@@ -1120,40 +792,13 @@ messages:
   commands:
     pvpdeny:
       no-permission: '&cDu hast keine Berechtigung für diesen Befehl!'
-      no-pending-requests: '&cDu hast keine ausstehenden Wager-Anfragen!'
-      request-removed-offline: '&7Anfrage entfernt (Spieler offline).'
     pvpaccept:
       no-permission: '&cDu hast keine Berechtigung für diesen Befehl!'
       no-pending-requests: '&cDu hast keine ausstehenden Wager-Anfragen!'
-      usage-hint: '&7Verwende &e/pvpaccept <spieler> &7um eine bestimmte Anfrage anzunehmen.'
       player-offline: '&cDer Spieler ist nicht mehr online!'
     pvprespond:
-      request-expired: '&cDie Wager-Anfrage ist bereits abgelaufen!'
       usage: '&7Verwendung: &e/pvprespond gui'
-      requester-offline: '&cDer Anfragende ist nicht mehr online!'
   pvp-wager-gui:
-    counter-offer-title: '&6&lGegenangebot erstellen'
-    counter-offer-info-title: '&e&lGegenangebot'
-    counter-offer-info-line1: '&7Passe deinen Einsatz an,'
-    counter-offer-info-line2: '&7um ein Gegenangebot zu senden.'
-    counter-offer-info-line3: '&eKlicke Items in deinem'
-    counter-offer-info-line4: '&eInventar, um sie hinzuzufügen.'
-    counter-offer-clear-items-title: '&c&l✖ Items leeren'
-    counter-offer-clear-items-lore: '&7Entfernt alle ausgewählten Items'
-    counter-offer-clear-money-title: '&c&l✖ Geld auf 0'
-    counter-offer-clear-money-lore: '&7Setzt den Geldbetrag auf 0'
-    counter-offer-remove-hint: '&cRechtsklick zum Entfernen'
-    counter-offer-money-button-lore: '&7Klicke zum Ändern'
-    counter-offer-current-stake-label: '&7Aktueller Einsatz:'
-    counter-offer-balance-label: '&7Dein Guthaben: &f${amount}'
-    counter-offer-money-title: '&6&lGeld-Einsatz'
-    counter-offer-already-selected: '&a✓ Bereits ausgewählt'
-    counter-offer-back-title: '&c&l← Abbrechen'
-    counter-offer-back-lore: '&7Zurück ohne Änderungen'
-    counter-offer-send-items-label: '&7Items: &f{count}'
-    counter-offer-send-money-label: '&7Geld: &6${amount}'
-    counter-offer-send-hint: '&aSendet das Gegenangebot!'
-    counter-offer-send-title: '&a&l➤ SENDEN'
     no-permission: '&cDu hast keine Berechtigung für diesen Befehl!'
     player-offline: '&cSpieler &e{player} &cist nicht online!'
     cannot-challenge-self: '&cDu kannst dich nicht selbst herausfordern!'
@@ -1170,26 +815,22 @@ messages:
     request-sent-header: '&e&lWAGER-ANFRAGE GESENDET'
     challenge-sent: '&7Du hast &e{player} &7herausgefordert!'
     waiting-response: '&7Warte auf Antwort...'
-    request-header: '§e§lPVP WAGER ANFRAGE'
+    request-header: §e§lPVP WAGER ANFRAGE
     challenge-message: '§e{player} §amöchte gegen dich wetten!'
     accept-button: '§a§l[► ANNEHMEN ◄]'
-    accept-hover: '§aKlicke, um das Wager-GUI zu öffnen!
-
+    accept-hover: |-
+      §aKlicke, um das Wager-GUI zu öffnen!
       §7Ihr könnt dann gemeinsam Items, Geld,
-
-      §7Arena und Ausrüstung auswählen.'
+      §7Arena und Ausrüstung auswählen.
     deny-button: ' §c§l[✖ ABLEHNEN]'
-    deny-hover: '§cKlicke um die Anfrage abzulehnen'
-    request-footer: '
+    deny-hover: §cKlicke um die Anfrage abzulehnen
+    request-footer: |2
 
 
       §7Die Anfrage läuft in §e60 Sekunden§7 ab.
-
       §6§l━━━━━━━━━━━━━━━━━━━━━━━
-
-      '
-    accept-command: 'Annehmen'
-    deny-command: 'Ablehnen'
+    accept-command: Annehmen
+    deny-command: Ablehnen
     request-expired-sender: '&cDeine Wager-Anfrage an &e{player} &cist abgelaufen.'
     request-expired-target: '&cDie Wager-Anfrage von &e{player} &cist abgelaufen.'
     both-in-session: '&cEiner der Spieler ist bereits in einer Wager-Session!'
@@ -1197,26 +838,15 @@ messages:
     session-start-failed: '&cKonnte Wager-Session nicht starten!'
     request-declined-other: '&e{player} &chat deine Wager-Anfrage abgelehnt.'
     request-declined-self: '&cDu hast die Wager-Anfrage von &e{player} &cabgelehnt.'
-    offer-declined-self: '&cDu hast das Angebot abgelehnt.'
-    offer-declined-other: '&c{player} hat das Angebot abgelehnt!'
-    opponent-offline: '&cDer andere Spieler ist nicht mehr online!'
-    already-in-match-self: '&cDu bist bereits in einem Kampf!'
-    already-in-match-other: '&c{player} ist bereits in einem Kampf!'
-    offer-accepted-self: '&a&lAngebot angenommen! Match wird gestartet...'
-    offer-accepted-other: '&a&l{player} hat das Angebot angenommen! Match startet...'
-    not-enough-money-other: '&c{player} hat nicht genug Geld!'
-    max-different-items: '&cMaximal 7 verschiedene Items!'
-    not-enough-money-self: '&cNicht genug Geld!'
-    missing-items-self: '&cDu hast nicht alle Items!'
-    counter-offer-sent: '&aGegenangebot gesendet! Warte auf Antwort...'
-    counter-offer-received: '&e{player} &7hat ein &6Gegenangebot &7gesendet!'
-    request-cancelled: '&cWager-Anfrage abgebrochen.'
   utility:
-    no-items: 'keine Items'
+    no-items: keine Items
   match-manager:
-    inventory-session-conflict: '&cDu hast noch eine offene Inventar-Sitzung aus einem anderen Match oder Event. Das Match kann nicht starten.'
-    inventory-backup-degraded: '&eDein Inventar konnte nicht auf die Platte gesichert werden. Es liegt bis zum Match-Ende nur im Arbeitsspeicher.'
-    inventory-backup-failed-abort: '&cDas Match wurde abgebrochen: dein Inventar konnte nicht sicher gesichert werden.'
+    inventory-session-conflict: '&cDu hast noch eine offene Inventar-Sitzung aus einem
+      anderen Match oder Event. Das Match kann nicht starten.'
+    inventory-backup-degraded: '&eDein Inventar konnte nicht auf die Platte gesichert
+      werden. Es liegt bis zum Match-Ende nur im Arbeitsspeicher.'
+    inventory-backup-failed-abort: '&cDas Match wurde abgebrochen: dein Inventar konnte
+      nicht sicher gesichert werden.'
     world-announcement: '&7Welt: &e{world}'
     please-wait: '&7Bitte warte einen Moment...'
     arena-loading: '&6&lARENA-WELT WIRD GELADEN...'
@@ -1227,27 +857,20 @@ messages:
     arena-not-exists: '&cFehler: ausgewählte Arena existiert nicht mehr.'
     teleport-countdown: '&eTeleport zur Arena in &6&l{seconds} &eSekunden...'
     match-countdown: '&eMatch startet in &6&l{seconds} &eSekunden!'
-    spectate-header: '
+    spectate-header: |2+
 
       §6§l━━━━━━━━━━━━━━━━━━━━━━━
-
       §e§lMATCH: §f{player1} §7gegen §f{player2}
-
       §6§l━━━━━━━━━━━━━━━━━━━━━━━
 
-
-      '
     spectate-button: '§b§l[► ZUSCHAUEN ◄]'
-    spectate-footer: '
+    spectate-footer: |2
 
 
       §7Nutze auch §e/pvp spectate <spieler>§7.
-
       §6§l━━━━━━━━━━━━━━━━━━━━━━━
-
-      '
-    spectate-simple: '&eNeues Match: &f{player1} &7gegen &f{player2} &8- &7Nutze
-      &e/pvp spectate {player1}'
+    spectate-simple: '&eNeues Match: &f{player1} &7gegen &f{player2} &8- &7Nutze &e/pvp
+      spectate {player1}'
     no-wager-mode: '&7Modus: &eOhne Einsatz - nur zum Spaß!'
     vs-display: '&e{player1} &7gegen &e{player2}'
     match-starting: '&a&lMATCH STARTET!'
@@ -1269,13 +892,11 @@ messages:
     better-luck: '&7Viel Glück beim nächsten Mal!'
     wager-returned: '&7Dein Einsatz wurde zurückgegeben.'
     no-wager-items: '&7Kein Wetteinsatz - keine Items zu verteilen.'
-    boundaries-warning: '&cDu darfst die Arena-Grenze während eines Matches
-      nicht verlassen!'
+    boundaries-warning: '&cDu darfst die Arena-Grenze während eines Matches nicht
+      verlassen!'
   pvp-listener:
-    disconnected-cancelled: '&e{player} &chat die Verbindung verloren! Match
-      abgebrochen.'
-    disconnected-win: '&e{player} &chat die Verbindung verloren! Du gewinnst
-      das Match!'
+    disconnected-cancelled: '&e{player} &chat die Verbindung verloren! Match abgebrochen.'
+    disconnected-win: '&e{player} &chat die Verbindung verloren! Du gewinnst das Match!'
     spectator-no-attack: '&cDu kannst als Zuschauer nicht angreifen!'
     match-not-started: '&cDas Match hat noch nicht begonnen oder ist beendet!'
     draw-double-death: '&a&lUNENTSCHIEDEN (Doppeltod)!'
@@ -1309,66 +930,118 @@ messages:
   pvp:
     gui-hint: '&7Hinweis: Nutze &e/pvpask <spieler> &7für Wette mit GUI'
   console:
-    dependency-multiverse-missing: 'Multiverse-Core ist für Weltverwaltung, Klonen und Regeneration erforderlich, aber nicht installiert oder aktiviert! Plugin wird deaktiviert.'
-    dependency-vault-missing: 'Vault ist für Wetteinsätze und Wirtschaft erforderlich, aber nicht installiert oder aktiviert! Plugin wird deaktiviert.'
-    dependency-inventorybackup-missing: 'InventoryBackup (aus dem InventoryRestore-Projekt) ist für die Inventarverwaltung erforderlich, aber nicht installiert oder aktiviert! Plugin wird deaktiviert.'
+    dependency-multiverse-missing: 'Multiverse-Core ist für Weltverwaltung, Klonen
+      und Regeneration erforderlich, aber nicht installiert oder aktiviert! Plugin
+      wird deaktiviert.'
+    dependency-vault-missing: 'Vault ist für Wetteinsätze und Wirtschaft erforderlich,
+      aber nicht installiert oder aktiviert! Plugin wird deaktiviert.'
+    dependency-inventorybackup-missing: 'InventoryBackup (aus dem InventoryRestore-Projekt)
+      ist für die Inventarverwaltung erforderlich, aber nicht installiert oder aktiviert!
+      Plugin wird deaktiviert.'
     migration-header: '&e--- Konfiguration auf den aktuellen Stand gebracht ---'
     migration-entry: '&e  {entry}'
-    migration-footer: '&eVon jeder geaenderten Datei liegt eine Kopie <name>.bak-<zeitstempel> daneben. Siehe UPGRADE.md.'
-    inventory-provider-legacy-safety: 'Inventar-Provider: Legacy-Modus mit Sicherheits-Backups. Multiverse-Inventories übernimmt den Tausch; Kopien werden über InventoryBackup geschrieben, aber nie automatisch zurückgespielt.'
-    inventory-provider-legacy-degraded: 'Legacy-Betrieb ist aktiv, aber die InventoryBackup-API steht nicht bereit - es werden keine Sicherungskopien geschrieben. Aktuell schuetzt nur Multiverse-Inventories.'
-    inventory-safety-backup-failed: 'Sicherungskopie fuer {player} konnte nicht geschrieben werden.'
-    inventory-provider-unavailable: 'Die InventoryBackup-API steht nicht bereit. Matches und Events werden abgelehnt, damit kein Inventar ohne Backup geleert wird.'
-    inventory-provider-inventoryrestore: 'Inventar-Provider: InventoryBackup (API v{version}).'
-    inventory-provider-legacy: 'Inventar-Provider: Legacy-Betrieb. Multiverse-Inventories uebernimmt den Inventartausch; Snapshots werden gesammelt, aber nie automatisch zurueckgespielt.'
-    inventory-provider-missing: 'Die Inventarverwaltung ist eingeschaltet, aber die InventoryBackup-API hat sich nicht registriert. Matches und Events werden abgelehnt, bis sie bereitsteht - ohne Backup wird nichts geleert.'
-    inventory-provider-invalid: 'Unbekannter Wert fuer settings.inventory-management.provider - es wird ''auto'' verwendet.'
-    inventory-provider-old-api: 'InventoryBackup liefert API v{running}, dieses Plugin wurde gegen v{expected} gebaut. Neuere Aufrufe stehen nicht zur Verfuegung.'
-    inventory-mvinv-conflict-header: 'Multiverse-Inventories ist installiert und teilt sich {count} Welt(en) mit der eigenen Inventarverwaltung dieses Plugins. Tauschen beide gleichzeitig, ist das Ergebnis nicht vorhersagbar.'
-    inventory-mvinv-conflict-entry: '  Welt ''{world}'' liegt in der Multiverse-Inventories-Gruppe ''{group}'' zusammen mit: {partners}. Aufloesen mit: {command}'
-    inventory-mvinv-guard-active: 'Der Konfliktschutz ist aktiv: jede Wiederherstellung wird einen Tick spaeter geprueft und erneut angewendet, falls ein anderes Plugin sie ueberschrieben hat. Die Weltgruppen oben aufzuloesen bleibt die sauberere Loesung.'
-    inventory-mvinv-guard-inactive: 'Der Konfliktschutz ist ausgeschaltet (settings.inventory-management.multiverse-inventories.conflict-guard). Es gewinnt, wer zuletzt schreibt.'
-    inventory-mvinv-groups-unreadable: 'Die groups.yml von Multiverse-Inventories konnte nicht gelesen werden: {error}. Konflikte lassen sich nicht ermitteln.'
-    inventory-mvinv-groups-unknown: 'Multiverse-Inventories ist installiert, seine Weltgruppen liessen sich aber nicht lesen. Ob sie mit Arena- und Event-Welten kollidieren, ist unbekannt - bitte von Hand pruefen.'
-    inventory-mvinv-worldchange-recovered: 'Beim Weltwechsel nach {world} hat ein anderes Plugin das Inventar von {player} getauscht, obwohl eine Sitzung offen war - der Sitzungszustand wurde wiederhergestellt.'
-    inventory-mvinv-overwrite-recovered: 'Das wiederhergestellte Inventar von {player} wurde von einem anderen Plugin ueberschrieben und erneut angewendet.'
-    inventory-init-failed: 'Die Inventar-Verwaltung konnte nicht aufgebaut werden: {error}. Es laeuft ohne Backups weiter.'
+    migration-footer: '&eVon jeder geaenderten Datei liegt eine Kopie <name>.bak-<zeitstempel>
+      daneben. Siehe UPGRADE.md.'
+    inventory-provider-legacy-safety: 'Inventar-Provider: Legacy-Modus mit Sicherheits-Backups.
+      Multiverse-Inventories übernimmt den Tausch; Kopien werden über InventoryBackup
+      geschrieben, aber nie automatisch zurückgespielt.'
+    inventory-provider-legacy-degraded: Legacy-Betrieb ist aktiv, aber die InventoryBackup-API
+      steht nicht bereit - es werden keine Sicherungskopien geschrieben. Aktuell schuetzt
+      nur Multiverse-Inventories.
+    inventory-safety-backup-failed: 'Sicherungskopie fuer {player} konnte nicht geschrieben
+      werden.'
+    inventory-provider-unavailable: Die InventoryBackup-API steht nicht bereit. Matches
+      und Events werden abgelehnt, damit kein Inventar ohne Backup geleert wird.
+    inventory-provider-inventoryrestore: 'Inventar-Provider: InventoryBackup (API
+      v{version}).'
+    inventory-provider-legacy: 'Inventar-Provider: Legacy-Betrieb. Multiverse-Inventories
+      uebernimmt den Inventartausch; Snapshots werden gesammelt, aber nie automatisch
+      zurueckgespielt.'
+    inventory-provider-missing: Die Inventarverwaltung ist eingeschaltet, aber die
+      InventoryBackup-API hat sich nicht registriert. Matches und Events werden abgelehnt,
+      bis sie bereitsteht - ohne Backup wird nichts geleert.
+    inventory-provider-invalid: 'Unbekannter Wert fuer settings.inventory-management.provider
+      - es wird ''auto'' verwendet.'
+    inventory-provider-old-api: 'InventoryBackup liefert API v{running}, dieses Plugin
+      wurde gegen v{expected} gebaut. Neuere Aufrufe stehen nicht zur Verfuegung.'
+    inventory-mvinv-conflict-header: 'Multiverse-Inventories ist installiert und teilt
+      sich {count} Welt(en) mit der eigenen Inventarverwaltung dieses Plugins. Tauschen
+      beide gleichzeitig, ist das Ergebnis nicht vorhersagbar.'
+    inventory-mvinv-conflict-entry: '  Welt ''{world}'' liegt in der Multiverse-Inventories-Gruppe
+      ''{group}'' zusammen mit: {partners}. Aufloesen mit: {command}'
+    inventory-mvinv-guard-active: 'Der Konfliktschutz ist aktiv: jede Wiederherstellung
+      wird einen Tick spaeter geprueft und erneut angewendet, falls ein anderes Plugin
+      sie ueberschrieben hat. Die Weltgruppen oben aufzuloesen bleibt die sauberere
+      Loesung.'
+    inventory-mvinv-guard-inactive: Der Konfliktschutz ist ausgeschaltet (settings.inventory-management.multiverse-inventories.conflict-guard).
+      Es gewinnt, wer zuletzt schreibt.
+    inventory-mvinv-groups-unreadable: 'Die groups.yml von Multiverse-Inventories
+      konnte nicht gelesen werden: {error}. Konflikte lassen sich nicht ermitteln.'
+    inventory-mvinv-groups-unknown: Multiverse-Inventories ist installiert, seine
+      Weltgruppen liessen sich aber nicht lesen. Ob sie mit Arena- und Event-Welten
+      kollidieren, ist unbekannt - bitte von Hand pruefen.
+    inventory-mvinv-worldchange-recovered: 'Beim Weltwechsel nach {world} hat ein
+      anderes Plugin das Inventar von {player} getauscht, obwohl eine Sitzung offen
+      war - der Sitzungszustand wurde wiederhergestellt.'
+    inventory-mvinv-overwrite-recovered: 'Das wiederhergestellte Inventar von {player}
+      wurde von einem anderen Plugin ueberschrieben und erneut angewendet.'
+    inventory-init-failed: 'Die Inventar-Verwaltung konnte nicht aufgebaut werden:
+      {error}. Es laeuft ohne Backups weiter.'
     inventory-backup-failed: 'Inventar-Backup fuer {player} fehlgeschlagen: {error}'
-    inventory-backup-not-persisted: 'Inventar-Backup fuer {player} wurde nicht geschrieben. Die Sitzung ueberlebt keinen Neustart.'
-    inventory-restore-failed: 'Inventar-Wiederherstellung fuer {player} fehlgeschlagen: {error}'
-    inventory-restore-degraded: 'Inventar-Wiederherstellung fuer {player} lieferte {reason} - es wird der Abzug aus dem Speicher versucht.'
-    inventory-restore-fallback: 'Inventar von {player} aus dem Speicher-Abzug wiederhergestellt; die Backup-Datei war unbrauchbar.'
-    inventory-restore-orphaned: 'Inventar von {player} konnte nicht wiederhergestellt werden und es gibt keinen Abzug mehr. Die Sitzung bleibt fuer den naechsten Start offen.'
-    inventory-restore-queued: '{player} ist offline - das Inventar wird beim naechsten Join wiederhergestellt.'
-    inventory-respawn-restore-failed: 'Wiederherstellung nach Respawn fehlgeschlagen fuer {player}: {reason}'
-    inventory-queue-rejected: 'Eingereihte Wiederherstellung fuer {player} wurde vom Provider abgelehnt.'
-    inventory-quit-queued: '{player} hat das Match verlassen - das Inventar ist fuer den naechsten Join eingereiht.'
-    inventory-session-conflict: '{player} hat bereits eine offene Inventar-Sitzung - ein zweites Backup wuerde das erste entwerten.'
-    inventory-match-aborted: 'Match abgebrochen: das Inventar-Backup fuer {player} konnte nicht geschrieben werden.'
-    guard-recovery-summary: 'Inventar-Guard: {handled} offene Sitzung(en) wiederhergestellt, {orphaned} verwaist.'
-    guard-recovery-orphans: '{count} Inventar-Sitzung(en) haben kein brauchbares Backup. Pruefe sie mit /eventpvp rescue list.'
-    guard-backup-missing: 'Backup {backup} von {player} ist verschwunden - die Sitzung wird als verwaist markiert.'
-    guard-restore-failed: 'Abgesicherte Wiederherstellung fuer {player} fehlgeschlagen: {reason}'
-    guard-entry-invalid: 'Ungueltiger Eintrag in inventory-guard.yml, uebersprungen: {entry}'
+    inventory-backup-not-persisted: 'Inventar-Backup fuer {player} wurde nicht geschrieben.
+      Die Sitzung ueberlebt keinen Neustart.'
+    inventory-restore-failed: 'Inventar-Wiederherstellung fuer {player} fehlgeschlagen:
+      {error}'
+    inventory-restore-degraded: 'Inventar-Wiederherstellung fuer {player} lieferte
+      {reason} - es wird der Abzug aus dem Speicher versucht.'
+    inventory-restore-fallback: 'Inventar von {player} aus dem Speicher-Abzug wiederhergestellt;
+      die Backup-Datei war unbrauchbar.'
+    inventory-restore-orphaned: 'Inventar von {player} konnte nicht wiederhergestellt
+      werden und es gibt keinen Abzug mehr. Die Sitzung bleibt fuer den naechsten
+      Start offen.'
+    inventory-restore-queued: '{player} ist offline - das Inventar wird beim naechsten
+      Join wiederhergestellt.'
+    inventory-respawn-restore-failed: 'Wiederherstellung nach Respawn fehlgeschlagen
+      fuer {player}: {reason}'
+    inventory-queue-rejected: 'Eingereihte Wiederherstellung fuer {player} wurde vom
+      Provider abgelehnt.'
+    inventory-quit-queued: '{player} hat das Match verlassen - das Inventar ist fuer
+      den naechsten Join eingereiht.'
+    inventory-session-conflict: '{player} hat bereits eine offene Inventar-Sitzung
+      - ein zweites Backup wuerde das erste entwerten.'
+    inventory-match-aborted: 'Match abgebrochen: das Inventar-Backup fuer {player}
+      konnte nicht geschrieben werden.'
+    guard-recovery-summary: 'Inventar-Guard: {handled} offene Sitzung(en) wiederhergestellt,
+      {orphaned} verwaist.'
+    guard-recovery-orphans: '{count} Inventar-Sitzung(en) haben kein brauchbares Backup.
+      Pruefe sie mit /eventpvp rescue list.'
+    guard-backup-missing: 'Backup {backup} von {player} ist verschwunden - die Sitzung
+      wird als verwaist markiert.'
+    guard-restore-failed: 'Abgesicherte Wiederherstellung fuer {player} fehlgeschlagen:
+      {reason}'
+    guard-entry-invalid: 'Ungueltiger Eintrag in inventory-guard.yml, uebersprungen:
+      {entry}'
     guard-save-failed: 'inventory-guard.yml konnte nicht geschrieben werden: {error}'
-    guard-shutdown-open: '{count} Inventar-Sitzung(en) sind noch offen - sie werden beim naechsten Start abgearbeitet.'
+    guard-shutdown-open: '{count} Inventar-Sitzung(en) sind noch offen - sie werden
+      beim naechsten Start abgearbeitet.'
     plugin-enabled: 'Event-PVP-Plugin aktiviert in {time} ms: Events & PvP-Wager kombiniert.'
     plugin-disabled: 'Event-PVP-Plugin deaktiviert in {time} ms.'
     vault-hooked: 'Vault Economy eingebunden: {status}'
     vault-not-found: 'Vault nicht gefunden! Geld-Wetten sind deaktiviert.'
     papi-registered: 'PlaceholderAPI Expansion registriert!'
     pvpmanager-enabled: 'PvPManager Integration aktiviert!'
-    web-auth-enabled: 'Web-Authentifizierung aktiviert. Nutze /eventpvp webtoken für Login.'
-    web-disabled: 'Web-Interface ist deaktiviert.'
+    web-auth-enabled: Web-Authentifizierung aktiviert. Nutze /eventpvp webtoken für
+      Login.
+    web-disabled: Web-Interface ist deaktiviert.
     web-started: 'Web-Server gestartet auf Port {port} ({auth})'
-    web-stopped: 'Web-Server gestoppt.'
-    stats-save-periodic: 'Periodisches Statistik-Speichern abgeschlossen.'
+    web-stopped: Web-Server gestoppt.
+    stats-save-periodic: Periodisches Statistik-Speichern abgeschlossen.
     stats-save-error: 'Konnte Statistiken nicht speichern: {error}'
     stats-load-error: 'Konnte Statistiken nicht laden: {error}'
-    core-reload: 'Core-Konfigurationen neu geladen.'
-    core-reload-all: 'Alle Konfigurationen und abhängigen Manager neu geladen.'
+    core-reload: Core-Konfigurationen neu geladen.
+    core-reload-all: Alle Konfigurationen und abhängigen Manager neu geladen.
     lang-changed: 'Sprache geändert zu: {lang}'
-    lang-loaded: "Messages für Sprache '{lang}' geladen ({file})"
+    lang-loaded: 'Messages für Sprache ''{lang}'' geladen ({file})'
     lang-save-error: 'Fehler beim Speichern der Sprache: {error}'
     lang-fallback-error: 'Konnte Fallback-Nachrichten nicht laden: {error}'
     event-loaded: 'Event geladen: {event}'
@@ -1382,34 +1055,56 @@ messages:
     world-loaded: 'Welt geladen: {world} - {msg}'
     world-unloading: 'Entlade Welt: {world}'
     world-load-failed: 'Welt-Laden fehlgeschlagen: {world} - {msg}'
-    safe-teleport-player: '[SafeTeleport] Teleportiere {player} zurück zu: {world} @ {coords}'
-    safe-teleport-fallback: '[SafeTeleport] Gespeicherte Welt für {player} nicht mehr geladen, nutze Hauptwelt.'
-    safe-teleport-no-location: '[SafeTeleport] Keine gespeicherte Location für {player}, nutze Hauptwelt.'
-    safe-teleport-critical: '[SafeTeleport] KRITISCH: Keine Hauptwelt verfügbar für {player}!'
-    safe-respawn-invalid-loc: '[SafeRespawn] Gespeicherte Location für {player} ist ungültig!'
-    safe-respawn-unloaded-world: '[SafeRespawn] Welt {world} für {player} nicht mehr geladen - verwende Hauptwelt-Spawn'
-    safe-respawn-wrong-world: '[SafeRespawn-Verify] KRITISCH: {player} ist in FALSCHER WELT!'
-    safe-respawn-distance-warn: '[SafeRespawn-Verify] {player} ist {distance} Blöcke von der erwarteten Position entfernt!'
-    safe-respawn-correct: '[SafeRespawn-Verify] Korrekt - {player} in {world} @ {coords} (Distanz: {distance} Blöcke)'
-    safe-respawn-correction-failed: '[SafeRespawn-Verify] FEHLER: Korrektur-Teleport für {player} fehlgeschlagen!'
-    safe-respawn-correction-success: '[SafeRespawn-Verify] Korrektur erfolgreich - {player} jetzt in {world}'
-    void-protection-rescued: '[VoidProtection] Spieler {player} vor Void-Tod in ungültiger Welt gerettet ({reason}) -> Hauptwelt'
-    void-protection-critical: '[VoidProtection] KRITISCH: Kein sicherer Standort für {player} gefunden!'
+    safe-teleport-player: '[SafeTeleport] Teleportiere {player} zurück zu: {world}
+      @ {coords}'
+    safe-teleport-fallback: '[SafeTeleport] Gespeicherte Welt für {player} nicht mehr
+      geladen, nutze Hauptwelt.'
+    safe-teleport-no-location: '[SafeTeleport] Keine gespeicherte Location für {player},
+      nutze Hauptwelt.'
+    safe-teleport-critical: '[SafeTeleport] KRITISCH: Keine Hauptwelt verfügbar für
+      {player}!'
+    safe-respawn-invalid-loc: '[SafeRespawn] Gespeicherte Location für {player} ist
+      ungültig!'
+    safe-respawn-unloaded-world: '[SafeRespawn] Welt {world} für {player} nicht mehr
+      geladen - verwende Hauptwelt-Spawn'
+    safe-respawn-wrong-world: '[SafeRespawn-Verify] KRITISCH: {player} ist in FALSCHER
+      WELT!'
+    safe-respawn-distance-warn: '[SafeRespawn-Verify] {player} ist {distance} Blöcke
+      von der erwarteten Position entfernt!'
+    safe-respawn-correct: '[SafeRespawn-Verify] Korrekt - {player} in {world} @ {coords}
+      (Distanz: {distance} Blöcke)'
+    safe-respawn-correction-failed: '[SafeRespawn-Verify] FEHLER: Korrektur-Teleport
+      für {player} fehlgeschlagen!'
+    safe-respawn-correction-success: '[SafeRespawn-Verify] Korrektur erfolgreich -
+      {player} jetzt in {world}'
+    void-protection-rescued: '[VoidProtection] Spieler {player} vor Void-Tod in ungültiger
+      Welt gerettet ({reason}) -> Hauptwelt'
+    void-protection-critical: '[VoidProtection] KRITISCH: Kein sicherer Standort für
+      {player} gefunden!'
     backup-created: 'Backup erstellt: {file}'
     backup-skipped: 'Backup übersprungen: Weltordner nicht gefunden: {world}'
     backup-failed: 'Backup fehlgeschlagen: {error}'
     equipment-loaded: 'Equipment-Set geladen: {set}'
     equipment-all-loaded: 'Ausrüstungen geladen: {sets}'
-    equipment-empty-error: 'Keine Ausrüstungs-Gruppen gefunden.'
-    equipment-not-found: "Equipment group '{group}' nicht gefunden. Verfügbare IDs: {available}"
-    equipment-lobby-not-found: "Keine Ausrüstungsgruppe gefunden für ID '{group}' (Lobby). Prüfe equipment.yml und config.yml."
-    equipment-lobby-retry: '[DEBUG] Ausrüstung in Lobby nicht vollständig angewendet für {player}, versuche erneut...'
-    equipment-lobby-still-incomplete: '[DEBUG] Ausrüstung in Lobby weiterhin nicht vollständig für {player}.'
-    equipment-lobby-applied: '[DEBUG] Ausrüstung in Lobby erfolgreich nach erneutem Versuch angewendet für {player}.'
-    equipment-event-not-found: "Keine Ausrüstungsgruppe gefunden für ID '{group}' (Team). Prüfe equipment.yml und config.yml."
-    equipment-event-retry: '[DEBUG] Ausrüstung im Event nicht vollständig angewendet für {player}, versuche erneut...'
-    equipment-event-still-incomplete: '[DEBUG] Ausrüstung im Event weiterhin nicht vollständig für {player}.'
-    equipment-event-applied: '[DEBUG] Ausrüstung im Event erfolgreich nach erneutem Versuch angewendet für {player}.'
+    equipment-empty-error: Keine Ausrüstungs-Gruppen gefunden.
+    equipment-not-found: 'Equipment group ''{group}'' nicht gefunden. Verfügbare IDs:
+      {available}'
+    equipment-lobby-not-found: 'Keine Ausrüstungsgruppe gefunden für ID ''{group}''
+      (Lobby). Prüfe equipment.yml und config.yml.'
+    equipment-lobby-retry: '[DEBUG] Ausrüstung in Lobby nicht vollständig angewendet
+      für {player}, versuche erneut...'
+    equipment-lobby-still-incomplete: '[DEBUG] Ausrüstung in Lobby weiterhin nicht
+      vollständig für {player}.'
+    equipment-lobby-applied: '[DEBUG] Ausrüstung in Lobby erfolgreich nach erneutem
+      Versuch angewendet für {player}.'
+    equipment-event-not-found: 'Keine Ausrüstungsgruppe gefunden für ID ''{group}''
+      (Team). Prüfe equipment.yml und config.yml.'
+    equipment-event-retry: '[DEBUG] Ausrüstung im Event nicht vollständig angewendet
+      für {player}, versuche erneut...'
+    equipment-event-still-incomplete: '[DEBUG] Ausrüstung im Event weiterhin nicht
+      vollständig für {player}.'
+    equipment-event-applied: '[DEBUG] Ausrüstung im Event erfolgreich nach erneutem
+      Versuch angewendet für {player}.'
     stats-queue-error: 'Konnte Event-Statistiken nach Event nicht einreihen: {error}'
     update-available-banner: 'UPDATE VERFÜGBAR!'
     update-current-version: 'Aktuelle Version: {version}'
@@ -1423,48 +1118,65 @@ messages:
     admin-reload-failed: 'Admin-Reload fehlgeschlagen: {error}'
     livetrade-session-expired: 'PVP-Wette-Sitzung abgelaufen: {session}'
     zip-error: 'Fehler beim Zippen: {error}'
-    livetrade-start-error: 'Fehler beim Starten des Matches aus LiveTrade'
+    livetrade-start-error: Fehler beim Starten des Matches aus LiveTrade
     teleport-error: 'Teleport-Fehler: {error}'
     pvp-death-saved: '[PvPDeath] Original-Location für {player} gespeichert: {location}'
-    pvp-death-no-location: '[PvPDeath] WARNUNG: Keine Original-Location für {player} gefunden!'
-    pvp-respawn-unloaded: '[SafeRespawn-PvP] Original-Welt nicht geladen: {world} - verwende Hauptwelt-Spawn'
-    pvp-respawn-no-location: '[SafeRespawn-PvP] Kein Original-Standort für {player} gefunden - verwende Hauptwelt-Spawn'
+    pvp-death-no-location: '[PvPDeath] WARNUNG: Keine Original-Location für {player}
+      gefunden!'
+    pvp-respawn-unloaded: '[SafeRespawn-PvP] Original-Welt nicht geladen: {world}
+      - verwende Hauptwelt-Spawn'
+    pvp-respawn-no-location: '[SafeRespawn-PvP] Kein Original-Standort für {player}
+      gefunden - verwende Hauptwelt-Spawn'
     spectator-recovered: 'Spieler {player} zur Hauptwelt teleportiert.'
     arena-world-loaded: 'Welt-Ladung erfolgreich: {world} - {msg}'
     arena-clone-reset: 'Clone-Reset abgeschlossen für Arena-Welt: {world}'
-    match-dead-player-gamemode: '[SafeTeleport-PvP] Spieler {player} ist tot - Teleport wird über RespawnEvent gehandhabt.'
-    match-origin-saved: '[Match] Original-Location für {player} aus Request gespeichert: {location}'
-    match-origin-warning: '[Match] WARNUNG: Keine Original-Location im Request für {player}'
+    match-dead-player-gamemode: '[SafeTeleport-PvP] Spieler {player} ist tot - Teleport
+      wird über RespawnEvent gehandhabt.'
+    match-origin-saved: '[Match] Original-Location für {player} aus Request gespeichert:
+      {location}'
+    match-origin-warning: '[Match] WARNUNG: Keine Original-Location im Request für
+      {player}'
     return-entry-invalid: 'Ungueltiger Eintrag in player-return-locations.yml: {entry}'
-    return-save-failed: 'player-return-locations.yml konnte nicht gespeichert werden: {error}'
-    return-shutdown-open: '{count} Rueckkehr-Position(en) noch offen - sie werden beim naechsten Start angewandt.'
-    return-stale-entries: '{count} Rueckkehr-Position(en) aelter als {hours}h. Pruefe sie mit /eventpvp rescue list.'
-    guard-stale-sessions: '{count} Inventar-Sitzung(en) laenger als {hours}h offen. Pruefe sie mit /eventpvp rescue list.'
+    return-save-failed: 'player-return-locations.yml konnte nicht gespeichert werden:
+      {error}'
+    return-shutdown-open: '{count} Rueckkehr-Position(en) noch offen - sie werden
+      beim naechsten Start angewandt.'
+    return-stale-entries: '{count} Rueckkehr-Position(en) aelter als {hours}h. Pruefe
+      sie mit /eventpvp rescue list.'
+    guard-stale-sessions: '{count} Inventar-Sitzung(en) laenger als {hours}h offen.
+      Pruefe sie mit /eventpvp rescue list.'
     safe-teleport-rejected: 'Teleport fuer {player} wurde direkt abgelehnt.'
-    safe-teleport-drift: '{player} ist nicht am Zielort in {world} geblieben - nach einer Korrektur aufgegeben.'
-    world-unload-aborted: 'Entladen von {world} abgebrochen: {count} Spieler konnten nicht herausgeholt werden.'
+    safe-teleport-drift: '{player} ist nicht am Zielort in {world} geblieben - nach
+      einer Korrektur aufgegeben.'
+    world-unload-aborted: 'Entladen von {world} abgebrochen: {count} Spieler konnten
+      nicht herausgeholt werden.'
     world-unload-player-stuck: '{player} konnte nicht aus {world} herausgeholt werden.'
-    world-unload-player-error: 'Fehler beim Herausholen von {player} aus {world}: {error}'
-    managed-worlds-scan-failed: 'Liste der Plugin-Welten konnte nicht ermittelt werden: {error}'
-    stranded-check-failed: 'Gestrandet-Pruefung fuer {player} fehlgeschlagen: {error} - Sitzung wird als laufend behandelt.'
+    world-unload-player-error: 'Fehler beim Herausholen von {player} aus {world}:
+      {error}'
+    managed-worlds-scan-failed: 'Liste der Plugin-Welten konnte nicht ermittelt werden:
+      {error}'
+    stranded-check-failed: 'Gestrandet-Pruefung fuer {player} fehlgeschlagen: {error}
+      - Sitzung wird als laufend behandelt.'
     stranded-no-target: 'Kein sicherer Ort fuer gestrandeten Spieler {player} gefunden.'
     stranded-rescue-failed: '{player} konnte nicht aus {world} zurueckgeholt werden.'
     stranded-rescued: '{player} zurueckgeholt: {from} -> {to}'
-    spawn-type-unsupported: "Spawn-Typ '{type}' wird von teleportPlayersToSpawns nicht unterstützt - Spieler wurden nicht teleportiert."
+    spawn-type-unsupported: 'Spawn-Typ ''{type}'' wird von teleportPlayersToSpawns
+      nicht unterstützt - Spieler wurden nicht teleportiert.'
   rescue:
     header: '&8&m                    &r &bRettung &8&m                    '
-    help-list: '&e/{label} rescue list &8- &7Offene Sitzungen und Rueckkehr-Positionen anzeigen'
-    help-player: '&e/{label} rescue <spieler> &8- &7Inventar wiederherstellen und zurueckholen'
+    help-list: '&e/{label} rescue list &8- &7Offene Sitzungen und Rueckkehr-Positionen
+      anzeigen'
+    help-player: '&e/{label} rescue <spieler> &8- &7Inventar wiederherstellen und
+      zurueckholen'
     help-clean: '&e/{label} rescue clean &8- &7Verwaiste Eintraege ohne Backup verwerfen'
     list-empty: '&aNichts offen - keine Sitzungen, keine hinterlegten Positionen.'
     list-sessions: '&7Offene Inventar-Sitzungen: &e{count}'
     list-session-entry: '  &7- &f{player} &8| &e{phase} &8| &7{context} &8| &7{age}'
     list-returns: '&7Hinterlegte Rueckkehr-Positionen: &e{count}'
     list-return-entry: '  &7- &f{player} &8| &7{world} &8| &7{age}'
-    player-offline: '&c{player} ist nicht online. Die Rettung funktioniert nur fuer Online-Spieler.'
+    player-offline: '&c{player} ist nicht online. Die Rettung funktioniert nur fuer
+      Online-Spieler.'
     inventory-result: '&7Inventar von &e{player}&7: &f{outcome}'
     teleport-done: '&a{player} wurde zurueckgeholt.'
     nothing-to-do: '&7Fuer &e{player} &7gibt es nichts zu tun.'
     clean-done: '&a{count} verwaiste Eintraege verworfen.'
-
-
