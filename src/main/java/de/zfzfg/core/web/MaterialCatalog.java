@@ -296,6 +296,7 @@ final class MaterialCatalog {
         return list;
     }
 
+    @SuppressWarnings("deprecation")
     private static boolean isTreasure(Enchantment enchantment) {
         if (de.zfzfg.core.util.Platform.isPaper()) {
             try {

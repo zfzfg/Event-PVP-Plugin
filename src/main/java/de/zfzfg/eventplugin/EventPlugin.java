@@ -99,7 +99,6 @@ public class EventPlugin extends JavaPlugin {
     private int externalDisplayRefreshTaskId = -1;
 
     @Override
-    @SuppressWarnings("deprecation")
     public void onEnable() {
         long t0 = System.nanoTime();
         instance = this;
@@ -335,7 +334,7 @@ public class EventPlugin extends JavaPlugin {
         // === Update-Check ===
         // Der Checker wird immer angelegt, damit /eventpvp version ihn benutzen
         // kann; nur der Abruf beim Start haengt an der Konfiguration.
-        updateChecker = new UpdateChecker(this, getDescription().getVersion(),
+        updateChecker = new UpdateChecker(this, de.zfzfg.core.util.Platform.getPluginVersion(this),
                 configManager.getModrinthProjectId());
         if (configManager.isUpdateCheckEnabled() && configManager.shouldCheckOnStartup()) {
             updateChecker.checkForUpdates();
