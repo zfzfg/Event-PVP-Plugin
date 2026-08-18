@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0] - 2026-08-18
+
+- **Full Dual-Platform Compatibility (Purpur 26.2 & Spigot 26.2)**: Added dynamic runtime platform detection (`Platform.java`), Kyori Adventure 5.2.0 shading with safe namespace relocation, cross-platform Component/String bridges (`TextUtil`, `GuiUtil`, `ItemUtil`, `TeleportUtil`), and isolated Paper Registry helpers (`PaperRegistryHelper`).
+- **Complete GUI Modernization**: Retired and archived 16 legacy GUI classes to `old-files/`, created `LiveTradeBridge` to connect wager command requests directly into the interactive `LiveTradeSession`, and modernized `PvPRespondCommand`.
+- **Adventure Text & True RGB**: Complete migration of in-game messages, hover tooltips, clickable actions, and countdown/victory titles to Adventure 5.2.0.
+- **Java 21 LTS & Clean Build**: 100% clean compilation, zero compiler warnings, and 182 automated unit and integration tests passing.
+
 ## [1.0.9] - 2026-08-08
 
 - **Inventory Management powered by InventoryBackup (Required Dependency)**: Replaced legacy snapshot storage with `InventoryBackup` (`InventoryBackup.jar` from the InventoryRestore project). Both `InventoryBackup` and `Multiverse-Core` are now hard dependencies (`depend:` in `plugin.yml`). Automatic backups are taken before match/event teleports and restored on match/event end, respawn, or rejoin.
