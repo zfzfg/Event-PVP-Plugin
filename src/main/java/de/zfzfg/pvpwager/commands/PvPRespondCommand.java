@@ -4,6 +4,7 @@ import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.gui.livetrade.LiveTradeBridge;
 import de.zfzfg.pvpwager.models.CommandRequest;
 import de.zfzfg.pvpwager.utils.MessageUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,7 +12,7 @@ import org.bukkit.entity.Player;
 
 /**
  * Moderner Befehl zum Öffnen des LiveTrade-GUIs als Antwort auf eine Wager-Herausforderung.
- * Usage: /pvprespond gui
+ * Usage: /pvprespond [gui|spieler]
  */
 public class PvPRespondCommand implements CommandExecutor {
     
@@ -42,12 +43,10 @@ public class PvPRespondCommand implements CommandExecutor {
     
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(getMsg("players-only"));
             return true;
         }
-        
-        Player player = (Player) sender;
         
         // Check permission
         if (!player.hasPermission("pvpwager.use") && !player.hasPermission("pvpwager.respond")) {
@@ -55,13 +54,17 @@ public class PvPRespondCommand implements CommandExecutor {
             return true;
         }
         
-        if (args.length == 0 || !args[0].equalsIgnoreCase("gui")) {
-            MessageUtil.sendMessage(player, getMsg("usage"));
-            return true;
+        // Finde den passenden Request (entweder nach Spielername oder den neuesten an diesen Spieler)
+        CommandRequest pendingRequest = null;
+        if (args.length >= 1 && !args[0].equalsIgnoreCase("gui")) {
+            Player challenger = Bukkit.getPlayer(args[0]);
+            if (challenger != null) {
+                pendingRequest = plugin.getCommandRequestManager().getRequest(challenger, player);
+            }
         }
-        
-        // Check if player has a pending request to respond to
-        CommandRequest pendingRequest = plugin.getCommandRequestManager().getRequestToPlayer(player);
+        if (pendingRequest == null) {
+            pendingRequest = plugin.getCommandRequestManager().getRequestToPlayer(player);
+        }
         
         if (pendingRequest == null) {
             MessageUtil.sendMessage(player, getMsg("no-request"));

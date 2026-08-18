@@ -4,10 +4,12 @@ import de.zfzfg.core.commands.SubCommand;
 import de.zfzfg.core.commands.SmartTabCompleter;
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.utils.MessageUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -26,6 +28,7 @@ public class PvPUnifiedCommand implements CommandExecutor, TabCompleter, Listene
         register(new de.zfzfg.pvpwager.commands.unified.subcommands.ChallengeSubCommand(plugin));
         register(new de.zfzfg.pvpwager.commands.unified.subcommands.AcceptSubCommand(plugin));
         register(new de.zfzfg.pvpwager.commands.unified.subcommands.DenySubCommand(plugin));
+        register(new de.zfzfg.pvpwager.commands.unified.subcommands.RespondSubCommand(plugin));
         register(new de.zfzfg.pvpwager.commands.unified.subcommands.SpectateSubCommand(plugin));
         register(new de.zfzfg.pvpwager.commands.unified.subcommands.LeaveSubCommand(plugin));
         register(new de.zfzfg.pvpwager.commands.unified.subcommands.SurrenderSubCommand(plugin));
@@ -53,6 +56,11 @@ public class PvPUnifiedCommand implements CommandExecutor, TabCompleter, Listene
         String name = args[0].toLowerCase();
         SubCommand sub = subCommands.get(name);
         if (sub == null) {
+            // Ermögliche "/pvp <spieler>" direkt als Challenge-Kurzbefehl
+            SubCommand challengeSub = subCommands.get("challenge");
+            if (challengeSub != null && Bukkit.getPlayer(args[0]) != null) {
+                return challengeSub.execute(sender, args);
+            }
             sender.sendMessage(getMsg("system.unknown-subcommand").replace("{command}", args[0]));
             sendHelp(sender);
             return true;
@@ -64,9 +72,13 @@ public class PvPUnifiedCommand implements CommandExecutor, TabCompleter, Listene
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return smart.filterStartsWith(new ArrayList<>(List.of(
-                    "challenge", "accept", "deny", "spectate", "leave", "surrender", "draw"
-            )), args[0]);
+            List<String> list = new ArrayList<>(List.of(
+                    "challenge", "accept", "deny", "respond", "spectate", "leave", "surrender", "draw"
+            ));
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                list.add(p.getName());
+            }
+            return smart.filterStartsWith(list, args[0]);
         }
         SubCommand sub = subCommands.get(args[0].toLowerCase());
         if (sub != null) {

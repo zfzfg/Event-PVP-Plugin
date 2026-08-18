@@ -52,7 +52,8 @@ This is the official stable release of **Event-PVP-Plugin 1.1.0**, featuring ful
 | **Plugin Version** | `1.1.0` |
 | **Java Version** | `Java 21 LTS` (Source / Target) |
 | **Target API** | `purpur-api:26.2.build.2618-stable` |
-| **Supported Servers** | Purpur 26.2+, Paper 26.2+, Spigot 26.2+ |
+| **Supported Server Engines** | Purpur 26.2+, Paper 1.21.x / 1.20.5+, Pufferfish 1.21.x, Spigot 26.2 / 1.21.x |
+| **Unsupported Engines** | Folia (requires regionised scheduler rebuild), 1.19.4 & older |
 | **Kyori Adventure** | `5.2.0` (Shaded & Relocated) |
 | **Test Suite** | 182 Passed Unit & Integration Tests |
 

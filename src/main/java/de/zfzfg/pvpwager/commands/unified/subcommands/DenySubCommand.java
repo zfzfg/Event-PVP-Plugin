@@ -2,11 +2,14 @@ package de.zfzfg.pvpwager.commands.unified.subcommands;
 
 import de.zfzfg.core.commands.SubCommand;
 import de.zfzfg.eventplugin.EventPlugin;
+import de.zfzfg.pvpwager.managers.ConfigManager;
+import de.zfzfg.pvpwager.models.CommandRequest;
 import de.zfzfg.pvpwager.utils.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import de.zfzfg.pvpwager.managers.ConfigManager;
+
+import java.util.UUID;
 
 public class DenySubCommand extends SubCommand {
     public DenySubCommand(EventPlugin plugin) { super(plugin); }
@@ -23,25 +26,57 @@ public class DenySubCommand extends SubCommand {
     @Override
     public boolean execute(CommandSender sender, String[] args) {
         ConfigManager cfg = plugin.getPvpConfigManager();
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             sender.sendMessage(cfg.getMessage("messages.command.common.player-only"));
             return true;
         }
-        Player player = (Player) sender;
+
+        Player target = null;
         if (args.length >= 1) {
-            Player target = Bukkit.getPlayer(args[0]);
-            if (target == null || !target.isOnline()) {
-                MessageUtil.sendMessage(player, cfg.getMessage("messages.command.common.player-offline", "player", args[0]));
-                return true;
+            target = Bukkit.getPlayer(args[0]);
+        }
+
+        boolean found = false;
+
+        // 1. CommandRequestManager
+        CommandRequest req = target != null
+                ? plugin.getCommandRequestManager().getRequest(target, player)
+                : plugin.getCommandRequestManager().getRequestToPlayer(player);
+        if (req != null) {
+            target = req.getSender();
+            plugin.getCommandRequestManager().removeRequest(target);
+            found = true;
+        }
+
+        // 2. RequestManager
+        if (target != null) {
+            plugin.getRequestManager().cancelRequest(target.getUniqueId(), player.getUniqueId());
+            found = true;
+        }
+
+        // 3. PvPWagerGuiCommand
+        if (plugin.getPvpWagerGuiCommand() != null) {
+            if (target != null) {
+                plugin.getPvpWagerGuiCommand().denyWagerRequest(player, target);
+                found = true;
+            } else {
+                UUID sId = plugin.getPvpWagerGuiCommand().getWagerRequestSender(player);
+                if (sId != null) {
+                    plugin.getPvpWagerGuiCommand().cancelWagerRequest(sId);
+                    found = true;
+                }
             }
-            de.zfzfg.pvpwager.models.CommandRequest req = plugin.getCommandRequestManager().getRequest(target, player);
-            if (req != null) {
-                plugin.getCommandRequestManager().removeRequest(target);
-            }
+        }
+
+        if (target != null) {
             MessageUtil.sendMessage(player, cfg.getMessage("messages.command.pvp.deny.success-self", "player", target.getName()));
-            MessageUtil.sendMessage(target, cfg.getMessage("messages.command.pvp.deny.success-other", "player", player.getName()));
+            if (target.isOnline()) {
+                MessageUtil.sendMessage(target, cfg.getMessage("messages.command.pvp.deny.success-other", "player", player.getName()));
+            }
+        } else if (found) {
+            MessageUtil.sendMessage(player, cfg.getMessage("messages.commands.pvpdeny.request-cancelled"));
         } else {
-            MessageUtil.sendMessage(player, cfg.getMessage("messages.command.pvp.deny.usage"));
+            MessageUtil.sendMessage(player, cfg.getMessage("messages.commands.pvpdeny.no-request"));
         }
         return true;
     }

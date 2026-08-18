@@ -232,15 +232,15 @@ public class EventSession {
             .replace("{time}", String.valueOf(plugin.getConfigManager().getJoinPhaseDuration()));
         
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-            onlinePlayer.sendMessage("");
-            onlinePlayer.sendMessage(ColorUtil.color(message));
+            TextUtil.send(onlinePlayer, "");
+            TextUtil.send(onlinePlayer, ColorUtil.color(message));
             
-            onlinePlayer.sendMessage(Text.button(
+            TextUtil.send(onlinePlayer, Text.button(
                 plugin.getConfigManager().getMessage("start.join-button"),
                 "/event join " + config.getCommand(),
                 plugin.getConfigManager().getMessage("start.join-hover")
             ));
-            onlinePlayer.sendMessage("");
+            TextUtil.send(onlinePlayer, "");
         }
     }
     

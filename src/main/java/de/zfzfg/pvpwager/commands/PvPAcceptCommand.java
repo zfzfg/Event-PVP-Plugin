@@ -1,7 +1,7 @@
 package de.zfzfg.pvpwager.commands;
 
 import de.zfzfg.eventplugin.EventPlugin;
-import de.zfzfg.pvpwager.utils.MessageUtil;
+import de.zfzfg.pvpwager.commands.unified.subcommands.AcceptSubCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -15,7 +15,6 @@ import java.util.UUID;
 
 /**
  * Befehl zum Annehmen einer PVP-Wager Anfrage.
- * Öffnet das Wager-GUI für beide Spieler.
  * 
  * Usage: /pvpaccept [spieler]
  * @deprecated Use /pvp accept instead. This command is kept for backward compatibility.
@@ -24,115 +23,48 @@ import java.util.UUID;
 public class PvPAcceptCommand implements CommandExecutor, TabCompleter {
     
     private final EventPlugin plugin;
+    private final AcceptSubCommand acceptSubCommand;
     
     @Deprecated
     public PvPAcceptCommand(EventPlugin plugin) {
         this.plugin = plugin;
-    }
-
-    private String getMsg(String key) {
-        String msg = plugin.getCoreConfigManager().getMessages().getString("messages.request." + key, null);
-        if (msg == null) {
-            msg = plugin.getCoreConfigManager().getMessages().getString("messages.system." + key, null);
-        }
-        if (msg == null) {
-            msg = plugin.getCoreConfigManager().getMessages().getString("messages.general." + key, null);
-        }
-        if (msg == null) {
-            return "&c[missing: " + key + "]";
-        }
-        return MessageUtil.color(msg);
-    }
-    
-    private String getPvpMsg(String key) {
-        return plugin.getPvpConfigManager().getMessage("messages.commands.pvpaccept." + key);
+        this.acceptSubCommand = new AcceptSubCommand(plugin);
     }
     
     @Override
     @Deprecated
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(getMsg("players-only"));
-            return true;
-        }
-        
-        Player player = (Player) sender;
-        
-        // Prüfe Permission
-        if (!player.hasPermission("pvpwager.use") && !player.hasPermission("pvpwager.accept")) {
-            MessageUtil.sendMessage(player, getPvpMsg("no-permission"));
-            return true;
-        }
-        
-        PvPWagerGuiCommand wagerCommand = plugin.getPvpWagerGuiCommand();
-        
-        // Ohne Argument: Prüfe ob es eine Anfrage gibt
-        if (args.length == 0) {
-            UUID senderId = wagerCommand.getWagerRequestSender(player);
-            
-            if (senderId == null) {
-                MessageUtil.sendMessage(player, getPvpMsg("no-pending-requests"));
-                MessageUtil.sendMessage(player, getPvpMsg("usage-hint"));
-                return true;
-            }
-            
-            Player senderPlayer = Bukkit.getPlayer(senderId);
-            if (senderPlayer == null || !senderPlayer.isOnline()) {
-                MessageUtil.sendMessage(player, getPvpMsg("player-offline"));
-                wagerCommand.cancelWagerRequest(senderId);
-                return true;
-            }
-            
-            // Anfrage annehmen
-            wagerCommand.acceptWagerRequest(player, senderPlayer);
-            return true;
-        }
-        
-        // Mit Argument: Bestimmten Spieler suchen
-        String senderName = args[0];
-        Player senderPlayer = Bukkit.getPlayer(senderName);
-        
-        if (senderPlayer == null || !senderPlayer.isOnline()) {
-            MessageUtil.sendMessage(player, getMsg("player-offline").replace("{player}", senderName));
-            return true;
-        }
-        
-        // Prüfe ob Anfrage existiert
-        UUID targetId = wagerCommand.getWagerRequestTarget(senderPlayer.getUniqueId());
-        
-        if (targetId == null || !targetId.equals(player.getUniqueId())) {
-            MessageUtil.sendMessage(player, getMsg("no-request").replace("{player}", senderPlayer.getName()));
-            return true;
-        }
-        
-        // Anfrage annehmen
-        wagerCommand.acceptWagerRequest(player, senderPlayer);
-        
-        return true;
+        return acceptSubCommand.execute(sender, args);
     }
     
     @Override
     @Deprecated
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (!(sender instanceof Player)) return new ArrayList<>();
+        if (!(sender instanceof Player player)) return new ArrayList<>();
         
-        Player player = (Player) sender;
         PvPWagerGuiCommand wagerCommand = plugin.getPvpWagerGuiCommand();
         
         if (args.length == 1) {
             String prefix = args[0].toLowerCase();
-            
-            // Zeige nur Spieler, die eine Anfrage gesendet haben
             List<String> suggestions = new ArrayList<>();
             
             for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                 if (onlinePlayer.equals(player)) continue;
                 
-                UUID targetId = wagerCommand.getWagerRequestTarget(onlinePlayer.getUniqueId());
-                if (targetId != null && targetId.equals(player.getUniqueId())) {
-                    if (onlinePlayer.getName().toLowerCase().startsWith(prefix)) {
-                        suggestions.add(onlinePlayer.getName());
+                boolean hasReq = false;
+                if (plugin.getCommandRequestManager().getRequest(onlinePlayer, player) != null) {
+                    hasReq = true;
+                } else if (plugin.getRequestManager().hasPendingRequest(onlinePlayer)) {
+                    hasReq = true;
+                } else if (wagerCommand != null) {
+                    UUID targetId = wagerCommand.getWagerRequestTarget(onlinePlayer.getUniqueId());
+                    if (targetId != null && targetId.equals(player.getUniqueId())) {
+                        hasReq = true;
                     }
+                }
+                
+                if (hasReq && onlinePlayer.getName().toLowerCase().startsWith(prefix)) {
+                    suggestions.add(onlinePlayer.getName());
                 }
             }
             

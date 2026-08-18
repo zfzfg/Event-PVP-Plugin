@@ -1,6 +1,7 @@
 package de.zfzfg.core.util;
 
 import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -73,6 +74,28 @@ public class TextUtil {
             player.sendMessage(message);
         } else {
             player.sendMessage(Text.toLegacy(message));
+        }
+    }
+
+    /** Broadcast einer Nachricht an alle Spieler. */
+    @SuppressWarnings("deprecation")
+    public static void broadcast(String message) {
+        if (message == null) return;
+        if (Platform.isPaper()) {
+            Bukkit.broadcast(Text.of(message));
+        } else {
+            Bukkit.broadcastMessage(color(message));
+        }
+    }
+
+    /** Broadcast einer Component an alle Spieler. */
+    @SuppressWarnings("deprecation")
+    public static void broadcast(Component message) {
+        if (message == null) return;
+        if (Platform.isPaper()) {
+            Bukkit.broadcast(message);
+        } else {
+            Bukkit.broadcastMessage(Text.toLegacy(message));
         }
     }
 

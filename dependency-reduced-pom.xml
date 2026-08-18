@@ -50,16 +50,6 @@
                   <exclude>com.google.code.gson:*</exclude>
                 </excludes>
               </artifactSet>
-              <relocations>
-                <relocation>
-                  <pattern>net.kyori</pattern>
-                  <shadedPattern>de.zfzfg.eventplugin.libs.kyori</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>de.zfzfg.pvpwager</pattern>
-                  <shadedPattern>de.zfzfg.eventplugin.pvp</shadedPattern>
-                </relocation>
-              </relocations>
               <minimizeJar>false</minimizeJar>
             </configuration>
           </execution>
