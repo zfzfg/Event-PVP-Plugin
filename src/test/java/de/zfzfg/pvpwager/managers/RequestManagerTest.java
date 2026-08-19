@@ -1,7 +1,6 @@
 package de.zfzfg.pvpwager.managers;
 
 import de.zfzfg.eventplugin.EventPlugin;
-import de.zfzfg.pvpwager.models.PvPRequest;
 import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitScheduler;

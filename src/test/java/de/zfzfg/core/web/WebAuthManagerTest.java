@@ -140,9 +140,13 @@ class WebAuthManagerTest {
         String t2 = authManager.generateToken(player);
         String s2 = authManager.validateTokenAndCreateSession(t2, "192.168.1.50");
 
+        assertThat(s1).isNotNull();
+        assertThat(s2).isNotNull();
         assertThat(authManager.getActiveSessionCount()).isEqualTo(2);
 
         authManager.invalidateAllPlayerSessions(playerId);
         assertThat(authManager.getActiveSessionCount()).isZero();
+        assertThat(authManager.validateSession(s1, "127.0.0.1")).isNull();
+        assertThat(authManager.validateSession(s2, "192.168.1.50")).isNull();
     }
 }

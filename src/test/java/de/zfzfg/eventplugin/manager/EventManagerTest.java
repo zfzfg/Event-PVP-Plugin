@@ -4,16 +4,12 @@ import de.zfzfg.core.location.ReturnLocationStore;
 import de.zfzfg.core.location.ReturnReason;
 import de.zfzfg.core.location.StoredReturn;
 import de.zfzfg.eventplugin.EventPlugin;
-import de.zfzfg.eventplugin.model.EventConfig;
-import de.zfzfg.eventplugin.session.EventSession;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
