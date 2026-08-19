@@ -9,7 +9,7 @@ Dieser Bericht dokumentiert alle technischen, architektonischen und funktionalen
 * **Betroffene Dateien:** `87` Dateien geändert
 * **Code-Änderungen:** `+2.687` Zeilen hinzugefügt, `-663` Zeilen entfernt (Netto: `+2.024` Zeilen)
 * **Commits seit 1.0.9-Baseline:** `43` Commits
-* **Automatisierte Unit-Tests:** Von **93** auf **176 Tests** ausgebaut (+83 neue Tests, alle grün)
+* **Automatisierte Unit-Tests:** Von **93** auf **327 Tests** ausgebaut (+234 neue Tests, 44 Testklassen, 100% grün)
 * **Veraltete Schnittstellen (Deprecations):** Restlos bereinigt (**0** verbleibende Warnungen oder veraltete API-Aufrufe)
 
 ---
@@ -22,6 +22,7 @@ Dieser Bericht dokumentiert alle technischen, architektonischen und funktionalen
 * **`plugin.yml`:** `api-version` auf `'26.2'` aktualisiert.
 * **Maven Shade Plugin:** Ausschlüsse für vom Purpur-Server bereitgestellte Abhängigkeiten konfiguriert (`net.kyori:*`, `org.purpurmc.purpur:*`, `io.papermc.paper:*`, `org.spigotmc:*`, `com.google.guava:*`, `com.google.code.gson:*`). Dies verhindert ClassLoader-Konflikte und reduziert die JAR-Dateigröße signifikant.
 * **Surefire Test-Runner:** Flag `-XX:+EnableDynamicAgentLoading` für Mockito-Tests unter Java 21 hinzugefügt.
+* **JaCoCo Code Coverage:** `jacoco-maven-plugin:0.8.12` mit automatisiertem Reporting (`prepare-agent` & `report`) integriert.
 
 ---
 
@@ -100,17 +101,20 @@ Alle 12 Inventar-Menüs wurden vollständig von veralteten String-basierten Meth
 
 ---
 
-## 🧪 7. Test-Suite & Qualitätssicherung (+83 Tests)
+## 🧪 7. Test-Suite & Qualitätssicherung (+234 Tests, 327 Gesamt)
 
-Die Testsuite wurde massiv ausgebaut (von 93 auf **176 Unit-Tests**):
+Die Testsuite wurde massiv auf **327 Unit- & Integrationstests über 44 Testklassen** ausgebaut (100% grün):
 
-* **`TextTest` (14 Tests):** Legacy-Farbparsing, Hex-Codes, Caching, Button-, Link- und Clipboard-Erstellung.
-* **`TextUtilTest` (7 Tests):** Delegationsmethoden, Stripping und Idempotenz.
-* **`TextButtonTest` (8 Tests):** Null-Safety, überlange Strings, Cache-Limits und Sonderzeichen.
-* **`ResourceConfigTest` (26 Tests):** Vollständige Validierung aller 11 Sprach- & Konfigurationsdateien (Schlüsselgleichheit de/en, keine unbekannten Schlüssel in FR/ES/RU/PL/JA, Syntaxprüfung).
-* **`ConcurrencyTest` (3 Tests):** Multithreading-Sicherheit für Text-Cache, Cooldowns und Rate-Limiter.
-* **`MigrationRegressionTest` (5 Tests):** Automatische Absicherung gegen Wiedereinführung von `md_5`, `spigot().sendMessage` oder falscher API-Version.
-* **`EnchantmentResolveTest` & `ConfiguredItemAmountTest`:** Absicherung der modernen Registry-Auflösung und Item-Generierung.
+* **`TextTest` / `TextUtilTest` / `TextButtonTest`:** Legacy-Farbparsing, Hex-Codes, Caching, Button-, Link- und Clipboard-Erstellung, Stripping und Idempotenz.
+* **`ResourceConfigTest`:** Vollständige Validierung aller 11 Sprach- & Konfigurationsdateien (Schlüsselgleichheit de/en, keine unbekannten Schlüssel in FR/ES/RU/PL/JA, Syntaxprüfung).
+* **`ConcurrencyTest`:** Multithreading-Sicherheit für Text-Cache, Cooldowns und Rate-Limiter.
+* **`MigrationRegressionTest`:** Automatische Absicherung gegen Wiedereinführung von `md_5`, `spigot().sendMessage` oder falscher API-Version.
+* **`Core & Location` (`InputValidatorTest`, `TimeTest`, `ReturnLocationStoreTest`, `SafeLocationResolverTest`):** Absicherung von Input-Validierung (inkl. NaN/Infinity-Schutz), Zeit-zu-Tick-Berechnungen, synchroner Rückkehrort-Persistenz und 5-stufiger Spawn-Auflösung.
+* **`Inventar-Schutz & MVI` (`InventoryGuardTest`, `InventoryManagementConfigTest`, `MultiverseInventoriesBridgeTest`):** Session-Lifecycle, Exactly-Once Restore-Schutz, Crash-Recovery und Multiverse-Inventories Konfliktdiagnose.
+* **`Event-System` (`TeamManagerTest`, `UpdateCheckerTest`, `EventConfigTest`, `EquipmentGroupTest`, `EventManagerTest`):** Team-Balancing (2- und 3-Team Split), SemVer-Prüfung, Event- und Kit-Konfigurationen sowie Session-Management.
+* **`PvP-Wager & LiveTrade` (`BoundariesTest`, `RequestManagerTest`, `InventoryUtilTest`, `ItemBuilderTest`, `LocationUtilTest`, `PvpStatsStorageTest`, `LiveTradeSessionTest`):** AABB-Arenagrenzen, Herausforderungs-Management, Inventarplatz-Prüfungen, Item-Builder, Koordinatenserialisierung, Statistik-Persistenz und Handelsablauf.
+* **`Web API & Auth` (`WebAuthManagerTest`, `WebApiHandlerTest`):** 16-Zeichen Einmal-Tokens, Session-Verwaltung, IP-Bindung und REST-Endpunkt-Validierung.
+* **`JaCoCo Code Coverage`:** Vollständige Messung und HTML-Report-Generierung unter `target/site/jacoco/index.html`.
 
 ---
 

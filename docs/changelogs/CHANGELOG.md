@@ -8,7 +8,7 @@
 - **Adventure Text & True RGB**: Complete migration of in-game messages, hover tooltips, clickable actions, and countdown/victory titles to Adventure 5.2.0.
 - **100% Clean Localization Audit (i18n D1–D11)**: All 11 detectors report 0 Critical and 0 Warnings. Safely pruned 284 dead keys from retired GUIs across all 7 languages (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) while preserving 100% bundle parity (815 keys per language).
 - **Deprecation & Java 21 LTS Cleanup**: Total removal of `bungeecord-chat`, replacement of `org.bukkit.ChatColor` with `Text` delegates, modernization to `Attribute.MAX_HEALTH`, `getRespawnLocation()`, `URI.create().toURL()`, `Registry.POTION_EFFECT_TYPE`, and `Bukkit.getServer().getTPS()`.
-- **Java 21 LTS & Clean Build**: 100% clean compilation, zero compiler warnings, and 182 automated unit and integration tests passing.
+- **Test Suite Expansion & JaCoCo Code Coverage**: 100% clean compilation, zero compiler warnings, 327 automated unit and integration tests across 44 test classes (100% passing), and automated JaCoCo code coverage report generation.
 
 
 ## [1.0.9] - 2026-08-08
