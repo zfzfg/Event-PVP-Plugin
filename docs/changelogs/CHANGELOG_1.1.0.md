@@ -14,7 +14,7 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 - **Interactive Chat & SubCommand Unification:** Clickable chat action buttons for challenges, invites, and tokens now delegate directly to unified subcommands (`AcceptSubCommand`, `DenySubCommand`, `RespondSubCommand`).
 - **100% Clean Localization Audit (i18n D1–D11):** All 11 detectors report 0 Critical and 0 Warnings. 284 legacy orphaned GUI keys safely pruned across all 7 language bundles (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) while preserving 100% key parity (815 master keys per language).
 - **Total Deprecation & Warning Cleanup:** 100% clean compilation against Java 21 LTS, resolving all compiler deprecation and platform-specific warnings.
-- **Automated Test Suite & JaCoCo Coverage:** 327 comprehensive unit and integration tests across 44 test classes (100% green) verifying dual-platform adapters, trade bridges, item migrations, inventory guards, safe location resolvers, event models, team balancing, request handling, and REST/auth APIs, with integrated JaCoCo code coverage.
+- **Automated Test Suite & JaCoCo Coverage:** 360 comprehensive unit, integration, and MockBukkit tests across 50 test classes (100% green) verifying dual-platform adapters, in-memory Bukkit listeners (friendly fire, spectator recovery, world protection, request cleanup, delayed payouts, stranded player rescue), trade bridges, item migrations, inventory guards, safe location resolvers, event models, team balancing, request handling, and REST/auth APIs, with integrated JaCoCo code coverage.
 
 ---
 
@@ -59,6 +59,7 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 - **Native TPS Metric:** Removed reflection in `WebApiHandler` and replaced with native `Bukkit.getServer().getTPS()`.
 - **PlayerMoveEvent Optimization:** Throttled move listeners in `WorldChangeListener` and `VoidProtectionListener` using `ignoreCancelled = true` and `hasChangedBlock()`.
 - **Thread-Safe Cooldowns:** `CommandCooldownManager` synchronized with thread-safe access patterns.
+- **Event Constructor Modernization (Purpur 26.2 / Paper 1.21):** Migrated `EntityDamageEvent`, `EntityDamageByEntityEvent`, and `PlayerQuitEvent` constructors to current, non-deprecated API signatures with modifier maps and `QuitReason`.
 
 #### 6. Safety, World Management & Inventory Protection
 - **Multiverse Integration:** Compatible with Multiverse-Core world cloning, arena resetting, and automatic world loading/unloading policies.
@@ -69,8 +70,9 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 - **Server Compatibility Matrix:** Comprehensive reference guide in `docs/SERVER_COMPATIBILITY.md`.
 - **Conceptual Analysis & Roadmap:** System architecture evaluation and feature roadmap in `docs/PROJEKT_KONZEPT_ANALYSE.md`.
 
-#### 8. Automated Test Suite & Code Coverage Expansion
-- **Comprehensive Test Suite (327 Tests across 44 Test Classes):** Expanded test coverage across all plugin modules (Core, Location, Inventory Guard, Multiverse-Inventories Bridge, Events, PvP Wager, LiveTrade, and Web API).
+#### 8. Automated Test Suite, MockBukkit & Code Coverage Expansion
+- **Comprehensive Test Suite (360 Tests across 50 Test Classes):** Expanded test coverage across all plugin modules (Core, Location, Inventory Guard, Multiverse-Inventories Bridge, Events, PvP Wager, LiveTrade, and Web API).
+- **In-Memory Server Testing via MockBukkit 26.2:** Integrated `MockBukkit-v26.2` (4.116.1) and `paper-api` for realistic, in-memory server simulation of listeners and commands (`MockBukkitTestBase`, `VoidProtectionListenerMockTest`, `PvPListenerMockTest`, `PvPUnifiedCommandMockTest`, `TeamPvPListenerMockTest`, `SpectatorRecoveryListenerMockTest`, `WorldProtectionListenerMockTest`, `RequestCleanupListenerMockTest`, `PendingPayoutListenerMockTest`, `StrandedPlayerListenerMockTest`).
 - **JaCoCo Code Coverage (`jacoco-maven-plugin:0.8.12`):** Automated coverage measurement and HTML report generation (`target/site/jacoco/index.html`).
 - **Modern Mocking & Assertions:** Integrated `mockito-junit-jupiter:5.11.0` and `assertj-core:3.25.3` with Java 21 dynamic agent loading support.
 - **Quality Improvements:** Enhanced `InputValidator` with `NaN` and `Infinity` bounds checks and hardened `SafeLocationResolver` with null-safe return store lookups.
@@ -87,7 +89,7 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 | **Supported Server Engines** | Purpur 26.2+, Paper 1.21.x / 1.20.5+, Pufferfish 1.21.x, Spigot 26.2 / 1.21.x |
 | **Unsupported Engines** | Folia (requires regionised scheduler rebuild), 1.19.4 & older |
 | **Kyori Adventure** | `5.2.0` (Shaded & Relocated to `de.zfzfg.eventplugin.libs.kyori`) |
-| **Test Suite** | 327 Passed Unit & Integration Tests (100% Green, 44 Classes) |
+| **Test Suite** | 360 Passed Unit, Integration & MockBukkit Tests (100% Green, 50 Classes) |
 | **Code Coverage** | JaCoCo 0.8.12 (`target/site/jacoco/index.html`) |
 | **Localization** | 7 Languages (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) – 815 Master Keys |
 

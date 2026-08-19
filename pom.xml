@@ -12,6 +12,8 @@
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <purpur.api.version>26.2.build.2618-stable</purpur.api.version>
+    <mockbukkit.version>4.116.1</mockbukkit.version>
+    <paper.version.from.mockbukkit>1.21-R0.1-SNAPSHOT</paper.version.from.mockbukkit>
   </properties>
 
   <repositories>
@@ -42,6 +44,10 @@
     <repository>
       <id>onarandombox</id>
       <url>https://repo.onarandombox.com/content/groups/public/</url>
+    </repository>
+    <repository>
+      <id>papermc</id>
+      <url>https://repo.papermc.io/repository/maven-public/</url>
     </repository>
   </repositories>
 
@@ -167,6 +173,18 @@
       <version>3.25.3</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.mockbukkit.mockbukkit</groupId>
+      <artifactId>mockbukkit-v26.2</artifactId>
+      <version>${mockbukkit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.papermc.paper</groupId>
+      <artifactId>paper-api</artifactId>
+      <version>${paper.version.from.mockbukkit}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -186,7 +204,68 @@
         </excludes>
       </resource>
     </resources>
+    <pluginManagement>
+      <plugins>
+        <!-- Eclipse m2e Lifecycle Mapping fuer groovy-maven-plugin -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.gmaven</groupId>
+                    <artifactId>groovy-maven-plugin</artifactId>
+                    <versionRange>[2.0,)</versionRange>
+                    <goals>
+                      <goal>execute</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>groovy-maven-plugin</artifactId>
+        <version>2.1.1</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>
+                // Extract Paper version from MockBukkit JAR
+                def mockbukkitJar = project.artifacts.find {
+                  it.artifactId.startsWith('mockbukkit-') || it.artifactId.equalsIgnoreCase('MockBukkit')
+                }?.file
+
+                if (mockbukkitJar) {
+                  def jar = new java.util.jar.JarFile(mockbukkitJar)
+                  def manifest = jar.manifest
+                  def paperVersion = manifest?.mainAttributes?.getValue('Paper-Version')
+                  jar.close()
+
+                  if (paperVersion) {
+                    project.properties['paper.version.from.mockbukkit'] = paperVersion
+                  }
+                }
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>

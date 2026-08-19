@@ -29,11 +29,12 @@
   [LIST]
   [*]All 11 detectors report 0 Critical and 0 Warnings.
   [*]Safely pruned 284 dead keys from retired legacy GUIs across all 7 language bundles ([ICODE]de[/ICODE], [ICODE]en[/ICODE], [ICODE]es[/ICODE], [ICODE]fr[/ICODE], [ICODE]ja[/ICODE], [ICODE]pl[/ICODE], [ICODE]ru[/ICODE]) with 100% key parity (815 master keys).
-  [/LIST]
-[*][B]Deprecation Cleanup & Test Expansion (Java 21 LTS):[/B]
+[*][B]Deprecation Cleanup, MockBukkit 26.2 & Test Expansion (Java 21 LTS):[/B]
   [LIST]
   [*]Removed [ICODE]bungeecord-chat[/ICODE], migrated [ICODE]ChatColor[/ICODE] to [ICODE]Text[/ICODE] delegates, modernized [ICODE]Attribute.MAX_HEALTH[/ICODE], [ICODE]getRespawnLocation()[/ICODE], [ICODE]URI.create().toURL()[/ICODE], [ICODE]Registry.POTION_EFFECT_TYPE[/ICODE], and native TPS metrics.
-  [*]327 passed automated unit and integration tests across 44 test classes (100% green).
+  [*]Modernized [ICODE]EntityDamageEvent[/ICODE], [ICODE]EntityDamageByEntityEvent[/ICODE], and [ICODE]PlayerQuitEvent[/ICODE] constructors for Purpur 26.2 / Paper 1.21.
+  [*]Integrated MockBukkit 26.2 for in-memory listener & safety mechanism testing.
+  [*]360 passed automated unit, integration, and MockBukkit tests across 50 test classes (100% green).
   [*]Integrated JaCoCo 0.8.12 code coverage report generation.
   [/LIST]
 [/LIST]

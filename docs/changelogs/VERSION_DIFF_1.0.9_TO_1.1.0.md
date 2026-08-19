@@ -9,7 +9,7 @@ Dieser Bericht dokumentiert alle technischen, architektonischen und funktionalen
 * **Betroffene Dateien:** `87` Dateien geändert
 * **Code-Änderungen:** `+2.687` Zeilen hinzugefügt, `-663` Zeilen entfernt (Netto: `+2.024` Zeilen)
 * **Commits seit 1.0.9-Baseline:** `43` Commits
-* **Automatisierte Unit-Tests:** Von **93** auf **327 Tests** ausgebaut (+234 neue Tests, 44 Testklassen, 100% grün)
+* **Automatisierte Unit- & MockBukkit-Tests:** Von **93** auf **360 Tests** ausgebaut (+267 neue Tests, 50 Testklassen, 100% grün)
 * **Veraltete Schnittstellen (Deprecations):** Restlos bereinigt (**0** verbleibende Warnungen oder veraltete API-Aufrufe)
 
 ---
@@ -23,6 +23,7 @@ Dieser Bericht dokumentiert alle technischen, architektonischen und funktionalen
 * **Maven Shade Plugin:** Ausschlüsse für vom Purpur-Server bereitgestellte Abhängigkeiten konfiguriert (`net.kyori:*`, `org.purpurmc.purpur:*`, `io.papermc.paper:*`, `org.spigotmc:*`, `com.google.guava:*`, `com.google.code.gson:*`). Dies verhindert ClassLoader-Konflikte und reduziert die JAR-Dateigröße signifikant.
 * **Surefire Test-Runner:** Flag `-XX:+EnableDynamicAgentLoading` für Mockito-Tests unter Java 21 hinzugefügt.
 * **JaCoCo Code Coverage:** `jacoco-maven-plugin:0.8.12` mit automatisiertem Reporting (`prepare-agent` & `report`) integriert.
+* **MockBukkit 26.2:** `org.mockbukkit.mockbukkit:mockbukkit-v26.2:4.116.1` und `paper-api` als Test-Dependencies integriert mit dynamischer Paper-Versionsauflösung via Groovy Maven Plugin.
 
 ---
 
@@ -88,6 +89,8 @@ Alle 12 Inventar-Menüs wurden vollständig von veralteten String-basierten Meth
   * Reflection in `WebApiHandler.java` entfernt und durch natives `Bukkit.getServer().getTPS()` ersetzt.
 * **D6.1 – ChatColor:**
   * `org.bukkit.ChatColor` durch moderne `Text`-Farbmethoden ersetzt.
+* **D6.2 – Event-Konstruktoren (Purpur 26.2 / Paper 1.21):**
+  * `EntityDamageEvent`, `EntityDamageByEntityEvent` und `PlayerQuitEvent` auf aktuelle, nicht-deprecatete Signaturen migriert.
 
 ---
 
@@ -101,10 +104,20 @@ Alle 12 Inventar-Menüs wurden vollständig von veralteten String-basierten Meth
 
 ---
 
-## 🧪 7. Test-Suite & Qualitätssicherung (+234 Tests, 327 Gesamt)
+## 🧪 7. Test-Suite & Qualitätssicherung (+267 Tests, 360 Gesamt)
 
-Die Testsuite wurde massiv auf **327 Unit- & Integrationstests über 44 Testklassen** ausgebaut (100% grün):
+Die Testsuite wurde massiv auf **360 Unit-, Integrations- & MockBukkit-Tests über 50 Testklassen** ausgebaut (100% grün):
 
+* **`MockBukkit Test Suite` (9 Klassen, 33 Tests):**
+  * `VoidProtectionListenerMockTest`: Void-Schutz in Event- vs. Fremdwelt.
+  * `PvPListenerMockTest`: Schadensblockierung im Countdown, aktiver Kampf, Spectator-Schutz.
+  * `PvPUnifiedCommandMockTest`: Command-Ausführung & Permissions.
+  * `TeamPvPListenerMockTest`: Friendly-Fire Schutz, gegnerischer Schaden, Pfeilbeschuss.
+  * `SpectatorRecoveryListenerMockTest`: Join-Recovery verwaister Zuschauer.
+  * `WorldProtectionListenerMockTest`: Block-Break/Place-Schutz in Event/Arena-Welten, Permissions & Explosionen.
+  * `RequestCleanupListenerMockTest`: Bereinigung von Anfragen beim Verlassen des Servers.
+  * `PendingPayoutListenerMockTest`: 30-Tick verzögerte Belohnungsnachlieferung beim Join.
+  * `StrandedPlayerListenerMockTest`: 20-Tick verzögerte Rettung gestrandeter Spieler aus verwaisten Welten.
 * **`TextTest` / `TextUtilTest` / `TextButtonTest`:** Legacy-Farbparsing, Hex-Codes, Caching, Button-, Link- und Clipboard-Erstellung, Stripping und Idempotenz.
 * **`ResourceConfigTest`:** Vollständige Validierung aller 11 Sprach- & Konfigurationsdateien (Schlüsselgleichheit de/en, keine unbekannten Schlüssel in FR/ES/RU/PL/JA, Syntaxprüfung).
 * **`ConcurrencyTest`:** Multithreading-Sicherheit für Text-Cache, Cooldowns und Rate-Limiter.
