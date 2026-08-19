@@ -51,11 +51,14 @@ public final class SafeLocationResolver {
         UUID playerId = player.getUniqueId();
 
         // 1. Hinterlegte Rueckkehr-Position
-        StoredReturn stored = plugin.getReturnLocations().peek(playerId);
-        if (stored != null) {
-            Location location = stored.toLocation();
-            if (isSafe(location)) {
-                return location;
+        ReturnLocationStore returnStore = plugin.getReturnLocations();
+        if (returnStore != null) {
+            StoredReturn stored = returnStore.peek(playerId);
+            if (stored != null) {
+                Location location = stored.toLocation();
+                if (isSafe(location)) {
+                    return location;
+                }
             }
         }
 

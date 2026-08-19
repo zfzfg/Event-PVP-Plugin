@@ -18,7 +18,7 @@ public class InputValidator {
     public static double validateMoney(String input, double min, double max) {
         try {
             double amount = Double.parseDouble(input);
-            if (amount < min || amount > max) {
+            if (Double.isNaN(amount) || Double.isInfinite(amount) || amount < min || amount > max) {
                 throw new IllegalArgumentException("Amount out of range");  // i18n-ignore: Exception-Text fuer Entwickler; der Aufrufer meldet dem Spieler einen Bundle-Text
             }
             return amount;
