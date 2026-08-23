@@ -1,5 +1,6 @@
 # Build & target directories
 target/
+*.jar
 reports/
 deprecation-*.txt
 
@@ -10,6 +11,11 @@ __pycache__/
 .pytest_cache/
 
 # IDE / Editor files
+.vscode/
 .idea/
 *.iml
 .DS_Store
+
+# Local automation scripts (do not push to github)
+Push-To-GitHub.ps1
+Push-To-GitHub.bat
