@@ -65,12 +65,13 @@ echo     %C_KEY%7%C_RESET%  Commit             %C_TEXT%Speichert NUR das Vorgeme
 echo     %C_KEY%8%C_RESET%  Schnell-Commit      %C_TEXT%Vormerken + Commit in einem Schritt%C_RESET%
 echo     %C_KEY%9%C_RESET%  Auswahl vormerken   %C_TEXT%Git fragt Datei fuer Datei (fuer saubere Commits)%C_RESET%
 echo.
-echo   %C_GROUP%[ 3 ] BRANCHES UND SERVER%C_RESET%
+echo   %C_GROUP%[ 3 ] BRANCHES UND GITHUB%C_RESET%
 echo    %C_KEY%10%C_RESET%  Branches anzeigen   %C_TEXT%Alle lokalen und entfernten Zweige%C_RESET%
 echo    %C_KEY%11%C_RESET%  Branch wechseln     %C_TEXT%Umschalten oder neuen Zweig anlegen%C_RESET%
-echo    %C_KEY%12%C_RESET%  Pull                %C_TEXT%Neuigkeiten vom Server holen und einbauen%C_RESET%
-echo    %C_KEY%13%C_RESET%  Push                %C_TEXT%Eigene Commits zum Server hochladen%C_RESET%
-echo    %C_KEY%14%C_RESET%  Fetch + Prune       %C_TEXT%Serverstand abgleichen, geloeschte Branches aufraeumen%C_RESET%
+echo    %C_KEY%12%C_RESET%  Pull von GitHub     %C_TEXT%Neuigkeiten von GitHub holen und einbauen%C_RESET%
+echo    %C_KEY%13%C_RESET%  Push zu GitHub      %C_TEXT%Eigene Commits zu GitHub hochladen (origin main)%C_RESET%
+echo    %C_KEY%14%C_RESET%  Fetch + Prune       %C_TEXT%GitHub-Stand abgleichen, geloeschte Branches aufraeumen%C_RESET%
+echo    %C_KEY%19%C_RESET%  Auto-Push Skript    %C_TEXT%Vollautomatischer Ablauf (Add + Commit + Push)%C_RESET%
 echo.
 echo   %C_GROUP%[ 4 ] AUFRAEUMEN%C_RESET%
 echo    %C_KEY%15%C_RESET%  Stash               %C_TEXT%Aenderungen kurz zur Seite legen und spaeter zurueckholen%C_RESET%
@@ -81,7 +82,7 @@ echo.
 echo     %C_KEY%0%C_RESET%  Beenden
 echo   %C_DIM%---------------------------------------------------------------------------%C_RESET%
 set "choice="
-set /p choice="  %C_INFO%Option [0-18]:%C_RESET% "
+set /p choice="  %C_INFO%Option [0-19]:%C_RESET% "
 
 if not defined choice goto MENU
 if "%choice%"=="0" goto END
@@ -103,9 +104,10 @@ if "%choice%"=="15" goto STASH_MENU
 if "%choice%"=="16" goto CLEAN_PYCACHE
 if "%choice%"=="17" goto RESET_STAGED
 if "%choice%"=="18" goto RESTORE_WORKSPACE
+if "%choice%"=="19" goto AUTO_PUSH
 
 echo.
-echo   %C_WARN%[^^!] "%choice%" ist keine gueltige Option.%C_RESET% Bitte eine Zahl von 0 bis 18 eingeben.
+echo   %C_WARN%[^^!] "%choice%" ist keine gueltige Option.%C_RESET% Bitte eine Zahl von 0 bis 19 eingeben.
 ping -n 2 127.0.0.1 >nul
 goto MENU
 
@@ -121,6 +123,9 @@ for /f "delims=" %%B in ('git rev-parse --abbrev-ref HEAD 2^>nul') do set "H_BRA
 set "H_REMOTE=kein Remote"
 for /f "delims=" %%R in ('git rev-parse --abbrev-ref --symbolic-full-name @{u} 2^>nul') do set "H_REMOTE=%%R"
 
+set "H_REMOTE_URL="
+for /f "delims=" %%U in ('git config --get remote.origin.url 2^>nul') do set "H_REMOTE_URL=%%U"
+
 set /a H_CHANGED=0
 for /f %%C in ('git status --porcelain 2^>nul ^| find /c /v ""') do set /a H_CHANGED=%%C
 
@@ -132,11 +137,12 @@ for /f "tokens=1,2" %%A in ('git rev-list --left-right --count HEAD...@{u} 2^>nu
 if not defined H_SYNC set "H_SYNC=nicht vergleichbar"
 
 echo %C_TITLE%===============================================================================%C_RESET%
-echo %C_TITLE%   GIT HELPER  -  Event-PVP-Plugin%C_RESET%
+echo %C_TITLE%   GIT HELPER  -  Event-PVP-Plugin (v1.1.0)%C_RESET%
 echo %C_TITLE%===============================================================================%C_RESET%
-echo   %C_DIM%Ordner  :%C_RESET% %CD%
-echo   %C_DIM%Branch  :%C_RESET% %C_OK%%H_BRANCH%%C_RESET%   %C_DIM%Remote:%C_RESET% %H_REMOTE%   %C_DIM%(%H_SYNC%)%C_RESET%
-echo   %C_DIM%Zustand :%C_RESET% %H_CHANGED% Datei(en) geaendert, davon %H_STAGED% zum Commit vorgemerkt
+echo   %C_DIM%Ordner    :%C_RESET% %CD%
+echo   %C_DIM%Branch    :%C_RESET% %C_OK%%H_BRANCH%%C_RESET%   %C_DIM%Tracking:%C_RESET% %H_REMOTE%   %C_DIM%(%H_SYNC%)%C_RESET%
+if defined H_REMOTE_URL echo   %C_DIM%GitHub    :%C_RESET% %C_INFO%%H_REMOTE_URL%%C_RESET%
+echo   %C_DIM%Zustand   :%C_RESET% %H_CHANGED% Datei(en) geaendert, davon %H_STAGED% zum Commit vorgemerkt
 echo %C_TITLE%-------------------------------------------------------------------------------%C_RESET%
 echo.
 exit /b 0
@@ -292,29 +298,42 @@ call :FOOTER
 goto MENU
 
 :PULL
-call :SECTION "PULL" "Holt die Commits vom Server und baut sie in deinen Branch ein. Bei Konflikten meldet Git sich - dann von Hand aufloesen." "git pull"
+call :SECTION "PULL VON GITHUB" "Holt die Commits von GitHub und baut sie in deinen Branch ein. Bei Konflikten meldet Git sich - dann von Hand aufloesen." "git pull"
 git pull
 call :FOOTER
 goto MENU
 
 :PUSH
-call :SECTION "PUSH" "Laedt deine lokalen Commits zum Server hoch. Fehlt der Upstream-Branch, wird er hier angeboten." "git push"
-git push
+call :SECTION "PUSH ZU GITHUB" "Laedt deine lokalen Commits zu GitHub hoch (origin/main)." "git push -u origin HEAD"
+git push -u origin HEAD
 if errorlevel 1 (
     echo.
-    echo   %C_WARN%Push fehlgeschlagen.%C_RESET% Haeufigster Grund: dieser Branch existiert auf dem Server noch nicht.
+    echo   %C_WARN%Standard-Push fehlgeschlagen.%C_RESET%
     set "pchoice="
-    set /p pchoice="  Branch jetzt auf origin anlegen und pushen? (j/n): "
-    if /i "!pchoice!"=="j" git push -u origin HEAD
+    set /p pchoice="  Soll ein Force-Push zu origin HEAD ausgefuehrt werden? (j/n): "
+    if /i "!pchoice!"=="j" git push -u origin HEAD --force
+) else (
+    echo.
+    echo   %C_OK%Erfolgreich zu GitHub gepusht!%C_RESET%
 )
 call :FOOTER
 goto MENU
 
 :FETCH
-call :SECTION "FETCH + PRUNE" "Aktualisiert nur das Wissen ueber den Server - dein Arbeitsstand bleibt unangetastet. Prune entfernt Verweise auf geloeschte Branches." "git fetch --all --prune"
+call :SECTION "FETCH + PRUNE (GITHUB)" "Aktualisiert nur das Wissen ueber das GitHub-Repository - dein Arbeitsstand bleibt unangetastet." "git fetch --all --prune"
 git fetch --all --prune
 echo.
-echo   %C_OK%Serverstand abgeglichen.%C_RESET%
+echo   %C_OK%GitHub-Stand abgeglichen.%C_RESET%
+call :FOOTER
+goto MENU
+
+:AUTO_PUSH
+call :SECTION "AUTO-PUSH SKRIPT" "Fuehrt das automatische Push-Skript (Push-To-GitHub.ps1) aus." "powershell -ExecutionPolicy Bypass -File Push-To-GitHub.ps1"
+if exist "%~dp0Push-To-GitHub.ps1" (
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0Push-To-GitHub.ps1"
+) else (
+    echo   %C_WARN%[FEHLER]%C_RESET% Push-To-GitHub.ps1 wurde nicht gefunden.
+)
 call :FOOTER
 goto MENU
 

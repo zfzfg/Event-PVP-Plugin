@@ -22,6 +22,7 @@ echo   [9] Write Accepted Baseline (freeze current findings)
 echo.
 echo   [L] Loose Ends: markierte Anbindungen ohne Ziel
 echo   [K] Loose Ends + verwaiste Uebersetzungsschluessel
+echo   [G] Git ^& GitHub Helper: Commits, Status ^& Push zu GitHub
 echo.
 echo   [0] Exit
 echo.
@@ -29,16 +30,17 @@ echo =======================================================================
 
 where choice >nul 2>&1
 if errorlevel 1 goto menu_fallback
-choice /c 1234567890LK /n /m "Bitte Option waehlen (0-9, L, K): "
+choice /c 1234567890LKG /n /m "Bitte Option waehlen (0-9, L, K, G): "
 set "choice=%errorlevel%"
-rem choice liefert die Position in der Liste, nicht das Zeichen - 11 und 12 sind L und K.
+rem choice liefert die Position in der Liste, nicht das Zeichen - 11=L, 12=K, 13=G.
 if "%choice%"=="11" set "choice=L"
 if "%choice%"=="12" set "choice=K"
+if "%choice%"=="13" set "choice=G"
 goto menu_dispatch
 
 :menu_fallback
 set "choice="
-set /p choice="Bitte Option waehlen (0-9, L, K): "
+set /p choice="Bitte Option waehlen (0-9, L, K, G): "
 
 :menu_dispatch
 if "%choice%"=="1" goto full_suite
@@ -52,8 +54,14 @@ if "%choice%"=="8" goto test_menu
 if "%choice%"=="9" goto write_baseline
 if /i "%choice%"=="L" goto loose_ends
 if /i "%choice%"=="K" goto loose_ends_i18n
+if /i "%choice%"=="G" goto git_helper_launch
 if "%choice%"=="10" goto quit
 if "%choice%"=="0" goto quit
+goto menu
+
+:git_helper_launch
+cls
+call "%~dp0..\git_helper.bat"
 goto menu
 
 :full_suite
