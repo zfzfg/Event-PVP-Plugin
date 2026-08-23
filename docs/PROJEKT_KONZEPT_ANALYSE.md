@@ -34,7 +34,7 @@ Das **Event-PVP-Plugin** gehört konzeptionell und technisch zur absoluten Spitz
 | **🌐 Web-Dashboard** | Integrierter HTTP-Server mit Token-Authentifizierung (`/eventpvp webtoken`), visueller Editor für alle Configs, Live-Synchronisations-Badges (`🟢 Synced`, `🟡 Unsaved Changes`), interaktiver Inventar-Viewer. |
 | **⚔️ PvP-Wager-System** | LiveTrade-GUI mit Gegenangeboten, Item- & Geld-Wetten, No-Wager-Modus, Countdown-Bestätigung, Draw- & Surrender-Voting, Zuschauermodus. |
 | **🌍 Internationalisierung (i18n)** | 7 Sprachen (DE, EN, FR, ES, JA, PL, RU) mit über 1000 Keys, 100% Parität, Embedded-Resource Fallbacks und vollständiger Konsolen-/Terminal-Lokalisierung. |
-| **🧹 Code-Qualität** | 0 verbleibende Deprecation-Warnungen, isolierte Adventure-Abstraktion, 176+ automatisierte JUnit-Tests. |
+| **🧹 Code-Qualität** | 0 verbleibende Deprecation-Warnungen, isolierte Adventure-Abstraktion, 360 automatisierte Unit- & MockBukkit-Tests (50 Testklassen, 100% grün). |
 
 ---
 
