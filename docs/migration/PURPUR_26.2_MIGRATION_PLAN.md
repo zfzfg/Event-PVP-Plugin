@@ -42,7 +42,7 @@ Diese Angaben wurden gegen die echten Dateien auf diesem Rechner geprüft. Sie s
 | Adventure-Version im Server | **5.2.0** (nicht 4.x!) | `libraries/net/kyori/*/5.2.0/` |
 | `api-version` die auf diesem Server akzeptiert wird | `"26.2"` | JsonBuild-0.0.2 läuft damit |
 | Lokal installiertes JDK | Java 26.0.1 | `java -version` |
-| Referenz-Plugin (läuft dort) kompiliert mit | Java 21 (source/target) | JsonBuild `pom.xml` im JAR |
+| Referenz-Plugin (läuft dort) kompiliert mit | Java 25 (source/target) | Aktualisierter Event-PVP-Build |
 | `net/md_5/**` in `purpur-api` enthalten? | **NEIN** (0 Klassen) | `unzip -l` auf die API-JAR |
 | `net/md_5/**` im Server-JAR enthalten? | **NEIN** (0 Klassen) | `unzip -l` auf `purpur-26.2.jar` |
 | BungeeCord-Chat zur Laufzeit | nur noch als *deprecated* Library: `libraries/net/md-5/bungeecord-chat/1.21-R0.2-**deprecated**+build.21/` | Dateisystem |
@@ -178,19 +178,18 @@ Datei `MIGRATION_NOTES.md` im Projektwurzelverzeichnis mit den Abschnitten:
 > Das ist der Grund, warum diese Phase **vor** der Adventure-Migration kommt: der Compiler wird
 > zum Werkzeug, statt dass geraten wird.
 
-### P1.1 — `pom.xml`: Java-Level auf 21
+### P1.1 — `pom.xml`: Java-Level auf 25
 
 In `pom.xml`, Block `<properties>`:
 
 ```xml
-<maven.compiler.source>21</maven.compiler.source>
-<maven.compiler.target>21</maven.compiler.target>
+<maven.compiler.source>25</maven.compiler.source>
+<maven.compiler.target>25</maven.compiler.target>
 ```
 
-Begründung: Das Referenz-Plugin auf demselben Server (JsonBuild) nutzt 21, `purpur-api` 26.2 ist
-gegen ≥21 gebaut. Nicht auf 25/26 gehen — 21 ist die konservative, belegte Wahl. Falls der
-Compiler später `class file has wrong version`-Fehler meldet, in `MIGRATION_NOTES.md` notieren
-und auf 25 erhöhen; nicht vorher.
+Begründung: Der Build erzeugt Java-25-Bytecode für die aktuelle LTS-Laufzeit. `purpur-api` 26.2
+bleibt als Server-API unverändert; Server-Kompatibilität wird weiterhin über die vorhandene
+Dual-Platform-Architektur erhalten.
 
 **Verifikation:** —(kommt mit P1.4)
 
@@ -332,7 +331,7 @@ zeigt `api-version: '26.2'` und die korrekt ersetzte `version: 1.0.9`.
 
 ### P1.7 — `pom.xml`: Surefire-Argline prüfen
 
-Aktuell: `<argLine>-Dnet.bytebuddy.experimental=true</argLine>`. Unter Java 21+ und Mockito 5.11
+Aktuell: `<argLine>-Dnet.bytebuddy.experimental=true</argLine>`. Unter Java 25+ und Mockito 5.11
 kann zusätzlich eine Warnung zu dynamischem Agent-Attach auftreten. Falls Tests in P0.3/P5 mit
 `Java agent has been loaded dynamically` scheitern, ergänzen:
 
@@ -1418,7 +1417,7 @@ JaCoCo in die `pom.xml` aufnehmen:
 <plugin>
   <groupId>org.jacoco</groupId>
   <artifactId>jacoco-maven-plugin</artifactId>
-  <version>0.8.12</version>
+    <version>0.8.15</version>
   <executions>
     <execution><goals><goal>prepare-agent</goal></goals></execution>
     <execution><id>report</id><phase>test</phase><goals><goal>report</goal></goals></execution>
@@ -1559,7 +1558,7 @@ Muss von Null grün durchlaufen.
   - **Breaking:** BungeeCord-Chat-API vollständig entfernt, Chat läuft über Adventure
   - **Behoben:** Verzauberungen aus `equipment.yml` mit modernen Namen (P3.3)
   - **Behoben:** TPS-Anzeige im Web-UI ohne Reflection (P3.6)
-  - **Intern:** Java 21, `api-version 26.2`, Legacy-Material-Pfad abgeschaltet
+    - **Intern:** Java 25, `api-version 26.2`, Legacy-Material-Pfad abgeschaltet
   - **Tests:** von 12 auf N Testklassen
 
 ### P7.3 — Abschlussbericht an den Menschen
@@ -1622,7 +1621,7 @@ mvn -o clean package
 | Item-Namen plötzlich kursiv | `Text.of` statt `Text.ofItem` bei ItemMeta | `Text.ofItem` (P3.1) |
 | `Unsupported api-version` beim Start | falscher Wert in `plugin.yml` | `'26.2'` (P1.6) |
 | Verzauberungen fehlen im Equipment | `Enchantment.getByName` mit Alt-Namen | P3.3 |
-| Mockito: `Java agent loaded dynamically` | Java 21+ | `-XX:+EnableDynamicAgentLoading` (P1.7) |
+| Mockito: `Java agent loaded dynamically` | Java 25+ | `-XX:+EnableDynamicAgentLoading` (P1.7) |
 | Farbcodes doppelt geparst / `§`-Artefakte | `MessageUtil.color()` **und** `Text.of()` auf demselben String | Nur `Text.of()` — es parst selbst |
 | `distance`-Vergleich verhält sich falsch | `distanceSquared` ohne Radius zu quadrieren | `r * r` (P4.4) |
 | Web-Handler wirft „not on main thread" | P4.5 ohne Scheduler-Rückführung | P4.5 zurückrollen, blockieren |
@@ -1634,7 +1633,7 @@ mvn -o clean package
 Die Migration gilt als abgeschlossen, wenn **alle** Punkte erfüllt sind:
 
 - [ ] `grep -rn "md_5\|spigot()" src/ pom.xml` ist leer
-- [ ] `pom.xml` nutzt `purpur-api:26.2.build.2618-stable`, Java 21, keine `bungeecord-chat`
+- [ ] `pom.xml` nutzt `purpur-api:26.2.build.2618-stable`, Java 25, keine `bungeecord-chat`
 - [ ] `plugin.yml` hat `api-version: '26.2'`
 - [ ] `unzip -l target/*.jar | grep -c "net/kyori"` ergibt `0`
 - [ ] `mvn -o clean test package` läuft von Null grün durch

@@ -8,8 +8,8 @@
   <description>Kombiniertes Event- und PvP-Wager-Plugin</description>
 
   <properties>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.source>25</maven.compiler.source>
+    <maven.compiler.target>25</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <purpur.api.version>26.2.build.2618-stable</purpur.api.version>
     <mockbukkit.version>4.116.1</mockbukkit.version>
@@ -303,7 +303,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
+        <version>0.8.15</version>
         <executions>
           <execution>
             <id>prepare-agent</id>

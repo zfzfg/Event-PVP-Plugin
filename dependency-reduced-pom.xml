@@ -116,7 +116,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.12</version>
+        <version>0.8.15</version>
         <executions>
           <execution>
             <id>prepare-agent</id>
@@ -333,9 +333,9 @@
     </dependency>
   </dependencies>
   <properties>
-    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.target>25</maven.compiler.target>
     <paper.version.from.mockbukkit>1.21-R0.1-SNAPSHOT</paper.version.from.mockbukkit>
-    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.source>25</maven.compiler.source>
     <purpur.api.version>26.2.build.2618-stable</purpur.api.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <mockbukkit.version>4.116.1</mockbukkit.version>

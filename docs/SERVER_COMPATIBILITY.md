@@ -12,7 +12,7 @@ Dieses Dokument enthält den verbindlichen technischen Leitfaden und die Kompati
 | **Paper** | **1.21.x** | 🟢 **100% Nativ** | ✅ **Vollständig unterstützt** (Alle Paper- und Adventure-APIs nativ eingebunden). |
 | **Pufferfish** | **1.21.x** | 🟢 **100% Nativ** | ✅ **Vollständig unterstützt** (Basiert auf Paper-API). |
 | **Spigot (Vanilla Spigot)** | **26.2 / 1.21.x** | 🟢 **Voll unterstützt** | ✅ **Neu in 1.1.0:** Volle Unterstützung dank **Dual-Platform-Architektur** (Kyori Adventure 5.2.0 ist isoliert geshadet; automatische Fallbacks für GUI-Titel, ItemMeta, Titles und synchrone Teleports). |
-| **Paper / Purpur** | **1.20.5 – 1.20.6** | 🟢 **Kompatibel** | ✅ **Unterstützt** (Java 21 und Adventure 5.x vorhanden). |
+| **Paper / Purpur** | **1.20.5 – 1.20.6** | 🟢 **Kompatibel** | ✅ **Unterstützt**, sofern der Server mit Java 25 ausgeführt wird (Adventure 5.x vorhanden). |
 | **Folia** | **1.21.x** | 🔴 **Nicht unterstützt** | ❌ **Inkompatibel** (Folia deaktiviert den `BukkitScheduler` und verbietet synchrone Multi-Thread-Zugriffe; zudem ist Multiverse-Core nicht Folia-fähig). |
 | **Spigot / Paper** | **1.19.4 & älter** | 🔴 **Inkompatibel** | ❌ Java 17 Laufzeit veraltet, alte Registry-/Trank-APIs, fehlende 1.21 Material-Definitionen. |
 
@@ -20,11 +20,11 @@ Dieses Dokument enthält den verbindlichen technischen Leitfaden und die Kompati
 
 ## ☕ 2. Java-Laufzeitumgebung (Java Runtime)
 
-* **Mindestanforderung:** **Java 21 (LTS)** oder neuer (z. B. Eclipse Temurin 21, OpenJDK 21, GraalVM 21).
-* **Bytecode-Zielversion:** Java 21 (Class File Version `65.0`).
+* **Mindestanforderung:** **Java 25 (LTS)** oder neuer (z. B. Eclipse Temurin 25, OpenJDK 25, GraalVM 25).
+* **Bytecode-Zielversion:** Java 25 (Class File Version `69.0`).
 * **Hintergrund:**
-  * Minecraft-Server ab Version 1.20.5 setzen Java 21 zwingend voraus.
-  * Das Plugin nutzt moderne Java-21-Sprachfeatures (Pattern Matching für `switch` und `instanceof`, Records, Concurrency-Klassen).
+   * Minecraft-Server ab Version 1.20.5 setzen eine ältere LTS-Basis voraus; dieses Plugin benötigt wegen seines Java-25-Bytecodes Java 25.
+   * Das Plugin nutzt moderne Java-Sprachfeatures (Pattern Matching für `switch` und `instanceof`, Records, Concurrency-Klassen) und wird für Java 25 kompiliert.
 * **JVM-Empfehlungen:**
   * Für optimale Garbage Collection werden die standardmäßigen **Aikar's Flags** mit G1GC empfohlen:
     ```bash
@@ -99,7 +99,7 @@ Mit Version 1.1.0 wurde eine saubere Brücken-Architektur eingeführt, die maxim
 ## 🔄 5. Checkliste für Administratoren
 
 1. **Server-Wahl:** Für beste Performance wird **Purpur 26.2** empfohlen. Das Plugin läuft jedoch ebenso reibungslos auf **Paper 1.21.x** und **Spigot 26.2**.
-2. **Java-Version:** Sicherstellen, dass der Server mit `java -version` mindestens **Java 21** meldet.
+2. **Java-Version:** Sicherstellen, dass der Server mit `java -version` mindestens **Java 25** meldet.
 3. **Konfigurationen:**
    * Bestehende YAML-Dateien (`config.yml`, `events.yml`, `worlds.yml`, `equipment.yml`, `messages_*.yml`) werden automatisch geladen und behalten alle Einstellungen.
 4. **Web-Interface:**

@@ -8,7 +8,7 @@
 - **Git:** Initialisiert, Baseline-Commit `acbaa66`.
 
 ## Endstand (Version 1.1.0)
-- **Ziel-Plattform:** Purpur 26.2 (`purpur-api:26.2.build.2618-stable`, Java 21)
+- **Ziel-Plattform:** Purpur 26.2 (`purpur-api:26.2.build.2618-stable`, Java 25)
 - **Adventure-Version:** 5.2.0 (Kyori Adventure transitiv über Purpur API)
 - **Finale Test-Suite:** 24 Testklassen, **152 Tests**, 0 Fehler, 0 Errors, 0 Übersprungen (`BUILD SUCCESS`).
 - **BungeeCord-Chat:** Vollständig entfernt (0 Vorkommen im Code und POM).
@@ -76,7 +76,7 @@ noetig, Commit `3a3e2b5`).
 - Fließtext-Chokepoint in `TextUtil.java` liefert weiterhin `String` über `color(String)` für Kompatibilität mit ItemMeta/Logs/Vergleichen, nutzt intern aber den zentralen Adventure-Serializer in `Text.java`.
 - `button(...)` und `link(...)` in `Text.java` bauen Klick- und Hover-Events nach Adventure 5.2.0 Spezifikation.
 - `Text.toLegacy(Component)` serialisiert in `§`-Codes (Section) für volle Kompatibilität mit Bukkit-String-APIs wie ItemMeta DisplayNames.
-- Surefire argLine um `-XX:+EnableDynamicAgentLoading` erweitert, um Mockito auf Java 21+ zu unterstützen.
+- Surefire argLine um `-XX:+EnableDynamicAgentLoading` erweitert, um Mockito auf Java 25+ zu unterstützen.
 - Kein Folia-Umbau: Purpur 26.2 unterstützt den Bukkit-Scheduler vollständig.
 
 ## BLOCKIERT

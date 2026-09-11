@@ -2,7 +2,7 @@
 
 ## [1.1.0] - 2026-08-18
 
-This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dual-platform compatibility for Purpur 26.2 and Vanilla Spigot 26.2**, a complete overhaul of the GUI/trading system, modern **Kyori Adventure 5.2.0** text formatting with true RGB color support, total deprecation cleanup under **Java 21 LTS**, unified sub-command handling, and 100% clean localization across all 7 supported languages.
+This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dual-platform compatibility for Purpur 26.2 and Vanilla Spigot 26.2**, a complete overhaul of the GUI/trading system, modern **Kyori Adventure 5.2.0** text formatting with true RGB color support, total deprecation cleanup under **Java 25 LTS**, unified sub-command handling, and 100% clean localization across all 7 supported languages.
 
 ---
 
@@ -13,7 +13,7 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 - **Adventure Text & True RGB:** Complete migration of all chat messages, titles, hover tooltips, and clickable actions to Kyori Adventure 5.2.0 (shaded & relocated to prevent server classloader collisions).
 - **Interactive Chat & SubCommand Unification:** Clickable chat action buttons for challenges, invites, and tokens now delegate directly to unified subcommands (`AcceptSubCommand`, `DenySubCommand`, `RespondSubCommand`).
 - **100% Clean Localization Audit (i18n D1–D11):** All 11 detectors report 0 Critical and 0 Warnings. 284 legacy orphaned GUI keys safely pruned across all 7 language bundles (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) while preserving 100% key parity (815 master keys per language).
-- **Total Deprecation & Warning Cleanup:** 100% clean compilation against Java 21 LTS, resolving all compiler deprecation and platform-specific warnings.
+- **Total Deprecation & Warning Cleanup:** 100% clean compilation against Java 25 LTS, resolving all compiler deprecation and platform-specific warnings.
 - **Automated Test Suite & JaCoCo Coverage:** 360 comprehensive unit, integration, and MockBukkit tests across 50 test classes (100% green) verifying dual-platform adapters, in-memory Bukkit listeners (friendly fire, spectator recovery, world protection, request cleanup, delayed payouts, stranded player rescue), trade bridges, item migrations, inventory guards, safe location resolvers, event models, team balancing, request handling, and REST/auth APIs, with integrated JaCoCo code coverage.
 
 ---
@@ -73,8 +73,8 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 #### 8. Automated Test Suite, MockBukkit & Code Coverage Expansion
 - **Comprehensive Test Suite (360 Tests across 50 Test Classes):** Expanded test coverage across all plugin modules (Core, Location, Inventory Guard, Multiverse-Inventories Bridge, Events, PvP Wager, LiveTrade, and Web API).
 - **In-Memory Server Testing via MockBukkit 26.2:** Integrated `MockBukkit-v26.2` (4.116.1) and `paper-api` for realistic, in-memory server simulation of listeners and commands (`MockBukkitTestBase`, `VoidProtectionListenerMockTest`, `PvPListenerMockTest`, `PvPUnifiedCommandMockTest`, `TeamPvPListenerMockTest`, `SpectatorRecoveryListenerMockTest`, `WorldProtectionListenerMockTest`, `RequestCleanupListenerMockTest`, `PendingPayoutListenerMockTest`, `StrandedPlayerListenerMockTest`).
-- **JaCoCo Code Coverage (`jacoco-maven-plugin:0.8.12`):** Automated coverage measurement and HTML report generation (`target/site/jacoco/index.html`).
-- **Modern Mocking & Assertions:** Integrated `mockito-junit-jupiter:5.11.0` and `assertj-core:3.25.3` with Java 21 dynamic agent loading support.
+- **JaCoCo Code Coverage (`jacoco-maven-plugin:0.8.15`):** Automated coverage measurement and HTML report generation (`target/site/jacoco/index.html`).
+- **Modern Mocking & Assertions:** Integrated `mockito-junit-jupiter:5.11.0` and `assertj-core:3.25.3` with Java 25 dynamic agent loading support.
 - **Quality Improvements:** Enhanced `InputValidator` with `NaN` and `Infinity` bounds checks and hardened `SafeLocationResolver` with null-safe return store lookups.
 
 ---
@@ -84,13 +84,13 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 | Property | Value |
 | :--- | :--- |
 | **Plugin Version** | `1.1.0` |
-| **Java Version** | `Java 21 LTS` (Source / Target) |
+| **Java Version** | `Java 25 LTS` (Source / Target) |
 | **Target API** | `purpur-api:26.2.build.2618-stable` |
 | **Supported Server Engines** | Purpur 26.2+, Paper 1.21.x / 1.20.5+, Pufferfish 1.21.x, Spigot 26.2 / 1.21.x |
 | **Unsupported Engines** | Folia (requires regionised scheduler rebuild), 1.19.4 & older |
 | **Kyori Adventure** | `5.2.0` (Shaded & Relocated to `de.zfzfg.eventplugin.libs.kyori`) |
 | **Test Suite** | 360 Passed Unit, Integration & MockBukkit Tests (100% Green, 50 Classes) |
-| **Code Coverage** | JaCoCo 0.8.12 (`target/site/jacoco/index.html`) |
+| **Code Coverage** | JaCoCo 0.8.15 (`target/site/jacoco/index.html`) |
 | **Localization** | 7 Languages (`de`, `en`, `es`, `fr`, `ja`, `pl`, `ru`) – 815 Master Keys |
 
 ---
@@ -98,6 +98,6 @@ This is the official release of **Event-PVP-Plugin 1.1.0**, featuring full **dua
 ### 🔧 Upgrade & Migration Notes
 
 1. **Drop-in Replacement:** `event-pvp-plugin-1.1.0.jar` is a direct replacement for previous 1.0.x and 1.1.0-beta builds.
-2. **Java 21 Required:** Ensure your server runtime is Java 21 or higher.
+2. **Java 25 Required:** Ensure your server runtime is Java 25 or higher.
 3. **Configuration Compatibility:** All existing configuration files (`config.yml`, `messages_*.yml`, `worlds.yml`, `equipment.yml`, `web-config.yml`) remain fully compatible and will be migrated automatically if new keys are present.
 4. **Dependencies:** `Multiverse-Core` and `Vault` are recommended for full feature support (arena resetting and economy wagers).
