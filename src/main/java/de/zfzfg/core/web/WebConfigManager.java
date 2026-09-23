@@ -152,6 +152,29 @@ public class WebConfigManager {
     public long getSessionValidityMinutes() {
         return webConfig.getLong("security.session-validity-minutes", 60);
     }
+
+    /**
+     * Permission fuer den Web-Zugang (security.required-permission).
+     */
+    public String getRequiredPermission() {
+        String permission = webConfig.getString("security.required-permission", "eventpvp.admin.web");
+        return permission == null || permission.isBlank() ? "eventpvp.admin.web" : permission.trim();
+    }
+
+    /**
+     * Ob eine Session nur von der IP aus gilt, mit der sie angelegt wurde
+     * (security.bind-session-to-ip).
+     */
+    public boolean isBindSessionToIp() {
+        return webConfig.getBoolean("security.bind-session-to-ip", false);
+    }
+
+    /**
+     * Erlaubte Client-IPs (security.allowed-ips). Leer = keine Einschraenkung.
+     */
+    public java.util.List<String> getAllowedIps() {
+        return webConfig.getStringList("security.allowed-ips");
+    }
     
     /**
      * Gibt die öffentliche URL für das Web-Interface zurück

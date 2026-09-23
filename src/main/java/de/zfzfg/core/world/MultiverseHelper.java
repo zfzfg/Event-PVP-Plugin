@@ -242,7 +242,9 @@ public class MultiverseHelper {
                     if (src != null && !src.trim().isEmpty()) return src.trim();
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getDebugManager().log("resolveCloneSourceForWorld(" + worldName + "): " + e);  // i18n-ignore: debug trace
+        }
         try {
             java.util.Map<String, de.zfzfg.eventplugin.model.EventConfig> events = plugin.getConfigManager().getAllEvents();
             for (de.zfzfg.eventplugin.model.EventConfig e : events.values()) {
@@ -251,7 +253,9 @@ public class MultiverseHelper {
                     if (src != null && !src.trim().isEmpty()) return src.trim();
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getDebugManager().log("resolveCloneSourceForWorld(" + worldName + "): " + e);  // i18n-ignore: debug trace
+        }
         return null;
     }
 

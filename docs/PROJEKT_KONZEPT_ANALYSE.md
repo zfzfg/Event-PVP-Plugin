@@ -22,7 +22,7 @@ Das **Event-PVP-Plugin** gehört konzeptionell und technisch zur absoluten Spitz
 * **Synergie aus zwei Welten**: Die Kombination aus **Admin-geführten Großevents** (LMS, FFA, Team-Arena) und **Spieler-gesteuerten PvP-Wetteinsätzen** (Item- und Geld-Wetten via LiveTrade) sorgt für maximale Server-Aktivität.
 * **Keine Kompromisse bei der Datensicherheit**: Der Verzicht auf Multiverse-Inventories zugunsten einer transaktionssicheren Eigenverwaltung via `InventoryBackup` und Crash-Journal (`inventory-guard.yml`) löst das größte Problem aller Duell-Plugins: *Itemverlust durch Server-Crashes oder Disconnects*.
 * **State-of-the-Art Web-Dashboard**: Das integrierte Web-Panel (Port 8085) mit Live-Config-Editor, 3-Tab Inventory Manager im Minecraft-Canvas-Design, Multiverse-Integration und Texturen aus Server-Resourcepacks hebt das Plugin weit über Standard-Plugins hinaus.
-* **Dual-Platform-Architektur (v1.1.0)**: Die Brücke zwischen nativer Purpur/Paper 1.21.x-Performance (Adventure Components, Async-Teleports) und stabiler Spigot-Lauffähigkeit (isolierte Adventure 5.2.0 Engine) sorgt für maximale Server-Kompatibilität.
+* **Dual-Platform-Architektur (v1.1.0)**: Die Brücke zwischen nativer Purpur/Paper 26.x-Performance (Adventure Components, Async-Teleports) und stabiler Spigot-Lauffähigkeit (mitgelieferte Adventure 5.2.0 Engine) sorgt für maximale Server-Kompatibilität.
 
 ---
 

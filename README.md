@@ -146,7 +146,7 @@ modern servers use) are fully supported for status display, backup and deletion.
 
 ## Requirements
 
-- **Server**: Paper/Spigot 1.19+ compatible
+- **Server**: Purpur / Paper / Spigot **26.2 / 26.3** (see `docs/SERVER_COMPATIBILITY.md`), Java 25+
 - **Required Dependencies**: 
   - **Multiverse-Core** (v4 or v5): Essential for world management (loading, unloading, cloning, regeneration)
   - **Vault**: Economy integration for money wagers

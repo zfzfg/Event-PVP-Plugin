@@ -70,14 +70,24 @@ security:
   # Standard: eventpvp.admin.web
   # OP-Spieler haben immer Zugang
   required-permission: "eventpvp.admin.web"
+
+  # Session an die IP binden, von der aus eingeloggt wurde.
+  # Sicherer, loggt aber bei wechselnden IPs (Mobilfunk, manche Proxys) aus.
+  bind-session-to-ip: false
+
+  # Hinweis: Das Panel spricht reines HTTP. Fuer Zugriff von aussen einen Reverse-Proxy
+  # mit HTTPS davorschalten (bind-address: "127.0.0.1" und public-url auf die Proxy-URL
+  # setzen) - Anfragen von anderen Origins als public-url werden abgewiesen.
   
+  # Erlaubte Client-IPs fuer Panel und API (leer = alle erlaubt).
+  # Beispiel: ["127.0.0.1", "192.168.1.20"]. Hinter einem Reverse-Proxy sieht das
+  # Plugin nur die IP des Proxys.
+  allowed-ips: []
+
   # Legacy-Einstellungen (nicht mehr verwendet)
   session-timeout: 24
   verification-timeout: 5
   password: ""
-  
-  # Erlaubte IPs (leer = alle erlaubt)
-  allowed-ips: []
 
 # Item-Texturen
 #
@@ -91,7 +101,7 @@ items:
   # Nur als Ausweg für Items, zu denen das Plugin kein Icon mitbringt (etwa Items
   # einer neueren Minecraft-Version als das Plugin). Leer lassen, wenn das Panel
   # niemals nach außen verbinden soll.
-  texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.21/assets/minecraft/textures/item/"
+  texture-source: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/26.3/assets/minecraft/textures/item/"
 
   # Texturen aus dem Resourcepack des Servers übernehmen
   #

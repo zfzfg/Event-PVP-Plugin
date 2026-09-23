@@ -8,11 +8,9 @@ import com.sun.net.httpserver.HttpHandler;
 import de.zfzfg.eventplugin.EventPlugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +19,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 
 /**
@@ -38,17 +38,17 @@ public class WebServer {
     private HttpServer httpServer;
     private final Gson gson;
     private final boolean authEnabled;
-    /** Rate-Limit: max. Requests je IP innerhalb eines Zeitfensters. */
-    private static final int RATE_LIMIT_MAX_REQUESTS = 100;
-    private static final long RATE_LIMIT_WINDOW_MS = 60_000L;
-
-    /** Zaehlerstand einer IP im laufenden Zeitfenster. */
-    private static final class RateWindow {
-        long windowStart;
-        int count;
-    }
-
-    private final Map<String, RateWindow> rateLimitCounters = new ConcurrentHashMap<>();
+    /** Rate-Limit der API: max. 100 Requests je IP und Minute. */
+    private final WebRequestGuard.RateLimiter apiRateLimiter = new WebRequestGuard.RateLimiter(100, 60_000L);
+    /** Strengeres Limit fuer den Login, damit Tokens nicht durchprobiert werden koennen. */
+    private final WebRequestGuard.RateLimiter loginRateLimiter = new WebRequestGuard.RateLimiter(10, 60_000L);
+    /** Threads fuer die HTTP-Handler; mit null lief alles auf einem einzigen Thread. */
+    private static final int HTTP_THREADS = 4;
+    private ExecutorService httpExecutor;
+    /** public-url aus der web-config.yml, beim Start gelesen (fuer die Origin-Pruefung). */
+    private volatile String publicUrl = "";
+    /** security.allowed-ips, beim Start gelesen. Leer = alle IPs erlaubt. */
+    private volatile java.util.List<String> allowedIps = java.util.List.of();
 
     /** Optional: Item-Texturen aus dem Server-Resourcepack. */
     private final ResourcePackTextureService textureService;
@@ -77,7 +77,9 @@ public class WebServer {
             String bindAddress = configManager.getBindAddress();
             java.net.InetAddress address = bindAddress.isEmpty() ? null : java.net.InetAddress.getByName(bindAddress);
             httpServer = HttpServer.create(new InetSocketAddress(address, port), 0);
-            
+            publicUrl = configManager.getPublicUrl();
+            allowedIps = java.util.List.copyOf(configManager.getAllowedIps());
+
             // Texturen aus dem Resourcepack im Hintergrund uebernehmen. Laeuft asynchron und
             // haelt den Start nicht auf; schlaegt es fehl, bleiben die mitgelieferten Icons.
             textureService.refreshAsync(
@@ -85,7 +87,8 @@ public class WebServer {
                     configManager.getResourcePackMaxSizeMb());
 
             // Statische Dateien (Login-Seite braucht keine Auth)
-            httpServer.createContext("/", new StaticFileHandler(plugin, textureService.getOverrideDirectory()));
+            httpServer.createContext("/", new StaticFileHandler(plugin, textureService.getOverrideDirectory(),
+                    exchange -> WebRequestGuard.isIpAllowed(clientIp(exchange), allowedIps)));
             
             // Auth Endpoints (brauchen keine Session)
             httpServer.createContext("/api/auth/login", this::handleLoginRequest);
@@ -172,17 +175,26 @@ public class WebServer {
             
             // Language API (kein Auth nötig für GET, damit Login-Screen richtige Sprache zeigt)
             httpServer.createContext("/api/language/get", exchange -> {
+                if (rejectForeignOrigin(exchange)) return;
                 if ("OPTIONS".equals(exchange.getRequestMethod())) {
                     sendCorsHeaders(exchange);
-                    try { exchange.sendResponseHeaders(204, -1); } catch (Exception e) {}
+                    try { exchange.sendResponseHeaders(204, -1); } catch (IOException ignored) {}
                     return;
                 }
                 sendJsonResponse(exchange, 200, apiHandler.getLanguage());
             });
-            httpServer.createContext("/api/language/save", exchange -> handleProtectedApiPostRequest(exchange, 
+            httpServer.createContext("/api/language/save", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.saveLanguage(parseJson(body))));
-            
-            httpServer.setExecutor(null); // Standard-Executor verwenden
+
+            // Mehrere Threads: ein langsamer Request (Weltliste, Backup-Restore) blockiert
+            // sonst das ganze Panel. Daemon, damit ein haengender Handler den Shutdown nicht aufhaelt.
+            AtomicInteger threadNo = new AtomicInteger();
+            httpExecutor = Executors.newFixedThreadPool(HTTP_THREADS, runnable -> {
+                Thread thread = new Thread(runnable, "EventPVP-Web-" + threadNo.incrementAndGet());  // i18n-ignore: Thread-Name
+                thread.setDaemon(true);
+                return thread;
+            });
+            httpServer.setExecutor(httpExecutor);
             httpServer.start();
             
             String authStatus = authEnabled ? "with authentication" : "without authentication";  // i18n-ignore: HTTP/HTML level; panel formats text from web/lang
@@ -198,6 +210,10 @@ public class WebServer {
     public void stop() {
         if (httpServer != null) {
             httpServer.stop(0);
+            if (httpExecutor != null) {
+                httpExecutor.shutdownNow();
+                httpExecutor = null;
+            }
             plugin.getLogger().log(Level.INFO, plugin.getConsoleMsg("web-stopped"));
         }
     }
@@ -209,6 +225,7 @@ public class WebServer {
      */
     private void handleLoginRequest(HttpExchange exchange) {
         try {
+            if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
                 sendCorsHeaders(exchange);
                 exchange.sendResponseHeaders(204, -1);
@@ -219,6 +236,8 @@ public class WebServer {
                 sendError(exchange, 405, "Method Not Allowed");
                 return;
             }
+
+            if (!checkRateLimit(exchange, loginRateLimiter)) return;
             
             String body = readRequestBody(exchange);
             Map<String, Object> request = parseJson(body);
@@ -247,6 +266,8 @@ public class WebServer {
                 "message", "Logged in successfully"  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
             ));
             
+        } catch (WebRequestGuard.PayloadTooLargeException e) {
+            sendError(exchange, 413, "Payload Too Large");
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Login Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
             sendError(exchange, 500, "Internal Server Error");
@@ -258,6 +279,7 @@ public class WebServer {
      */
     private void handleLogoutRequest(HttpExchange exchange) {
         try {
+            if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
                 sendCorsHeaders(exchange);
                 exchange.sendResponseHeaders(204, -1);
@@ -284,6 +306,7 @@ public class WebServer {
      */
     private void handleAuthCheckRequest(HttpExchange exchange) {
         try {
+            if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
                 sendCorsHeaders(exchange);
                 exchange.sendResponseHeaders(204, -1);
@@ -331,6 +354,7 @@ public class WebServer {
      */
     private void handleProtectedApiRequest(HttpExchange exchange, ResponseProvider provider) {
         try {
+            if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
                 sendCorsHeaders(exchange);
                 exchange.sendResponseHeaders(204, -1);
@@ -338,7 +362,7 @@ public class WebServer {
             }
             
             // Rate limit check
-            if (!checkRateLimit(exchange)) return;
+            if (!checkRateLimit(exchange, apiRateLimiter)) return;
 
             // Auth-Check wenn aktiviert
             if (authEnabled && !isAuthenticated(exchange)) {
@@ -377,13 +401,14 @@ public class WebServer {
      */
     private void handleProtectedApiQueryRequest(HttpExchange exchange, QueryRequestHandler handler) {
         try {
+            if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
                 sendCorsHeaders(exchange);
                 exchange.sendResponseHeaders(204, -1);
                 return;
             }
 
-            if (!checkRateLimit(exchange)) return;
+            if (!checkRateLimit(exchange, apiRateLimiter)) return;
 
             if (authEnabled && !isAuthenticated(exchange)) {
                 sendJsonResponse(exchange, 401, Map.of("success", false, "error", "Nicht authentifiziert"));  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
@@ -434,6 +459,7 @@ public class WebServer {
     private void handleProtectedApiPostRequest(HttpExchange exchange, PostRequestHandler handler) {
         try {
             // Handle CORS preflight
+            if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
                 sendCorsHeaders(exchange);
                 exchange.sendResponseHeaders(204, -1);
@@ -441,7 +467,7 @@ public class WebServer {
             }
             
             // Rate limit check
-            if (!checkRateLimit(exchange)) return;
+            if (!checkRateLimit(exchange, apiRateLimiter)) return;
 
             // Auth-Check wenn aktiviert
             if (authEnabled && !isAuthenticated(exchange)) {
@@ -466,6 +492,8 @@ public class WebServer {
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(responseBytes);
             }
+        } catch (WebRequestGuard.PayloadTooLargeException e) {
+            sendError(exchange, 413, "Payload Too Large");
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
             sendError(exchange, 500, "Internal Server Error");
@@ -506,14 +534,29 @@ public class WebServer {
      * Liest Request-Body
      */
     private String readRequestBody(HttpExchange exchange) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(exchange.getRequestBody(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
+        try (InputStream in = exchange.getRequestBody()) {
+            return WebRequestGuard.readBodyLimited(in, WebRequestGuard.MAX_BODY_BYTES);
         }
-        return sb.toString();
+    }
+
+    /**
+     * Weist Requests von nicht erlaubten IPs ({@code security.allowed-ips}) oder mit fremdem
+     * {@code Origin} mit 403 ab.
+     *
+     * @return true, wenn der Request abgewiesen wurde und der Handler abbrechen muss
+     */
+    private boolean rejectForeignOrigin(HttpExchange exchange) {
+        if (!WebRequestGuard.isIpAllowed(clientIp(exchange), allowedIps)) {
+            sendError(exchange, 403, "Forbidden");
+            return true;
+        }
+        String origin = exchange.getRequestHeaders().getFirst("Origin");
+        String host = exchange.getRequestHeaders().getFirst("Host");
+        if (WebRequestGuard.isOriginAllowed(origin, host, publicUrl)) {
+            return false;
+        }
+        sendError(exchange, 403, "Forbidden");
+        return true;
     }
     
     /**
@@ -521,9 +564,11 @@ public class WebServer {
      */
     private void sendCorsHeaders(HttpExchange exchange) {
         String origin = exchange.getRequestHeaders().getFirst("Origin");
-        // Mirror the request origin for credential support; deny if none provided
-        if (origin == null || origin.isEmpty()) {
-            origin = "null";
+        // Nur erlaubte Origins (gleicher Host oder public-url) bekommen CORS-Header. Frueher
+        // wurde jeder Origin gespiegelt - samt Allow-Credentials.
+        if (origin == null || origin.isEmpty()
+                || !WebRequestGuard.isOriginAllowed(origin, exchange.getRequestHeaders().getFirst("Host"), publicUrl)) {
+            return;
         }
         exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origin);
         exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
@@ -575,41 +620,19 @@ public class WebServer {
         } catch (IOException ignored) {}
     }
 
-    private boolean checkRateLimit(HttpExchange exchange) {
+    private static String clientIp(HttpExchange exchange) {
+        return exchange.getRemoteAddress().getAddress().getHostAddress();
+    }
+
+    private boolean checkRateLimit(HttpExchange exchange, WebRequestGuard.RateLimiter limiter) {
         String clientIp = exchange.getRemoteAddress().getAddress().getHostAddress();
-        long now = System.currentTimeMillis();
-
-        RateWindow window = rateLimitCounters.computeIfAbsent(clientIp, k -> new RateWindow());
-        boolean limited;
-        synchronized (window) {
-            // Abgelaufenes Fenster startet neu. Ohne diesen Reset zaehlte der
-            // Wert unbegrenzt weiter und sperrte den Admin nach 100 Requests
-            // dauerhaft aus -- bis zum Server-Neustart.
-            if (now - window.windowStart >= RATE_LIMIT_WINDOW_MS) {
-                window.windowStart = now;
-                window.count = 0;
-            }
-            window.count++;
-            limited = window.count > RATE_LIMIT_MAX_REQUESTS;
+        if (limiter.tryAcquire(clientIp, System.currentTimeMillis())) {
+            return true;
         }
-
-        if (limited) {
-            exchange.getResponseHeaders().set("Retry-After", // i18n-ignore: HTTP-Header-Name, erreicht nie einen Spieler
-                    String.valueOf(RATE_LIMIT_WINDOW_MS / 1000L));
-            sendJsonResponse(exchange, 429, Map.of("success", false, "error", "Rate limit exceeded"));  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
-            return false;
-        }
-
-        // Verwaiste Eintraege entfernen, damit die Map nicht unbegrenzt waechst.
-        if (rateLimitCounters.size() > 512) {
-            rateLimitCounters.values().removeIf(w -> {
-                synchronized (w) {
-                    return now - w.windowStart >= RATE_LIMIT_WINDOW_MS * 2;
-                }
-            });
-        }
-
-        return true;
+        exchange.getResponseHeaders().set("Retry-After", // i18n-ignore: HTTP-Header-Name, erreicht nie einen Spieler
+                String.valueOf(limiter.windowSeconds()));
+        sendJsonResponse(exchange, 429, Map.of("success", false, "error", "Rate limit exceeded"));  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
+        return false;
     }
 
     /**
@@ -650,6 +673,7 @@ public class WebServer {
 
         private final JavaPlugin plugin;
         private final File overrideDir;
+        private final java.util.function.Predicate<HttpExchange> accessCheck;
         private static final Map<String, String> MIME_TYPES = new HashMap<>();
 
         /** Unveraenderliche Assets - alles andere (html/js/json) wird bewusst nicht gecacht. */
@@ -672,13 +696,19 @@ public class WebServer {
             MIME_TYPES.put("ttf", "font/ttf");
         }
 
-        StaticFileHandler(JavaPlugin plugin, File overrideDir) {
+        StaticFileHandler(JavaPlugin plugin, File overrideDir, java.util.function.Predicate<HttpExchange> accessCheck) {
             this.plugin = plugin;
             this.overrideDir = overrideDir;
+            this.accessCheck = accessCheck;
         }
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
+            if (!accessCheck.test(exchange)) {
+                sendError(exchange, 403, "Forbidden");
+                return;
+            }
+
             String path = exchange.getRequestURI().getPath();
 
             // Redirect root zu index.html

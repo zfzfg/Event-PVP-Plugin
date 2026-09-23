@@ -53,7 +53,7 @@ A lightweight, powerful all-in-one Minecraft plugin that unifies **custom automa
 ## Quick Start & Dependencies
 
 ### 1. Requirements
-- **Server**: Paper / Spigot **1.19+**, Java 17+ — in practice **1.20+**, because the mandatory InventoryBackup requires it.
+- **Server**: Purpur / Paper / Spigot **26.2 / 26.3**, **Java 25+**.
 - **Mandatory Plugins**:
   * [Multiverse-Core](https://modrinth.com/project/3wmN97b8) (v4 or v5)
   * [VaultUnlocked](https://modrinth.com/project/ayRaM8J7) — recommended; the classic [Vault](https://www.spigotmc.org/resources/vault.34315/) from SpigotMC also works

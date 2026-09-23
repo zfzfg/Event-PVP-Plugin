@@ -62,7 +62,7 @@ public class WebApiHandler {
                 // Neubau wirkt z.B. "cleanup-backups-after-match" erst nach einem Neustart.
                 EventPlugin ep = eventPlugin();
                 if (ep != null) {
-                    ep.reloadInventoryConfig();
+                    onMainThread(() -> { ep.reloadInventoryConfig(); return null; });
                 }
                 response.put("success", true);
                 response.put("message", "Config saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
@@ -232,11 +232,15 @@ public class WebApiHandler {
 
         try {
             plugin.getLogger().info("[Web-API] Inventory provider -> " + mode.id());  // i18n-ignore: web API internal log
-            plugin.getConfig().set("settings.inventory-management.provider", mode.id());
-            plugin.saveConfig();
-            plugin.reloadConfig();
-            ep.getCoreConfigManager().reloadAll();
-            ep.reloadInventoryManagement();
+            final String providerId = mode.id();
+            onMainThread(() -> {
+                plugin.getConfig().set("settings.inventory-management.provider", providerId);
+                plugin.saveConfig();
+                plugin.reloadConfig();
+                ep.getCoreConfigManager().reloadAll();
+                ep.reloadInventoryManagement();
+                return null;
+            });
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "[Web-API] Could not switch inventory provider", e);  // i18n-ignore: web API internal log
             return failure(response, "inventory.error.switchFailed", String.valueOf(e.getMessage()));
@@ -505,16 +509,47 @@ public class WebApiHandler {
         } catch (IllegalArgumentException ignored) {
             // Kein UUID-Format - als Name behandeln
         }
-        org.bukkit.entity.Player online = org.bukkit.Bukkit.getPlayerExact(raw);
-        if (online != null) {
-            return online.getUniqueId();
+        try {
+            return onMainThread(() -> {
+                org.bukkit.entity.Player online = org.bukkit.Bukkit.getPlayerExact(raw);
+                if (online != null) {
+                    return online.getUniqueId();
+                }
+                for (org.bukkit.OfflinePlayer offline : org.bukkit.Bukkit.getOfflinePlayers()) {
+                    if (raw.equalsIgnoreCase(offline.getName())) {
+                        return offline.getUniqueId();
+                    }
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "[Web-API] Could not resolve player '" + raw + "'", e);  // i18n-ignore: web API internal log
+            return null;
         }
-        for (org.bukkit.OfflinePlayer offline : org.bukkit.Bukkit.getOfflinePlayers()) {
-            if (raw.equalsIgnoreCase(offline.getName())) {
-                return offline.getUniqueId();
+    }
+
+    /**
+     * Fuehrt Code, der die Bukkit-API anfasst, auf dem Main-Thread aus und wartet auf das
+     * Ergebnis. Die HTTP-Handler laufen auf eigenen Threads; Reloads und Spielerabfragen von
+     * dort aus konkurrieren sonst mit dem Tick.
+     *
+     * <p>Nicht fuer Code verwenden, der selbst auf den Main-Thread wartet (etwa {@link #await}
+     * auf Inventar-Futures) - das waere ein Deadlock.</p>
+     */
+    private <T> T onMainThread(java.util.concurrent.Callable<T> task) throws Exception {
+        if (plugin.getServer().isPrimaryThread()) {
+            return task.call();
+        }
+        try {
+            return plugin.getServer().getScheduler().callSyncMethod(plugin, task)
+                    .get(30, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (java.util.concurrent.ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof Exception ex) {
+                throw ex;
             }
+            throw e;
         }
-        return null;
     }
 
     private List<Map<String, Object>> describeItems(org.bukkit.inventory.ItemStack[] items) {
@@ -971,7 +1006,9 @@ public class WebApiHandler {
             if (plugin instanceof EventPlugin) {
                 EventPlugin eventPlugin = (EventPlugin) plugin;
                 if (eventPlugin.getConfigurationService() != null) {
-                    eventPlugin.getConfigurationService().reloadAll();
+                    // Arenen, Equipment und Events lesen Welten und Bukkit-Registries - das
+                    // gehoert auf den Main-Thread, nicht in den HTTP-Thread.
+                    onMainThread(() -> { eventPlugin.getConfigurationService().reloadAll(); return null; });
                     plugin.getLogger().info("[Web-API] ConfigurationService.reloadAll() successful");  // i18n-ignore: web API internal log
                 } else {
                     // Fallback

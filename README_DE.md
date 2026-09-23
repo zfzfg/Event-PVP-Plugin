@@ -30,8 +30,8 @@ Das gesamte Plugin kann über eine intuitive Benutzeroberfläche im Browser konf
 
 ## 📋 Voraussetzungen
 
-- **Server**: Spigot / Paper / Purpur (kompatibel mit Minecraft 1.19.4+)
-- **Java**: Version 17 oder neuer
+- **Server**: Purpur / Paper / Spigot **26.2 / 26.3** (siehe `docs/SERVER_COMPATIBILITY.md`), Java 25+
+- **Java**: Version 25 oder neuer
 - **Pflicht-Abhängigkeiten**:
   - `Multiverse-Core` (Welt-Verwaltung, dynamisches Laden/Entladen, Klonen und Zurücksetzen)
   - `InventoryBackup` / `InventoryRestore` (Sichere Inventar-Snapshots und Crash-Sicherheitsnetz)

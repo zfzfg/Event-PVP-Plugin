@@ -1,5 +1,25 @@
 [CENTER][SIZE=6][B]Changelog[/B][/SIZE][/CENTER]
 
+[SIZE=5][B][[COLOR=#5b9bd5]1.1.1[/COLOR]] - 2026-09-23[/B][/SIZE]
+[HR][/HR]
+
+[SIZE=4][COLOR=#57bb57][B]» Highlights[/B][/COLOR][/SIZE]
+
+[LIST]
+[*][B]Minecraft 26.3 support:[/B] one JAR runs on Purpur/Paper 26.2 and 26.3 (tested on Purpur 26.3 build 2639). New Maven profile [ICODE]mc263[/ICODE].
+[*][B]Web panel security:[/B]
+  [LIST]
+  [*]Foreign origins are rejected (403); CORS no longer mirrors every origin with credentials.
+  [*]2 MB request size limit (413) and a login rate limit of 10 attempts per minute (429).
+  [*][ICODE]security.allowed-ips[/ICODE] and [ICODE]security.required-permission[/ICODE] are now enforced.
+  [*]New option [ICODE]security.bind-session-to-ip[/ICODE].
+  [/LIST]
+[*][B]Thread safety:[/B] reloads, inventory-provider switches, config saves and player lookups from the web panel now run on the main thread. The HTTP server uses a thread pool instead of a single thread.
+[*][B]Web icons:[/B] 8 explorer-map icons renamed to their final 26.3 item names. The fallback texture source now points at 26.3.
+[*][B]Build:[/B] updated Maven plugins, JUnit 5.14, Mockito 5.23, AssertJ 3.27 and PlaceholderAPI 2.12; old build workarounds removed.
+[*][B]Docs:[/B] compatibility matrix corrected (26.2 / 26.3 only). Adventure is shaded but [I]not[/I] relocated.
+[/LIST]
+
 [SIZE=5][B][[COLOR=#5b9bd5]1.1.0[/COLOR]] - 2026-08-18[/B][/SIZE]
 [HR][/HR]
 

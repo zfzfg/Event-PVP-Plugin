@@ -306,9 +306,10 @@ public class EventPlugin extends JavaPlugin {
         if (webConfigManager.isEnabled()) {
             // Auth-Manager initialisieren
             boolean authEnabled = webConfigManager.isAuthEnabled();
-            webAuthManager = new WebAuthManager(this, "eventpvp.admin.web");
+            webAuthManager = new WebAuthManager(this, webConfigManager.getRequiredPermission());
             webAuthManager.setTokenValidityMinutes(webConfigManager.getTokenValidityMinutes());
             webAuthManager.setSessionValidityMinutes(webConfigManager.getSessionValidityMinutes());
+            webAuthManager.setBindSessionToIp(webConfigManager.isBindSessionToIp());
             
             webServer = new WebServer(this, webConfigManager, webAuthManager, webConfigManager.getPort(), authEnabled);
             webServer.start();
