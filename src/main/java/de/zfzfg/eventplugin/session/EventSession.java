@@ -644,10 +644,11 @@ public class EventSession {
      */
     private void restoreInventoryAfterEvent(Player player, java.util.function.Consumer<Boolean> onRestored) {
         de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
-        if (sessions == null || !sessions.isManaged()
+        if (sessions == null || !plugin.getInventoryConfig().managedByPlugin()
                 || !plugin.getInventoryConfig().restoreOnEventEnd()) {
             if (onRestored != null) {
-                onRestored.accept(player.isOnline());
+                onRestored.accept(player.isOnline() && (plugin.getInventoryGuard() == null
+                        || !plugin.getInventoryGuard().hasOpenSession(player.getUniqueId())));
             }
             return;
         }

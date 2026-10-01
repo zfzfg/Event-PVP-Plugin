@@ -474,12 +474,13 @@ public class MatchManager {
      */
     private void restoreInventoryAfterMatch(Player player, java.util.function.Consumer<Boolean> onRestored) {
         de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
-        if (sessions == null || !sessions.isManaged()
+        if (sessions == null || !plugin.getInventoryConfig().managedByPlugin()
                 || !plugin.getInventoryConfig().restoreOnMatchEnd()) {
             // Keine Inventarverwaltung aktiv: das Inventar wurde nie angetastet, der Gewinn
             // kann direkt hinein.
             if (onRestored != null) {
-                onRestored.accept(player.isOnline());
+                onRestored.accept(player.isOnline() && (plugin.getInventoryGuard() == null
+                        || !plugin.getInventoryGuard().hasOpenSession(player.getUniqueId())));
             }
             return;
         }
@@ -952,6 +953,109 @@ public class MatchManager {
         }
     }
 
+    /**
+     * Schreibt die abgebuchten Einsaetze, bevor das Match weiterlaeuft.
+     *
+     * @return false, wenn die Datei nicht geschrieben werden konnte. Der Einsatz ist dann
+     *         schon zurueckgegeben und das Match aus den Maps genommen.
+     */
+    private boolean commitWagerJournal(Match match) {
+        de.zfzfg.core.reward.ActiveWagerJournal journal = plugin.getActiveWagers();
+        if (journal == null || match.isNoWagerMode()) {
+            return true;
+        }
+        Player player1 = match.getPlayer1();
+        Player player2 = match.getPlayer2();
+        boolean saved = journal.record(match.getMatchId(),
+                new de.zfzfg.core.reward.ActiveWagerJournal.Stake(
+                        player1.getUniqueId(), match.getMatchId(),
+                        match.getWagerItems(player1), stakeMoney(match, player1)),
+                new de.zfzfg.core.reward.ActiveWagerJournal.Stake(
+                        player2.getUniqueId(), match.getMatchId(),
+                        match.getWagerItems(player2), stakeMoney(match, player2)));
+        if (saved) {
+            return true;
+        }
+        returnDebitedStake(match, player1);
+        returnDebitedStake(match, player2);
+        dropMatchQuietly(match);
+        MessageUtil.sendMessage(player1, getMsg("messages.livetrade.broadcast-error-match-start"));
+        MessageUtil.sendMessage(player2, getMsg("messages.livetrade.broadcast-error-match-start"));
+        plugin.getLogger().severe("[Wagers] Refused to start match " + match.getMatchId()  // i18n-ignore: technical wager journal log
+                + " because the stake journal could not be written");
+        return false;
+    }
+
+    private double stakeMoney(Match match, Player player) {
+        if (!plugin.hasEconomy()) {
+            return 0;
+        }
+        return match.getWagerMoney(player);
+    }
+
+    /** Gibt einen gerade abgebuchten Einsatz zurueck, noch bevor das Inventar getauscht wurde. */
+    private void returnDebitedStake(Match match, Player player) {
+        try {
+            InventoryUtil.giveItems(player, match.getWagerItems(player));
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to return items after a stake-journal failure: " + e.getMessage());  // i18n-ignore: technical exception log
+        }
+        try {
+            double money = stakeMoney(match, player);
+            if (money > 0) {
+                plugin.getEconomy().depositPlayer(player, money);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to return money after a stake-journal failure: " + e.getMessage());  // i18n-ignore: technical exception log
+        }
+    }
+
+    private void dropMatchQuietly(Match match) {
+        synchronized (matchOpMutex) {
+            playerToMatchId.remove(match.getPlayer1().getUniqueId());
+            playerToMatchId.remove(match.getPlayer2().getUniqueId());
+            matches.remove(match.getMatchId());
+        }
+    }
+
+    private void forgetWagerStake(java.util.UUID playerId) {
+        if (playerId == null || plugin.getActiveWagers() == null) {
+            return;
+        }
+        plugin.getActiveWagers().forget(playerId);
+    }
+
+    /** Schreibt Siege und Niederlagen sofort, nicht erst beim Fuenf-Minuten-Task. */
+    private void persistPvpStats() {
+        if (plugin.getStatsManager() == null) {
+            return;
+        }
+        de.zfzfg.pvpwager.storage.PvpStatsStorage.saveAsync(plugin, plugin.getStatsManager().toMap());
+    }
+
+    /**
+     * @return true, wenn Items und Geld dieses Spielers zurueck sind. Sonst bleibt der
+     *         Journal-Eintrag stehen und der naechste Start erstattet ihn.
+     */
+    private boolean returnStakeOnShutdown(Match match, Player player) {
+        try {
+            InventoryUtil.giveItems(player, match.getWagerItems(player));
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to return items on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
+            return false;
+        }
+        try {
+            double money = stakeMoney(match, player);
+            if (money > 0) {
+                plugin.getEconomy().depositPlayer(player, money);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().severe("Failed to return money on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
+            return false;
+        }
+        return true;
+    }
+
     public void endMatch(Match match, Player winner, boolean isDraw) {
         // Cancel tasks (unter Lock)
         List<BukkitTask> countdownTaskList;
@@ -1000,6 +1104,7 @@ public class MatchManager {
                 plugin.getStatsManager().recordLoss(loser);
             }
             plugin.markExternalDisplayDirty();
+            persistPvpStats();
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to record match statistics: " + e.getMessage());  // i18n-ignore: technical stats log
         }
@@ -1071,6 +1176,7 @@ public class MatchManager {
                 forgetOrigin(match.getPlayer2().getUniqueId());
                 matches.remove(matchId);
             }
+            plugin.flushDeferredConfigReload();
             
         }, de.zfzfg.core.util.Time.seconds(MATCH_CLEANUP_DELAY_SECONDS));
     }
@@ -1094,6 +1200,9 @@ public class MatchManager {
         Bukkit.getScheduler().runTaskLater(plugin, () -> restoreInventoryAfterMatch(winner, inventoryReady -> {
             if (!plugin.getInventorySessions().claimPayout(winner.getUniqueId())) {
                 // Bereits ausgeschuettet (z. B. durch den Shutdown-Pfad) - nicht doppelt.
+                // Das Journal darf trotzdem zu: der andere Pfad hat den Pot uebernommen.
+                forgetWagerStake(match.getPlayer1().getUniqueId());
+                forgetWagerStake(match.getPlayer2().getUniqueId());
                 return;
             }
             List<ItemStack> allItems = new ArrayList<>();
@@ -1110,6 +1219,11 @@ public class MatchManager {
             // und wird beim naechsten Join nachgereicht. Direkt ausgeben hiesse: weg.
             boolean handedOut = plugin.getPendingPayouts().deliverOrQueue(
                     winner, allItems, totalMoney, "pvp-win", inventoryReady);
+            // Ausgezahlt oder in pending-payouts.yml vorgemerkt: der Pot lebt nicht mehr
+            // nur im Match. Das Journal muss weg, sonst erstattet der naechste Start ihn
+            // zusaetzlich zurueck.
+            forgetWagerStake(match.getPlayer1().getUniqueId());
+            forgetWagerStake(match.getPlayer2().getUniqueId());
             if (!handedOut) {
                 return;  // Die Erfolgsmeldungen ergaeben ohne den Gewinn keinen Sinn.
             }
@@ -1200,12 +1314,14 @@ public class MatchManager {
     private void returnOwnStake(Match match, Player player, boolean inventoryReady) {
         if (plugin.getInventorySessions() != null
                 && !plugin.getInventorySessions().claimPayout(player.getUniqueId())) {
+            forgetWagerStake(player.getUniqueId());
             return;
         }
 
         double money = plugin.hasEconomy() ? match.getWagerMoney(player) : 0;
         boolean handedOut = plugin.getPendingPayouts().deliverOrQueue(
                 player, match.getWagerItems(player), money, "pvp-draw-return", inventoryReady);
+        forgetWagerStake(player.getUniqueId());
 
         if (handedOut) {
             MessageUtil.sendMessage(player, getMsg("wager-returned"));
@@ -1445,23 +1561,11 @@ public class MatchManager {
                 plugin.getInventorySessions().claimPayout(player1.getUniqueId());
                 plugin.getInventorySessions().claimPayout(player2.getUniqueId());
             }
-            try {
-                InventoryUtil.giveItems(player1, match.getWagerItems(player1));
-                InventoryUtil.giveItems(player2, match.getWagerItems(player2));
-            } catch (Exception e) {
-                plugin.getLogger().severe("Failed to return items on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
+            if (returnStakeOnShutdown(match, player1)) {
+                forgetWagerStake(player1.getUniqueId());
             }
-
-            // Geld direkt zurück
-            try {
-                if (plugin.hasEconomy()) {
-                    double p1Money = match.getWagerMoney(player1);
-                    double p2Money = match.getWagerMoney(player2);
-                    if (p1Money > 0) plugin.getEconomy().depositPlayer(player1, p1Money);
-                    if (p2Money > 0) plugin.getEconomy().depositPlayer(player2, p2Money);
-                }
-            } catch (Exception e) {
-                plugin.getLogger().severe("Failed to return money on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
+            if (returnStakeOnShutdown(match, player2)) {
+                forgetWagerStake(player2.getUniqueId());
             }
         }
 
@@ -1503,6 +1607,7 @@ public class MatchManager {
             plugin.getStatsManager().recordDraw(player1);
             plugin.getStatsManager().recordDraw(player2);
             plugin.markExternalDisplayDirty();
+            persistPvpStats();
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to record draw statistics on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
         }
@@ -1523,6 +1628,7 @@ public class MatchManager {
             forgetOrigin(player2.getUniqueId());
             matches.remove(matchId);
         }
+        plugin.flushDeferredConfigReload();
     }
 
     // Tasks sauber abbrechen (Reload/Disable)
@@ -1614,6 +1720,13 @@ public class MatchManager {
                 if (request.getTargetWagerMoney() > 0) {
                     plugin.getEconomy().withdrawPlayer(player2, request.getTargetWagerMoney());
                 }
+            }
+
+            // Erst das Journal, dann der Start. Scheitert die Datei, ist der Einsatz
+            // schon abgebucht und muss denselben Weg zurueck, sonst startet ein Match,
+            // dessen Pot ein Absturz nicht mehr kennt.
+            if (!commitWagerJournal(match)) {
+                return;
             }
         }
         

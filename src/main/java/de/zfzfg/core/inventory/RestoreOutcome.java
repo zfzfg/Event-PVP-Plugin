@@ -8,7 +8,7 @@ package de.zfzfg.core.inventory;
  * (aus dem im Speicher gehaltenen Abzug wiederhergestellt, weil das Backup nicht lesbar war).</p>
  *
  * <p>Invariante I4 des Integrationsplans: dieses Ergebnis wird <b>immer</b> ausgewertet.
- * Nur bei {@link #isSuccess()} darf ausgeschuettet und die Guard-Sitzung geschlossen werden.</p>
+ * Nur bei {@link #isApplied()} darf direkt ausgeschuettet und die Guard-Sitzung geschlossen werden.</p>
  */
 public enum RestoreOutcome {
 
@@ -25,9 +25,16 @@ public enum RestoreOutcome {
     /** Fehler beim Lesen oder Anwenden - Details im Serverlog. */
     FAILED,
     /** Kein Inventar-Provider aktiv. */
-    UNAVAILABLE;
+    UNAVAILABLE,
+    INVALID_BACKUP,
+    INCOMPATIBLE_VERSION,
+    INSUFFICIENT_SPACE;
 
-    /** Wahr, wenn das Inventar angekommen ist oder garantiert noch ankommt. */
+    public boolean permitsFallback() {
+        return this == NOT_FOUND || this == INVALID_BACKUP || this == FAILED || this == UNAVAILABLE;
+    }
+
+    /** Wahr, wenn angewendet oder die Join-Wiederherstellung persistent eingereiht wurde. */
     public boolean isSuccess() {
         return this == APPLIED || this == QUEUED_FOR_JOIN || this == FALLBACK_APPLIED;
     }

@@ -44,6 +44,46 @@ public final class InventoryGuard {
     private final Map<UUID, GuardEntry> sessions = new ConcurrentHashMap<>();
     private final Object fileLock = new Object();
     private volatile boolean loaded;
+    private record Authorization(UUID target, UUID owner, String backup) {}
+    private final Map<Authorization, Integer> authorizations = new ConcurrentHashMap<>();
+
+    public boolean authorizeRestore(UUID target, BackupRef ref) {
+        GuardEntry entry = get(target);
+        if (entry == null || entry.phase() != GuardPhase.RESTORING
+                || !target.equals(ref.ownerId()) || !ref.backupId().equals(entry.backupId())) return false;
+        authorizations.merge(new Authorization(target, ref.ownerId(), ref.backupId()), 1, Integer::sum);
+        return true;
+    }
+
+    public void endAuthorization(UUID target, BackupRef ref) {
+        authorizations.computeIfPresent(new Authorization(target, ref.ownerId(), ref.backupId()),
+                (key, count) -> count == 1 ? null : count - 1);
+    }
+
+    public boolean authorized(UUID target, UUID owner, String backup) {
+        return authorizations.containsKey(new Authorization(target, owner, backup));
+    }
+
+    public boolean matches(UUID target, UUID owner, String backup) {
+        GuardEntry entry = get(target);
+        return entry != null && target.equals(owner) && backup != null && backup.equals(entry.backupId());
+    }
+
+    public boolean tryCompleteRestore(UUID id) {
+        GuardEntry entry = get(id);
+        return entry != null && entry.tryComplete();
+    }
+
+    public void diagnostic(UUID id, String error, boolean damaged) {
+        GuardEntry entry = get(id);
+        if (entry != null) { entry.diagnostic(error, damaged || entry.backupDamaged()); save(); }
+    }
+
+    public void asyncFailure(UUID id, Throwable error) {
+        diagnostic(id, "FAILED: " + error.getMessage(), false);
+        releaseRestore(id, GuardPhase.ORPHANED);
+        plugin.getLogger().log(java.util.logging.Level.WARNING, "[Inventory guard] " + id, error);
+    }
 
     public InventoryGuard(EventPlugin plugin) {
         this.plugin = plugin;
@@ -110,7 +150,7 @@ public final class InventoryGuard {
      */
     public synchronized boolean tryBeginRestore(UUID playerId) {
         GuardEntry entry = sessions.get(playerId);
-        if (entry == null || entry.phase() == GuardPhase.RESTORING) {
+        if (entry == null || entry.isCompleting() || entry.phase() == GuardPhase.RESTORING) {
             return false;
         }
         entry.phase(GuardPhase.RESTORING);
@@ -204,6 +244,8 @@ public final class InventoryGuard {
                                     sec.getString("origin-world", ""),
                                     sec.getLong("opened-at", System.currentTimeMillis()),
                                     sec.getBoolean("payout-done", false)));
+                            sessions.get(id).diagnostic(sec.getString("last-error", ""),
+                                    sec.getBoolean("backup-damaged", false));
                         } catch (IllegalArgumentException e) {
                             plugin.getLogger().warning(plugin.getConsoleMsg("guard-entry-invalid",
                                     "entry", key));
@@ -231,6 +273,8 @@ public final class InventoryGuard {
                     cfg.set(key + ".phase", entry.phase().name());
                     cfg.set(key + ".origin-world", entry.originWorld());  // i18n-ignore: YAML-Pfadfragment in inventory-guard.yml
                     cfg.set(key + ".opened-at", entry.openedAt());  // i18n-ignore: YAML-Pfadfragment in inventory-guard.yml
+                    cfg.set(key + ".last-error", entry.lastError());
+                    cfg.set(key + ".backup-damaged", entry.backupDamaged());
                     cfg.set(key + ".payout-done", entry.payoutDone());  // i18n-ignore: YAML-Pfadfragment in inventory-guard.yml
                 }
                 File dir = plugin.getDataFolder();
@@ -297,7 +341,8 @@ public final class InventoryGuard {
     private void recoverSingle(GuardEntry entry) {
         InventoryBackupService service = plugin.getInventoryBackupService();
         UUID playerId = entry.playerId();
-        service.resolve(playerId, entry.backupId()).thenAccept(ref -> {
+        service.resolve(playerId, entry.backupId()).thenAcceptAsync(ref -> {
+            if (get(playerId) != entry) return;
             if (ref.isEmpty()) {
                 entry.phase(GuardPhase.ORPHANED);
                 plugin.getLogger().warning(plugin.getConsoleMsg("guard-backup-missing",
@@ -306,7 +351,8 @@ public final class InventoryGuard {
                 return;
             }
             restoreFor(playerId, ref.get(), GuardPhase.BACKED_UP);
-        });
+        }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin)).exceptionallyAsync(error -> { asyncFailure(playerId, error); return null; },
+                de.zfzfg.core.inventory.InventoryTasks.executor(plugin));
     }
 
     /**
@@ -319,12 +365,19 @@ public final class InventoryGuard {
      */
     public void restoreFor(UUID playerId, BackupRef ref, GuardPhase fallbackPhase) {
         InventoryBackupService service = plugin.getInventoryBackupService();
-        service.restore(playerId, ref, RestoreMode.all()).thenAccept(outcome -> {
+        GuardEntry restoring = get(playerId);
+        phase(playerId, GuardPhase.RESTORING);
+        service.restore(playerId, ref, RestoreMode.all()).thenAcceptAsync(outcome -> {
+            if (get(playerId) != restoring) return;
             if (outcome == RestoreOutcome.QUEUED_FOR_JOIN) {
                 phase(playerId, GuardPhase.QUEUED);
                 return;
             }
             if (outcome.isSuccess()) {
+                if (plugin.getInventorySessions() != null) {
+                    plugin.getInventorySessions().completeApplied(playerId, ref, null);
+                    return;
+                }
                 close(playerId);
                 // Gleiche Regel wie InventorySessionManager.cleanupAfterRestore: das Inventar ist
                 // zurueck, das temporaere Backup wird nicht mehr gebraucht. Nur auf dem
@@ -336,8 +389,10 @@ public final class InventoryGuard {
             }
             plugin.getLogger().warning(plugin.getConsoleMsg("guard-restore-failed",
                     "player", playerId.toString(), "reason", outcome.name()));
+            diagnostic(playerId, outcome.name(), outcome == RestoreOutcome.INVALID_BACKUP);
             releaseRestore(playerId, fallbackPhase);
-        });
+        }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin)).exceptionallyAsync(error -> { asyncFailure(playerId, error); return null; },
+                de.zfzfg.core.inventory.InventoryTasks.executor(plugin));
     }
 
     /**
@@ -354,6 +409,20 @@ public final class InventoryGuard {
             // Rejoin in ein laufendes Match/Event - die Module regeln das selbst.
             return;
         }
+        if (entry.phase() == GuardPhase.QUEUED) {
+            plugin.getInventoryBackupService().hasPendingRestore(id).thenAcceptAsync(pending -> {
+                if (!pending && get(id) == entry) restoreOnJoin(player, entry);
+            }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+                asyncFailure(id, error); return null;
+            }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin));
+            return;
+        }
+        restoreOnJoin(player, entry);
+    }
+
+    private void restoreOnJoin(Player player, GuardEntry entry) {
+        UUID id = player.getUniqueId();
+        if (!player.isOnline() || get(id) != entry) return;
         if (!entry.hasBackup()) {
             entry.phase(GuardPhase.ORPHANED);
             save();
@@ -362,17 +431,19 @@ public final class InventoryGuard {
         if (!tryBeginRestore(id)) {
             return;
         }
-        plugin.getInventoryBackupService().resolve(id, entry.backupId()).thenAccept(ref -> {
+        plugin.getInventoryBackupService().resolve(id, entry.backupId()).thenAcceptAsync(ref -> {
+            if (get(id) != entry) return;
             if (ref.isPresent()) {
                 restoreFor(id, ref.get(), GuardPhase.BACKED_UP);
             } else {
                 releaseRestore(id, GuardPhase.ORPHANED);
             }
-        });
+        }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin)).exceptionallyAsync(error -> { asyncFailure(id, error); return null; },
+                de.zfzfg.core.inventory.InventoryTasks.executor(plugin));
     }
 
     /** Ob das Match bzw. Event zu dieser Sitzung noch laeuft. */
-    private boolean isSessionStillRunning(GuardEntry entry) {
+    public boolean isSessionStillRunning(GuardEntry entry) {
         try {
             if (entry.context() == GuardContext.PVP_MATCH) {
                 return plugin.getMatchManager() != null
@@ -383,9 +454,8 @@ public final class InventoryGuard {
                         && plugin.getEventManager().isPlayerInEvent(entry.playerId());
             }
         } catch (Exception e) {
-            // Im Zweifel als beendet behandeln: lieber einmal zu frueh wiederherstellen als
-            // ein Inventar dauerhaft haengen lassen.
-            return false;
+            // Ambiguous state must not release a foreign restore into an active kit.
+            return true;
         }
         return false;
     }

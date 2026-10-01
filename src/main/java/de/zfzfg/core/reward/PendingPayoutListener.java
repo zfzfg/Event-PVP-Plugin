@@ -11,7 +11,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 /**
  * Reicht offene Gewinne und Belohnungen beim Join nach.
  *
- * <p><b>Die Verzoegerung ist der eigentliche Punkt dieser Klasse.</b> Beim Join laufen zwei
+ * <p>Beim Join laufen zwei
  * Dinge an, die sich gegenseitig ausloeschen koennen:</p>
  * <ol>
  *   <li>Die eingereihte Wiederherstellung des Survival-Inventars - entweder ueber den
@@ -22,17 +22,12 @@ import org.bukkit.event.player.PlayerJoinEvent;
  *
  * <p>Laeuft die Ausgabe zuerst, loescht die nachfolgende Wiederherstellung sie im selben
  * Moment wieder - genau der Fehler, den die Reihenfolge nach Match und Event vermeidet.
- * Deshalb wartet diese Klasse bewusst laenger als das Guard-Netz.</p>
+ * Der erste Versuch erfolgt nach dem Guard-Netz; offene Wiederherstellungen blockieren
+ * die Ausgabe unabhaengig von ihrer Dauer. Der Restore-Abschluss versucht erneut.</p>
  */
 public final class PendingPayoutListener implements Listener {
 
-    /**
-     * Abstand zum Join in Ticks.
-     *
-     * <p>Muss ueber den 10 Ticks des {@code InventoryGuardListener} liegen. 30 Ticks
-     * (1,5 Sekunden) lassen zusaetzlich Luft fuer die Wiederherstellung durch
-     * InventoryBackup selbst, die einen eigenen Zeitpunkt waehlt.</p>
-     */
+    /** First attempt after join. Guard/pending state, rather than this delay, gates delivery. */
     private static final int DELAY_TICKS = 30;
 
     private final EventPlugin plugin;
@@ -53,11 +48,31 @@ public final class PendingPayoutListener implements Listener {
                 // Wieder weg - die Posten bleiben in der Datei und kommen beim naechsten Mal.
                 return;
             }
-            int delivered = store.deliverAll(event.getPlayer());
-            if (delivered > 0) {
-                event.getPlayer().sendMessage(de.zfzfg.eventplugin.util.ColorUtil.color(
-                        plugin.getConfigManager().getMessage("rewards.delivered-on-join")));
-            }
+            deliverWhenSafe(plugin, event.getPlayer().getUniqueId());
         }, Time.ticks(DELAY_TICKS));
     }
+    /** No payout while a restore can still overwrite it; errors retain stored rewards. */
+    public static void deliverWhenSafe(EventPlugin plugin, java.util.UUID id) {
+        if (!plugin.isEnabled()) return;
+        var guard = plugin.getInventoryGuard();
+        if (guard != null && guard.hasOpenSession(id)) return;
+        var store = plugin.getPendingPayouts();
+        if (store == null || !store.hasPending(id)) return;
+        var service = plugin.getInventoryBackupService();
+        if (service == null) return;
+        if (!service.isAvailable() && plugin.getInventoryConfig() != null
+                && plugin.getInventoryConfig().managedByPlugin()) return;
+        service.hasPendingRestore(id).thenAcceptAsync(pending -> {
+            if (pending || guard != null && guard.hasOpenSession(id)) return;
+            var player = Bukkit.getPlayer(id);
+            if (player == null || !player.isOnline()) return;
+            int delivered = store.deliverAll(player);
+            if (delivered > 0) player.sendMessage(de.zfzfg.eventplugin.util.ColorUtil.color(
+                    plugin.getConfigManager().getMessage("rewards.delivered-on-join")));
+        }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin)).exceptionally(error -> {
+            plugin.getLogger().log(java.util.logging.Level.WARNING, "[Payouts] Restore check failed for " + id, error);
+            return null;
+        });
+    }
+
 }

@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.1.1] - 2026-09-23
+
+- **Minecraft 26.3 support**: Plugin compiles warning-free against `purpur-api 26.3`; no removed materials, entities or sounds. Startup, config reload and web panel verified on Purpur 26.3 (build 2639). `api-version` stays `26.2`, so one JAR runs on 26.2 and 26.3. New Maven profile `mc263` (`mvn -Pmc263 package`) builds against the 26.3 API.
+- **Web panel icons**: 8 explorer-map icons renamed to their final 26.3 item names (`ABANDONED_CAMP_MAP`, `BURIED_ANCIENT_CITY_MAP`, `BURIED_MINESHAFT_MAP`, `BURIED_TRIAL_CHAMBERS_MAP`, `JUNGLE_PYRAMID_MAP`, `OCEAN_MONUMENT_MAP`, `SWAMP_HUT_MAP`, `WOODLAND_MANSION_MAP`). Fallback `texture-source` now points at the `26.3` asset branch.
+- **Web security**:
+  - CORS no longer mirrors every `Origin` with credentials. Requests from foreign origins (other domain *or* other port on the same host) are rejected with 403; same-origin and the configured `public-url` are allowed.
+  - Request bodies are capped at 2 MB (HTTP 413).
+  - Login is rate-limited (10 attempts/minute per IP).
+  - `security.allowed-ips` is now actually enforced (it was documented but unused), and `security.required-permission` is honoured (was hard-coded).
+  - New option `security.bind-session-to-ip` (default `false`).
+  - HTTP handlers run on a small thread pool instead of a single thread.
+  - Web reload, inventory-provider switch, config save and player lookup now run their Bukkit work on the main thread.
+- **Build**: `maven.compiler.release=25`; compiler/shade/surefire plugins, JUnit 5.14, Mockito 5.23, AssertJ 3.27 and PlaceholderAPI 2.12 updated; removed Groovy manifest hack, the stray `paper-api 1.21` test dependency, dead Sonatype/Spigot repositories and the ByteBuddy experimental flag. `dependency-reduced-pom.xml` is no longer tracked.
+- **Docs**: Corrected compatibility matrix (1.21.x/1.20.x servers cannot load an `api-version: 26.2` plugin) and the Adventure note (shaded, *not* relocated – relocation would break Paper's `Component` methods).
+
 ## [1.1.0] - 2026-08-18
 
 - **Full Dual-Platform Compatibility (Purpur 26.2 & Spigot 26.2)**: Added dynamic runtime platform detection (`Platform.java`), Kyori Adventure 5.2.0 shading with safe namespace relocation (`de.zfzfg.eventplugin.libs.kyori`), cross-platform Component/String bridges (`TextUtil`, `GuiUtil`, `ItemUtil`, `TeleportUtil`), and isolated Paper Registry helpers (`PaperRegistryHelper`).

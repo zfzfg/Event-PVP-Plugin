@@ -117,6 +117,21 @@ Backups can also be deleted from the panel (only the zip file — never a world)
 Worlds stored as dimensions inside the main world (`world/dimensions/minecraft/<name>`, the layout
 modern servers use) are fully supported for status display, backup and deletion.
 
+#### Building with InventoryBackup API 2
+
+InventoryBackup **0.2.0 / API revision 2 or newer** is required. Install its local API before building:
+
+```powershell
+mvn -f ../../InventoryBackup/InventoryBackup-GitHub/pom.xml -pl api -am install
+mvn verify
+```
+
+The API dependency is `provided`; its classes are supplied by InventoryBackup on the server.
+Older or disabled providers block managed event/match entry before inventory changes.
+Restore failures are shown in the web panel and inventory journal. Foreign restores cannot
+replace an active match/event inventory, and join rewards wait until recovery finishes.
+Cancelled, incompatible and insufficient-space restores never force the memory fallback.
+
 #### About Inventory Management (via InventoryBackup)
 **Inventory management** is handled automatically by the plugin using the required backend plugin **InventoryBackup** (from the InventoryRestore project):
 - **Pre-teleport Backups**: Backups are taken before a player is teleported to an arena or lobby world.
@@ -146,7 +161,7 @@ modern servers use) are fully supported for status display, backup and deletion.
 
 ## Requirements
 
-- **Server**: Paper/Spigot 1.19+ compatible
+- **Server**: Purpur / Paper / Spigot **26.2 / 26.3** (see `docs/SERVER_COMPATIBILITY.md`), Java 25+
 - **Required Dependencies**: 
   - **Multiverse-Core** (v4 or v5): Essential for world management (loading, unloading, cloning, regeneration)
   - **Vault**: Economy integration for money wagers

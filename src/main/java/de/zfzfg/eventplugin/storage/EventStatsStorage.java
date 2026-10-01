@@ -32,7 +32,10 @@ public class EventStatsStorage {
                     stats.addWins(wins);
                     stats.addParticipations(parts);
                     map.put(id, stats);
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    // Kaputter Eintrag (z. B. keine UUID): ueberspringen, aber sichtbar machen.
+                    plugin.getLogger().warning("Skipping invalid Event stats entry '" + key + "': " + e.getMessage());  // i18n-ignore: technical storage exception log
+                }
             }
         } catch (Exception e) {
             plugin.getLogger().warning("Failed to load Event stats: " + e.getMessage());  // i18n-ignore: technical storage exception log

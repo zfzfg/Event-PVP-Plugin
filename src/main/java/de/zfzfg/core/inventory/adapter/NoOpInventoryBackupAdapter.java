@@ -62,22 +62,22 @@ public final class NoOpInventoryBackupAdapter implements InventoryBackupService 
 
     @Override
     public CompletableFuture<List<BackupRef>> list(UUID ownerId, String type) {
-        return CompletableFuture.completedFuture(Collections.emptyList());
+        return CompletableFuture.failedFuture(new IllegalStateException("InventoryBackup API 2 unavailable"));
     }
 
     @Override
     public CompletableFuture<Optional<BackupRef>> resolve(UUID ownerId, String backupId) {
-        return CompletableFuture.completedFuture(Optional.empty());
+        return CompletableFuture.failedFuture(new IllegalStateException("InventoryBackup API 2 unavailable"));
     }
 
     @Override
     public CompletableFuture<Optional<CapturedInventory>> load(BackupRef ref) {
-        return CompletableFuture.completedFuture(Optional.empty());
+        return CompletableFuture.failedFuture(new IllegalStateException("InventoryBackup API 2 unavailable"));
     }
 
     @Override
     public CompletableFuture<Boolean> delete(BackupRef ref) {
-        return CompletableFuture.completedFuture(false);
+        return CompletableFuture.failedFuture(new IllegalStateException("InventoryBackup API 2 unavailable"));
     }
 
     @Override

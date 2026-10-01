@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Failed to load: {message}",
   "info.noChanges": "No changes to save",
   "success.savedAll": "All configurations saved",
+  "success.savedReloadDeferred": "Saved. It will apply once no match or event is running.",
   "error.savePartial": "Failed to save some configurations",
   "theme.reset": "Theme reset to default",
   "yaml.copied": "YAML copied to clipboard",
@@ -762,5 +763,15 @@
   "editor.equipmentIconAuto": "Automatic (based on the chestplate)",
   "editor.equipmentIconHint": "Type a material name or pick one of the suggestions. Leave it empty to derive the icon from the chestplate.",
   "editor.inventoryDoubleClickHint": "Double-click an item you placed to open its extra settings: amount, enchantments, name, lore and unbreakable.",
-  "editor.armorClickHint": "Click a filled armour or offhand slot to open its extra settings: enchantments, name, lore and unbreakable."
+  "editor.armorClickHint": "Click a filled armour or offhand slot to open its extra settings: enchantments, name, lore and unbreakable.",
+  "inventory.error.invalidBackup": "The backup contains invalid data.",
+  "inventory.error.incompatibleVersion": "The backup was saved by a newer Minecraft version.",
+  "inventory.error.insufficientSpace": "There is not enough inventory space. Nothing was changed.",
+  "inventory.error.cancelled": "Another plugin cancelled the restore.",
+  "inventory.apiVersion": "API v{version}",
+  "inventory.apiCompatible": "API compatible",
+  "inventory.apiIncompatible": "InventoryBackup API 2 is required",
+  "inventory.lastError": "Last error",
+  "inventory.backupDamaged": "Backup unavailable or damaged",
+  "inventory.error.lookupFailed": "Could not look up the player; see the server log."
 }

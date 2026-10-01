@@ -1,6 +1,6 @@
 # 🌐 Minecraft Server Kompatibilitäts- & Versionsbericht
 
-Dieses Dokument enthält den verbindlichen technischen Leitfaden und die Kompatibilitätsmatrix für das **Event-PVP-Plugin (Version 1.1.0)**. Es beschreibt unterstützte Server-Engines, Minecraft-Versionen, Java-Laufzeitanforderungen sowie Abhängigkeiten im Detail.
+Dieses Dokument enthält den verbindlichen technischen Leitfaden und die Kompatibilitätsmatrix für das **Event-PVP-Plugin (Version 1.1.1)**. Es beschreibt unterstützte Server-Engines, Minecraft-Versionen, Java-Laufzeitanforderungen sowie Abhängigkeiten im Detail.
 
 ---
 
@@ -8,13 +8,13 @@ Dieses Dokument enthält den verbindlichen technischen Leitfaden und die Kompati
 
 | Server-Software | Minecraft Version | Kompatibilität | Status & Technische Details |
 |---|---|---|---|
-| **Purpur** | **26.2 / 1.21.x** (Build 2618+) | 🟢 **100% Nativ** | ⭐ **Offizielle Referenzplattform** (Native Adventure RGB Components, Async-Teleports, Paper-Registry TagKeys, volle Performance-Optimierung). |
-| **Paper** | **1.21.x** | 🟢 **100% Nativ** | ✅ **Vollständig unterstützt** (Alle Paper- und Adventure-APIs nativ eingebunden). |
-| **Pufferfish** | **1.21.x** | 🟢 **100% Nativ** | ✅ **Vollständig unterstützt** (Basiert auf Paper-API). |
-| **Spigot (Vanilla Spigot)** | **26.2 / 1.21.x** | 🟢 **Voll unterstützt** | ✅ **Neu in 1.1.0:** Volle Unterstützung dank **Dual-Platform-Architektur** (Kyori Adventure 5.2.0 ist isoliert geshadet; automatische Fallbacks für GUI-Titel, ItemMeta, Titles und synchrone Teleports). |
-| **Paper / Purpur** | **1.20.5 – 1.20.6** | 🟢 **Kompatibel** | ✅ **Unterstützt**, sofern der Server mit Java 25 ausgeführt wird (Adventure 5.x vorhanden). |
-| **Folia** | **1.21.x** | 🔴 **Nicht unterstützt** | ❌ **Inkompatibel** (Folia deaktiviert den `BukkitScheduler` und verbietet synchrone Multi-Thread-Zugriffe; zudem ist Multiverse-Core nicht Folia-fähig). |
-| **Spigot / Paper** | **1.19.4 & älter** | 🔴 **Inkompatibel** | ❌ Java 17 Laufzeit veraltet, alte Registry-/Trank-APIs, fehlende 1.21 Material-Definitionen. |
+| **Purpur** | **26.2** (Build 2618+) | 🟢 **100% Nativ** | ⭐ **Offizielle Referenzplattform** (Native Adventure RGB Components, Async-Teleports, Paper-Registry TagKeys). |
+| **Purpur** | **26.3** (Build 2634+) | 🟢 **Unterstützt** | ✅ **Neu in 1.1.1:** Kompiliert ohne Warnungen gegen `purpur-api 26.3`, keine entfernten Materialien/Entities/Sounds; Start, Konfigurations-Reload und Web-Panel auf Purpur 26.3 (Build 2639) getestet. Dasselbe JAR läuft auf 26.2 und 26.3 (`api-version: 26.2`). |
+| **Paper** | **26.2 / 26.3** | 🟢 **100% Nativ** | ✅ **Vollständig unterstützt** (Alle Paper- und Adventure-APIs nativ eingebunden; 26.3 wie oben). |
+| **Pufferfish** | **26.2+** | 🟢 **Nativ** | ✅ Basiert auf Paper-API. |
+| **Spigot (Vanilla Spigot)** | **26.2+** | 🟢 **Unterstützt** | ✅ **Neu in 1.1.0:** Dual-Platform-Architektur (Kyori Adventure 5.2.0 wird mitgeliefert; automatische Fallbacks für GUI-Titel, ItemMeta, Titles und synchrone Teleports). |
+| **Paper / Purpur / Spigot** | **1.21.x und älter** | 🔴 **Inkompatibel** | ❌ `api-version: '26.2'` wird von älteren Servern abgelehnt („Unsupported API version“). Zusätzlich: Java-25-Bytecode und Adventure 5 (erst ab 26.2 im Server). |
+| **Folia** | **alle** | 🔴 **Nicht unterstützt** | ❌ **Inkompatibel** (Folia deaktiviert den `BukkitScheduler` und verbietet synchrone Multi-Thread-Zugriffe; zudem ist Multiverse-Core nicht Folia-fähig). |
 
 ---
 
@@ -23,12 +23,12 @@ Dieses Dokument enthält den verbindlichen technischen Leitfaden und die Kompati
 * **Mindestanforderung:** **Java 25 (LTS)** oder neuer (z. B. Eclipse Temurin 25, OpenJDK 25, GraalVM 25).
 * **Bytecode-Zielversion:** Java 25 (Class File Version `69.0`).
 * **Hintergrund:**
-   * Minecraft-Server ab Version 1.20.5 setzen eine ältere LTS-Basis voraus; dieses Plugin benötigt wegen seines Java-25-Bytecodes Java 25.
+   * Minecraft 26.x-Server laufen auf Java 25; das Plugin wird mit `maven.compiler.release=25` gebaut.
    * Das Plugin nutzt moderne Java-Sprachfeatures (Pattern Matching für `switch` und `instanceof`, Records, Concurrency-Klassen) und wird für Java 25 kompiliert.
 * **JVM-Empfehlungen:**
   * Für optimale Garbage Collection werden die standardmäßigen **Aikar's Flags** mit G1GC empfohlen:
     ```bash
-    java -Xms4G -Xmx4G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -jar purpur-1.21.jar --nogui
+    java -Xms4G -Xmx4G -XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200 -XX:+UnlockExperimentalVMOptions -XX:+DisableExplicitGC -XX:+AlwaysPreTouch -XX:G1NewSizePercent=30 -XX:G1MaxNewSizePercent=40 -XX:G1ReservePercent=20 -XX:G1HeapWastePercent=5 -XX:G1MixedGCCountTarget=4 -XX:InitiatingHeapOccupancyPercent=15 -XX:G1MixedGCLiveThresholdPercent=90 -XX:G1RSetUpdatingPauseTimePercent=5 -XX:SurvivorRatio=32 -XX:+PerfDisableSharedMem -XX:MaxTenuringThreshold=1 -jar purpur-26.2.jar --nogui
     ```
 
 ---
@@ -82,8 +82,9 @@ Mit Version 1.1.0 wurde eine saubere Brücken-Architektur eingeführt, die maxim
 ```
 
 ### 1. Isolierte Adventure 5.2.0 Engine
-* **Keine externen Abhängigkeiten auf Spigot:** Kyori Adventure (`adventure-api`, `adventure-text-serializer-legacy`, `adventure-text-serializer-plain`) ist in das Plugin-JAR geshadet und nach `de.zfzfg.eventplugin.libs.kyori` verschoben.
-* **Keine Classloader-Konflikte:** Auf Paper/Purpur nutzt das Plugin die Server-internen Adventure-Instanzen, auf Spigot die isolierten Bibliotheken.
+* **Keine externen Abhängigkeiten auf Spigot:** Kyori Adventure (`adventure-api`, `adventure-text-serializer-legacy`, `adventure-text-serializer-plain`) ist in das Plugin-JAR geshadet – **ohne Relocation**, die Pakete bleiben `net.kyori.*`.
+* **Warum keine Relocation:** Auf Paper/Purpur übergibt das Plugin `Component`-Objekte direkt an Server-Methoden (`ItemMeta.displayName(Component)`, `Bukkit.createInventory(..., Component)`). Mit umbenannten Paketen würden diese Aufrufe mit `NoSuchMethodError` scheitern.
+* **Classloading:** Der Plugin-Classloader fragt zuerst den Server. Auf Paper/Purpur gewinnt damit die Server-Kopie von Adventure, auf Spigot (ohne Adventure) die mitgelieferte. Ein Restrisiko besteht nur auf Spigot, wenn ein anderes Plugin eine abweichende, ebenfalls nicht relocatete Adventure-Version mitbringt.
 
 ### 2. Plattformunabhängige Text- & GUI-Brücke
 * [`TextUtil.java`](file:///c:/Users/zfzfg/Documents/HammerMegaProjekte/selfmadePlugins/Plugins/Event-PVP-Plugins/Event-PVP-Plugin-1.1.0-BetaPurpur/src/main/java/de/zfzfg/core/util/TextUtil.java): Sendet echte RGB-Components auf Purpur/Paper und farbcodierte Strings auf Spigot.
@@ -98,10 +99,12 @@ Mit Version 1.1.0 wurde eine saubere Brücken-Architektur eingeführt, die maxim
 
 ## 🔄 5. Checkliste für Administratoren
 
-1. **Server-Wahl:** Für beste Performance wird **Purpur 26.2** empfohlen. Das Plugin läuft jedoch ebenso reibungslos auf **Paper 1.21.x** und **Spigot 26.2**.
+1. **Server-Wahl:** Für beste Performance wird **Purpur 26.2** empfohlen. Das Plugin läuft ebenso auf **Purpur/Paper 26.3**, **Paper 26.2** und **Spigot 26.2**.
 2. **Java-Version:** Sicherstellen, dass der Server mit `java -version` mindestens **Java 25** meldet.
 3. **Konfigurationen:**
    * Bestehende YAML-Dateien (`config.yml`, `events.yml`, `worlds.yml`, `equipment.yml`, `messages_*.yml`) werden automatisch geladen und behalten alle Einstellungen.
 4. **Web-Interface:**
    * Der Webserver startet auf Port `8085` (konfigurierbar in `web-config.yml`).
    * Authentifizierung für Administratoren erfolgt im Spiel über `/eventpvp webtoken`.
+   * Das Panel spricht reines HTTP. Für Zugriff von außen einen Reverse-Proxy mit HTTPS davorschalten, `bind-address: "127.0.0.1"` setzen und `public-url` auf die Proxy-URL stellen. Anfragen mit fremdem `Origin` (andere Domain oder anderer Port) werden mit 403 abgewiesen.
+   * Optional: `security.allowed-ips` (IP-Allowlist) und `security.bind-session-to-ip` in der `web-config.yml`.

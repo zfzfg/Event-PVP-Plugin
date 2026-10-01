@@ -15,14 +15,20 @@ import java.util.concurrent.CompletableFuture;
  * Haupt-Thread enden - was dort einen Deadlock erzeugt.</p>
  *
  * <h2>Threading</h2>
- * Jedes zurueckgegebene Future wird <b>auf dem Haupt-Thread</b> komplettiert. In
- * {@code thenAccept} darf also direkt mit Bukkit gearbeitet werden. Nie {@code join()} oder
- * {@code get()} vom Haupt-Thread aufrufen.
+ * Futures koennen auf jedem Thread abgeschlossen werden. Bukkit-Zugriffe und Guard-
+ * Aenderungen explizit ueber InventoryTasks.executor dispatchen, auch bei Fehlern und
+ * bereits abgeschlossenen Futures. Nie join/get auf dem Hauptthread.
  *
  * <p>Implementierungen werden ueber {@link InventoryBackupServiceFactory} gewaehlt und nicht
  * direkt instanziiert.</p>
  */
 public interface InventoryBackupService {
+
+    default int apiVersion() { return -1; }
+    default String lastError() { return ""; }
+    default CompletableFuture<Optional<UUID>> resolvePlayerId(String name) {
+        return CompletableFuture.completedFuture(Optional.empty());
+    }
 
     /** Ob dieser Provider tatsaechlich sichern und wiederherstellen kann. */
     boolean isAvailable();

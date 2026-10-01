@@ -79,12 +79,17 @@ public class EventPlugin extends JavaPlugin {
     // Inventar-Verwaltung (Ersatz fuer Multiverse-Inventories)
     private de.zfzfg.core.inventory.InventoryManagementConfig inventoryConfig;
     private de.zfzfg.core.inventory.InventoryBackupService inventoryBackupService;
+    private boolean inventoryApiEventsRegistered;
     private de.zfzfg.core.inventory.guard.InventoryGuard inventoryGuard;
     private de.zfzfg.core.inventory.InventorySessionManager inventorySessions;
     // Erkennung und Konfliktschutz gegenueber einem parallel laufenden Multiverse-Inventories
     private de.zfzfg.core.inventory.mvi.MultiverseInventoriesBridge mviBridge;
     // Auffangspeicher fuer Gewinne, die nicht sofort ausgegeben werden konnten
     private de.zfzfg.core.reward.PendingPayoutStore pendingPayouts;
+    // Abgebuchte Wetteinsaetze, die ein Absturz sonst mit dem Match-Objekt verliert
+    private de.zfzfg.core.reward.ActiveWagerJournal activeWagers;
+    private final java.util.concurrent.atomic.AtomicBoolean deferredConfigReload =
+            new java.util.concurrent.atomic.AtomicBoolean(false);
     // Positions-Sicherheitsnetz (Gegenstueck zum Inventar-Journal)
     private de.zfzfg.core.location.ReturnLocationStore returnLocations;
     private de.zfzfg.core.location.SafeLocationResolver safeLocations;
@@ -126,6 +131,8 @@ public class EventPlugin extends JavaPlugin {
         // schon waehrend des Startvorgangs beitreten kann.
         pendingPayouts = new de.zfzfg.core.reward.PendingPayoutStore(this);
         pendingPayouts.load();
+        activeWagers = new de.zfzfg.core.reward.ActiveWagerJournal(this);
+        activeWagers.load();
 
         safeLocations = new de.zfzfg.core.location.SafeLocationResolver(this);
         pluginWorlds = new de.zfzfg.core.location.PluginWorlds(this);
@@ -306,9 +313,10 @@ public class EventPlugin extends JavaPlugin {
         if (webConfigManager.isEnabled()) {
             // Auth-Manager initialisieren
             boolean authEnabled = webConfigManager.isAuthEnabled();
-            webAuthManager = new WebAuthManager(this, "eventpvp.admin.web");
+            webAuthManager = new WebAuthManager(this, webConfigManager.getRequiredPermission());
             webAuthManager.setTokenValidityMinutes(webConfigManager.getTokenValidityMinutes());
             webAuthManager.setSessionValidityMinutes(webConfigManager.getSessionValidityMinutes());
+            webAuthManager.setBindSessionToIp(webConfigManager.isBindSessionToIp());
             
             webServer = new WebServer(this, webConfigManager, webAuthManager, webConfigManager.getPort(), authEnabled);
             webServer.start();
@@ -343,6 +351,12 @@ public class EventPlugin extends JavaPlugin {
         // === Inventar-Wiederanlauf ===
         // Ganz am Ende: erst jetzt koennen Match- und Event-Manager beantworten, ob eine
         // im Journal offene Sitzung noch zu einem laufenden Spiel gehoert.
+        if (activeWagers != null && pendingPayouts != null) {
+            // Vor dem Inventar-Wiederanlauf: die Einsaetze liegen dann in pending-payouts.yml
+            // und werden beim Join erst nach der Inventar-Wiederherstellung ausgeteilt.
+            activeWagers.refundOpen(pendingPayouts);
+        }
+
         if (inventoryGuard != null) {
             inventoryGuard.recoverOpenSessions();
             reportStaleState();
@@ -372,6 +386,7 @@ public class EventPlugin extends JavaPlugin {
             inventoryGuard = new de.zfzfg.core.inventory.guard.InventoryGuard(this);
             inventoryGuard.load();
             inventorySessions = new de.zfzfg.core.inventory.InventorySessionManager(this, inventoryGuard);
+            registerInventoryApiEvents();
 
             getServer().getPluginManager().registerEvents(
                     new de.zfzfg.core.inventory.InventoryGuardListener(this), this);
@@ -408,6 +423,14 @@ public class EventPlugin extends JavaPlugin {
         // haetten sonst keinen Weg zurueck zum Spieler.
         getServer().getPluginManager().registerEvents(
                 new de.zfzfg.core.reward.PendingPayoutListener(this), this);
+    }
+
+    private void registerInventoryApiEvents() {
+        if (!inventoryApiEventsRegistered && inventoryBackupService.isAvailable()) {
+            getServer().getPluginManager().registerEvents(
+                    new de.zfzfg.core.inventory.adapter.InventoryBackupEvents(this), this);
+            inventoryApiEventsRegistered = true;
+        }
     }
 
     /** Ab diesem Alter gilt eine offene Sitzung als haengengeblieben. */
@@ -525,6 +548,40 @@ public class EventPlugin extends JavaPlugin {
         return pendingPayouts;
     }
 
+    /** Journal abgebuchter Wetteinsaetze. {@code null} nur, bevor {@code onEnable} so weit ist. */
+    public de.zfzfg.core.reward.ActiveWagerJournal getActiveWagers() {
+        return activeWagers;
+    }
+
+    /** Ob gerade ein Event oder ein Match laeuft, dessen Arena- und Kit-Objekte ein Reload nicht ersetzen darf. */
+    public boolean hasLiveGameplay() {
+        if (eventManager != null && !eventManager.getActiveSessions().isEmpty()) {
+            return true;
+        }
+        return matchManager != null && !matchManager.getMatches().isEmpty();
+    }
+
+    /** Speichern im Web waehrend eines laufenden Spiels: Reload nachholen, sobald nichts mehr laeuft. */
+    public void noteDeferredConfigReload() {
+        deferredConfigReload.set(true);
+    }
+
+    /**
+     * Zieht einen aufgeschobenen Reload nach, wenn weder Event noch Match mehr laufen.
+     * Ist noch etwas aktiv, bleibt das Merker-Flag stehen.
+     */
+    public void flushDeferredConfigReload() {
+        if (!deferredConfigReload.get() || hasLiveGameplay()) {
+            return;
+        }
+        if (!deferredConfigReload.compareAndSet(true, false)) {
+            return;
+        }
+        if (configurationService != null) {
+            configurationService.reloadAll();
+        }
+    }
+
     /** Einheitliche Antwort auf "wohin gehoert dieser Spieler". */
     public de.zfzfg.core.location.SafeLocationResolver getSafeLocations() {
         return safeLocations;
@@ -563,6 +620,7 @@ public class EventPlugin extends JavaPlugin {
         reloadInventoryConfig();
         inventoryBackupService = de.zfzfg.core.inventory.InventoryBackupServiceFactory
                 .create(this, inventoryConfig);
+        registerInventoryApiEvents();
         if (mviBridge != null) {
             // Weltgruppen und Verzoegerung neu einlesen: ein Reload kann beides geaendert
             // haben, und die Diagnose darf nicht auf dem Stand vom Serverstart stehenbleiben.

@@ -58,6 +58,7 @@ public class EventManager {
                 playerToEventId.remove(uuid);
             }
         }
+        plugin.flushDeferredConfigReload();
     }
     
     public boolean isEventActive(String eventId) {
@@ -85,6 +86,7 @@ public class EventManager {
         // Nur der Zwischenspeicher. Der ReturnLocationStore bleibt bewusst stehen: wer beim
         // Herunterfahren noch eine offene Position hat, braucht sie beim naechsten Start.
         globalSavedLocations.clear();
+        plugin.flushDeferredConfigReload();
     }
     
     public Map<String, EventSession> getActiveSessions() {

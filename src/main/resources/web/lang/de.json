@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Fehler beim Laden: {message}",
   "info.noChanges": "Keine Änderungen zu speichern",
   "success.savedAll": "Alle Konfigurationen gespeichert!",
+  "success.savedReloadDeferred": "Gespeichert. Übernommen wird es, sobald kein Match und kein Event mehr läuft.",
   "error.savePartial": "Fehler beim Speichern einiger Konfigurationen",
   "theme.reset": "Theme auf Standard zurückgesetzt",
   "yaml.copied": "YAML in Zwischenablage kopiert",
@@ -762,5 +763,15 @@
   "editor.equipmentIconAuto": "Automatisch (nach dem Brustpanzer)",
   "editor.equipmentIconHint": "Materialnamen eingeben oder einen Vorschlag anklicken. Leer lassen leitet das Icon vom Brustpanzer ab.",
   "editor.inventoryDoubleClickHint": "Doppelklick auf ein platziertes Item öffnet dessen Zusatzeinstellungen: Menge, Verzauberungen, Name, Lore und Unzerstörbarkeit.",
-  "editor.armorClickHint": "Klick auf ein belegtes Rüstungs- oder Nebenhand-Feld öffnet dessen Zusatzeinstellungen: Verzauberungen, Name, Lore und Unzerstörbarkeit."
+  "editor.armorClickHint": "Klick auf ein belegtes Rüstungs- oder Nebenhand-Feld öffnet dessen Zusatzeinstellungen: Verzauberungen, Name, Lore und Unzerstörbarkeit.",
+  "inventory.error.invalidBackup": "Die Sicherung enthält ungültige Daten.",
+  "inventory.error.incompatibleVersion": "Die Sicherung stammt aus einer neueren Minecraft-Version.",
+  "inventory.error.insufficientSpace": "Nicht genügend Inventarplatz. Es wurde nichts verändert.",
+  "inventory.error.cancelled": "Ein anderes Plugin hat die Wiederherstellung abgebrochen.",
+  "inventory.apiVersion": "API v{version}",
+  "inventory.apiCompatible": "API kompatibel",
+  "inventory.apiIncompatible": "InventoryBackup API 2 wird benötigt",
+  "inventory.lastError": "Letzter Fehler",
+  "inventory.backupDamaged": "Sicherung fehlt oder ist beschädigt",
+  "inventory.error.lookupFailed": "Spielerabfrage fehlgeschlagen; siehe Serverlog."
 }

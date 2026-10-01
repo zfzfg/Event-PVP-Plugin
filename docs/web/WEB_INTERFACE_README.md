@@ -461,14 +461,6 @@ items:
   resource-pack:
     enabled: false
     max-size-mb: 50
-
-interface:
-  auto-refresh-interval: 0
-  auto-save: false
-  confirm-save: true
-  max-undo-steps: 20
-  compact-view: false
-  syntax-highlighting: true
 ```
 
 ---

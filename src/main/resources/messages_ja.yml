@@ -959,6 +959,7 @@ messages:
     guard-backup-missing: '{player} のバックアップ {backup} が見つかりません。セッションを孤立として記録します。'
     guard-restore-failed: '{player} の保護付き復元に失敗しました: {reason}'
     guard-entry-invalid: 'inventory-guard.yml に不正なエントリがあり、スキップしました: {entry}'
+    guard-backup-deleted: 'Backup for {player} was deleted ({reason}); recovery reference retained.'
     guard-save-failed: 'inventory-guard.yml を書き込めませんでした: {error}'
     guard-shutdown-open: '{count} 件のインベントリセッションが未完了です。次回起動時に処理します。'
     plugin-enabled: 'Event-PVP-Plugin が {time} ms で有効化されました: イベント＆PvP-Wager 統合。'

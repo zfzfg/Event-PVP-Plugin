@@ -58,12 +58,7 @@ public class WebApiHandler {
             if (data != null) {
                 configManager.saveConfigFromMap(data);
                 plugin.getLogger().info("[Web-API] config.yml saved");  // i18n-ignore: web API internal log
-                // Die Inventar-Einstellungen liegen in final-Feldern eines Caches - ohne diesen
-                // Neubau wirkt z.B. "cleanup-backups-after-match" erst nach einem Neustart.
-                EventPlugin ep = eventPlugin();
-                if (ep != null) {
-                    ep.reloadInventoryConfig();
-                }
+                applyGameplayReload(response);
                 response.put("success", true);
                 response.put("message", "Config saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
             } else {
@@ -103,6 +98,7 @@ public class WebApiHandler {
             if (data != null) {
                 configManager.saveWorldsFromMap(data);
                 plugin.getLogger().info("[Web-API] worlds.yml saved");  // i18n-ignore: web API internal log
+                applyGameplayReload(response);
                 response.put("success", true);
                 response.put("message", "Worlds saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
             } else {
@@ -138,6 +134,10 @@ public class WebApiHandler {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("provider", config.mode().id());
         data.put("activeProvider", ep.getInventoryBackupService().providerName());
+        data.put("apiVersion", de.zfzfg.core.inventory.InventoryBackupServiceFactory.apiRevision());
+        data.put("requiredApiVersion", 2);
+        data.put("apiCompatible", ep.getInventoryBackupService().isAvailable());
+        data.put("lastError", ep.getInventoryBackupService().lastError());
         data.put("managed", config.managedByPlugin());
         data.put("inventoryRestoreInstalled",
                 de.zfzfg.core.inventory.InventoryBackupServiceFactory.inventoryRestoreAvailable());
@@ -232,11 +232,15 @@ public class WebApiHandler {
 
         try {
             plugin.getLogger().info("[Web-API] Inventory provider -> " + mode.id());  // i18n-ignore: web API internal log
-            plugin.getConfig().set("settings.inventory-management.provider", mode.id());
-            plugin.saveConfig();
-            plugin.reloadConfig();
-            ep.getCoreConfigManager().reloadAll();
-            ep.reloadInventoryManagement();
+            final String providerId = mode.id();
+            onMainThread(() -> {
+                plugin.getConfig().set("settings.inventory-management.provider", providerId);
+                plugin.saveConfig();
+                plugin.reloadConfig();
+                ep.getCoreConfigManager().reloadAll();
+                ep.reloadInventoryManagement();
+                return null;
+            });
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "[Web-API] Could not switch inventory provider", e);  // i18n-ignore: web API internal log
             return failure(response, "inventory.error.switchFailed", String.valueOf(e.getMessage()));
@@ -253,7 +257,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(query.get("player"));
+        UUID ownerId = resolvePlayer(query.get("player"), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         if (ownerId == null) {
             return failure(response, "inventory.error.unknownPlayer", String.valueOf(query.get("player")));
         }
@@ -300,7 +305,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(query.get("player"));
+        UUID ownerId = resolvePlayer(query.get("player"), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         String backupId = query.get("id");
         if (ownerId == null || backupId == null || backupId.isEmpty()) {
             return failure(response, "inventory.error.unknownBackup", String.valueOf(backupId));
@@ -315,7 +321,7 @@ public class WebApiHandler {
             Optional<de.zfzfg.core.inventory.CapturedInventory> snapshot =
                     await(ep.getInventoryBackupService().load(ref.get()));
             if (snapshot.isEmpty()) {
-                return failure(response, "inventory.error.loadFailed", backupId);
+                return failure(response, "inventory.error.unknownBackup", backupId);
             }
 
             Map<String, Object> data = new LinkedHashMap<>();
@@ -349,7 +355,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(str(requestBody.get("player")));
+        UUID ownerId = resolvePlayer(str(requestBody.get("player")), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         String backupId = str(requestBody.get("backupId"));
         if (ownerId == null || backupId == null || backupId.isEmpty()) {
             return failure(response, "inventory.error.unknownBackup", String.valueOf(backupId));
@@ -389,7 +396,17 @@ public class WebApiHandler {
                     + " -> " + outcome.name());
 
             if (!outcome.isSuccess()) {
-                return failure(response, "inventory.error.restoreFailed", outcome.name());
+                String code = switch (outcome) {
+                    case NOT_FOUND -> "inventory.error.unknownBackup";
+                    case INVALID_BACKUP -> "inventory.error.invalidBackup";
+                    case INCOMPATIBLE_VERSION -> "inventory.error.incompatibleVersion";
+                    case INSUFFICIENT_SPACE -> "inventory.error.insufficientSpace";
+                    case CANCELLED -> "inventory.error.cancelled";
+                    case UNAVAILABLE -> "inventory.error.unavailable";
+                    default -> "inventory.error.restoreFailed";
+                };
+                response.put("outcome", outcome.name());
+                return failure(response, code, outcome.name());
             }
             Map<String, Object> data = new LinkedHashMap<>();
             data.put("outcome", outcome.name());
@@ -409,7 +426,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(str(requestBody.get("player")));
+        UUID ownerId = resolvePlayer(str(requestBody.get("player")), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         String backupId = str(requestBody.get("backupId"));
         if (ownerId == null || backupId == null || backupId.isEmpty()) {
             return failure(response, "inventory.error.unknownBackup", String.valueOf(backupId));
@@ -480,6 +498,35 @@ public class WebApiHandler {
         return plugin instanceof EventPlugin ? (EventPlugin) plugin : null;
     }
 
+    /**
+     * Nach dem Speichern von config.yml, worlds.yml oder equipment.yml denselben Reload
+     * ausloesen wie {@code POST /api/reload}. Laeuft ein Match oder Event, bleibt die Datei
+     * gespeichert und der Reload wird nachgezogen, sobald nichts mehr laeuft.
+     */
+    private void applyGameplayReload(Map<String, Object> response) {
+        EventPlugin ep = eventPlugin();
+        if (ep == null || ep.getConfigurationService() == null) {
+            return;
+        }
+        try {
+            Boolean deferred = onMainThread(() -> {
+                if (ep.hasLiveGameplay()) {
+                    ep.noteDeferredConfigReload();
+                    return Boolean.TRUE;
+                }
+                ep.getConfigurationService().reloadAll();
+                return Boolean.FALSE;
+            });
+            if (Boolean.TRUE.equals(deferred)) {
+                response.put("reloadDeferred", true);
+            } else {
+                response.put("reloaded", true);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "[Web-API] Config reload after save failed", e);  // i18n-ignore: web API internal log
+        }
+    }
+
     private static String str(Object value) {
         return value == null ? null : String.valueOf(value);
     }
@@ -496,6 +543,14 @@ public class WebApiHandler {
     }
 
     /** Loest Name oder UUID zu einer Spieler-UUID auf. */
+    private UUID resolvePlayer(String raw, Map<String, Object> response) {
+        try { return resolvePlayer(raw); }
+        catch (RuntimeException error) {
+            failure(response, "inventory.error.lookupFailed", String.valueOf(error.getMessage()));
+            return null;
+        }
+    }
+
     private UUID resolvePlayer(String raw) {
         if (raw == null || raw.isEmpty()) {
             return null;
@@ -505,16 +560,53 @@ public class WebApiHandler {
         } catch (IllegalArgumentException ignored) {
             // Kein UUID-Format - als Name behandeln
         }
-        org.bukkit.entity.Player online = org.bukkit.Bukkit.getPlayerExact(raw);
-        if (online != null) {
-            return online.getUniqueId();
-        }
-        for (org.bukkit.OfflinePlayer offline : org.bukkit.Bukkit.getOfflinePlayers()) {
-            if (raw.equalsIgnoreCase(offline.getName())) {
-                return offline.getUniqueId();
+        try {
+            UUID onlineId = onMainThread(() -> {
+                org.bukkit.entity.Player online = org.bukkit.Bukkit.getPlayerExact(raw);
+                return online == null ? null : online.getUniqueId();
+            });
+            if (onlineId != null) return onlineId;
+            EventPlugin ep = eventPlugin();
+            if (ep != null && ep.getInventoryBackupService().isAvailable()) {
+                Optional<UUID> indexed = await(ep.getInventoryBackupService().resolvePlayerId(raw));
+                if (indexed.isPresent()) return indexed.get();
             }
+            return onMainThread(() -> {
+                for (org.bukkit.OfflinePlayer offline : org.bukkit.Bukkit.getOfflinePlayers()) {
+                    if (raw.equalsIgnoreCase(offline.getName())) {
+                        return offline.getUniqueId();
+                    }
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "[Web-API] Could not resolve player '" + raw + "'", e);  // i18n-ignore: web API internal log
+            throw new IllegalStateException("Player lookup failed", e);
         }
-        return null;
+    }
+
+    /**
+     * Fuehrt Code, der die Bukkit-API anfasst, auf dem Main-Thread aus und wartet auf das
+     * Ergebnis. Die HTTP-Handler laufen auf eigenen Threads; Reloads und Spielerabfragen von
+     * dort aus konkurrieren sonst mit dem Tick.
+     *
+     * <p>Nicht fuer Code verwenden, der selbst auf den Main-Thread wartet (etwa {@link #await}
+     * auf Inventar-Futures) - das waere ein Deadlock.</p>
+     */
+    private <T> T onMainThread(java.util.concurrent.Callable<T> task) throws Exception {
+        if (plugin.getServer().isPrimaryThread()) {
+            return task.call();
+        }
+        try {
+            return plugin.getServer().getScheduler().callSyncMethod(plugin, task)
+                    .get(30, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (java.util.concurrent.ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof Exception ex) {
+                throw ex;
+            }
+            throw e;
+        }
     }
 
     private List<Map<String, Object>> describeItems(org.bukkit.inventory.ItemStack[] items) {
@@ -884,6 +976,7 @@ public class WebApiHandler {
             if (data != null) {
                 configManager.saveEquipmentFromMap(data);
                 plugin.getLogger().info("[Web-API] equipment.yml saved");  // i18n-ignore: web API internal log
+                applyGameplayReload(response);
                 response.put("success", true);
                 response.put("message", "Equipment saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
             } else {
@@ -971,7 +1064,9 @@ public class WebApiHandler {
             if (plugin instanceof EventPlugin) {
                 EventPlugin eventPlugin = (EventPlugin) plugin;
                 if (eventPlugin.getConfigurationService() != null) {
-                    eventPlugin.getConfigurationService().reloadAll();
+                    // Arenen, Equipment und Events lesen Welten und Bukkit-Registries - das
+                    // gehoert auf den Main-Thread, nicht in den HTTP-Thread.
+                    onMainThread(() -> { eventPlugin.getConfigurationService().reloadAll(); return null; });
                     plugin.getLogger().info("[Web-API] ConfigurationService.reloadAll() successful");  // i18n-ignore: web API internal log
                 } else {
                     // Fallback

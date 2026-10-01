@@ -152,20 +152,28 @@ public final class InventorySessionManager {
         String world = player.getWorld() == null ? "" : player.getWorld().getName();
         guard.openWithoutBackup(id, context, refId, world);
 
-        service().backup(player, backupContext).thenAccept(ref -> {
+        GuardEntry opened = guard.get(id);
+        service().backup(player, backupContext).thenAcceptAsync(ref -> {
+            if (guard.get(id) != opened) return;
             if (ref.isPresent()) {
                 guard.attachBackup(id, ref.get().backupId());
                 if (onPersisted != null) {
                     onPersisted.accept(true);
                 }
             } else {
+                guard.diagnostic(id, "BACKUP_CANCELLED", false);
                 plugin.getLogger().severe(plugin.getConsoleMsg("inventory-backup-not-persisted",
                         "player", player.getName()));
                 if (onPersisted != null) {
                     onPersisted.accept(false);
                 }
             }
-        });
+        }, InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+            if (guard.get(id) != opened) return null;
+            guard.diagnostic(id, "BACKUP_FAILED: " + error.getMessage(), false);
+            if (onPersisted != null) onPersisted.accept(false);
+            return null;
+        }, InventoryTasks.executor(plugin));
         return BeginResult.STARTED;
     }
 
@@ -180,12 +188,15 @@ public final class InventorySessionManager {
      * Multiverse-Inventories, diese Kopie ist das Netz darunter.</p>
      */
     private void backupOnly(Player player, BackupContext backupContext) {
-        service().backup(player, withSafetyMarker(backupContext)).thenAccept(ref -> {
+        service().backup(player, withSafetyMarker(backupContext)).thenAcceptAsync(ref -> {
             if (ref.isEmpty()) {
                 plugin.getLogger().warning(plugin.getConsoleMsg("inventory-safety-backup-failed",
                         "player", player.getName()));
             }
-        });
+        }, InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+            plugin.getLogger().log(java.util.logging.Level.WARNING, "[Inventory safety backup]", error);
+            return null;
+        }, InventoryTasks.executor(plugin));
     }
 
     /**
@@ -222,7 +233,7 @@ public final class InventorySessionManager {
      *                   noch nicht - Gewinne muessen dann eingereiht statt uebergeben werden.
      */
     public void finish(UUID playerId, Consumer<RestoreOutcome> onRestored) {
-        if (!isManaged()) {
+        if (!config().managedByPlugin()) {
             if (onRestored != null) {
                 onRestored.accept(RestoreOutcome.UNAVAILABLE);
             }
@@ -245,12 +256,14 @@ public final class InventorySessionManager {
             return;
         }
 
-        service().resolve(playerId, entry.backupId()).thenAccept(ref -> {
+        service().resolve(playerId, entry.backupId()).thenAcceptAsync(ref -> {
+            if (guard.get(playerId) != entry) return;
             if (ref.isEmpty()) {
                 completeWithFallback(playerId, onRestored);
                 return;
             }
-            service().restore(playerId, ref.get(), RestoreMode.all()).thenAccept(outcome -> {
+            service().restore(playerId, ref.get(), RestoreMode.all()).thenAcceptAsync(outcome -> {
+                if (guard.get(playerId) != entry) return;
                 if (outcome == RestoreOutcome.QUEUED_FOR_JOIN) {
                     guard.phase(playerId, GuardPhase.QUEUED);
                     if (onRestored != null) {
@@ -259,18 +272,42 @@ public final class InventorySessionManager {
                     return;
                 }
                 if (outcome.isSuccess()) {
-                    cleanupAfterRestore(playerId, ref.get());
-                    verifyRestore(playerId, () -> {
-                        if (onRestored != null) {
-                            onRestored.accept(outcome);
-                        }
+                    completeApplied(playerId, ref.get(), () -> {
+                        if (onRestored != null) onRestored.accept(outcome);
                     });
                     return;
                 }
                 plugin.getLogger().warning(plugin.getConsoleMsg("inventory-restore-degraded",
                         "player", playerId.toString(), "reason", outcome.name()));
-                completeWithFallback(playerId, onRestored);
-            });
+                guard.diagnostic(playerId, outcome.name(), outcome == RestoreOutcome.INVALID_BACKUP);
+                if (outcome.permitsFallback()) completeWithFallback(playerId, onRestored);
+                else {
+                    guard.releaseRestore(playerId, GuardPhase.ORPHANED);
+                    if (onRestored != null) onRestored.accept(outcome);
+                }
+            }, InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+                restoreException(playerId, error, onRestored); return null;
+            }, InventoryTasks.executor(plugin));
+        }, InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+            restoreException(playerId, error, onRestored); return null;
+        }, InventoryTasks.executor(plugin));
+    }
+
+    private void restoreException(UUID id, Throwable error, Consumer<RestoreOutcome> callback) {
+        guard.diagnostic(id, "FAILED: " + error.getMessage(), false);
+        completeWithFallback(id, callback);
+    }
+
+    /** Shared completion for futures and successful queued restore events. */
+    public void completeApplied(UUID id, BackupRef ref, Runnable callback) {
+        if (!guard.matches(id, ref.ownerId(), ref.backupId()) || !guard.tryCompleteRestore(id)) return;
+        GuardEntry completing = guard.get(id);
+        verifyRestore(id, () -> {
+            if (guard.get(id) != completing) return;
+            cleanupAfterRestore(id, ref);
+            if (callback != null) callback.run();
+            if (plugin.isEnabled()) Bukkit.getScheduler().runTask(plugin,
+                    () -> de.zfzfg.core.reward.PendingPayoutListener.deliverWhenSafe(plugin, id));
         });
     }
 
@@ -324,14 +361,18 @@ public final class InventorySessionManager {
         CapturedInventory fallback = fallbacks.get(playerId);
         Player player = Bukkit.getPlayer(playerId);
         if (fallback != null && player != null && player.isOnline()) {
+            if (!guard.tryCompleteRestore(playerId)) return;
             fallback.applyTo(player, true);
-            fallbacks.remove(playerId);
-            guard.close(playerId);
             plugin.getLogger().warning(plugin.getConsoleMsg("inventory-restore-fallback",
                     "player", player.getName()));
-            if (onRestored != null) {
-                onRestored.accept(RestoreOutcome.FALLBACK_APPLIED);
-            }
+            GuardEntry completing = guard.get(playerId);
+            verifyRestore(playerId, () -> {
+                if (guard.get(playerId) != completing) return;
+                fallbacks.remove(playerId);
+                guard.close(playerId);
+                if (onRestored != null) onRestored.accept(RestoreOutcome.FALLBACK_APPLIED);
+                de.zfzfg.core.reward.PendingPayoutListener.deliverWhenSafe(plugin, playerId);
+            });
             return;
         }
         guard.releaseRestore(playerId, GuardPhase.ORPHANED);
@@ -347,7 +388,10 @@ public final class InventorySessionManager {
         fallbacks.remove(playerId);
         guard.close(playerId);
         if (config().cleanupAfterMatch()) {
-            service().delete(ref);
+            service().delete(ref).exceptionally(error -> {
+                plugin.getLogger().log(java.util.logging.Level.WARNING, "[Inventory cleanup] " + ref.backupId(), error);
+                return false;
+            });
         }
     }
 
@@ -366,26 +410,33 @@ public final class InventorySessionManager {
         if (entry == null || !entry.hasBackup() || entry.phase() == GuardPhase.QUEUED) {
             return;
         }
-        service().hasPendingRestore(playerId).thenAccept(pending -> {
-            if (pending) {
-                guard.phase(playerId, GuardPhase.QUEUED);
-                return;
-            }
-            service().resolve(playerId, entry.backupId()).thenAccept(ref -> {
+        service().hasPendingRestore(playerId).thenAcceptAsync(pending -> {
+            if (guard.get(playerId) != entry) return;
+            service().resolve(playerId, entry.backupId()).thenAcceptAsync(ref -> {
+                if (guard.get(playerId) != entry) return;
                 if (ref.isEmpty()) {
                     guard.releaseRestore(playerId, GuardPhase.ORPHANED);
                     return;
                 }
-                service().queueOnJoin(playerId, ref.get(), RestoreMode.all()).thenAccept(ok -> {
+                service().queueOnJoin(playerId, ref.get(), RestoreMode.all()).thenAcceptAsync(ok -> {
+                    if (guard.get(playerId) != entry) return;
                     if (ok) {
                         guard.phase(playerId, GuardPhase.QUEUED);
                     } else {
+                        guard.diagnostic(playerId, "PENDING_RESTORE_CONFLICT_OR_MISSING", false);
+                        guard.releaseRestore(playerId, GuardPhase.ORPHANED);
                         plugin.getLogger().warning(plugin.getConsoleMsg("inventory-queue-rejected",
                                 "player", playerId.toString()));
                     }
-                });
-            });
-        });
+                }, InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+                    guard.asyncFailure(playerId, error); return null;
+                }, InventoryTasks.executor(plugin));
+            }, InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+                guard.asyncFailure(playerId, error); return null;
+            }, InventoryTasks.executor(plugin));
+        }, InventoryTasks.executor(plugin)).exceptionallyAsync(error -> {
+            guard.asyncFailure(playerId, error); return null;
+        }, InventoryTasks.executor(plugin));
     }
 
     /**

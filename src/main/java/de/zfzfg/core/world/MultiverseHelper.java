@@ -134,12 +134,16 @@ public class MultiverseHelper {
         teleportPlayersOutWithSavedLocations(world);
 
         plugin.getTaskManager().runLater(() -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv regen " + worldName);  // i18n-ignore: nur Konsole (mv-Befehl bzw. Log-Diagnose), erreicht keinen Spieler
-            plugin.getTaskManager().runLater(() -> {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv confirm");  // i18n-ignore: nur Konsole (mv-Befehl bzw. Log-Diagnose), erreicht keinen Spieler
+            try {
+                de.zfzfg.core.world.mv.MvResult result = plugin.getMvWorldService().regenerateWorldNow(worldName);
+                if (!result.isSuccess()) {
+                    plugin.getLogger().warning("Regenerating world '" + worldName + "' failed: "  // i18n-ignore: console-only diagnosis
+                            + result.getMessageKey() + " " + result.getDetail());
+                }
+            } finally {
                 REGENERATING_WORLDS.remove(worldKey);
                 if (callback != null) callback.run();
-            }, 40L);
+            }
         }, 40L);
     }
 
@@ -242,7 +246,9 @@ public class MultiverseHelper {
                     if (src != null && !src.trim().isEmpty()) return src.trim();
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getDebugManager().log("resolveCloneSourceForWorld(" + worldName + "): " + e);  // i18n-ignore: debug trace
+        }
         try {
             java.util.Map<String, de.zfzfg.eventplugin.model.EventConfig> events = plugin.getConfigManager().getAllEvents();
             for (de.zfzfg.eventplugin.model.EventConfig e : events.values()) {
@@ -251,7 +257,9 @@ public class MultiverseHelper {
                     if (src != null && !src.trim().isEmpty()) return src.trim();
                 }
             }
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            plugin.getDebugManager().log("resolveCloneSourceForWorld(" + worldName + "): " + e);  // i18n-ignore: debug trace
+        }
         return null;
     }
 

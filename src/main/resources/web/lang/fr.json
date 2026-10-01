@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Échec du chargement: {message}",
   "info.noChanges": "Aucun changement à enregistrer",
   "success.savedAll": "Toutes les configurations enregistrées!",
+  "success.savedReloadDeferred": "Enregistré. Appliqué dès qu'aucun match ni événement n'est en cours.",
   "error.savePartial": "Échec d'enregistrement de certaines configurations",
   "theme.reset": "Theme réinitialisé par défaut",
   "yaml.copied": "YAML copié dans le presse-papiers",
@@ -762,5 +763,15 @@
   "editor.equipmentIconAuto": "Automatique (d'après le plastron)",
   "editor.equipmentIconHint": "Saisissez un matériau ou choisissez une suggestion. Laissez vide pour déduire l'icône du plastron.",
   "editor.inventoryDoubleClickHint": "Double-cliquez sur un objet placé pour ouvrir ses réglages supplémentaires : quantité, enchantements, nom, lore et incassable.",
-  "editor.armorClickHint": "Cliquez sur un emplacement d'armure ou de seconde main occupé pour ouvrir ses réglages supplémentaires : enchantements, nom, lore et incassable."
+  "editor.armorClickHint": "Cliquez sur un emplacement d'armure ou de seconde main occupé pour ouvrir ses réglages supplémentaires : enchantements, nom, lore et incassable.",
+  "inventory.error.invalidBackup": "La sauvegarde contient des données invalides.",
+  "inventory.error.incompatibleVersion": "La sauvegarde provient d’une version plus récente de Minecraft.",
+  "inventory.error.insufficientSpace": "Espace insuffisant. Aucun changement effectué.",
+  "inventory.error.cancelled": "Un autre plugin a annulé la restauration.",
+  "inventory.apiVersion": "API v{version}",
+  "inventory.apiCompatible": "API compatible",
+  "inventory.apiIncompatible": "InventoryBackup API 2 est nécessaire",
+  "inventory.lastError": "Dernière erreur",
+  "inventory.backupDamaged": "Sauvegarde absente ou endommagée",
+  "inventory.error.lookupFailed": "La recherche du joueur a échoué ; consultez le journal du serveur."
 }

@@ -1026,6 +1026,7 @@ messages:
       est marquee comme orpheline.'
     guard-restore-failed: 'Echec de la restauration protegee pour {player} : {reason}'
     guard-entry-invalid: 'Entree invalide dans inventory-guard.yml, ignoree : {entry}'
+    guard-backup-deleted: 'Backup for {player} was deleted ({reason}); recovery reference retained.'
     guard-save-failed: 'inventory-guard.yml n''a pas pu etre ecrit : {error}'
     guard-shutdown-open: '{count} session(s) d''inventaire sont encore ouvertes -
       elles seront traitees au prochain demarrage.'

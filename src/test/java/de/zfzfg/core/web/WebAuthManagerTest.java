@@ -149,4 +149,22 @@ class WebAuthManagerTest {
         assertThat(authManager.validateSession(s1, "127.0.0.1")).isNull();
         assertThat(authManager.validateSession(s2, "192.168.1.50")).isNull();
     }
+
+    @Test
+    @DisplayName("bind-session-to-ip: Session gilt nur von der Login-IP aus")
+    void testSessionBoundToIp() {
+        Player player = mock(Player.class);
+        when(player.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(player.getName()).thenReturn("Admin");
+        when(player.isOp()).thenReturn(true);
+
+        String sessionId = authManager.validateTokenAndCreateSession(authManager.generateToken(player), "10.0.0.1");
+
+        // Standard: IP-Wechsel erlaubt
+        assertThat(authManager.validateSession(sessionId, "10.0.0.2")).isNotNull();
+
+        authManager.setBindSessionToIp(true);
+        assertThat(authManager.validateSession(sessionId, "10.0.0.2")).isNull();
+        assertThat(authManager.validateSession(sessionId, "10.0.0.1")).isNotNull();
+    }
 }

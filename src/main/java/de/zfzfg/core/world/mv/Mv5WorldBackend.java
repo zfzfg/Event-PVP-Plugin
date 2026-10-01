@@ -10,6 +10,7 @@ import org.mvplugins.multiverse.core.world.WorldManager;
 import org.mvplugins.multiverse.core.world.options.CreateWorldOptions;
 import org.mvplugins.multiverse.core.world.options.DeleteWorldOptions;
 import org.mvplugins.multiverse.core.world.options.LoadWorldOptions;
+import org.mvplugins.multiverse.core.world.options.RegenWorldOptions;
 import org.mvplugins.multiverse.core.world.options.UnloadWorldOptions;
 import org.mvplugins.multiverse.core.utils.result.Attempt;
 
@@ -202,6 +203,18 @@ public class Mv5WorldBackend implements MvWorldBackend {
             return MvResult.fail(MvWorldService.NOT_MANAGED_MARKER);
         }
         return toResult(worldManager().deleteWorld(DeleteWorldOptions.world(world)));
+    }
+
+    @Override
+    public MvResult regen(String worldName) {
+        LoadedMultiverseWorld world = worldManager().getLoadedWorld(worldName).getOrNull();
+        if (world == null) {
+            return MvResult.fail(MvResult.GENERIC_ERROR, "world is not loaded: " + worldName);
+        }
+        // Neue Saat, gleiche Multiverse-Konfiguration: das ist das, was "mv regen"
+        // fuer eine Arena meint, nur ohne das Confirm-Einmalpasswort.
+        return toResult(worldManager().regenWorld(
+                RegenWorldOptions.world(world).randomSeed(true).keepWorldConfig(true)));
     }
 
     /**

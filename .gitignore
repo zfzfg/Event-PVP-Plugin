@@ -1,5 +1,6 @@
 # Build & target directories
 target/
+dependency-reduced-pom.xml
 *.jar
 reports/
 deprecation-*.txt

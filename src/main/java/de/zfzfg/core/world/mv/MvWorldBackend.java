@@ -34,6 +34,15 @@ public interface MvWorldBackend {
 
     MvResult delete(String worldName);
 
+    /**
+     * Baut die Welt neu, ohne {@code mv confirm}.
+     *
+     * <p>MV5 spricht {@code WorldManager.regenWorld}. Der Legacy-Pfad (MV4) darf
+     * {@code mv regen} plus {@code mv confirm} schicken, weil dort kein Einmalpasswort
+     * noetig ist. Die Welt muss geladen sein, und Spieler muessen sie vorher verlassen haben.</p>
+     */
+    MvResult regen(String worldName);
+
     /** Registriert einen bereits auf der Platte liegenden Weltordner bei Multiverse und laedt ihn. */
     MvResult importWorld(String worldName);
 

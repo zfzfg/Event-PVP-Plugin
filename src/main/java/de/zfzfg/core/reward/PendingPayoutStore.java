@@ -207,6 +207,30 @@ public final class PendingPayoutStore {
         return payouts != null && !payouts.isEmpty();
     }
 
+    /**
+     * Ob fuer diesen Spieler schon ein Posten mit genau diesem Grund vorgemerkt ist.
+     *
+     * <p>Der Wiederanlauf offener Wetten benutzt das, um einen Posten nicht ein zweites Mal
+     * einzureihen, wenn der vorige Lauf nach dem Schreiben der Payout-Datei abgebrochen ist.</p>
+     */
+    public boolean hasReason(UUID playerId, String reason) {
+        if (playerId == null || reason == null) {
+            return false;
+        }
+        List<PendingPayout> payouts = pending.get(playerId);
+        if (payouts == null) {
+            return false;
+        }
+        synchronized (payouts) {
+            for (PendingPayout payout : payouts) {
+                if (reason.equals(payout.reason())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void hand(Player player, PendingPayout payout) {
         if (!payout.items().isEmpty()) {
             // giveItems legt ab, was nicht ins Inventar passt, als Drop vor die Fuesse -

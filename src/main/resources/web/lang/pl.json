@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Nie udało się wczytać: {message}",
   "info.noChanges": "Brak zmian do zapisania",
   "success.savedAll": "Wszystkie konfiguracje zapisane",
+  "success.savedReloadDeferred": "Zapisano. Zostanie zastosowane, gdy nie trwa mecz ani wydarzenie.",
   "error.savePartial": "Nie udało się zapisać części konfiguracji",
   "theme.reset": "Przywrócono motyw domyślny",
   "yaml.copied": "YAML skopiowany do schowka",
@@ -762,5 +763,15 @@
   "editor.equipmentIconAuto": "Automatycznie (na podstawie napierśnika)",
   "editor.equipmentIconHint": "Wpisz nazwę materiału lub wybierz podpowiedź. Zostaw puste, aby ikona wynikała z napierśnika.",
   "editor.inventoryDoubleClickHint": "Kliknij dwukrotnie umieszczony przedmiot, aby otworzyć jego dodatkowe ustawienia: ilość, zaklęcia, nazwę, opis i niezniszczalność.",
-  "editor.armorClickHint": "Kliknij zajęty slot zbroi lub drugiej ręki, aby otworzyć jego dodatkowe ustawienia: zaklęcia, nazwę, opis i niezniszczalność."
+  "editor.armorClickHint": "Kliknij zajęty slot zbroi lub drugiej ręki, aby otworzyć jego dodatkowe ustawienia: zaklęcia, nazwę, opis i niezniszczalność.",
+  "inventory.error.invalidBackup": "Kopia zawiera nieprawidłowe dane.",
+  "inventory.error.incompatibleVersion": "Kopia pochodzi z nowszej wersji Minecraft.",
+  "inventory.error.insufficientSpace": "Za mało miejsca. Nic nie zmieniono.",
+  "inventory.error.cancelled": "Inny plugin anulował przywracanie.",
+  "inventory.apiVersion": "API v{version}",
+  "inventory.apiCompatible": "API zgodne",
+  "inventory.apiIncompatible": "Wymagane InventoryBackup API 2",
+  "inventory.lastError": "Ostatni błąd",
+  "inventory.backupDamaged": "Kopia brakująca lub uszkodzona",
+  "inventory.error.lookupFailed": "Nie udało się wyszukać gracza; sprawdź dziennik serwera."
 }

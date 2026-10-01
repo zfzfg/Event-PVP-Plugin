@@ -21,6 +21,8 @@ public class WebAuthManager {
     // Konfigurierbare Werte
     private long tokenValidityMinutes = 10;
     private long sessionValidityMinutes = 60;
+    /** Session nur von der IP aus gueltig, mit der sie angelegt wurde. */
+    private volatile boolean bindSessionToIp = false;
     private final String requiredPermission;
     
     private static final String CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -121,10 +123,10 @@ public class WebAuthManager {
             return null;
         }
         
-        // Optional: IP-Check (kann bei dynamischen IPs Probleme machen)
-        // if (!session.clientIp.equals(clientIp)) {
-        //     return null;
-        // }
+        // Optional, weil es bei wechselnden IPs (Mobilfunk, manche Proxys) ausloggt.
+        if (bindSessionToIp && (clientIp == null || !clientIp.equals(session.clientIp))) {
+            return null;
+        }
         
         // Session verlängern bei Aktivität
         session.expiresAt = System.currentTimeMillis() + (sessionValidityMinutes * 60 * 1000);
@@ -203,6 +205,10 @@ public class WebAuthManager {
      */
     public void setSessionValidityMinutes(long minutes) {
         this.sessionValidityMinutes = minutes;
+    }
+
+    public void setBindSessionToIp(boolean bindSessionToIp) {
+        this.bindSessionToIp = bindSessionToIp;
     }
     
     /**
