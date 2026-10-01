@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Не удалось загрузить: {message}",
   "info.noChanges": "Нет изменений для сохранения",
   "success.savedAll": "Все конфигурации сохранены",
+  "success.savedReloadDeferred": "Сохранено. Применится, когда не идёт матч или ивент.",
   "error.savePartial": "Не удалось сохранить часть конфигураций",
   "theme.reset": "Тема сброшена по умолчанию",
   "yaml.copied": "YAML скопирован в буфер",

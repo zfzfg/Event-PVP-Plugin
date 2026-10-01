@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Échec du chargement: {message}",
   "info.noChanges": "Aucun changement à enregistrer",
   "success.savedAll": "Toutes les configurations enregistrées!",
+  "success.savedReloadDeferred": "Enregistré. Appliqué dès qu'aucun match ni événement n'est en cours.",
   "error.savePartial": "Échec d'enregistrement de certaines configurations",
   "theme.reset": "Theme réinitialisé par défaut",
   "yaml.copied": "YAML copié dans le presse-papiers",

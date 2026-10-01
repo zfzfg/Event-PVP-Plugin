@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Nie udało się wczytać: {message}",
   "info.noChanges": "Brak zmian do zapisania",
   "success.savedAll": "Wszystkie konfiguracje zapisane",
+  "success.savedReloadDeferred": "Zapisano. Zostanie zastosowane, gdy nie trwa mecz ani wydarzenie.",
   "error.savePartial": "Nie udało się zapisać części konfiguracji",
   "theme.reset": "Przywrócono motyw domyślny",
   "yaml.copied": "YAML skopiowany do schowka",

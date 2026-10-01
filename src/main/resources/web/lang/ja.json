@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "読み込みエラー: {message}",
   "info.noChanges": "保存する変更がありません",
   "success.savedAll": "全ての設定を保存しました！",
+  "success.savedReloadDeferred": "保存しました。試合とイベントが終わってから反映されます。",
   "error.savePartial": "一部の設定の保存に失敗しました",
   "theme.reset": "テーマをデフォルトにリセットしました",
   "yaml.copied": "YAMLをクリップボードにコピーしました",

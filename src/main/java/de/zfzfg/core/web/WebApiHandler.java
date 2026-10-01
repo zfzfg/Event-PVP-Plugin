@@ -58,12 +58,7 @@ public class WebApiHandler {
             if (data != null) {
                 configManager.saveConfigFromMap(data);
                 plugin.getLogger().info("[Web-API] config.yml saved");  // i18n-ignore: web API internal log
-                // Die Inventar-Einstellungen liegen in final-Feldern eines Caches - ohne diesen
-                // Neubau wirkt z.B. "cleanup-backups-after-match" erst nach einem Neustart.
-                EventPlugin ep = eventPlugin();
-                if (ep != null) {
-                    onMainThread(() -> { ep.reloadInventoryConfig(); return null; });
-                }
+                applyGameplayReload(response);
                 response.put("success", true);
                 response.put("message", "Config saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
             } else {
@@ -103,6 +98,7 @@ public class WebApiHandler {
             if (data != null) {
                 configManager.saveWorldsFromMap(data);
                 plugin.getLogger().info("[Web-API] worlds.yml saved");  // i18n-ignore: web API internal log
+                applyGameplayReload(response);
                 response.put("success", true);
                 response.put("message", "Worlds saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
             } else {
@@ -482,6 +478,35 @@ public class WebApiHandler {
 
     private EventPlugin eventPlugin() {
         return plugin instanceof EventPlugin ? (EventPlugin) plugin : null;
+    }
+
+    /**
+     * Nach dem Speichern von config.yml, worlds.yml oder equipment.yml denselben Reload
+     * ausloesen wie {@code POST /api/reload}. Laeuft ein Match oder Event, bleibt die Datei
+     * gespeichert und der Reload wird nachgezogen, sobald nichts mehr laeuft.
+     */
+    private void applyGameplayReload(Map<String, Object> response) {
+        EventPlugin ep = eventPlugin();
+        if (ep == null || ep.getConfigurationService() == null) {
+            return;
+        }
+        try {
+            Boolean deferred = onMainThread(() -> {
+                if (ep.hasLiveGameplay()) {
+                    ep.noteDeferredConfigReload();
+                    return Boolean.TRUE;
+                }
+                ep.getConfigurationService().reloadAll();
+                return Boolean.FALSE;
+            });
+            if (Boolean.TRUE.equals(deferred)) {
+                response.put("reloadDeferred", true);
+            } else {
+                response.put("reloaded", true);
+            }
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "[Web-API] Config reload after save failed", e);  // i18n-ignore: web API internal log
+        }
     }
 
     private static String str(Object value) {
@@ -919,6 +944,7 @@ public class WebApiHandler {
             if (data != null) {
                 configManager.saveEquipmentFromMap(data);
                 plugin.getLogger().info("[Web-API] equipment.yml saved");  // i18n-ignore: web API internal log
+                applyGameplayReload(response);
                 response.put("success", true);
                 response.put("message", "Equipment saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
             } else {

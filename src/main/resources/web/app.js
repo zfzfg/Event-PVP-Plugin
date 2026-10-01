@@ -927,6 +927,25 @@ function updateConnectionStatus(status, text) {
     updateSyncStatusUI();
 }
 
+function saveRequest(category, url, data) {
+    return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ data })
+    }).then(async (response) => {
+        let body = {};
+        try { body = await response.json(); } catch (e) { /* Antwort ohne JSON */ }
+        console.log('[Save]', category, 'response:', response.status);
+        return {
+            category,
+            ok: response.ok,
+            status: response.status,
+            reloadDeferred: body.reloadDeferred === true
+        };
+    });
+}
+
 async function saveAllConfigs() {
     try {
         // Port-Änderungswarnung: Prüfen, ob der Port geändert wurde
@@ -956,40 +975,19 @@ async function saveAllConfigs() {
         if (hasConfigChanged('settings')) {
             console.log('[Save] Speichere config.yml...');
             savedCategories.push('settings');
-            promises.push(
-                fetch('/api/config/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ data: CONFIG_STATE.config })
-                }).then(r => { console.log('[Save] config response:', r.status); return { category: 'settings', ok: r.ok, status: r.status }; })
-            );
+            promises.push(saveRequest('settings', '/api/config/save', CONFIG_STATE.config));
         }
 
         if (hasConfigChanged('worlds')) {
             console.log('[Save] Speichere worlds.yml...');
             savedCategories.push('worlds');
-            promises.push(
-                fetch('/api/worlds/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ data: CONFIG_STATE.worlds })
-                }).then(r => { console.log('[Save] worlds response:', r.status); return { category: 'worlds', ok: r.ok, status: r.status }; })
-            );
+            promises.push(saveRequest('worlds', '/api/worlds/save', CONFIG_STATE.worlds));
         }
 
         if (hasConfigChanged('equipment')) {
             console.log('[Save] Speichere equipment.yml...');
             savedCategories.push('equipment');
-            promises.push(
-                fetch('/api/equipment/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ data: CONFIG_STATE.equipment })
-                }).then(r => { console.log('[Save] equipment response:', r.status); return { category: 'equipment', ok: r.ok, status: r.status }; })
-            );
+            promises.push(saveRequest('equipment', '/api/equipment/save', CONFIG_STATE.equipment));
         }
 
         if (hasConfigChanged('web')) {
@@ -1042,6 +1040,9 @@ async function saveAllConfigs() {
             CONFIG_STATE.lastSave = new Date();
             updateQuickActionsPanel();
             showToast(i18n.t('success.savedAll'), 'success');
+            if (results.some(r => r.reloadDeferred)) {
+                showToast(i18n.t('success.savedReloadDeferred'), 'warning');
+            }
         } else {
             results.forEach(res => {
                 if (res.ok) {

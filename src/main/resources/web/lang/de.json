@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Fehler beim Laden: {message}",
   "info.noChanges": "Keine Änderungen zu speichern",
   "success.savedAll": "Alle Konfigurationen gespeichert!",
+  "success.savedReloadDeferred": "Gespeichert. Übernommen wird es, sobald kein Match und kein Event mehr läuft.",
   "error.savePartial": "Fehler beim Speichern einiger Konfigurationen",
   "theme.reset": "Theme auf Standard zurückgesetzt",
   "yaml.copied": "YAML in Zwischenablage kopiert",

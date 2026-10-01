@@ -134,12 +134,16 @@ public class MultiverseHelper {
         teleportPlayersOutWithSavedLocations(world);
 
         plugin.getTaskManager().runLater(() -> {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv regen " + worldName);  // i18n-ignore: nur Konsole (mv-Befehl bzw. Log-Diagnose), erreicht keinen Spieler
-            plugin.getTaskManager().runLater(() -> {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "mv confirm");  // i18n-ignore: nur Konsole (mv-Befehl bzw. Log-Diagnose), erreicht keinen Spieler
+            try {
+                de.zfzfg.core.world.mv.MvResult result = plugin.getMvWorldService().regenerateWorldNow(worldName);
+                if (!result.isSuccess()) {
+                    plugin.getLogger().warning("Regenerating world '" + worldName + "' failed: "  // i18n-ignore: console-only diagnosis
+                            + result.getMessageKey() + " " + result.getDetail());
+                }
+            } finally {
                 REGENERATING_WORLDS.remove(worldKey);
                 if (callback != null) callback.run();
-            }, 40L);
+            }
         }, 40L);
     }
 

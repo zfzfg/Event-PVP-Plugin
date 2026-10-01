@@ -189,6 +189,21 @@ class LegacyCommandWorldBackend implements MvWorldBackend {
         return MvResult.fail(MvWorldService.NOT_MANAGED_MARKER);
     }
 
+    @Override
+    public MvResult regen(String worldName) {
+        // Nur MV4 landet hier. Dort reicht "mv confirm" ohne OTP, und der erste
+        // Befehl hat die Bestaetigung gesetzt, bevor der zweite zurueckkehrt.
+        if (!isAvailable()) {
+            return MvResult.fail("mv.error.notInstalled");
+        }
+        if (Bukkit.getWorld(worldName) == null) {
+            return MvResult.fail(MvResult.GENERIC_ERROR, "world is not loaded: " + worldName);
+        }
+        dispatch("mv regen " + worldName);  // i18n-ignore: nur Konsole (mv-Befehl), erreicht keinen Spieler
+        dispatch("mv confirm");  // i18n-ignore: nur Konsole (mv-Befehl), erreicht keinen Spieler
+        return MvResult.ok();
+    }
+
     private void dispatch(String command) {
         plugin.getLogger().info("[Multiverse] /" + command);  // i18n-ignore: console-only mv command trace
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);  // i18n-ignore: console-only mv command

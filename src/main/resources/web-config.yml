@@ -121,34 +121,6 @@ items:
     # Obergrenze für den Download in Megabyte. Größere Packs werden abgebrochen.
     max-size-mb: 50
 
-# Interface-Einstellungen
-#
-# @loose-end(dead-config): der gesamte interface-Block wird von keiner Zeile Java oder JavaScript gelesen
-#
-# Diese Schalter beschreiben Verhalten, das das Panel fest verdrahtet hat: es speichert nie
-# automatisch, fragt vor dem Speichern immer nach, hat keinen Auto-Refresh und eine feste
-# Anzahl Undo-Schritte. Der Block bleibt vorerst stehen, damit bestehende Konfigurationen
-# nicht mit Warnungen auffallen - entweder werden die Schalter noch angebunden oder sie
-# entfallen in einer spaeteren Version.
-interface:
-  # Auto-Refresh Intervall in Sekunden (0 = deaktiviert)
-  auto-refresh-interval: 0
-
-  # Änderungen automatisch speichern
-  auto-save: false
-
-  # Bestätigung vor Speichern anzeigen
-  confirm-save: true
-
-  # Anzahl der Undo-Schritte
-  max-undo-steps: 20
-
-  # Kompakte Ansicht als Standard
-  compact-view: false
-
-  # Syntax-Highlighting aktivieren
-  syntax-highlighting: true
-
 # Editierbare Dateien
 editable-files:
   - config.yml

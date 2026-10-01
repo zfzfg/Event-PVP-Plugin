@@ -85,6 +85,10 @@ public class EventPlugin extends JavaPlugin {
     private de.zfzfg.core.inventory.mvi.MultiverseInventoriesBridge mviBridge;
     // Auffangspeicher fuer Gewinne, die nicht sofort ausgegeben werden konnten
     private de.zfzfg.core.reward.PendingPayoutStore pendingPayouts;
+    // Abgebuchte Wetteinsaetze, die ein Absturz sonst mit dem Match-Objekt verliert
+    private de.zfzfg.core.reward.ActiveWagerJournal activeWagers;
+    private final java.util.concurrent.atomic.AtomicBoolean deferredConfigReload =
+            new java.util.concurrent.atomic.AtomicBoolean(false);
     // Positions-Sicherheitsnetz (Gegenstueck zum Inventar-Journal)
     private de.zfzfg.core.location.ReturnLocationStore returnLocations;
     private de.zfzfg.core.location.SafeLocationResolver safeLocations;
@@ -126,6 +130,8 @@ public class EventPlugin extends JavaPlugin {
         // schon waehrend des Startvorgangs beitreten kann.
         pendingPayouts = new de.zfzfg.core.reward.PendingPayoutStore(this);
         pendingPayouts.load();
+        activeWagers = new de.zfzfg.core.reward.ActiveWagerJournal(this);
+        activeWagers.load();
 
         safeLocations = new de.zfzfg.core.location.SafeLocationResolver(this);
         pluginWorlds = new de.zfzfg.core.location.PluginWorlds(this);
@@ -344,6 +350,12 @@ public class EventPlugin extends JavaPlugin {
         // === Inventar-Wiederanlauf ===
         // Ganz am Ende: erst jetzt koennen Match- und Event-Manager beantworten, ob eine
         // im Journal offene Sitzung noch zu einem laufenden Spiel gehoert.
+        if (activeWagers != null && pendingPayouts != null) {
+            // Vor dem Inventar-Wiederanlauf: die Einsaetze liegen dann in pending-payouts.yml
+            // und werden beim Join erst nach der Inventar-Wiederherstellung ausgeteilt.
+            activeWagers.refundOpen(pendingPayouts);
+        }
+
         if (inventoryGuard != null) {
             inventoryGuard.recoverOpenSessions();
             reportStaleState();
@@ -524,6 +536,40 @@ public class EventPlugin extends JavaPlugin {
      */
     public de.zfzfg.core.reward.PendingPayoutStore getPendingPayouts() {
         return pendingPayouts;
+    }
+
+    /** Journal abgebuchter Wetteinsaetze. {@code null} nur, bevor {@code onEnable} so weit ist. */
+    public de.zfzfg.core.reward.ActiveWagerJournal getActiveWagers() {
+        return activeWagers;
+    }
+
+    /** Ob gerade ein Event oder ein Match laeuft, dessen Arena- und Kit-Objekte ein Reload nicht ersetzen darf. */
+    public boolean hasLiveGameplay() {
+        if (eventManager != null && !eventManager.getActiveSessions().isEmpty()) {
+            return true;
+        }
+        return matchManager != null && !matchManager.getMatches().isEmpty();
+    }
+
+    /** Speichern im Web waehrend eines laufenden Spiels: Reload nachholen, sobald nichts mehr laeuft. */
+    public void noteDeferredConfigReload() {
+        deferredConfigReload.set(true);
+    }
+
+    /**
+     * Zieht einen aufgeschobenen Reload nach, wenn weder Event noch Match mehr laufen.
+     * Ist noch etwas aktiv, bleibt das Merker-Flag stehen.
+     */
+    public void flushDeferredConfigReload() {
+        if (!deferredConfigReload.get() || hasLiveGameplay()) {
+            return;
+        }
+        if (!deferredConfigReload.compareAndSet(true, false)) {
+            return;
+        }
+        if (configurationService != null) {
+            configurationService.reloadAll();
+        }
     }
 
     /** Einheitliche Antwort auf "wohin gehoert dieser Spieler". */

@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "No se pudo cargar: {message}",
   "info.noChanges": "No hay cambios que guardar",
   "success.savedAll": "Todas las configuraciones guardadas",
+  "success.savedReloadDeferred": "Guardado. Se aplicará cuando no haya partida ni evento en curso.",
   "error.savePartial": "Error al guardar algunas configuraciones",
   "theme.reset": "Tema restablecido",
   "yaml.copied": "YAML copiado",

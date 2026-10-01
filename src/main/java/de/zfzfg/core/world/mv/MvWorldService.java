@@ -327,6 +327,24 @@ public class MvWorldService {
      * <p>Fuer {@link de.zfzfg.core.world.MultiverseHelper#deleteWorld}, das seinen
      * Callback-Vertrag behaelt und deshalb keinen Job benutzen kann.</p>
      */
+    /**
+     * Regeneriert eine geladene Welt ueber das gewaehlte Backend.
+     *
+     * <p>Auf MV5 geht das an {@code regenWorld} vorbei an {@code mv confirm}. Auf MV4
+     * bleibt das Kommando-Paar im Legacy-Backend. Muss auf dem Main-Thread laufen.</p>
+     */
+    public MvResult regenerateWorldNow(String worldName) {
+        if (worldName == null || worldName.isBlank()) {
+            return MvResult.fail("mv.error.invalidName");
+        }
+        return backend().regen(worldName.trim());
+    }
+
+    /** Nur fuer Tests: setzt das Backend, ohne Class.forName und ohne Konsolenbefehle. */
+    void useBackendForTests(MvWorldBackend injected) {
+        this.backend = injected;
+    }
+
     public MvResult deleteWorldNow(String worldName) {
         String name = requireValidWorldName(worldName);
         return deleteWorldNow(name, resolveWorldFolder(name));

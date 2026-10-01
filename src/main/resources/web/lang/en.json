@@ -101,6 +101,7 @@
   "error.loadFailedWithReason": "Failed to load: {message}",
   "info.noChanges": "No changes to save",
   "success.savedAll": "All configurations saved",
+  "success.savedReloadDeferred": "Saved. It will apply once no match or event is running.",
   "error.savePartial": "Failed to save some configurations",
   "theme.reset": "Theme reset to default",
   "yaml.copied": "YAML copied to clipboard",

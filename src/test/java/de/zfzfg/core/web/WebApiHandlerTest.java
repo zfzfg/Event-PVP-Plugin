@@ -100,4 +100,50 @@ class WebApiHandlerTest {
         assertThat(response.get("success")).isEqualTo(false);
         assertThat(response.get("messageKey")).isEqualTo("inventory.error.unknownProvider");
     }
+
+    @Test
+    @DisplayName("saving config reloads the running configuration when nothing is in progress")
+    void saveConfigReloadsWhenIdle() throws Exception {
+        org.bukkit.Server server = mock(org.bukkit.Server.class);
+        when(server.isPrimaryThread()).thenReturn(true);
+        when(plugin.getServer()).thenReturn(server);
+
+        de.zfzfg.core.service.ConfigurationService configuration =
+                mock(de.zfzfg.core.service.ConfigurationService.class);
+        when(plugin.getConfigurationService()).thenReturn(configuration);
+        when(plugin.hasLiveGameplay()).thenReturn(false);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("data", Map.of("language", "de"));
+
+        Map<String, Object> response = apiHandler.saveConfig(body);
+
+        assertThat(response.get("success")).isEqualTo(true);
+        assertThat(response.get("reloaded")).isEqualTo(true);
+        verify(configuration).reloadAll();
+        verify(plugin, never()).noteDeferredConfigReload();
+    }
+
+    @Test
+    @DisplayName("saving worlds keeps the live arena objects and only notes a later reload")
+    void saveWorldsDefersReloadWhileAMatchIsRunning() throws Exception {
+        org.bukkit.Server server = mock(org.bukkit.Server.class);
+        when(server.isPrimaryThread()).thenReturn(true);
+        when(plugin.getServer()).thenReturn(server);
+
+        de.zfzfg.core.service.ConfigurationService configuration =
+                mock(de.zfzfg.core.service.ConfigurationService.class);
+        when(plugin.getConfigurationService()).thenReturn(configuration);
+        when(plugin.hasLiveGameplay()).thenReturn(true);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("data", Map.of("worlds", Map.of()));
+
+        Map<String, Object> response = apiHandler.saveWorlds(body);
+
+        assertThat(response.get("success")).isEqualTo(true);
+        assertThat(response.get("reloadDeferred")).isEqualTo(true);
+        verify(plugin).noteDeferredConfigReload();
+        verify(configuration, never()).reloadAll();
+    }
 }
