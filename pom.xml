@@ -119,7 +119,7 @@
 
       Das Artefakt liegt in keinem oeffentlichen Repository. Vor dem ersten Build einmalig
       aus dem InventoryRestore-Projekt installieren:
-          cd .../InventoryRestore/InventoryRestore-0.0.7 && mvn -pl api -am clean install
+          mvn -f ../../InventoryRestore/InventoryRestore-0.1.0/pom.xml -pl api -am install
     -->
     <dependency>
       <groupId>com.zfzfg</groupId>
