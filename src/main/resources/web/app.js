@@ -1928,6 +1928,9 @@ async function loadInventoryStatus() {
 function applyInventoryStatus(data) {
     INVENTORY_STATE.provider = data.provider || 'auto';
     INVENTORY_STATE.activeProvider = data.activeProvider || '';
+    INVENTORY_STATE.apiVersion = data.apiVersion;
+    INVENTORY_STATE.apiCompatible = data.apiCompatible === true;
+    INVENTORY_STATE.lastError = data.lastError || '';
     INVENTORY_STATE.managed = data.managed !== false;
     INVENTORY_STATE.inventoryRestoreInstalled = data.inventoryRestoreInstalled === true;
     INVENTORY_STATE.multiverseInventoriesInstalled = data.multiverseInventoriesInstalled === true;
@@ -1962,6 +1965,17 @@ function renderInventoryMode() {
                 provider: i18n.t('inventory.provider.' + (INVENTORY_STATE.activeProvider || mode || 'none'))
             });
     }
+    if (kpiProvider) {
+        kpiProvider.textContent += ' · ' + i18n.t('inventory.apiVersion', {
+            version: String(INVENTORY_STATE.apiVersion ?? '?')
+        });
+        if (!INVENTORY_STATE.apiCompatible && !legacy) kpiProvider.textContent += ' · ' + i18n.t('inventory.apiIncompatible');
+        kpiProvider.title = INVENTORY_STATE.apiCompatible
+            ? i18n.t('inventory.apiCompatible') : i18n.t('inventory.apiIncompatible');
+    }
+    const apiDiagnostic = document.getElementById('inventory-api-diagnostic');
+    if (apiDiagnostic) apiDiagnostic.textContent = INVENTORY_STATE.lastError
+        ? i18n.t('inventory.lastError') + ': ' + INVENTORY_STATE.lastError : '';
     const kpiSessions = document.getElementById('inv-kpi-sessions');
     if (kpiSessions) {
         kpiSessions.textContent = i18n.t('inventory.openSessions', {
@@ -2208,6 +2222,8 @@ async function loadInventoryGuard() {
                     <strong style="cursor:pointer;color:var(--primary);" onclick="selectPlayerForInventory('${escapeAttr(session.playerName || session.player)}')">${escapeHtml(session.playerName || session.player)}</strong>
                     <span class="form-label-hint">${escapeHtml(i18n.t('inventory.context.' + session.context))}
                         &middot; ${escapeHtml(session.backupId || i18n.t('inventory.noBackup'))}</span>
+                    ${session.backupDamaged ? `<span class="badge badge-error">${escapeHtml(i18n.t('inventory.backupDamaged'))}</span>` : ''}
+                    ${session.lastError ? `<span class="form-label-hint">${escapeHtml(i18n.t('inventory.lastError'))}: ${escapeHtml(session.lastError)}</span>` : ''}
                 </div>`;
             }).join('');
         }

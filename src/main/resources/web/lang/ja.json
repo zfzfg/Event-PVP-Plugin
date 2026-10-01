@@ -763,5 +763,15 @@
   "editor.equipmentIconAuto": "自動（チェストプレートに基づく）",
   "editor.equipmentIconHint": "素材名を入力するか、候補を選んでください。空にするとチェストプレートからアイコンを決めます。",
   "editor.inventoryDoubleClickHint": "配置したアイテムをダブルクリックすると、追加設定（個数・エンチャント・名前・説明文・不破壊）を開けます。",
-  "editor.armorClickHint": "防具またはオフハンドの埋まったスロットをクリックすると、追加設定（エンチャント・名前・説明文・不破壊）を開けます。"
+  "editor.armorClickHint": "防具またはオフハンドの埋まったスロットをクリックすると、追加設定（エンチャント・名前・説明文・不破壊）を開けます。",
+  "inventory.error.invalidBackup": "バックアップのデータが不正です。",
+  "inventory.error.incompatibleVersion": "バックアップは新しいMinecraftで作成されています。",
+  "inventory.error.insufficientSpace": "空きが足りません。変更は行われていません。",
+  "inventory.error.cancelled": "別のプラグインが復元をキャンセルしました。",
+  "inventory.apiVersion": "API v{version}",
+  "inventory.apiCompatible": "APIに互換性があります",
+  "inventory.apiIncompatible": "InventoryBackup API 2が必要です",
+  "inventory.lastError": "最後のエラー",
+  "inventory.backupDamaged": "バックアップが見つからないか破損しています",
+  "inventory.error.lookupFailed": "プレイヤーの検索に失敗しました。サーバーログを確認してください。"
 }

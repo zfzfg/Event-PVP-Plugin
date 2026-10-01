@@ -20,13 +20,17 @@ public final class InventoryBackupServiceFactory {
 
     /** Ob das Plugin InventoryBackup laeuft und seine API bereitsteht. */
     public static boolean inventoryRestoreAvailable() {
-        if (Bukkit.getPluginManager().getPlugin("InventoryBackup") == null) {
+        if (!Bukkit.getPluginManager().isPluginEnabled("InventoryBackup")) {
             return false;
         }
         if (!InventoryRestoreApiAdapter.classesPresent()) {
             return false;
         }
-        return InventoryRestoreApiAdapter.runningApiVersion() > 0;
+        return InventoryRestoreApiAdapter.runningApiVersion() >= 2;
+    }
+
+    public static int apiRevision() {
+        return InventoryRestoreApiAdapter.classesPresent() ? InventoryRestoreApiAdapter.runningApiVersion() : -1;
     }
 
     /**
@@ -43,6 +47,10 @@ public final class InventoryBackupServiceFactory {
         // InventoryBackup gebraucht, dort fuer die Sicherungskopien, die bewusst nie
         // automatisch zurueckgespielt werden. Was mit den Backups geschieht, entscheidet
         // allein InventorySessionManager.
+        if (InventoryRestoreApiAdapter.classesPresent()) {
+            int running = InventoryRestoreApiAdapter.runningApiVersion();
+            if (running > 0 && running < 2) logApiVersion(plugin);
+        }
         if (inventoryRestoreAvailable()) {
             logApiVersion(plugin);
             if (config.mode() == InventoryManagementConfig.Mode.NONE) {

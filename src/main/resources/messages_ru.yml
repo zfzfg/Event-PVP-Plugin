@@ -1002,6 +1002,7 @@ messages:
       как осиротевшая.'
     guard-restore-failed: 'Защищённое восстановление для {player} не удалось: {reason}'
     guard-entry-invalid: 'Некорректная запись в inventory-guard.yml, пропущена: {entry}'
+    guard-backup-deleted: 'Backup for {player} was deleted ({reason}); recovery reference retained.'
     guard-save-failed: 'Не удалось записать inventory-guard.yml: {error}'
     guard-shutdown-open: 'Осталось открытых сессий инвентаря: {count} — они будут
       обработаны при следующем запуске.'

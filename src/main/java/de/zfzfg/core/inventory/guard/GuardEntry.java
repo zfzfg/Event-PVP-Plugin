@@ -15,6 +15,22 @@ public final class GuardEntry {
     private final String originWorld;
     private final long openedAt;
     private volatile boolean payoutDone;
+    private volatile String lastError = "";
+    private volatile boolean backupDamaged;
+    private boolean completing;
+
+    public String lastError() { return lastError; }
+    public boolean backupDamaged() { return backupDamaged; }
+    public void diagnostic(String error, boolean damaged) {
+        lastError = error == null ? "" : error;
+        backupDamaged = damaged;
+    }
+    synchronized boolean isCompleting() { return completing; }
+    synchronized boolean tryComplete() {
+        if (completing) return false;
+        completing = true;
+        return true;
+    }
 
     public GuardEntry(UUID playerId, GuardContext context, String refId, String backupId,
                       GuardPhase phase, String originWorld, long openedAt, boolean payoutDone) {
@@ -64,6 +80,8 @@ public final class GuardEntry {
         map.put("originWorld", originWorld);
         map.put("openedAt", openedAt);
         map.put("payoutDone", payoutDone);
+        map.put("lastError", lastError);
+        map.put("backupDamaged", backupDamaged);
         return map;
     }
 }

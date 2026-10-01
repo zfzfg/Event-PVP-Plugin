@@ -474,12 +474,13 @@ public class MatchManager {
      */
     private void restoreInventoryAfterMatch(Player player, java.util.function.Consumer<Boolean> onRestored) {
         de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
-        if (sessions == null || !sessions.isManaged()
+        if (sessions == null || !plugin.getInventoryConfig().managedByPlugin()
                 || !plugin.getInventoryConfig().restoreOnMatchEnd()) {
             // Keine Inventarverwaltung aktiv: das Inventar wurde nie angetastet, der Gewinn
             // kann direkt hinein.
             if (onRestored != null) {
-                onRestored.accept(player.isOnline());
+                onRestored.accept(player.isOnline() && (plugin.getInventoryGuard() == null
+                        || !plugin.getInventoryGuard().hasOpenSession(player.getUniqueId())));
             }
             return;
         }

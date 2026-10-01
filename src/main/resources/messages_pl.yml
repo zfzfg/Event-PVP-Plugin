@@ -1015,6 +1015,7 @@ messages:
     guard-restore-failed: 'Zabezpieczone przywracanie dla {player} nie powiodlo sie:
       {reason}'
     guard-entry-invalid: 'Nieprawidlowy wpis w inventory-guard.yml, pominiety: {entry}'
+    guard-backup-deleted: 'Backup for {player} was deleted ({reason}); recovery reference retained.'
     guard-save-failed: 'Nie udalo sie zapisac inventory-guard.yml: {error}'
     guard-shutdown-open: '{count} sesji ekwipunku pozostaje otwartych - zostana obsluzone
       przy nastepnym starcie.'

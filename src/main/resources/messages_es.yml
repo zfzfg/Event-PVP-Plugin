@@ -1018,6 +1018,7 @@ messages:
       se marca como huerfana.'
     guard-restore-failed: 'Fallo la restauracion protegida de {player}: {reason}'
     guard-entry-invalid: 'Entrada invalida en inventory-guard.yml, omitida: {entry}'
+    guard-backup-deleted: 'Backup for {player} was deleted ({reason}); recovery reference retained.'
     guard-save-failed: 'No se pudo escribir inventory-guard.yml: {error}'
     guard-shutdown-open: '{count} sesion(es) de inventario siguen abiertas: se resolveran
       en el proximo arranque.'

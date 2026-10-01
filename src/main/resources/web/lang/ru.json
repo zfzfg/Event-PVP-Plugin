@@ -763,5 +763,15 @@
   "editor.equipmentIconAuto": "Автоматически (по нагруднику)",
   "editor.equipmentIconHint": "Введите название материала или выберите подсказку. Оставьте пустым, чтобы значок определялся по нагруднику.",
   "editor.inventoryDoubleClickHint": "Двойной клик по размещённому предмету открывает его дополнительные настройки: количество, чары, имя, описание и неразрушимость.",
-  "editor.armorClickHint": "Клик по занятому слоту брони или второй руки открывает его дополнительные настройки: чары, имя, описание и неразрушимость."
+  "editor.armorClickHint": "Клик по занятому слоту брони или второй руки открывает его дополнительные настройки: чары, имя, описание и неразрушимость.",
+  "inventory.error.invalidBackup": "Копия содержит некорректные данные.",
+  "inventory.error.incompatibleVersion": "Копия создана в более новой версии Minecraft.",
+  "inventory.error.insufficientSpace": "Недостаточно места. Ничего не изменено.",
+  "inventory.error.cancelled": "Другой плагин отменил восстановление.",
+  "inventory.apiVersion": "API v{version}",
+  "inventory.apiCompatible": "API совместим",
+  "inventory.apiIncompatible": "Требуется InventoryBackup API 2",
+  "inventory.lastError": "Последняя ошибка",
+  "inventory.backupDamaged": "Копия отсутствует или повреждена",
+  "inventory.error.lookupFailed": "Не удалось найти игрока; смотрите журнал сервера."
 }

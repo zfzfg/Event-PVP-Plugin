@@ -1006,6 +1006,7 @@ messages:
       as orphaned.'
     guard-restore-failed: 'Guarded restore for {player} failed: {reason}'
     guard-entry-invalid: 'Invalid entry in inventory-guard.yml, skipped: {entry}'
+    guard-backup-deleted: 'Backup for {player} was deleted ({reason}); recovery reference retained.'
     guard-save-failed: 'inventory-guard.yml could not be written: {error}'
     guard-shutdown-open: '{count} inventory session(s) are still open - they will
       be handled on the next start.'

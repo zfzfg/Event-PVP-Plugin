@@ -1021,6 +1021,7 @@ messages:
       {reason}'
     guard-entry-invalid: 'Ungueltiger Eintrag in inventory-guard.yml, uebersprungen:
       {entry}'
+    guard-backup-deleted: 'Backup for {player} was deleted ({reason}); recovery reference retained.'
     guard-save-failed: 'inventory-guard.yml konnte nicht geschrieben werden: {error}'
     guard-shutdown-open: '{count} Inventar-Sitzung(en) sind noch offen - sie werden
       beim naechsten Start abgearbeitet.'

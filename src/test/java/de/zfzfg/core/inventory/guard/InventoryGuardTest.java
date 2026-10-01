@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-class InventoryGuardTest {
+class InventoryGuardTest extends de.zfzfg.test.MockBukkitTestBase {
 
     @TempDir
     Path tempDir;
@@ -33,6 +33,8 @@ class InventoryGuardTest {
     @BeforeEach
     void setUp() {
         plugin = mock(EventPlugin.class);
+        when(plugin.isEnabled()).thenReturn(true);
+        when(plugin.getServer()).thenReturn(server);
         when(plugin.getDataFolder()).thenReturn(tempDir.toFile());
         when(plugin.getLogger()).thenReturn(Logger.getLogger("InventoryGuardTest"));
         when(plugin.getConsoleMsg(any(), any())).thenReturn("console msg");

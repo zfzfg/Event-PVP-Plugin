@@ -37,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 public final class InventoryRestoreApiAdapter implements InventoryBackupService {
 
     private final EventPlugin plugin;
+    private volatile String lastError = "";
 
     public InventoryRestoreApiAdapter(EventPlugin plugin) {
         this.plugin = plugin;
@@ -54,8 +55,9 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
 
     /** API-Revision, die das laufende Plugin implementiert, oder -1. */
     public static int runningApiVersion() {
-        Optional<InventoryBackupAPI> api = InventoryBackupProvider.getOptional();
-        return api.map(InventoryBackupAPI::getApiVersion).orElse(-1);
+        try {
+            return InventoryBackupProvider.getOptional().map(InventoryBackupAPI::getApiVersion).orElse(-1);
+        } catch (LinkageError | IllegalStateException e) { return -1; }
     }
 
     /** Revision, gegen die dieses Plugin kompiliert wurde. */
@@ -65,10 +67,35 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
 
     private Optional<InventoryBackupAPI> api() {
         try {
-            return InventoryBackupProvider.getOptional();
+            return InventoryBackupProvider.getOptional().filter(a -> a.getApiVersion() >= 2
+                    && plugin.getServer().getPluginManager().isPluginEnabled("InventoryBackup"));
         } catch (Throwable t) {
             return Optional.empty();
         }
+    }
+
+    private InventoryBackupAPI requireApi() {
+        return api().orElseThrow(() -> new IllegalStateException("InventoryBackup API 2 unavailable"));
+    }
+
+    @Override public int apiVersion() { return runningApiVersion(); }
+    @Override public String lastError() { return lastError; }
+
+    private void recordError(Throwable error) {
+        lastError = String.valueOf(error.getMessage());
+        plugin.getLogger().log(java.util.logging.Level.WARNING, "[Inventory API] " + lastError, error);
+    }
+
+    private <T> CompletableFuture<T> checked(CompletableFuture<T> future) {
+        return future.whenComplete((value, error) -> { if (error != null) recordError(error); });
+    }
+
+    private <T> CompletableFuture<T> unavailable() {
+        return CompletableFuture.failedFuture(new IllegalStateException("InventoryBackup API 2 unavailable"));
+    }
+
+    @Override public CompletableFuture<Optional<UUID>> resolvePlayerId(String name) {
+        return api().map(a -> checked(a.resolvePlayerId(name))).orElseGet(this::unavailable);
     }
 
     @Override
@@ -86,35 +113,20 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
     @Override
     public CompletableFuture<Optional<BackupRef>> backup(Player player, BackupContext context) {
         Optional<InventoryBackupAPI> api = api();
-        if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(Optional.empty());
-        }
-        return api.get().createBackup(player, toRequest(context))
-                .thenApply(handle -> handle.map(InventoryRestoreApiAdapter::toRef))
-                .exceptionally(t -> {
-                    plugin.getLogger().warning(plugin.getConsoleMsg("inventory-backup-failed",
-                            "player", player.getName(), "error", String.valueOf(t.getMessage())));
-                    return Optional.empty();
-                });
+        if (api.isEmpty()) return unavailable();
+        return checked(api.get().createBackup(player, toRequest(context))
+                .thenApply(handle -> handle.map(InventoryRestoreApiAdapter::toRef)));
     }
 
     @Override
     public CompletableFuture<Optional<BackupRef>> backup(UUID ownerId, String ownerName,
-                                                         CapturedInventory snapshot,
-                                                         BackupContext context) {
+                                                         CapturedInventory snapshot, BackupContext context) {
         Optional<InventoryBackupAPI> api = api();
-        if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(Optional.empty());
-        }
+        if (api.isEmpty()) return unavailable();
         BackupSnapshot apiSnapshot = new BackupSnapshot(null, snapshot.contents(), snapshot.armor(),
                 snapshot.offhand(), snapshot.level(), snapshot.exp());
-        return api.get().createBackup(ownerId, ownerName, apiSnapshot, toRequest(context))
-                .thenApply(handle -> handle.map(InventoryRestoreApiAdapter::toRef))
-                .exceptionally(t -> {
-                    plugin.getLogger().warning(plugin.getConsoleMsg("inventory-backup-failed",
-                            "player", String.valueOf(ownerName), "error", String.valueOf(t.getMessage())));
-                    return Optional.empty();
-                });
+        return checked(api.get().createBackup(ownerId, ownerName, apiSnapshot, toRequest(context))
+                .thenApply(handle -> handle.map(InventoryRestoreApiAdapter::toRef)));
     }
 
     // ----------------------------------------------------------------- restore
@@ -127,38 +139,53 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
         }
         return withHandle(api.get(), ref)
                 .thenCompose(handle -> handle
-                        .map(h -> api.get().restore(targetId, h, toOptions(mode))
-                                .thenApply(InventoryRestoreApiAdapter::toOutcome))
+                        .map(h -> restoreAuthorized(targetId, ref, h, mode)
+                                .thenApply(result -> {
+                                    RestoreOutcome outcome = toOutcome(result);
+                                    if (!outcome.isSuccess()) lastError = outcome.name();
+                                    return outcome;
+                                }))
                         .orElse(CompletableFuture.completedFuture(RestoreOutcome.NOT_FOUND)))
-                .exceptionally(t -> {
+                .exceptionallyAsync(t -> {
                     plugin.getLogger().warning(plugin.getConsoleMsg("inventory-restore-failed",
                             "player", targetId.toString(), "error", String.valueOf(t.getMessage())));
+                    recordError(t);
                     return RestoreOutcome.FAILED;
-                });
+                }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin));
     }
 
     @Override
     public CompletableFuture<Boolean> queueOnJoin(UUID targetId, BackupRef ref, RestoreMode mode) {
         Optional<InventoryBackupAPI> api = api();
         if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(false);
+            return unavailable();
         }
         return withHandle(api.get(), ref)
                 .thenCompose(handle -> handle
-                        .map(h -> api.get().queueRestoreOnJoin(targetId, h, toOptions(mode)))
+                        .map(h -> requireApi().getPendingRestore(targetId)
+                                .thenCompose(pending -> {
+                                    if (pending.isPresent()) {
+                                        boolean matches = pending.get().handle().ownerId().equals(h.ownerId())
+                                                && pending.get().handle().id().equals(h.id())
+                                                && sameOptions(pending.get().options(), toOptions(mode));
+                                        if (!matches) lastError = "PENDING_RESTORE_CONFLICT";
+                                        return CompletableFuture.completedFuture(matches);
+                                    }
+                                    return requireApi().queueRestoreOnJoin(targetId, h, toOptions(mode));
+                                }))
                         .orElse(CompletableFuture.completedFuture(false)))
-                .exceptionally(t -> false);
+                .whenComplete((v, t) -> { if (t != null) recordError(t); });
     }
 
     @Override
     public CompletableFuture<Boolean> hasPendingRestore(UUID targetId) {
         Optional<InventoryBackupAPI> api = api();
         if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(false);
+            return unavailable();
         }
         return api.get().getPendingRestore(targetId)
                 .thenApply(Optional::isPresent)
-                .exceptionally(t -> false);
+                .whenComplete((v, t) -> { if (t != null) recordError(t); });
     }
 
     // -------------------------------------------------------------------- read
@@ -167,7 +194,7 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
     public CompletableFuture<List<BackupRef>> list(UUID ownerId, String type) {
         Optional<InventoryBackupAPI> api = api();
         if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(new ArrayList<>());
+            return unavailable();
         }
         return api.get().listBackups(ownerId, type).thenApply(handles -> {
             List<BackupRef> refs = new ArrayList<>(handles.size());
@@ -175,46 +202,46 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
                 refs.add(toRef(handle));
             }
             return refs;
-        }).exceptionally(t -> new ArrayList<>());
+        }).whenComplete((v, t) -> { if (t != null) recordError(t); });
     }
 
     @Override
     public CompletableFuture<Optional<BackupRef>> resolve(UUID ownerId, String backupId) {
         Optional<InventoryBackupAPI> api = api();
         if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(Optional.empty());
+            return unavailable();
         }
         return api.get().getBackup(ownerId, backupId)
                 .thenApply(handle -> handle.map(InventoryRestoreApiAdapter::toRef))
-                .exceptionally(t -> Optional.empty());
+                .whenComplete((v, t) -> { if (t != null) recordError(t); });
     }
 
     @Override
     public CompletableFuture<Optional<CapturedInventory>> load(BackupRef ref) {
         Optional<InventoryBackupAPI> api = api();
         if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(Optional.empty());
+            return unavailable();
         }
         return withHandle(api.get(), ref)
                 .thenCompose(handle -> handle
-                        .map(h -> api.get().loadBackup(h))
+                        .map(h -> requireApi().loadBackup(h))
                         .orElse(CompletableFuture.completedFuture(Optional.empty())))
                 .thenApply(snapshot -> snapshot.map(s -> new CapturedInventory(
                         s.contents(), s.armor(), s.offhand(), s.level(), s.exp())))
-                .exceptionally(t -> Optional.empty());
+                .whenComplete((v, t) -> { if (t != null) recordError(t); });
     }
 
     @Override
     public CompletableFuture<Boolean> delete(BackupRef ref) {
         Optional<InventoryBackupAPI> api = api();
         if (api.isEmpty()) {
-            return CompletableFuture.completedFuture(false);
+            return unavailable();
         }
         return withHandle(api.get(), ref)
                 .thenCompose(handle -> handle
-                        .map(h -> api.get().deleteBackup(h))
+                        .map(h -> requireApi().deleteBackup(h))
                         .orElse(CompletableFuture.completedFuture(false)))
-                .exceptionally(t -> false);
+                .whenComplete((v, t) -> { if (t != null) recordError(t); });
     }
 
     @Override
@@ -225,9 +252,51 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
         }
         // openPreview braucht den echten Handle; das Aufloesen ist asynchron, das Oeffnen
         // danach wieder Haupt-Thread - genau das leistet der Completion-Hop der API.
-        withHandle(api.get(), ref).thenAccept(handle ->
-                handle.ifPresent(h -> api.get().openPreview(viewer, h)));
+        withHandle(api.get(), ref).thenAcceptAsync(handle ->
+                handle.ifPresent(h -> api().ifPresent(current -> current.openPreview(viewer, h))),
+                de.zfzfg.core.inventory.InventoryTasks.executor(plugin)).exceptionally(t -> {
+                    recordError(t); return null;
+                });
         return true;
+    }
+
+    private CompletableFuture<RestoreResult> restoreAuthorized(UUID targetId, BackupRef ref,
+                                                               BackupHandle handle, RestoreMode mode) {
+        CompletableFuture<RestoreResult> result = new CompletableFuture<>();
+        try {
+            de.zfzfg.core.inventory.InventoryTasks.executor(plugin).execute(() -> {
+                var guard = plugin.getInventoryGuard();
+                boolean authorized = guard != null && guard.authorizeRestore(targetId, ref);
+                try {
+                    restoreWithoutOverwritingPending(targetId, handle, mode)
+                            .whenComplete((value, error) -> {
+                                if (authorized) guard.endAuthorization(targetId, ref);
+                                if (error != null) result.completeExceptionally(error);
+                                else result.complete(value);
+                            });
+                } catch (Throwable error) {
+                    if (authorized) guard.endAuthorization(targetId, ref);
+                    result.completeExceptionally(error);
+                }
+            });
+        } catch (RuntimeException error) { result.completeExceptionally(error); }
+        return result;
+    }
+
+    private CompletableFuture<RestoreResult> restoreWithoutOverwritingPending(UUID targetId,
+                                                                              BackupHandle handle, RestoreMode mode) {
+        var player = org.bukkit.Bukkit.getPlayer(targetId);
+        if (player != null && player.isOnline())
+            return requireApi().restore(targetId, handle, toOptions(mode));
+        return requireApi().getPendingRestore(targetId).thenComposeAsync(pending -> {
+            if (pending.isPresent()) {
+                boolean matches = pending.get().handle().ownerId().equals(handle.ownerId())
+                        && pending.get().handle().id().equals(handle.id())
+                        && sameOptions(pending.get().options(), toOptions(mode));
+                return CompletableFuture.completedFuture(matches ? RestoreResult.QUEUED_FOR_JOIN : RestoreResult.CANCELLED);
+            }
+            return requireApi().restore(targetId, handle, toOptions(mode));
+        }, de.zfzfg.core.inventory.InventoryTasks.executor(plugin));
     }
 
     // ------------------------------------------------------------------ mapping
@@ -250,6 +319,13 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
             builder.metadata(entry.getKey(), entry.getValue());
         }
         return builder.build();
+    }
+
+    private static boolean sameOptions(RestoreOptions left, RestoreOptions right) {
+        return left.contents() == right.contents() && left.armor() == right.armor()
+                && left.offhand() == right.offhand() && left.level() == right.level()
+                && left.exp() == right.exp() && left.clearBefore() == right.clearBefore()
+                && left.dropOverflow() == right.dropOverflow();
     }
 
     private static RestoreOptions toOptions(RestoreMode mode) {
@@ -278,7 +354,11 @@ public final class InventoryRestoreApiAdapter implements InventoryBackupService 
             case QUEUED_FOR_JOIN: return RestoreOutcome.QUEUED_FOR_JOIN;
             case NOT_FOUND:       return RestoreOutcome.NOT_FOUND;
             case CANCELLED:       return RestoreOutcome.CANCELLED;
-            default:              return RestoreOutcome.FAILED;
+            case INVALID_BACKUP: return RestoreOutcome.INVALID_BACKUP;
+            case INCOMPATIBLE_VERSION: return RestoreOutcome.INCOMPATIBLE_VERSION;
+            case INSUFFICIENT_SPACE: return RestoreOutcome.INSUFFICIENT_SPACE;
+            case FAILED: return RestoreOutcome.FAILED;
+            default: return RestoreOutcome.FAILED;
         }
     }
 }

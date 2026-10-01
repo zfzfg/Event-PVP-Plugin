@@ -134,6 +134,10 @@ public class WebApiHandler {
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("provider", config.mode().id());
         data.put("activeProvider", ep.getInventoryBackupService().providerName());
+        data.put("apiVersion", de.zfzfg.core.inventory.InventoryBackupServiceFactory.apiRevision());
+        data.put("requiredApiVersion", 2);
+        data.put("apiCompatible", ep.getInventoryBackupService().isAvailable());
+        data.put("lastError", ep.getInventoryBackupService().lastError());
         data.put("managed", config.managedByPlugin());
         data.put("inventoryRestoreInstalled",
                 de.zfzfg.core.inventory.InventoryBackupServiceFactory.inventoryRestoreAvailable());
@@ -253,7 +257,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(query.get("player"));
+        UUID ownerId = resolvePlayer(query.get("player"), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         if (ownerId == null) {
             return failure(response, "inventory.error.unknownPlayer", String.valueOf(query.get("player")));
         }
@@ -300,7 +305,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(query.get("player"));
+        UUID ownerId = resolvePlayer(query.get("player"), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         String backupId = query.get("id");
         if (ownerId == null || backupId == null || backupId.isEmpty()) {
             return failure(response, "inventory.error.unknownBackup", String.valueOf(backupId));
@@ -315,7 +321,7 @@ public class WebApiHandler {
             Optional<de.zfzfg.core.inventory.CapturedInventory> snapshot =
                     await(ep.getInventoryBackupService().load(ref.get()));
             if (snapshot.isEmpty()) {
-                return failure(response, "inventory.error.loadFailed", backupId);
+                return failure(response, "inventory.error.unknownBackup", backupId);
             }
 
             Map<String, Object> data = new LinkedHashMap<>();
@@ -349,7 +355,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(str(requestBody.get("player")));
+        UUID ownerId = resolvePlayer(str(requestBody.get("player")), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         String backupId = str(requestBody.get("backupId"));
         if (ownerId == null || backupId == null || backupId.isEmpty()) {
             return failure(response, "inventory.error.unknownBackup", String.valueOf(backupId));
@@ -389,7 +396,17 @@ public class WebApiHandler {
                     + " -> " + outcome.name());
 
             if (!outcome.isSuccess()) {
-                return failure(response, "inventory.error.restoreFailed", outcome.name());
+                String code = switch (outcome) {
+                    case NOT_FOUND -> "inventory.error.unknownBackup";
+                    case INVALID_BACKUP -> "inventory.error.invalidBackup";
+                    case INCOMPATIBLE_VERSION -> "inventory.error.incompatibleVersion";
+                    case INSUFFICIENT_SPACE -> "inventory.error.insufficientSpace";
+                    case CANCELLED -> "inventory.error.cancelled";
+                    case UNAVAILABLE -> "inventory.error.unavailable";
+                    default -> "inventory.error.restoreFailed";
+                };
+                response.put("outcome", outcome.name());
+                return failure(response, code, outcome.name());
             }
             Map<String, Object> data = new LinkedHashMap<>();
             data.put("outcome", outcome.name());
@@ -409,7 +426,8 @@ public class WebApiHandler {
         if (ep == null) {
             return failure(response, "inventory.error.unavailable", "");
         }
-        UUID ownerId = resolvePlayer(str(requestBody.get("player")));
+        UUID ownerId = resolvePlayer(str(requestBody.get("player")), response);
+        if (Boolean.FALSE.equals(response.get("success"))) return response;
         String backupId = str(requestBody.get("backupId"));
         if (ownerId == null || backupId == null || backupId.isEmpty()) {
             return failure(response, "inventory.error.unknownBackup", String.valueOf(backupId));
@@ -525,6 +543,14 @@ public class WebApiHandler {
     }
 
     /** Loest Name oder UUID zu einer Spieler-UUID auf. */
+    private UUID resolvePlayer(String raw, Map<String, Object> response) {
+        try { return resolvePlayer(raw); }
+        catch (RuntimeException error) {
+            failure(response, "inventory.error.lookupFailed", String.valueOf(error.getMessage()));
+            return null;
+        }
+    }
+
     private UUID resolvePlayer(String raw) {
         if (raw == null || raw.isEmpty()) {
             return null;
@@ -535,11 +561,17 @@ public class WebApiHandler {
             // Kein UUID-Format - als Name behandeln
         }
         try {
-            return onMainThread(() -> {
+            UUID onlineId = onMainThread(() -> {
                 org.bukkit.entity.Player online = org.bukkit.Bukkit.getPlayerExact(raw);
-                if (online != null) {
-                    return online.getUniqueId();
-                }
+                return online == null ? null : online.getUniqueId();
+            });
+            if (onlineId != null) return onlineId;
+            EventPlugin ep = eventPlugin();
+            if (ep != null && ep.getInventoryBackupService().isAvailable()) {
+                Optional<UUID> indexed = await(ep.getInventoryBackupService().resolvePlayerId(raw));
+                if (indexed.isPresent()) return indexed.get();
+            }
+            return onMainThread(() -> {
                 for (org.bukkit.OfflinePlayer offline : org.bukkit.Bukkit.getOfflinePlayers()) {
                     if (raw.equalsIgnoreCase(offline.getName())) {
                         return offline.getUniqueId();
@@ -549,7 +581,7 @@ public class WebApiHandler {
             });
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "[Web-API] Could not resolve player '" + raw + "'", e);  // i18n-ignore: web API internal log
-            return null;
+            throw new IllegalStateException("Player lookup failed", e);
         }
     }
 

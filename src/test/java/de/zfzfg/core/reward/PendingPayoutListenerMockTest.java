@@ -27,6 +27,8 @@ class PendingPayoutListenerMockTest extends MockBukkitTestBase {
         when(mockPlugin.isEnabled()).thenReturn(true);
         when(mockPlugin.getName()).thenReturn("EventPlugin");
         when(mockPlugin.getPendingPayouts()).thenReturn(mockStore);
+        when(mockPlugin.getInventoryBackupService()).thenReturn(backupService);
+        when(mockPlugin.getLogger()).thenReturn(java.util.logging.Logger.getLogger("PayoutTest"));
         when(mockPlugin.getConfigManager()).thenReturn(mockConfigManager);
         when(mockConfigManager.getMessage("rewards.delivered-on-join")).thenReturn("&aYour pending rewards have been delivered!");
 

@@ -27,9 +27,9 @@ public final class CapturedInventory {
 
     public CapturedInventory(ItemStack[] contents, ItemStack[] armor, ItemStack offhand,
                              int level, float exp) {
-        this.contents = contents == null ? new ItemStack[0] : contents;
-        this.armor = armor == null ? new ItemStack[0] : armor;
-        this.offhand = offhand;
+        this.contents = cloneAll(contents);
+        this.armor = cloneAll(armor);
+        this.offhand = offhand == null ? null : offhand.clone();
         this.level = level;
         this.exp = exp;
     }
@@ -38,7 +38,7 @@ public final class CapturedInventory {
     public static CapturedInventory of(Player player) {
         PlayerInventory inv = player.getInventory();
         return new CapturedInventory(
-                cloneAll(inv.getContents()),
+                cloneAll(inv.getStorageContents()),
                 cloneAll(inv.getArmorContents()),
                 inv.getItemInOffHand() == null ? null : inv.getItemInOffHand().clone(),
                 player.getLevel(),
@@ -56,9 +56,9 @@ public final class CapturedInventory {
         return copy;
     }
 
-    public ItemStack[] contents() { return contents; }
-    public ItemStack[] armor() { return armor; }
-    public ItemStack offhand() { return offhand; }
+    public ItemStack[] contents() { return cloneAll(contents); }
+    public ItemStack[] armor() { return cloneAll(armor); }
+    public ItemStack offhand() { return offhand == null ? null : offhand.clone(); }
     public int level() { return level; }
     public float exp() { return exp; }
 
@@ -108,18 +108,19 @@ public final class CapturedInventory {
     public void applyTo(Player player, boolean dropOverflow) {
         PlayerInventory inv = player.getInventory();
         inv.clear();
-        inv.setArmorContents(null);
+        inv.setArmorContents(new ItemStack[4]);
 
-        ItemStack[] target = new ItemStack[inv.getSize()];
+        ItemStack[] target = new ItemStack[inv.getStorageContents().length];
         int overflowFrom = Math.min(contents.length, target.length);
-        System.arraycopy(contents, 0, target, 0, overflowFrom);
-        inv.setContents(target);
+        System.arraycopy(cloneAll(contents), 0, target, 0, overflowFrom);
+        inv.setStorageContents(target);
+        inv.setItemInOffHand(null);
 
         if (armor.length > 0) {
-            inv.setArmorContents(armor);
+            inv.setArmorContents(cloneAll(armor));
         }
         if (offhand != null) {
-            inv.setItemInOffHand(offhand);
+            inv.setItemInOffHand(offhand.clone());
         }
         player.setLevel(level);
         player.setExp(exp);

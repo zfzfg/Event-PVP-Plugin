@@ -763,5 +763,15 @@
   "editor.equipmentIconAuto": "Automático (según la pechera)",
   "editor.equipmentIconHint": "Escribe un material o elige una sugerencia. Déjalo vacío para deducir el icono de la pechera.",
   "editor.inventoryDoubleClickHint": "Haz doble clic en un objeto colocado para abrir sus ajustes adicionales: cantidad, encantamientos, nombre, lore e irrompible.",
-  "editor.armorClickHint": "Haz clic en una casilla de armadura o mano secundaria ocupada para abrir sus ajustes adicionales: encantamientos, nombre, lore e irrompible."
+  "editor.armorClickHint": "Haz clic en una casilla de armadura o mano secundaria ocupada para abrir sus ajustes adicionales: encantamientos, nombre, lore e irrompible.",
+  "inventory.error.invalidBackup": "La copia contiene datos no válidos.",
+  "inventory.error.incompatibleVersion": "La copia procede de una versión más reciente de Minecraft.",
+  "inventory.error.insufficientSpace": "No hay espacio suficiente. No se ha cambiado nada.",
+  "inventory.error.cancelled": "Otro plugin canceló la restauración.",
+  "inventory.apiVersion": "API v{version}",
+  "inventory.apiCompatible": "API compatible",
+  "inventory.apiIncompatible": "Se requiere InventoryBackup API 2",
+  "inventory.lastError": "Último error",
+  "inventory.backupDamaged": "Copia ausente o dañada",
+  "inventory.error.lookupFailed": "No se pudo buscar al jugador; consulta el registro del servidor."
 }

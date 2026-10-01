@@ -79,6 +79,7 @@ public class EventPlugin extends JavaPlugin {
     // Inventar-Verwaltung (Ersatz fuer Multiverse-Inventories)
     private de.zfzfg.core.inventory.InventoryManagementConfig inventoryConfig;
     private de.zfzfg.core.inventory.InventoryBackupService inventoryBackupService;
+    private boolean inventoryApiEventsRegistered;
     private de.zfzfg.core.inventory.guard.InventoryGuard inventoryGuard;
     private de.zfzfg.core.inventory.InventorySessionManager inventorySessions;
     // Erkennung und Konfliktschutz gegenueber einem parallel laufenden Multiverse-Inventories
@@ -385,6 +386,7 @@ public class EventPlugin extends JavaPlugin {
             inventoryGuard = new de.zfzfg.core.inventory.guard.InventoryGuard(this);
             inventoryGuard.load();
             inventorySessions = new de.zfzfg.core.inventory.InventorySessionManager(this, inventoryGuard);
+            registerInventoryApiEvents();
 
             getServer().getPluginManager().registerEvents(
                     new de.zfzfg.core.inventory.InventoryGuardListener(this), this);
@@ -421,6 +423,14 @@ public class EventPlugin extends JavaPlugin {
         // haetten sonst keinen Weg zurueck zum Spieler.
         getServer().getPluginManager().registerEvents(
                 new de.zfzfg.core.reward.PendingPayoutListener(this), this);
+    }
+
+    private void registerInventoryApiEvents() {
+        if (!inventoryApiEventsRegistered && inventoryBackupService.isAvailable()) {
+            getServer().getPluginManager().registerEvents(
+                    new de.zfzfg.core.inventory.adapter.InventoryBackupEvents(this), this);
+            inventoryApiEventsRegistered = true;
+        }
     }
 
     /** Ab diesem Alter gilt eine offene Sitzung als haengengeblieben. */
@@ -610,6 +620,7 @@ public class EventPlugin extends JavaPlugin {
         reloadInventoryConfig();
         inventoryBackupService = de.zfzfg.core.inventory.InventoryBackupServiceFactory
                 .create(this, inventoryConfig);
+        registerInventoryApiEvents();
         if (mviBridge != null) {
             // Weltgruppen und Verzoegerung neu einlesen: ein Reload kann beides geaendert
             // haben, und die Diagnose darf nicht auf dem Stand vom Serverstart stehenbleiben.
