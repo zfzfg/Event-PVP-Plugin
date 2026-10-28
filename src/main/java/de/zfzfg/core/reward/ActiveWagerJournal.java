@@ -39,6 +39,7 @@ public final class ActiveWagerJournal {
     private final Object fileLock = new Object();
     private final Map<UUID, Stake> stakes = new LinkedHashMap<>();
     private volatile boolean loaded;
+    private boolean writable = true;
 
     public ActiveWagerJournal(EventPlugin plugin) {
         this.plugin = plugin;
@@ -90,10 +91,12 @@ public final class ActiveWagerJournal {
 
     public void load() {
         synchronized (fileLock) {
-            stakes.clear();
+            stakes.clear(); writable = true;
             File file = file();
             if (file.isFile()) {
-                YamlConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+                YamlConfiguration cfg = new YamlConfiguration();
+                try { cfg.load(file); }
+                catch (Exception ex) { writable = false; loaded = true; plugin.getLogger().log(Level.SEVERE, "[Wagers] Invalid journal retained; new wagers refused", ex); return; }
                 ConfigurationSection root = cfg.getConfigurationSection("stakes");
                 if (root != null) {
                     for (String key : root.getKeys(false)) {
@@ -101,10 +104,12 @@ public final class ActiveWagerJournal {
                             UUID playerId = UUID.fromString(key);
                             ConfigurationSection sec = root.getConfigurationSection(key);
                             Stake stake = sec == null ? null : readStake(playerId, sec);
+                            if (stake == null) { writable = false; }
                             if (stake != null && !stake.isEmpty()) {
                                 stakes.put(playerId, stake);
                             }
                         } catch (IllegalArgumentException e) {
+                            writable = false;
                             plugin.getLogger().warning("[Wagers] Skipping entry with invalid UUID: " + key);  // i18n-ignore: technical wager journal log
                         }
                     }
@@ -130,6 +135,8 @@ public final class ActiveWagerJournal {
             if (!loaded) {
                 load();
             }
+            if (incoming != null) for (Stake stake : incoming)
+                if (stake != null && stakes.containsKey(stake.playerId)) return false;
             List<UUID> added = new ArrayList<>();
             if (incoming != null) {
                 for (Stake stake : incoming) {
@@ -159,9 +166,8 @@ public final class ActiveWagerJournal {
             return;
         }
         synchronized (fileLock) {
-            if (stakes.remove(playerId) != null) {
-                save();
-            }
+            Stake removed = stakes.remove(playerId);
+            if (removed != null && !save()) stakes.put(playerId, removed);
         }
     }
 
@@ -192,12 +198,15 @@ public final class ActiveWagerJournal {
             int queued = 0;
             for (Stake stake : new ArrayList<>(stakes.values())) {
                 String reason = CRASH_REFUND_PREFIX + stake.matchId;
-                if (!payouts.hasReason(stake.playerId, reason)) {
-                    payouts.queue(stake.playerId, stake.items, stake.money, reason);
+                String source = stake.matchId + ":" + stake.playerId;
+                if (!payouts.completeDebit("debit:" + source) || !payouts.completeDebit("item-debit:" + source)) continue;
+                if (!payouts.ownsSource(source) && !payouts.hasReason(stake.playerId, reason)) {
+                    var result = payouts.submit("refund:" + source, stake.playerId, null, stake.items, stake.money,
+                            reason, false, List.of(source), List.of());
+                    if (!result.accepted()) continue;
                     queued++;
                 }
-                stakes.remove(stake.playerId);
-                save();
+                forget(stake.playerId);
             }
             if (queued > 0) {
                 plugin.getLogger().info("[Wagers] Queued " + queued  // i18n-ignore: technical wager journal log
@@ -228,16 +237,19 @@ public final class ActiveWagerJournal {
                 try {
                     items.add(ItemStack.deserialize((Map<String, Object>) element));
                 } catch (Exception ignored) {
-                    plugin.getLogger().warning("[Wagers] Skipping unreadable item for " + playerId);  // i18n-ignore: technical wager journal log
+                    writable = false;
+                    plugin.getLogger().warning("[Wagers] Retaining journal with unreadable item for " + playerId);  // i18n-ignore: technical wager journal log
                 }
             }
         }
         double money = sec.getDouble("money", 0);
+        if (!Double.isFinite(money) || money < 0) throw new IllegalArgumentException("Invalid stake money");
         long openedAt = sec.getLong("opened-at", System.currentTimeMillis());
         return new Stake(playerId, matchId, items, money, openedAt);
     }
 
     private boolean save() {
+        if (!writable) return false;
         try {
             YamlConfiguration cfg = new YamlConfiguration();
             cfg.set("version", 1);
@@ -263,17 +275,7 @@ public final class ActiveWagerJournal {
     }
 
     private static void saveAtomic(YamlConfiguration cfg, File file) throws IOException {
-        File tmp = new File(file.getParentFile(), file.getName() + ".tmp");
-        cfg.save(tmp);
-        try {
-            Files.move(tmp.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-        } catch (Exception atomicFailed) {
-            try {
-                Files.move(tmp.toPath(), file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception moveFailed) {
-                cfg.save(file);
-            }
-        }
+        de.zfzfg.core.util.AtomicFiles.save(cfg, file.toPath());
     }
 
     private File file() {

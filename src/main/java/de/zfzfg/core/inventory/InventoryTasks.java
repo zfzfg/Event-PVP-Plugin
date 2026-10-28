@@ -11,12 +11,12 @@ public final class InventoryTasks {
 
     public static Executor executor(Plugin plugin) {
         return task -> {
-            if (!plugin.isEnabled()) {
+            if (!plugin.isEnabled() || plugin instanceof de.zfzfg.eventplugin.EventPlugin ep && ep.isStopping()) {
                 throw new RejectedExecutionException("Inventory integration is stopping");
             }
             if (Bukkit.isPrimaryThread()) task.run();
             else Bukkit.getScheduler().runTask(plugin, () -> {
-                if (plugin.isEnabled()) task.run();
+                if (plugin.isEnabled() && !(plugin instanceof de.zfzfg.eventplugin.EventPlugin ep && ep.isStopping())) task.run();
             });
         };
     }

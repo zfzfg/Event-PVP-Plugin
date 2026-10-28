@@ -26,6 +26,9 @@ class WebApiHandlerTest {
         webConfigManager = mock(WebConfigManager.class);
         inventoryGuard = mock(InventoryGuard.class);
 
+        org.bukkit.Server defaultServer = mock(org.bukkit.Server.class);
+        when(defaultServer.isPrimaryThread()).thenReturn(true);
+        when(plugin.getServer()).thenReturn(defaultServer);
         when(plugin.getLogger()).thenReturn(Logger.getLogger("WebApiHandlerTest"));
         when(plugin.getInventoryGuard()).thenReturn(inventoryGuard);
 

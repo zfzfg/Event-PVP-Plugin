@@ -44,47 +44,20 @@ public class PvpStatsStorage {
         return map;
     }
 
+    private static String snapshot(Map<UUID, PlayerStats> stats) {
+        YamlConfiguration cfg = new YamlConfiguration();
+        for (var entry : stats.entrySet()) {
+            cfg.set("players." + entry.getKey() + ".wins", entry.getValue().getWins());
+            cfg.set("players." + entry.getKey() + ".losses", entry.getValue().getLosses());
+            cfg.set("players." + entry.getKey() + ".draws", entry.getValue().getDraws());
+        }
+        return cfg.saveToString();
+    }
     public static void save(EventPlugin plugin, Map<UUID, PlayerStats> stats) {
-        try {
-            File folder = plugin.getDataFolder();
-            if (!folder.exists()) folder.mkdirs();
-            File file = new File(folder, FILE_NAME);
-            YamlConfiguration cfg = new YamlConfiguration();
-            for (Map.Entry<UUID, PlayerStats> e : stats.entrySet()) {
-                String base = "players." + e.getKey();
-                cfg.set(base + ".wins", e.getValue().getWins());
-                cfg.set(base + ".losses", e.getValue().getLosses());
-                cfg.set(base + ".draws", e.getValue().getDraws());
-            }
-            saveYamlAtomic(cfg, file);
-        } catch (IOException e) {
-            plugin.getLogger().warning("Failed to save PvP stats: " + e.getMessage());  // i18n-ignore: technical storage exception log
-        }
+        try { de.zfzfg.core.util.OrderedFileWriter.now(new File(plugin.getDataFolder(), FILE_NAME).toPath(), snapshot(stats)); }
+        catch (IOException ex) { plugin.getLogger().log(java.util.logging.Level.SEVERE, "Statistics write failed", ex); }
     }
-
     public static void saveAsync(EventPlugin plugin, Map<UUID, PlayerStats> stats) {
-        // Run disk I/O asynchronously to avoid blocking the main server thread
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            try {
-                save(plugin, stats);
-            } catch (Exception e) {
-                plugin.getLogger().warning("Async save PvP stats failed: " + e.getMessage());  // i18n-ignore: technical storage exception log
-            }
-        });
-    }
-
-    private static final java.util.concurrent.ConcurrentHashMap<String, Object> FILE_LOCKS = new java.util.concurrent.ConcurrentHashMap<>();
-
-    private static void saveYamlAtomic(org.bukkit.configuration.file.YamlConfiguration cfg, java.io.File file) throws java.io.IOException {
-        Object lock = FILE_LOCKS.computeIfAbsent(file.getAbsolutePath(), k -> new Object());
-        synchronized (lock) {
-            java.io.File tmp = new java.io.File(file.getParentFile(), file.getName() + ".tmp");
-            cfg.save(tmp);
-            try {
-                java.nio.file.Files.move(tmp.toPath(), file.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            } catch (Exception e) {
-                cfg.save(file);
-            }
-        }
+        de.zfzfg.core.util.OrderedFileWriter.later(new File(plugin.getDataFolder(), FILE_NAME).toPath(), snapshot(stats), plugin.getLogger());
     }
 }

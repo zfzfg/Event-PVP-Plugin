@@ -57,6 +57,61 @@ public class MvWorldService {
     private final EventPlugin plugin;
     private final Map<String, MvJob> jobs = new ConcurrentHashMap<>();
     private volatile MvWorldBackend backend;
+    private volatile boolean stopping;
+    private final WorldOperationGuard reservations = new WorldOperationGuard();
+    private final java.util.concurrent.ThreadPoolExecutor io = new java.util.concurrent.ThreadPoolExecutor(
+            2, 2, 0, java.util.concurrent.TimeUnit.SECONDS, new java.util.concurrent.ArrayBlockingQueue<>(16),
+            task -> { Thread thread = new Thread(task, "EventPVP-WorldIO"); thread.setDaemon(true); return thread; });
+
+    private void dispatch(MvJob job, Runnable work) {
+        if (stopping) { fail(job, "Plugin stopping"); return; }
+        try {
+            plugin.getTaskManager().run(() -> {
+                if (stopping) { fail(job, "Plugin stopping"); return; }
+                try { work.run(); } catch (Exception ex) { fail(job, ex.toString()); }
+            });
+        } catch (Exception ex) { fail(job, ex.toString()); }
+    }
+    private void async(MvJob job, Runnable work) {
+        if (stopping) { fail(job, "Plugin stopping"); return; }
+        try { io.execute(() -> {
+            if (stopping) { fail(job, "Plugin stopping"); return; }
+            try { work.run(); } catch (Exception ex) { fail(job, ex.toString()); }
+        }); } catch (java.util.concurrent.RejectedExecutionException ex) { fail(job, "World I/O overloaded"); }
+    }
+    private boolean reserve(MvJob job) throws java.io.IOException {
+        File folder = resolveWorldFolder(job.worldName);
+        if (folder == null) folder = new File(Bukkit.getWorldContainer(), job.worldName);
+        if (!reservations.acquire(job.id, folder.getCanonicalFile().toPath())) {
+            fail(job, "Conflicting world operation"); return false;
+        }
+        return true;
+    }
+    private void fail(MvJob job, String detail) {
+        job.detail = detail; job.messageKey = MvResult.GENERIC_ERROR; job.status = "FAILED";
+        complete(job);
+        plugin.getLogger().warning("[Multiverse] Job " + job.id + " failed: " + detail);
+    }
+    private void complete(MvJob job) {
+        job.completedAt = System.currentTimeMillis(); reservations.release(job.id);
+    }
+    public void shutdown() {
+        stopping = true; io.shutdownNow();
+        org.bukkit.configuration.file.YamlConfiguration report = new org.bukkit.configuration.file.YamlConfiguration();
+        java.util.List<Map<String, Object>> unfinished = new ArrayList<>();
+        for (MvJob job : jobs.values()) if ("RUNNING".equals(job.status)) {
+            unfinished.add(job.toMap()); fail(job, "Interrupted by plugin shutdown; inspect world files before retry");
+        }
+        if (!unfinished.isEmpty()) {
+            report.set("interrupted", unfinished);
+            try { de.zfzfg.core.util.AtomicFiles.save(report, new File(plugin.getDataFolder(), "interrupted-world-jobs.yml").toPath()); }
+            catch (java.io.IOException ex) { plugin.getLogger().log(Level.SEVERE, "Could not record interrupted world jobs", ex); }
+        }
+    }
+    public Map<String, Object> status() {
+        return Map.of("running", jobs.values().stream().filter(j -> "RUNNING".equals(j.status)).count(),
+                "queuedIO", io.getQueue().size(), "activeIO", io.getActiveCount(), "stopping", stopping);
+    }
 
     public MvWorldService(EventPlugin plugin) {
         this.plugin = plugin;
@@ -179,6 +234,8 @@ public class MvWorldService {
         /** Untranslatierbarer Zusatz: Multiverse-Fehlertext oder Exception-Message. */
         public volatile String detail = "";
         public final long createdAt = System.currentTimeMillis();
+        public volatile long completedAt;
+        public volatile String stagingPath = "";
 
         MvJob(String action, String worldName) {
             this.action = action;
@@ -193,6 +250,9 @@ public class MvWorldService {
             map.put("status", status);
             map.put("messageKey", messageKey);
             map.put("detail", detail);
+            map.put("stagingPath", stagingPath);
+            map.put("createdAt", createdAt);
+            map.put("completedAt", completedAt);
             return map;
         }
     }
@@ -204,7 +264,7 @@ public class MvWorldService {
 
     private void purgeExpiredJobs() {
         long cutoff = System.currentTimeMillis() - JOB_TTL_MILLIS;
-        jobs.values().removeIf(job -> job.createdAt < cutoff);
+        jobs.values().removeIf(job -> job.completedAt > 0 && job.completedAt < cutoff);
     }
 
     private MvJob submit(String action, String worldName, java.util.function.Supplier<MvResult> work) {
@@ -212,13 +272,18 @@ public class MvWorldService {
         MvJob job = new MvJob(action, worldName);
         jobs.put(job.id, job);
 
-        plugin.getTaskManager().run(() -> finish(job, work));
+        dispatch(job, () -> {
+            try { if (reserve(job)) finish(job, work); }
+            catch (java.io.IOException ex) { fail(job, ex.toString()); }
+        });
         return job;
     }
 
     private void finish(MvJob job, java.util.function.Supplier<MvResult> work) {
+        if (stopping) { fail(job, "Plugin stopping"); return; }
         try {
             MvResult result = work.get();
+            if (stopping) { fail(job, "Shutdown overlapped operation; inspect world state"); return; }
             job.messageKey = result.getMessageKey();
             job.detail = result.getDetail();
             job.status = result.isSuccess() ? "SUCCESS" : "FAILED";  // i18n-ignore: Protokoll-Token der JSON-API
@@ -233,6 +298,7 @@ public class MvWorldService {
             job.detail = String.valueOf(t.getMessage());
             job.status = "FAILED";  // i18n-ignore: Protokoll-Token der JSON-API
         }
+        complete(job);
         if ("FAILED".equals(job.status)) {  // i18n-ignore: Protokoll-Token der JSON-API
             // Auch in die Konsole: bisher wusste nur das Panel von einem fehlgeschlagenen Job,
             // im Server-Log fehlte z.B. ein gescheitertes "create" komplett.
@@ -254,10 +320,11 @@ public class MvWorldService {
 
     public MvJob unloadWorld(String worldName) {
         String name = requireValidWorldName(worldName);
-        if (isProtected(name)) {
-            throw new MvInputException("mv.error.protectedWorld", name);
-        }
-        return submit("unload", name, () -> backend().unload(name));
+        return submit("unload", name, () -> {
+            if (isProtected(name)) return MvResult.fail("mv.error.protectedWorld", name);
+            evacuateWorld(name);
+            return MvResult.ok();
+        });
     }
 
     /**
@@ -275,50 +342,45 @@ public class MvWorldService {
      */
     public MvJob deleteWorld(String worldName, boolean backup) {
         String name = requireValidWorldName(worldName);
-        if (isProtected(name)) {
-            throw new MvInputException("mv.error.protectedWorld", name);
-        }
-
-        purgeExpiredJobs();
-        MvJob job = new MvJob("delete", name);
-        jobs.put(job.id, job);
-
-        plugin.getTaskManager().run(() -> {
-            // Ordner aufloesen, SOLANGE die Welt noch geladen ist: bei einer Dimension der
-            // Hauptwelt (world/dimensions/minecraft/<name>) ist Bukkits getWorldFolder() die
-            // einzige garantiert richtige Quelle -- nach dem Entladen ist sie weg.
-            java.io.File folder = resolveWorldFolder(name);
-
+        purgeExpiredJobs(); MvJob job = new MvJob("delete", name); jobs.put(job.id, job);
+        dispatch(job, () -> {
+            if (isProtected(name)) { fail(job, "Protected world"); return; }
+            final File folder;
             try {
+                if (!reserve(job)) return;
+                folder = resolveWorldFolder(name);
                 evacuateWorld(name);
-            } catch (Throwable t) {
-                plugin.getLogger().log(Level.WARNING, "[Multiverse] Could not unload " + name + " before deleting", t);  // i18n-ignore: console-only diagnosis
-            }
-
-            if (!backup) {
-                finish(job, () -> deleteWorldNow(name, folder));
-                return;
-            }
-
-            plugin.getTaskManager().runAsync(() -> {
+                validateDeleteTarget(name, folder);
+            } catch (Exception ex) { fail(job, ex.toString()); return; }
+            async(job, () -> {
                 try {
-                    java.io.File archive = new de.zfzfg.core.world.MultiverseHelper(plugin).createBackup(name, folder);
-                    plugin.getLogger().info("[Multiverse] Backup before deleting " + name + ": " + archive.getName());  // i18n-ignore: console-only diagnosis
-                } catch (Throwable t) {
-                    // Wer ein Backup anfordert, verlaesst sich darauf. Kommt keines zustande,
-                    // wird NICHT geloescht -- sonst ist die Welt weg und die Sicherung existiert
-                    // nur in der Annahme des Nutzers.
-                    plugin.getLogger().log(Level.SEVERE,
-                            "[Multiverse] Backup for '" + name + "' failed - deletion aborted", t);  // i18n-ignore: console-only diagnosis
-                    job.messageKey = "mv.error.backupFailed";
-                    job.detail = String.valueOf(t.getMessage());
-                    job.status = "FAILED";  // i18n-ignore: Protokoll-Token der JSON-API
-                    return;
-                }
-                plugin.getTaskManager().run(() -> finish(job, () -> deleteWorldNow(name, folder)));
+                    if (folder != null) SafeFileTree.validate(folder.toPath());
+                    if (backup) new de.zfzfg.core.world.MultiverseHelper(plugin).createBackup(name, folder);
+                } catch (Exception ex) { fail(job, ex.toString()); return; }
+                dispatch(job, () -> {
+                    try { validateDeleteTarget(name, folder); }
+                    catch (Exception ex) { fail(job, ex.toString()); return; }
+                    MvResult result = backend().delete(name);
+                    if (!result.isSuccess() && !NOT_MANAGED_MARKER.equals(result.getMessageKey())) { finish(job, () -> result); return; }
+                    async(job, () -> finish(job, () -> {
+                        try { if (folder != null) SafeFileTree.delete(folder.toPath()); return MvResult.ok(); }
+                        catch (java.io.IOException ex) { return MvResult.fail("mv.error.deleteFolderFailed", ex.toString()); }
+                    }));
+                });
             });
         });
         return job;
+    }
+
+    private void validateDeleteTarget(String name, File folder) throws java.io.IOException {
+        if (isProtected(name) || Bukkit.getWorld(name) != null) throw new java.io.IOException("World protected or still loaded");
+        if (folder == null) return;
+        File canonical = folder.getCanonicalFile(), container = Bukkit.getWorldContainer().getCanonicalFile();
+        if (!isStrictlyInside(canonical, container)) throw new java.io.IOException("World folder outside container");
+        for (World world : Bukkit.getWorlds()) {
+            var loaded = world.getWorldFolder().getCanonicalFile().toPath();
+            if (loaded.startsWith(canonical.toPath())) throw new java.io.IOException("Deletion contains a loaded world");
+        }
     }
 
     /**
@@ -337,7 +399,14 @@ public class MvWorldService {
         if (worldName == null || worldName.isBlank()) {
             return MvResult.fail("mv.error.invalidName");
         }
-        return backend().regen(worldName.trim());
+        String name = requireValidWorldName(worldName);
+        if (stopping || isProtected(name)) return MvResult.fail("mv.error.protectedWorld", name);
+        MvJob job = new MvJob("regen", name);
+        try {
+            if (!reserve(job)) return MvResult.fail(MvResult.GENERIC_ERROR, job.detail);
+            return backend().regen(name);
+        } catch (java.io.IOException ex) { return MvResult.fail(MvResult.GENERIC_ERROR, ex.toString()); }
+        finally { reservations.release(job.id); }
     }
 
     /** Nur fuer Tests: setzt das Backend, ohne Class.forName und ohne Konsolenbefehle. */
@@ -347,7 +416,13 @@ public class MvWorldService {
 
     public MvResult deleteWorldNow(String worldName) {
         String name = requireValidWorldName(worldName);
-        return deleteWorldNow(name, resolveWorldFolder(name));
+        if (stopping) return MvResult.fail(MvResult.GENERIC_ERROR, "Plugin stopping");
+        MvJob job = new MvJob("delete", name);
+        try {
+            if (!reserve(job)) return MvResult.fail(MvResult.GENERIC_ERROR, job.detail);
+            return deleteWorldNow(name, resolveWorldFolder(name));
+        } catch (java.io.IOException ex) { return MvResult.fail(MvResult.GENERIC_ERROR, ex.toString()); }
+        finally { reservations.release(job.id); }
     }
 
     /** @param resolvedFolder der vor dem Entladen aufgeloeste Weltordner, darf null sein */
@@ -357,6 +432,10 @@ public class MvWorldService {
             return MvResult.fail("mv.error.protectedWorld", name);
         }
         evacuateWorld(name);
+        if (resolvedFolder != null) {
+            try { SafeFileTree.validate(resolvedFolder.toPath()); }
+            catch (java.io.IOException ex) { return MvResult.fail("mv.error.deleteFolderFailed", ex.toString()); }
+        }
         MvResult result = backend().delete(name);
         if (!result.isSuccess() && NOT_MANAGED_MARKER.equals(result.getMessageKey())) {
             return deleteWorldFolder(name, resolvedFolder);
@@ -437,12 +516,14 @@ public class MvWorldService {
         if (fallback != null && !fallback.equals(world)) {
             for (org.bukkit.entity.Player player : new ArrayList<>(world.getPlayers())) {
                 try {
-                    player.teleport(fallback.getSpawnLocation());
-                } catch (Exception ignored) {
+                    if (!player.teleport(fallback.getSpawnLocation())) throw new IllegalStateException("Evacuation rejected");
+                } catch (Exception ex) {
+                    throw new IllegalStateException("Could not evacuate " + player.getUniqueId(), ex);
                 }
             }
         }
-        Bukkit.unloadWorld(world, true);
+        if (!world.getPlayers().isEmpty() || !Bukkit.unloadWorld(world, true) || Bukkit.getWorld(worldName) != null)
+            throw new IllegalStateException("World remains loaded: " + worldName);
     }
 
     /**
@@ -507,13 +588,7 @@ public class MvWorldService {
     }
 
     private void deleteRecursively(File file) throws java.io.IOException {
-        File[] children = file.listFiles();
-        if (children != null) {
-            for (File child : children) {
-                deleteRecursively(child);
-            }
-        }
-        java.nio.file.Files.deleteIfExists(file.toPath());
+        SafeFileTree.delete(file.toPath());
     }
 
     // ============ Backups ============
@@ -603,49 +678,36 @@ public class MvWorldService {
     public MvJob restoreBackup(String fileName, String targetName) {
         File archive = requireValidBackupFile(fileName);
         String target = requireValidWorldName(targetName);
-
-        purgeExpiredJobs();
-        MvJob job = new MvJob("restore", target);
-        jobs.put(job.id, job);
-
-        plugin.getTaskManager().run(() -> {
-            // Existenzpruefung auf dem Main-Thread: Bukkit-Welt, Multiverse-Registrierung
-            // oder ein Ordner (auch als Dimension) -- alles blockiert das Ziel.
-            if (Bukkit.getWorld(target) != null || resolveWorldFolder(target) != null) {
-                job.messageKey = "mv.error.restoreTargetExists";
-                job.detail = target;
-                job.status = "FAILED";  // i18n-ignore: Protokoll-Token der JSON-API
-                return;
-            }
-
+        MvJob job = new MvJob("restore", target); jobs.put(job.id, job);
+        dispatch(job, () -> {
+            try { if (!reserve(job)) return; } catch (java.io.IOException ex) { fail(job, ex.toString()); return; }
+            if (Bukkit.getWorld(target) != null || resolveWorldFolder(target) != null) { fail(job, "Restore target exists"); return; }
             File targetFolder = new File(Bukkit.getWorldContainer(), target);
-            plugin.getTaskManager().runAsync(() -> {
-                boolean hasLevelDat;
+            long maxBytes = plugin.getConfig().getLong("settings.world-io.max-restore-bytes", 21_474_836_480L);
+            int maxEntries = plugin.getConfig().getInt("settings.world-io.max-restore-entries", 1_000_000);
+            async(job, () -> {
+                java.nio.file.Path staging = null;
                 try {
-                    hasLevelDat = extractBackup(archive, targetFolder);
-                } catch (Throwable t) {
-                    plugin.getLogger().log(Level.SEVERE, "[Multiverse] Restore of " + archive.getName() + " failed", t);  // i18n-ignore: console-only diagnosis
-                    try {
-                        deleteRecursively(targetFolder);
-                    } catch (Exception ignored) {
-                        // Aufraeumen ist best effort; ein Torso-Ordner ohne Welt dahinter ist
-                        // aergerlich, aber der Fehler selbst wird gemeldet.
-                    }
-                    job.messageKey = "mv.error.restoreBadArchive";
-                    job.detail = String.valueOf(t.getMessage());
-                    job.status = "FAILED";  // i18n-ignore: Protokoll-Token der JSON-API
-                    return;
+                    staging = java.nio.file.Files.createTempDirectory(targetFolder.toPath().toAbsolutePath().getParent(), ".eventpvp-restore-");
+                    job.stagingPath = staging.toString();
+                    extractBackup(archive, staging.toFile(), maxBytes, maxEntries);
+                    if (stopping || Thread.currentThread().isInterrupted()) throw new java.io.IOException("Restore interrupted");
+                    final java.nio.file.Path prepared = staging;
+                    dispatch(job, () -> {
+                        try {
+                            if (Bukkit.getWorld(target) != null || resolveWorldFolder(target) != null)
+                                throw new java.io.IOException("Restore target appeared while extracting");
+                            java.nio.file.Files.move(prepared, targetFolder.toPath()); // deliberately no REPLACE_EXISTING
+                            finish(job, () -> backend().importWorld(target));
+                        } catch (Exception ex) {
+                            try { SafeFileTree.delete(prepared); } catch (Exception cleanup) { ex.addSuppressed(cleanup); }
+                            fail(job, ex.toString());
+                        }
+                    });
+                } catch (Exception ex) {
+                    if (staging != null) try { SafeFileTree.delete(staging); } catch (Exception cleanup) { ex.addSuppressed(cleanup); }
+                    fail(job, ex.toString());
                 }
-
-                final String note = hasLevelDat ? ""
-                        : "no level.dat in archive (dimension backup?)";  // i18n-ignore: technisches Detail hinter uebersetztem Rahmen
-                plugin.getTaskManager().run(() -> finish(job, () -> {
-                    MvResult imported = backend().importWorld(target);
-                    if (!imported.isSuccess() && !note.isEmpty() && imported.getDetail().isEmpty()) {
-                        return MvResult.fail(imported.getMessageKey(), note);
-                    }
-                    return imported;
-                }));
             });
         });
         return job;
@@ -661,7 +723,15 @@ public class MvWorldService {
      * @return ob das Archiv ein {@code level.dat} enthielt
      */
     static boolean extractBackup(File archive, File targetFolder) throws java.io.IOException {
+        return extractBackup(archive, targetFolder, 21_474_836_480L, 1_000_000);
+    }
+
+    static boolean extractBackup(File archive, File targetFolder, long maxBytes, int maxEntries) throws java.io.IOException {
+        if (maxBytes <= 0 || maxEntries <= 0) throw new java.io.IOException("Invalid archive limits");
         java.nio.file.Path targetRoot = targetFolder.toPath().toAbsolutePath().normalize();
+        SafeFileTree.validate(targetRoot);
+        long totalBytes = 0;
+        int entryCount = 0;
         boolean hasLevelDat = false;
         int written = 0;
 
@@ -669,6 +739,7 @@ public class MvWorldService {
             java.util.Enumeration<? extends java.util.zip.ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 java.util.zip.ZipEntry entry = entries.nextElement();
+                if (++entryCount > maxEntries || Thread.currentThread().isInterrupted()) throw new java.io.IOException("Archive limit or interruption");
                 java.nio.file.Path destination = targetRoot.resolve(entry.getName()).normalize();
                 if (!destination.startsWith(targetRoot)) {
                     throw new java.io.IOException("Blocked zip-slip entry: " + entry.getName());  // i18n-ignore: console-only diagnosis, panel shows a localized reason
@@ -685,8 +756,14 @@ public class MvWorldService {
                 }
                 java.nio.file.Files.createDirectories(destination.getParent());
                 try (java.io.InputStream in = zip.getInputStream(entry)) {
-                    java.nio.file.Files.copy(in, destination,
-                            java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    try (var out = java.nio.file.Files.newOutputStream(destination, java.nio.file.StandardOpenOption.CREATE_NEW)) {
+                        byte[] buffer = new byte[8192]; int read;
+                        while ((read = in.read(buffer)) != -1) {
+                            totalBytes += read;
+                            if (totalBytes > maxBytes || Thread.currentThread().isInterrupted()) throw new java.io.IOException("Archive limit or interruption");
+                            out.write(buffer, 0, read);
+                        }
+                    }
                 }
                 written++;
             }

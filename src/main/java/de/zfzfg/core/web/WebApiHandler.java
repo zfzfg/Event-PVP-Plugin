@@ -40,9 +40,14 @@ public class WebApiHandler {
      * GET /api/config/get - Gibt die config.yml zurück
      */
     public Map<String, Object> getConfig() {
+        return main(() -> getConfigMain());
+    }
+
+    private Map<String, Object> getConfigMain() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);
         response.put("data", configManager.getConfigAsMap());
+        response.put("revision", configManager.revision("config.yml"));
         return response;
     }
 
@@ -50,13 +55,19 @@ public class WebApiHandler {
      * POST /api/config/save - Speichert die config.yml
      */
     public Map<String, Object> saveConfig(Map<String, Object> requestBody) {
+        return main(() -> saveConfigMain(requestBody));
+    }
+
+    private Map<String, Object> saveConfigMain(Map<String, Object> requestBody) {
         Map<String, Object> response = new LinkedHashMap<>();
         try {
             plugin.getLogger().info("[Web-API] Saving config.yml...");  // i18n-ignore: web API internal log
             @SuppressWarnings("unchecked")
             Map<String, Object> data = (Map<String, Object>) requestBody.get("data");
             if (data != null) {
-                configManager.saveConfigFromMap(data);
+                configManager.write("config.yml", data, requestBody.get("revision") instanceof String revision ? revision : null);
+                response.put("saved", true);
+                response.put("revision", configManager.revision("config.yml"));
                 plugin.getLogger().info("[Web-API] config.yml saved");  // i18n-ignore: web API internal log
                 applyGameplayReload(response);
                 response.put("success", true);
@@ -69,6 +80,9 @@ public class WebApiHandler {
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "[Web-API] Error saving config.yml", e);  // i18n-ignore: web API internal log
             response.put("success", false);
+            response.put("state", "failed");
+            if (e instanceof de.zfzfg.core.config.ConfigWriteCoordinator.Conflict) response.put("httpStatus", 409);
+            else if (e instanceof IllegalArgumentException || e instanceof ClassCastException) response.put("httpStatus", 400);
             response.put("message", "Error: " + e.getMessage());  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
         }
         return response;
@@ -80,9 +94,14 @@ public class WebApiHandler {
      * GET /api/worlds/get - Gibt die worlds.yml zurück
      */
     public Map<String, Object> getWorlds() {
+        return main(() -> getWorldsMain());
+    }
+
+    private Map<String, Object> getWorldsMain() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);
         response.put("data", configManager.getWorldsAsMap());
+        response.put("revision", configManager.revision("worlds.yml"));
         return response;
     }
 
@@ -90,13 +109,19 @@ public class WebApiHandler {
      * POST /api/worlds/save - Speichert die worlds.yml
      */
     public Map<String, Object> saveWorlds(Map<String, Object> requestBody) {
+        return main(() -> saveWorldsMain(requestBody));
+    }
+
+    private Map<String, Object> saveWorldsMain(Map<String, Object> requestBody) {
         Map<String, Object> response = new LinkedHashMap<>();
         try {
             plugin.getLogger().info("[Web-API] Saving worlds.yml...");  // i18n-ignore: web API internal log
             @SuppressWarnings("unchecked")
             Map<String, Object> data = (Map<String, Object>) requestBody.get("data");
             if (data != null) {
-                configManager.saveWorldsFromMap(data);
+                configManager.write("worlds.yml", data, requestBody.get("revision") instanceof String revision ? revision : null);
+                response.put("saved", true);
+                response.put("revision", configManager.revision("worlds.yml"));
                 plugin.getLogger().info("[Web-API] worlds.yml saved");  // i18n-ignore: web API internal log
                 applyGameplayReload(response);
                 response.put("success", true);
@@ -109,6 +134,9 @@ public class WebApiHandler {
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "[Web-API] Error saving worlds.yml", e);  // i18n-ignore: web API internal log
             response.put("success", false);
+            response.put("state", "failed");
+            if (e instanceof de.zfzfg.core.config.ConfigWriteCoordinator.Conflict) response.put("httpStatus", 409);
+            else if (e instanceof IllegalArgumentException || e instanceof ClassCastException) response.put("httpStatus", 400);
             response.put("message", "Error: " + e.getMessage());  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
         }
         return response;
@@ -124,6 +152,10 @@ public class WebApiHandler {
      * Angaben koennte das Panel den Legacy-Modus nicht ehrlich beschriften.</p>
      */
     public Map<String, Object> getInventoryStatus() {
+        return main(() -> getInventoryStatusMain());
+    }
+
+    private Map<String, Object> getInventoryStatusMain() {
         Map<String, Object> response = new LinkedHashMap<>();
         EventPlugin ep = eventPlugin();
         if (ep == null) {
@@ -234,8 +266,8 @@ public class WebApiHandler {
             plugin.getLogger().info("[Web-API] Inventory provider -> " + mode.id());  // i18n-ignore: web API internal log
             final String providerId = mode.id();
             onMainThread(() -> {
-                plugin.getConfig().set("settings.inventory-management.provider", providerId);
-                plugin.saveConfig();
+                de.zfzfg.core.config.ConfigWriteCoordinator.patch(new java.io.File(plugin.getDataFolder(), "config.yml").toPath(),
+                        latest -> latest.set("settings.inventory-management.provider", providerId));
                 plugin.reloadConfig();
                 ep.getCoreConfigManager().reloadAll();
                 ep.reloadInventoryManagement();
@@ -514,16 +546,20 @@ public class WebApiHandler {
                     ep.noteDeferredConfigReload();
                     return Boolean.TRUE;
                 }
-                ep.getConfigurationService().reloadAll();
+                var result = ep.getConfigurationService().reloadAll();
+                if (result != null && !result.success()) throw new IllegalStateException(String.join("; ", result.failures()));
                 return Boolean.FALSE;
             });
             if (Boolean.TRUE.equals(deferred)) {
                 response.put("reloadDeferred", true);
+                response.put("state", "deferred");
             } else {
                 response.put("reloaded", true);
+                response.put("state", "applied");
             }
         } catch (Exception e) {
-            plugin.getLogger().log(Level.WARNING, "[Web-API] Config reload after save failed", e);  // i18n-ignore: web API internal log
+            response.put("state", "failed");
+            throw new IllegalStateException("Saved, but reload failed", e);  // i18n-ignore: web API internal log
         }
     }
 
@@ -593,13 +629,23 @@ public class WebApiHandler {
      * <p>Nicht fuer Code verwenden, der selbst auf den Main-Thread wartet (etwa {@link #await}
      * auf Inventar-Futures) - das waere ein Deadlock.</p>
      */
+    private Map<String, Object> main(java.util.concurrent.Callable<Map<String, Object>> action) {
+        try { return onMainThread(action); }
+        catch (Exception ex) { return Map.of("success", false, "state", "failed", "message", String.valueOf(ex.getMessage())); }
+    }
+
     private <T> T onMainThread(java.util.concurrent.Callable<T> task) throws Exception {
         if (plugin.getServer().isPrimaryThread()) {
             return task.call();
         }
+        var future = plugin.getServer().getScheduler().callSyncMethod(plugin, task);
         try {
-            return plugin.getServer().getScheduler().callSyncMethod(plugin, task)
-                    .get(30, java.util.concurrent.TimeUnit.SECONDS);
+            return future.get(30, java.util.concurrent.TimeUnit.SECONDS);
+        } catch (java.util.concurrent.TimeoutException e) {
+            future.cancel(false);
+            throw new IllegalStateException("Timed out; refresh state before retrying", e);
+        } catch (InterruptedException e) {
+            future.cancel(false); Thread.currentThread().interrupt(); throw e;
         } catch (java.util.concurrent.ExecutionException e) {
             Throwable cause = e.getCause();
             if (cause instanceof Exception ex) {
@@ -958,9 +1004,14 @@ public class WebApiHandler {
      * GET /api/equipment/get - Gibt die equipment.yml zurück
      */
     public Map<String, Object> getEquipment() {
+        return main(() -> getEquipmentMain());
+    }
+
+    private Map<String, Object> getEquipmentMain() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);
         response.put("data", configManager.getEquipmentAsMap());
+        response.put("revision", configManager.revision("equipment.yml"));
         return response;
     }
 
@@ -968,13 +1019,19 @@ public class WebApiHandler {
      * POST /api/equipment/save - Speichert die equipment.yml
      */
     public Map<String, Object> saveEquipment(Map<String, Object> requestBody) {
+        return main(() -> saveEquipmentMain(requestBody));
+    }
+
+    private Map<String, Object> saveEquipmentMain(Map<String, Object> requestBody) {
         Map<String, Object> response = new LinkedHashMap<>();
         try {
             plugin.getLogger().info("[Web-API] Saving equipment.yml...");  // i18n-ignore: web API internal log
             @SuppressWarnings("unchecked")
             Map<String, Object> data = (Map<String, Object>) requestBody.get("data");
             if (data != null) {
-                configManager.saveEquipmentFromMap(data);
+                configManager.write("equipment.yml", data, requestBody.get("revision") instanceof String revision ? revision : null);
+                response.put("saved", true);
+                response.put("revision", configManager.revision("equipment.yml"));
                 plugin.getLogger().info("[Web-API] equipment.yml saved");  // i18n-ignore: web API internal log
                 applyGameplayReload(response);
                 response.put("success", true);
@@ -987,6 +1044,9 @@ public class WebApiHandler {
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "[Web-API] Error saving equipment.yml", e);  // i18n-ignore: web API internal log
             response.put("success", false);
+            response.put("state", "failed");
+            if (e instanceof de.zfzfg.core.config.ConfigWriteCoordinator.Conflict) response.put("httpStatus", 409);
+            else if (e instanceof IllegalArgumentException || e instanceof ClassCastException) response.put("httpStatus", 400);
             response.put("message", "Error: " + e.getMessage());  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
         }
         return response;
@@ -1021,9 +1081,14 @@ public class WebApiHandler {
      * GET /api/webconfig/get - Gibt die web-config.yml zurück
      */
     public Map<String, Object> getWebConfig() {
+        return main(() -> getWebConfigMain());
+    }
+
+    private Map<String, Object> getWebConfigMain() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);
         response.put("data", configManager.getWebConfigAsMap());
+        response.put("revision", configManager.revision("web-config.yml"));
         return response;
     }
 
@@ -1031,13 +1096,20 @@ public class WebApiHandler {
      * POST /api/webconfig/save - Speichert die web-config.yml
      */
     public Map<String, Object> saveWebConfig(Map<String, Object> requestBody) {
+        return main(() -> saveWebConfigMain(requestBody));
+    }
+
+    private Map<String, Object> saveWebConfigMain(Map<String, Object> requestBody) {
         Map<String, Object> response = new LinkedHashMap<>();
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> data = (Map<String, Object>) requestBody.get("data");
             if (data != null) {
-                configManager.saveWebConfigFromMap(data);
+                configManager.write("web-config.yml", data, requestBody.get("revision") instanceof String revision ? revision : null);
+                response.put("saved", true);
+                response.put("revision", configManager.revision("web-config.yml"));
                 response.put("success", true);
+                response.put("state", "saved");
                 response.put("message", "Web config saved");  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
             } else {
                 response.put("success", false);
@@ -1045,6 +1117,9 @@ public class WebApiHandler {
             }
         } catch (Exception e) {
             response.put("success", false);
+            response.put("state", "failed");
+            if (e instanceof de.zfzfg.core.config.ConfigWriteCoordinator.Conflict) response.put("httpStatus", 409);
+            else if (e instanceof IllegalArgumentException || e instanceof ClassCastException) response.put("httpStatus", 400);
             response.put("message", "Error: " + e.getMessage());  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
         }
         return response;
@@ -1066,7 +1141,11 @@ public class WebApiHandler {
                 if (eventPlugin.getConfigurationService() != null) {
                     // Arenen, Equipment und Events lesen Welten und Bukkit-Registries - das
                     // gehoert auf den Main-Thread, nicht in den HTTP-Thread.
-                    onMainThread(() -> { eventPlugin.getConfigurationService().reloadAll(); return null; });
+                    onMainThread(() -> {
+                        var result = eventPlugin.getConfigurationService().reloadAll();
+                        if (result != null && !result.success()) throw new IllegalStateException(String.join("; ", result.failures()));
+                        return null;
+                    });
                     plugin.getLogger().info("[Web-API] ConfigurationService.reloadAll() successful");  // i18n-ignore: web API internal log
                 } else {
                     // Fallback
@@ -1099,6 +1178,10 @@ public class WebApiHandler {
      */
     @SuppressWarnings("deprecation")
     public Map<String, Object> getStatus() {
+        return main(() -> getStatusMain());
+    }
+
+    private Map<String, Object> getStatusMain() {
         Map<String, Object> response = new LinkedHashMap<>();
         response.put("success", true);
         
@@ -1110,6 +1193,10 @@ public class WebApiHandler {
         status.put("maxPlayers", plugin.getServer().getMaxPlayers());
         status.put("tps", getTps());
         status.put("uptime", getUptime());
+        status.put("persistence", de.zfzfg.core.util.AtomicFiles.metrics());
+        EventPlugin ep = eventPlugin();
+        if (ep != null && ep.getPendingPayouts() != null) status.put("payouts", ep.getPendingPayouts().status());
+        if (ep != null && ep.getMvWorldService() != null) status.put("worldJobs", ep.getMvWorldService().status());
         
         // Aktuelle Sprache hinzufügen
         String currentLang = "en";
@@ -1129,6 +1216,10 @@ public class WebApiHandler {
      * GET /api/language/get - Gibt die aktuelle Sprache zurück
      */
     public Map<String, Object> getLanguage() {
+        return main(() -> getLanguageMain());
+    }
+
+    private Map<String, Object> getLanguageMain() {
         Map<String, Object> response = new LinkedHashMap<>();
         String currentLang = "en";
         if (plugin instanceof EventPlugin) {
@@ -1151,6 +1242,10 @@ public class WebApiHandler {
      * POST /api/language/save - Speichert die Sprache in der config.yml
      */
     public Map<String, Object> saveLanguage(Map<String, Object> requestBody) {
+        return main(() -> saveLanguageMain(requestBody));
+    }
+
+    private Map<String, Object> saveLanguageMain(Map<String, Object> requestBody) {
         Map<String, Object> response = new LinkedHashMap<>();
         try {
             String language = (String) requestBody.get("language");
@@ -1180,6 +1275,9 @@ public class WebApiHandler {
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "[Web-API] Error saving language", e);  // i18n-ignore: web API internal log
             response.put("success", false);
+            response.put("state", "failed");
+            if (e instanceof de.zfzfg.core.config.ConfigWriteCoordinator.Conflict) response.put("httpStatus", 409);
+            else if (e instanceof IllegalArgumentException || e instanceof ClassCastException) response.put("httpStatus", 400);
             response.put("message", "Error: " + e.getMessage());  // i18n-ignore: JSON-Feld, das das Panel nicht anzeigt (nur /api/reload wird gerendert)
         }
         return response;

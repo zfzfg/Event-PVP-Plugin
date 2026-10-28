@@ -276,16 +276,16 @@ public class CoreConfigManager {
             language = "en"; // Fallback auf Englisch
         }
         
-        config.set("settings.language", language);
+        final String selectedLanguage = language;
         
         try {
-            config.save(configFile);
+            config = ConfigWriteCoordinator.patch(configFile.toPath(), latest -> latest.set("settings.language", selectedLanguage));
             plugin.getLogger().info(getConsoleMsg("lang-changed", "lang", language));
             
             // Messages neu laden
             loadMessagesForLanguage(language);
         } catch (Exception e) {
-            plugin.getLogger().severe(getConsoleMsg("lang-save-error", "error", e.getMessage()));
+            throw new IllegalStateException("Language save failed", e);
         }
     }
 
@@ -300,13 +300,7 @@ public class CoreConfigManager {
      * Setzt settings.debug und speichert die config.yml.
      */
     public void setDebugSetting(String value) {
-        config.set("settings.debug", value);
-
-        try {
-            config.save(configFile);
-        } catch (Exception e) {
-            plugin.getLogger().warning("Could not save debug setting: " + e.getMessage()); // i18n-ignore: technical config save log
-        }
+        config = ConfigWriteCoordinator.patch(configFile.toPath(), latest -> latest.set("settings.debug", value));
     }
 
     /**

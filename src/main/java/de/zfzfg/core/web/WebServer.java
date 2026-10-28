@@ -29,7 +29,7 @@ import java.util.logging.Level;
  * Serves statische Dateien und REST API mit Token-Authentifizierung
  */
 public class WebServer {
-    
+
     private final EventPlugin plugin;
     private final WebConfigManager configManager;
     private final WebApiHandler apiHandler;
@@ -45,6 +45,16 @@ public class WebServer {
     /** Threads fuer die HTTP-Handler; mit null lief alles auf einem einzigen Thread. */
     private static final int HTTP_THREADS = 4;
     private ExecutorService httpExecutor;
+    private final java.util.concurrent.Semaphore apiSlots = new java.util.concurrent.Semaphore(2);
+    private final java.util.concurrent.ScheduledThreadPoolExecutor deadlines = new java.util.concurrent.ScheduledThreadPoolExecutor(1,
+            task -> { Thread thread = new Thread(task, "EventPVP-HttpDeadlines"); thread.setDaemon(true); return thread; });
+    private void register(String path, HttpHandler handler) {
+        deadlines.setRemoveOnCancelPolicy(true);
+        httpServer.createContext(path, exchange -> {
+            var timeout = deadlines.schedule(exchange::close, path.startsWith("/api/auth") ? 10 : 35, java.util.concurrent.TimeUnit.SECONDS);
+            try { handler.handle(exchange); } finally { timeout.cancel(false); exchange.close(); }
+        });
+    }
     /** public-url aus der web-config.yml, beim Start gelesen (fuer die Origin-Pruefung). */
     private volatile String publicUrl = "";
     /** security.allowed-ips, beim Start gelesen. Leer = alle IPs erlaubt. */
@@ -63,7 +73,7 @@ public class WebServer {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.textureService = new ResourcePackTextureService(plugin);
     }
-    
+
     // Konstruktor für Rückwärtskompatibilität
     public WebServer(EventPlugin plugin, WebConfigManager configManager, int port) {
         this(plugin, configManager, null, port, false);
@@ -87,72 +97,72 @@ public class WebServer {
                     configManager.getResourcePackMaxSizeMb());
 
             // Statische Dateien (Login-Seite braucht keine Auth)
-            httpServer.createContext("/", new StaticFileHandler(plugin, textureService.getOverrideDirectory(),
+            register("/", new StaticFileHandler(plugin, textureService.getOverrideDirectory(),
                     exchange -> WebRequestGuard.isIpAllowed(clientIp(exchange), allowedIps)));
-            
+
             // Auth Endpoints (brauchen keine Session)
-            httpServer.createContext("/api/auth/login", this::handleLoginRequest);
-            httpServer.createContext("/api/auth/logout", this::handleLogoutRequest);
-            httpServer.createContext("/api/auth/check", this::handleAuthCheckRequest);
-            httpServer.createContext("/api/auth/validate", this::handleAuthCheckRequest); // Alias für Frontend
-            
+            register("/api/auth/login", this::handleLoginRequest);
+            register("/api/auth/logout", this::handleLogoutRequest);
+            register("/api/auth/check", this::handleAuthCheckRequest);
+            register("/api/auth/validate", this::handleAuthCheckRequest); // Alias für Frontend
+
             // Geschützte API Endpoints
-            httpServer.createContext("/api/config/get", exchange -> handleProtectedApiRequest(exchange, 
+            register("/api/config/get", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getConfig()));
-            httpServer.createContext("/api/config/save", exchange -> handleProtectedApiPostRequest(exchange, 
+            register("/api/config/save", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.saveConfig(parseJson(body))));
-            
-            httpServer.createContext("/api/worlds/get", exchange -> handleProtectedApiRequest(exchange, 
+
+            register("/api/worlds/get", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getWorlds()));
-            httpServer.createContext("/api/worlds/save", exchange -> handleProtectedApiPostRequest(exchange, 
+            register("/api/worlds/save", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.saveWorlds(parseJson(body))));
-            
+
             // Multiverse-Weltverwaltung: Liste lesen, Welt erstellen, laden/entladen/loeschen,
             // Job-Status pollen (create/delete laufen zu lange fuer einen HTTP-Request).
-            httpServer.createContext("/api/mvworlds/list", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/mvworlds/list", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getMvWorlds()));
-            httpServer.createContext("/api/mvworlds/create", exchange -> handleProtectedApiPostRequest(exchange,
+            register("/api/mvworlds/create", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.createMvWorld(parseJson(body))));
-            httpServer.createContext("/api/mvworlds/action", exchange -> handleProtectedApiPostRequest(exchange,
+            register("/api/mvworlds/action", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.mvWorldAction(parseJson(body))));
-            httpServer.createContext("/api/mvworlds/job", exchange -> handleProtectedApiQueryRequest(exchange,
+            register("/api/mvworlds/job", exchange -> handleProtectedApiQueryRequest(exchange,
                 query -> apiHandler.getMvJob(query)));
-            httpServer.createContext("/api/mvworlds/backups", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/mvworlds/backups", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getMvBackups()));
-            httpServer.createContext("/api/mvworlds/backup-action", exchange -> handleProtectedApiPostRequest(exchange,
+            register("/api/mvworlds/backup-action", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.mvBackupAction(parseJson(body))));
 
             // Inventar-Verwaltung: Betriebsart umschalten, Backups einsehen und
             // wiederherstellen, offene Sitzungen des Guard-Journals ueberwachen.
-            httpServer.createContext("/api/inventories/status", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/inventories/status", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getInventoryStatus()));
-            httpServer.createContext("/api/inventories/provider", exchange -> handleProtectedApiPostRequest(exchange,
+            register("/api/inventories/provider", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.setInventoryProvider(parseJson(body))));
-            httpServer.createContext("/api/inventories/list", exchange -> handleProtectedApiQueryRequest(exchange,
+            register("/api/inventories/list", exchange -> handleProtectedApiQueryRequest(exchange,
                 query -> apiHandler.listInventories(query)));
-            httpServer.createContext("/api/inventories/get", exchange -> handleProtectedApiQueryRequest(exchange,
+            register("/api/inventories/get", exchange -> handleProtectedApiQueryRequest(exchange,
                 query -> apiHandler.getInventory(query)));
-            httpServer.createContext("/api/inventories/restore", exchange -> handleProtectedApiPostRequest(exchange,
+            register("/api/inventories/restore", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.restoreInventory(parseJson(body))));
-            httpServer.createContext("/api/inventories/delete", exchange -> handleProtectedApiPostRequest(exchange,
+            register("/api/inventories/delete", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.deleteInventory(parseJson(body))));
-            httpServer.createContext("/api/inventories/guard", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/inventories/guard", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getInventoryGuard()));
 
-            httpServer.createContext("/api/equipment/get", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/equipment/get", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getEquipment()));
-            httpServer.createContext("/api/equipment/save", exchange -> handleProtectedApiPostRequest(exchange, 
+            register("/api/equipment/save", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.saveEquipment(parseJson(body))));
-            
+
             // Item-Katalog des laufenden Servers: speist Item-Auswahl, Verzauberungslisten
             // und Stapelgroessen im Panel, damit dort nichts angeboten wird, was der Server
             // gar nicht kennt.
-            httpServer.createContext("/api/materials", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/materials", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getMaterials()));
 
             // Welche Items eine Textur aus dem Server-Resourcepack haben. Antwortet auch bei
             // abgeschalteter Funktion - dann eben mit einer leeren Liste.
-            httpServer.createContext("/api/textures/overrides", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/textures/overrides", exchange -> handleProtectedApiRequest(exchange,
                 () -> {
                     Map<String, Object> data = new HashMap<>();
                     data.put("materials", new java.util.ArrayList<>(textureService.getAvailableMaterials()));
@@ -162,19 +172,19 @@ public class WebServer {
                     return response;
                 }));
 
-            httpServer.createContext("/api/webconfig/get", exchange -> handleProtectedApiRequest(exchange,
+            register("/api/webconfig/get", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getWebConfig()));
-            httpServer.createContext("/api/webconfig/save", exchange -> handleProtectedApiPostRequest(exchange, 
+            register("/api/webconfig/save", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.saveWebConfig(parseJson(body))));
-            
-            httpServer.createContext("/api/reload", exchange -> handleProtectedApiPostRequest(exchange, 
+
+            register("/api/reload", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.reload()));
-            
-            httpServer.createContext("/api/status", exchange -> handleProtectedApiRequest(exchange, 
+
+            register("/api/status", exchange -> handleProtectedApiRequest(exchange,
                 () -> apiHandler.getStatus()));
-            
+
             // Language API (kein Auth nötig für GET, damit Login-Screen richtige Sprache zeigt)
-            httpServer.createContext("/api/language/get", exchange -> {
+            register("/api/language/get", exchange -> {
                 if (rejectForeignOrigin(exchange)) return;
                 if ("OPTIONS".equals(exchange.getRequestMethod())) {
                     sendCorsHeaders(exchange);
@@ -183,20 +193,21 @@ public class WebServer {
                 }
                 sendJsonResponse(exchange, 200, apiHandler.getLanguage());
             });
-            httpServer.createContext("/api/language/save", exchange -> handleProtectedApiPostRequest(exchange,
+            register("/api/language/save", exchange -> handleProtectedApiPostRequest(exchange,
                 body -> apiHandler.saveLanguage(parseJson(body))));
 
             // Mehrere Threads: ein langsamer Request (Weltliste, Backup-Restore) blockiert
             // sonst das ganze Panel. Daemon, damit ein haengender Handler den Shutdown nicht aufhaelt.
             AtomicInteger threadNo = new AtomicInteger();
-            httpExecutor = Executors.newFixedThreadPool(HTTP_THREADS, runnable -> {
+            httpExecutor = new java.util.concurrent.ThreadPoolExecutor(HTTP_THREADS, HTTP_THREADS, 0,
+                    java.util.concurrent.TimeUnit.SECONDS, new java.util.concurrent.ArrayBlockingQueue<>(64), runnable -> {
                 Thread thread = new Thread(runnable, "EventPVP-Web-" + threadNo.incrementAndGet());  // i18n-ignore: Thread-Name
                 thread.setDaemon(true);
                 return thread;
-            });
+            }, new java.util.concurrent.ThreadPoolExecutor.AbortPolicy());
             httpServer.setExecutor(httpExecutor);
             httpServer.start();
-            
+
             String authStatus = authEnabled ? "with authentication" : "without authentication";  // i18n-ignore: HTTP/HTML level; panel formats text from web/lang
             plugin.getLogger().log(Level.INFO, plugin.getConsoleMsg("web-started", "port", String.valueOf(port), "auth", authStatus));
         } catch (IOException e) {
@@ -208,6 +219,8 @@ public class WebServer {
      * Stoppt den HTTP-Server
      */
     public void stop() {
+        textureService.stop();
+        deadlines.shutdownNow();
         if (httpServer != null) {
             httpServer.stop(0);
             if (httpExecutor != null) {
@@ -219,7 +232,7 @@ public class WebServer {
     }
 
     // ============ Auth Endpoints ============
-    
+
     /**
      * Handlet Login-Request (Token -> Session)
      */
@@ -231,41 +244,43 @@ public class WebServer {
                 exchange.sendResponseHeaders(204, -1);
                 return;
             }
-            
+
             if (!"POST".equals(exchange.getRequestMethod())) {
                 sendError(exchange, 405, "Method Not Allowed");
                 return;
             }
 
             if (!checkRateLimit(exchange, loginRateLimiter)) return;
-            
+
             String body = readRequestBody(exchange);
             Map<String, Object> request = parseJson(body);
             String token = (String) request.get("token");
-            
+
             if (token == null || token.isEmpty()) {
                 sendJsonResponse(exchange, 400, Map.of("success", false, "error", "Token fehlt"));  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
                 return;
             }
-            
+
             String clientIp = exchange.getRemoteAddress().getAddress().getHostAddress();
             String sessionId = authManager.validateTokenAndCreateSession(token, clientIp);
-            
+
             if (sessionId == null) {
                 sendJsonResponse(exchange, 401, Map.of("success", false, "error", "Invalid or expired token"));  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
                 return;
             }
-            
+
             // Session-Cookie setzen
             WebAuthManager.AuthSession session = authManager.validateSession(sessionId, clientIp);
-            exchange.getResponseHeaders().add("Set-Cookie", "session=" + sessionId + "; Path=/; HttpOnly; SameSite=Strict");
-            
+            exchange.getResponseHeaders().add("Set-Cookie", "session=" + sessionId + "; Path=/; HttpOnly; SameSite=Strict" + (publicUrl.startsWith("https://") ? "; Secure" : ""));
+
             sendJsonResponse(exchange, 200, Map.of(
-                "success", true, 
+                "success", true,
                 "playerName", session.playerName,
                 "message", "Logged in successfully"  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
             ));
-            
+
+        } catch (IllegalArgumentException | ClassCastException e) {
+            sendError(exchange, 400, "Invalid request");
         } catch (WebRequestGuard.PayloadTooLargeException e) {
             sendError(exchange, 413, "Payload Too Large");
         } catch (Exception e) {
@@ -273,7 +288,7 @@ public class WebServer {
             sendError(exchange, 500, "Internal Server Error");
         }
     }
-    
+
     /**
      * Handlet Logout-Request
      */
@@ -285,22 +300,23 @@ public class WebServer {
                 exchange.sendResponseHeaders(204, -1);
                 return;
             }
-            
+
+            if (!"POST".equals(exchange.getRequestMethod())) { sendError(exchange, 405, "Method Not Allowed"); return; }
             String sessionId = getSessionIdFromCookie(exchange);
             if (sessionId != null) {
                 authManager.invalidateSession(sessionId);
             }
-            
+
             // Cookie löschen
             exchange.getResponseHeaders().add("Set-Cookie", "session=; Path=/; HttpOnly; Max-Age=0");
             sendJsonResponse(exchange, 200, Map.of("success", true, "message", "Logged out successfully"));  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
-            
+
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Logout Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
             sendError(exchange, 500, "Internal Server Error");
         }
     }
-    
+
     /**
      * Prüft ob Session gültig ist
      */
@@ -312,7 +328,7 @@ public class WebServer {
                 exchange.sendResponseHeaders(204, -1);
                 return;
             }
-            
+
             // Wenn Auth deaktiviert ist, immer OK zurückgeben
             if (!authEnabled) {
                 sendJsonResponse(exchange, 200, Map.of(
@@ -322,12 +338,12 @@ public class WebServer {
                 ));
                 return;
             }
-            
+
             String sessionId = getSessionIdFromCookie(exchange);
             String clientIp = exchange.getRemoteAddress().getAddress().getHostAddress();
-            
+
             WebAuthManager.AuthSession session = authManager.validateSession(sessionId, clientIp);
-            
+
             if (session != null) {
                 sendJsonResponse(exchange, 200, Map.of(
                     "authenticated", true,
@@ -340,19 +356,20 @@ public class WebServer {
                     "authRequired", true
                 ));
             }
-            
+
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Auth Check Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
             sendError(exchange, 500, "Internal Server Error");
         }
     }
-    
+
     // ============ Protected API Handlers ============
-    
+
     /**
      * Handlet GET-Requests für geschützte API (mit Auth-Check)
      */
     private void handleProtectedApiRequest(HttpExchange exchange, ResponseProvider provider) {
+        boolean acquired = false;
         try {
             if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
@@ -360,7 +377,7 @@ public class WebServer {
                 exchange.sendResponseHeaders(204, -1);
                 return;
             }
-            
+
             // Rate limit check
             if (!checkRateLimit(exchange, apiRateLimiter)) return;
 
@@ -374,22 +391,27 @@ public class WebServer {
                 sendError(exchange, 405, "Method Not Allowed");
                 return;
             }
-            
+
+            if (exchange.getRequestURI().getPath().startsWith("/api/mvworlds/")
+                    || exchange.getRequestURI().getPath().equals("/api/inventories/restore")) {
+                acquired = apiSlots.tryAcquire();
+                if (!acquired) { sendError(exchange, 503, "API busy; retry later"); return; }
+            }
             Object response = provider.get();
             String jsonResponse = gson.toJson(response);
-            
+
             exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
             sendCorsHeaders(exchange);
             byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(200, responseBytes.length);
-            
+
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(responseBytes);
             }
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
             sendError(exchange, 500, "Internal Server Error");
-        }
+        } finally { if (acquired) apiSlots.release(); }
     }
 
     /**
@@ -400,6 +422,7 @@ public class WebServer {
      * Query daher nicht lesen.</p>
      */
     private void handleProtectedApiQueryRequest(HttpExchange exchange, QueryRequestHandler handler) {
+        boolean acquired = false;
         try {
             if (rejectForeignOrigin(exchange)) return;
             if ("OPTIONS".equals(exchange.getRequestMethod())) {
@@ -420,11 +443,16 @@ public class WebServer {
                 return;
             }
 
+            if (exchange.getRequestURI().getPath().startsWith("/api/mvworlds/")
+                    || exchange.getRequestURI().getPath().equals("/api/inventories/restore")) {
+                acquired = apiSlots.tryAcquire();
+                if (!acquired) { sendError(exchange, 503, "API busy; retry later"); return; }
+            }
             sendJsonResponse(exchange, 200, handler.handle(parseQuery(exchange.getRequestURI().getRawQuery())));
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
             sendError(exchange, 500, "Internal Server Error");
-        }
+        } finally { if (acquired) apiSlots.release(); }
     }
 
     /**
@@ -457,6 +485,7 @@ public class WebServer {
      * Handlet POST-Requests für geschützte API (mit Auth-Check)
      */
     private void handleProtectedApiPostRequest(HttpExchange exchange, PostRequestHandler handler) {
+        boolean acquired = false;
         try {
             // Handle CORS preflight
             if (rejectForeignOrigin(exchange)) return;
@@ -465,7 +494,7 @@ public class WebServer {
                 exchange.sendResponseHeaders(204, -1);
                 return;
             }
-            
+
             // Rate limit check
             if (!checkRateLimit(exchange, apiRateLimiter)) return;
 
@@ -479,48 +508,56 @@ public class WebServer {
                 sendError(exchange, 405, "Method Not Allowed");
                 return;
             }
-            
+
+            if (exchange.getRequestURI().getPath().startsWith("/api/mvworlds/")
+                    || exchange.getRequestURI().getPath().equals("/api/inventories/restore")) {
+                acquired = apiSlots.tryAcquire();
+                if (!acquired) { sendError(exchange, 503, "API busy; retry later"); return; }
+            }
             String body = readRequestBody(exchange);
             Object response = handler.handle(body);
             String jsonResponse = gson.toJson(response);
-            
+
             exchange.getResponseHeaders().set("Content-Type", "application/json; charset=UTF-8");
             sendCorsHeaders(exchange);
             byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
-            exchange.sendResponseHeaders(200, responseBytes.length);
-            
+            int code = response instanceof Map<?, ?> map && map.get("httpStatus") instanceof Number n ? n.intValue() : 200;
+            exchange.sendResponseHeaders(code, responseBytes.length);
+
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(responseBytes);
             }
+        } catch (IllegalArgumentException | ClassCastException e) {
+            sendError(exchange, 400, "Invalid request");
         } catch (WebRequestGuard.PayloadTooLargeException e) {
             sendError(exchange, 413, "Payload Too Large");
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "API Error: " + e.getMessage(), e);  // i18n-ignore: technical web exception log
             sendError(exchange, 500, "Internal Server Error");
-        }
+        } finally { if (acquired) apiSlots.release(); }
     }
 
     // ============ Helper Methods ============
-    
+
     /**
      * Prüft ob Request authentifiziert ist
      */
     private boolean isAuthenticated(HttpExchange exchange) {
-        if (authManager == null) return true;
-        
+        if (authManager == null) return !authEnabled;
+
         String sessionId = getSessionIdFromCookie(exchange);
         String clientIp = exchange.getRemoteAddress().getAddress().getHostAddress();
-        
+
         return authManager.validateSession(sessionId, clientIp) != null;
     }
-    
+
     /**
      * Extrahiert Session-ID aus Cookie
      */
     private String getSessionIdFromCookie(HttpExchange exchange) {
         String cookieHeader = exchange.getRequestHeaders().getFirst("Cookie");
         if (cookieHeader == null) return null;
-        
+
         for (String cookie : cookieHeader.split(";")) {
             String trimmed = cookie.trim();
             if (trimmed.startsWith("session=")) {
@@ -529,7 +566,7 @@ public class WebServer {
         }
         return null;
     }
-    
+
     /**
      * Liest Request-Body
      */
@@ -558,7 +595,7 @@ public class WebServer {
         sendError(exchange, 403, "Forbidden");
         return true;
     }
-    
+
     /**
      * Sendet CORS Headers
      */
@@ -576,7 +613,7 @@ public class WebServer {
         exchange.getResponseHeaders().set("Access-Control-Allow-Credentials", "true");
         exchange.getResponseHeaders().set("Vary", "Origin");
     }
-    
+
     /**
      * Sendet JSON Response
      */
@@ -587,7 +624,7 @@ public class WebServer {
             sendCorsHeaders(exchange);
             byte[] responseBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(code, responseBytes.length);
-            
+
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(responseBytes);
             }
@@ -640,7 +677,11 @@ public class WebServer {
      */
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseJson(String json) {
-        return gson.fromJson(json, Map.class);
+        try {
+            com.google.gson.JsonElement parsed = com.google.gson.JsonParser.parseString(json);
+            if (!parsed.isJsonObject()) throw new IllegalArgumentException("Expected JSON object");
+            return gson.fromJson(parsed, Map.class);
+        } catch (com.google.gson.JsonParseException ex) { throw new IllegalArgumentException("Invalid JSON", ex); }
     }
 
     // ============ Functional Interfaces ============
@@ -739,11 +780,11 @@ public class WebServer {
 
             try {
                 byte[] content = is.readAllBytes();
-                
+
                 // Content-Type bestimmen
                 String extension = path.contains(".") ? path.substring(path.lastIndexOf('.') + 1) : "html";
                 String contentType = MIME_TYPES.getOrDefault(extension.toLowerCase(), "application/octet-stream");
-                
+
                 exchange.getResponseHeaders().set("Content-Type", contentType);
                 // Panel-Code und Sprachbundles duerfen nie aus dem Browser-Cache kommen:
                 // sonst zeigt das Panel nach einem Plugin-Update alte Texte bzw. rohe i18n-Keys.
@@ -754,7 +795,7 @@ public class WebServer {
                     exchange.getResponseHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate"); // i18n-ignore: HTTP-Header-Wert, erreicht nie einen Spieler
                 }
                 exchange.sendResponseHeaders(200, content.length);
-                
+
                 try (OutputStream os = exchange.getResponseBody()) {
                     os.write(content);
                 }
@@ -801,10 +842,10 @@ public class WebServer {
                 + "<h1 style='color:#f44336;'>Error " + code + "</h1>"  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
                 + "<p>" + message + "</p></body></html>";  // i18n-ignore: HTTP-/HTML-Ebene; das Panel formuliert seine Texte selbst aus web/lang
             byte[] bytes = errorHtml.getBytes(StandardCharsets.UTF_8);
-            
+
             exchange.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
             exchange.sendResponseHeaders(code, bytes.length);
-            
+
             try (OutputStream os = exchange.getResponseBody()) {
                 os.write(bytes);
             }

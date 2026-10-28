@@ -90,9 +90,9 @@ public class WebConfigManager {
      */
     public void saveWebConfig() {
         try {
-            webConfig.save(webConfigFile);
+            de.zfzfg.core.util.AtomicFiles.write(webConfigFile.toPath(), webConfig.saveToString());
         } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error saving web-config.yml", e);  // i18n-ignore: technical exception log
+            throw new IllegalStateException("Error saving web-config.yml", e);  // i18n-ignore: technical exception log
         }
     }
 
@@ -191,23 +191,64 @@ public class WebConfigManager {
         return finalUrl;
     }
 
+    private static YamlConfiguration readStrict(File file) {
+        try { var config = new YamlConfiguration(); config.load(file); return config; }
+        catch (Exception ex) { throw new IllegalStateException("Could not read " + file.getName(), ex); }
+    }
+    public String revision(String fileName) {
+        return de.zfzfg.core.config.ConfigWriteCoordinator.revision(new File(plugin.getDataFolder(), fileName).toPath());
+    }
+    public void write(String fileName, Map<String, Object> data, String expectedRevision) {
+        if (!Set.of("config.yml", "worlds.yml", "equipment.yml", "web-config.yml").contains(fileName))
+            throw new IllegalArgumentException("Unknown config file");
+        validateValues(data, 0);
+        YamlConfiguration proposed = new YamlConfiguration();
+        setConfigFromMap(proposed, data);
+        String required = switch (fileName) {
+            case "config.yml" -> "settings"; case "worlds.yml" -> "worlds";
+            case "equipment.yml" -> "equipment"; default -> "web";
+        };
+        // Custom IDs are retained; only structural roots and numeric safety are constrained.
+        if (!(data.get(required) instanceof Map)) throw new IllegalArgumentException("Invalid " + required + " section");
+        if (fileName.equals("config.yml")) {
+            for (String key : List.of("settings.checks.minimum-bet-money", "settings.checks.max-bet-money"))
+                if (proposed.getDouble(key, 0) < 0) throw new IllegalArgumentException("Negative wager limit");
+            if (proposed.getLong("settings.world-io.max-restore-bytes", 21_474_836_480L) <= 0
+                    || proposed.getInt("settings.world-io.max-restore-entries", 1_000_000) <= 0)
+                throw new IllegalArgumentException("Invalid restore limits");
+        }
+        if (fileName.equals("web-config.yml")) {
+            int port = proposed.getInt("web.port", 8085);
+            if (port < 1 || port > 65535) throw new IllegalArgumentException("Invalid web port");
+        }
+        de.zfzfg.core.config.ConfigWriteCoordinator.replace(new File(plugin.getDataFolder(), fileName).toPath(), proposed, expectedRevision);
+        if (fileName.equals("config.yml")) plugin.reloadConfig();
+        if (fileName.equals("web-config.yml")) webConfig = proposed;
+    }
+    private static void validateValues(Object value, int depth) {
+        if (depth > 32) throw new IllegalArgumentException("Configuration nesting too deep");
+        if (value instanceof Number n && !Double.isFinite(n.doubleValue())) throw new IllegalArgumentException("Invalid numeric value");
+        if (value instanceof Map<?, ?> map) for (var entry : map.entrySet()) {
+            if (!(entry.getKey() instanceof String key) || key.isBlank()) throw new IllegalArgumentException("Invalid configuration key");
+            validateValues(entry.getValue(), depth + 1);
+        }
+        else if (value instanceof List<?> list) for (Object child : list) validateValues(child, depth + 1);
+    }
+
     // ============ Config Operationen ============
 
     /**
      * Liest die config.yml und konvertiert zu Map
      */
     public Map<String, Object> getConfigAsMap() {
-        FileConfiguration config = plugin.getConfig();
-        return configSectionToMap(config);
+        return configSectionToMap(readStrict(new File(plugin.getDataFolder(), "config.yml")));
     }
 
     /**
      * Speichert die Config aus einer Map
      */
     public void saveConfigFromMap(Map<String, Object> data) {
-        FileConfiguration config = plugin.getConfig();
-        clearAndSetConfig(config, data);
-        plugin.saveConfig();
+        write("config.yml", data, null);
         plugin.reloadConfig();
     }
 
@@ -221,7 +262,7 @@ public class WebConfigManager {
         if (!worldsFile.exists()) {
             return new LinkedHashMap<>();
         }
-        FileConfiguration worldsConfig = YamlConfiguration.loadConfiguration(worldsFile);
+        FileConfiguration worldsConfig = readStrict(worldsFile);
         return configSectionToMap(worldsConfig);
     }
 
@@ -229,14 +270,7 @@ public class WebConfigManager {
      * Speichert die Worlds aus einer Map
      */
     public void saveWorldsFromMap(Map<String, Object> data) {
-        File worldsFile = new File(plugin.getDataFolder(), "worlds.yml");
-        FileConfiguration worldsConfig = new YamlConfiguration();
-        setConfigFromMap(worldsConfig, data);
-        try {
-            worldsConfig.save(worldsFile);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error saving worlds.yml", e);  // i18n-ignore: technical exception log
-        }
+        write("worlds.yml", data, null);
     }
 
     // ============ Equipment.yml Operationen ============
@@ -249,7 +283,7 @@ public class WebConfigManager {
         if (!equipmentFile.exists()) {
             return new LinkedHashMap<>();
         }
-        FileConfiguration equipmentConfig = YamlConfiguration.loadConfiguration(equipmentFile);
+        FileConfiguration equipmentConfig = readStrict(equipmentFile);
         return configSectionToMap(equipmentConfig);
     }
 
@@ -257,19 +291,7 @@ public class WebConfigManager {
      * Speichert die Equipment aus einer Map
      */
     public void saveEquipmentFromMap(Map<String, Object> data) {
-        File equipmentFile = new File(plugin.getDataFolder(), "equipment.yml");
-        plugin.getLogger().info("[Web-Config] Saving equipment.yml to: " + equipmentFile.getAbsolutePath());  // i18n-ignore: web config diagnostic trace
-        plugin.getLogger().info("[Web-Config] Data keys: " + data.keySet());  // i18n-ignore: web config diagnostic trace
-        
-        FileConfiguration equipmentConfig = new YamlConfiguration();
-        setConfigFromMap(equipmentConfig, data);
-        
-        try {
-            equipmentConfig.save(equipmentFile);
-            plugin.getLogger().info("[Web-Config] equipment.yml saved successfully!");  // i18n-ignore: web config diagnostic trace
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Error saving equipment.yml", e);  // i18n-ignore: technical exception log
-        }
+        write("equipment.yml", data, null);
     }
 
     // ============ Web-Config Operationen ============
@@ -285,8 +307,8 @@ public class WebConfigManager {
      * Speichert die Web-Config aus einer Map
      */
     public void saveWebConfigFromMap(Map<String, Object> data) {
-        setConfigFromMap(webConfig, data);
-        saveWebConfig();
+        write("web-config.yml", data, null);
+        webConfig = YamlConfiguration.loadConfiguration(webConfigFile);
     }
 
     // ============ Hilfsmethoden ============

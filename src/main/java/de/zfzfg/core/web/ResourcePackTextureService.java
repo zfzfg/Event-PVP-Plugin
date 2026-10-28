@@ -95,6 +95,9 @@ public final class ResourcePackTextureService {
 
     private final JavaPlugin plugin;
     private final File overrideDir;
+    private volatile boolean stopping;
+    private volatile org.bukkit.scheduler.BukkitTask task;
+    public void stop() { stopping = true; if (task != null) task.cancel(); }
 
     /** Materialnamen mit uebernommener Textur. Wird nur im Ganzen ersetzt, nie veraendert. */
     private volatile Set<String> available = Collections.emptySet();
@@ -134,7 +137,7 @@ public final class ResourcePackTextureService {
         }
         String packSha1 = readServerProperty("resource-pack-sha1");
 
-        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+        task = plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 importPack(packUrl.trim(), packSha1, Math.max(1, maxSizeMb));
             } catch (Throwable t) {
@@ -146,7 +149,7 @@ public final class ResourcePackTextureService {
 
     // ============ Import ============
 
-    private void importPack(String url, String sha1, int maxSizeMb) throws IOException {
+    private synchronized void importPack(String url, String sha1, int maxSizeMb) throws IOException {
         File stampFile = new File(overrideDir, ".pack-sha1");
         String stamp = sha1 == null || sha1.trim().isEmpty() ? url : sha1.trim();
 
@@ -162,11 +165,35 @@ public final class ResourcePackTextureService {
         try {
             long maxBytes = (long) maxSizeMb * 1024L * 1024L;
             download(url, archive, maxBytes);
-            Set<String> imported = extract(archive);
-
-            available = Collections.unmodifiableSet(imported);
-            Files.write(stampFile.toPath(), stamp.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            plugin.getLogger().info("[Textures] Imported " + imported.size() + " item textures from the server resource pack");  // i18n-ignore: technical texture log
+            if (sha1 != null && !sha1.isBlank()) {
+                try (InputStream input = Files.newInputStream(archive.toPath())) {
+                    var digest = java.security.MessageDigest.getInstance("SHA-1");
+                    byte[] bytes = new byte[8192]; int n;
+                    while ((n = input.read(bytes)) != -1) digest.update(bytes, 0, n);
+                    if (!java.util.HexFormat.of().formatHex(digest.digest()).equalsIgnoreCase(sha1.trim()))
+                        throw new IOException("Resource pack hash mismatch");
+                } catch (java.security.NoSuchAlgorithmException ex) { throw new IOException(ex); }
+            }
+            Files.createDirectories(overrideDir.toPath().getParent());
+            Path staged = Files.createTempDirectory(overrideDir.toPath().getParent(), "textures-stage-");
+            Path previous = null;
+            try {
+                Set<String> imported = extract(archive, staged);
+                Files.writeString(staged.resolve(".pack-sha1"), stamp);
+                if (stopping) throw new IOException("Texture import stopped");
+                if (overrideDir.exists()) {
+                    previous = Files.createTempDirectory(overrideDir.toPath().getParent(), "textures-previous-");
+                    Files.delete(previous);
+                    Files.move(overrideDir.toPath(), previous);
+                }
+                try { Files.move(staged, overrideDir.toPath()); }
+                catch (IOException ex) { if (previous != null) Files.move(previous, overrideDir.toPath()); throw ex; }
+                available = Collections.unmodifiableSet(imported);
+            } finally {
+                removeStaging(staged);
+                if (previous != null && Files.exists(overrideDir.toPath())) removeStaging(previous);
+            }
+            plugin.getLogger().info("[Textures] Imported " + available.size() + " item textures from the server resource pack");  // i18n-ignore: technical texture log
         } finally {
             // Nur ein Zwischenspeicher - beim Loeschen darf nichts schiefgehen.
             if (!archive.delete()) {
@@ -202,6 +229,7 @@ public final class ResourcePackTextureService {
                 int read;
                 while ((read = in.read(buffer)) != -1) {
                     written += read;
+                    if (stopping || Thread.currentThread().isInterrupted()) throw new IOException("Texture import stopped");
                     if (written > maxBytes) {
                         throw new IOException("Resource pack exceeds the configured size limit of " + maxBytes + " bytes");
                     }
@@ -218,21 +246,22 @@ public final class ResourcePackTextureService {
      *
      * @return Materialnamen, fuer die eine Textur geschrieben wurde
      */
-    private Set<String> extract(File archive) throws IOException {
-        if (!overrideDir.isDirectory() && !overrideDir.mkdirs()) {
-            throw new IOException("Cannot create texture override directory: " + overrideDir);
-        }
-        // Bestand aus einem frueheren Pack entfernen, sonst bleiben Texturen stehen, die
-        // das neue Pack gar nicht mehr ersetzt.
-        clearOverrideDirectory();
+    private static void removeStaging(Path path) throws IOException {
+        if (!Files.isDirectory(path, java.nio.file.LinkOption.NOFOLLOW_LINKS)) return;
+        try (var files = Files.list(path)) { for (Path child : files.toList()) Files.delete(child); }
+        Files.delete(path);
+    }
 
-        Path base = overrideDir.toPath().toRealPath();
+    private Set<String> extract(File archive, Path base) throws IOException {
+        long expanded = 0;
+        int count = 0;
         Set<String> imported = new HashSet<>();
 
         try (ZipFile zip = new ZipFile(archive)) {
             java.util.Enumeration<? extends ZipEntry> entries = zip.entries();
             while (entries.hasMoreElements()) {
                 ZipEntry entry = entries.nextElement();
+                if (++count > 100_000 || stopping || Thread.currentThread().isInterrupted()) throw new IOException("Texture entry limit or interruption");
                 if (entry.isDirectory()) {
                     continue;
                 }
@@ -263,11 +292,12 @@ public final class ResourcePackTextureService {
                 }
 
                 try (InputStream in = zip.getInputStream(entry)) {
-                    if (writeScaled(in, target)) {
+                    byte[] bytes = in.readNBytes(16 * 1024 * 1024 + 1);
+                    expanded += bytes.length;
+                    if (bytes.length > 16 * 1024 * 1024 || expanded > 256L * 1024 * 1024) throw new IOException("Expanded texture limit exceeded");
+                    if (writeScaled(new java.io.ByteArrayInputStream(bytes), target)) {
                         imported.add(material.name());
                     }
-                } catch (Exception e) {
-                    plugin.getLogger().warning("[Textures] Skipped unreadable texture " + name + ": " + e.getMessage());  // i18n-ignore: technical texture log
                 }
             }
         }
@@ -280,9 +310,18 @@ public final class ResourcePackTextureService {
      * @return {@code false}, wenn das Bild nicht lesbar war
      */
     private boolean writeScaled(InputStream in, Path target) throws IOException {
-        BufferedImage source = ImageIO.read(in);
-        if (source == null) {
-            return false;
+        BufferedImage source;
+        try (var input = ImageIO.createImageInputStream(in)) {
+            var readers = ImageIO.getImageReaders(input);
+            if (!readers.hasNext()) return false;
+            var reader = readers.next();
+            try {
+                reader.setInput(input, true, true);
+                int width = reader.getWidth(0), height = reader.getHeight(0);
+                if (width < 1 || height < 1 || width > 4096 || height > 4096 || (long) width * height > 16_777_216L)
+                    throw new IOException("Texture dimensions exceed limit");
+                source = reader.read(0);
+            } finally { reader.dispose(); }
         }
         BufferedImage scaled = new BufferedImage(ICON_SIZE, ICON_SIZE, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = scaled.createGraphics();

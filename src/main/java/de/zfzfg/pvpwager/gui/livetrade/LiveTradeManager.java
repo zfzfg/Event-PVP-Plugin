@@ -36,6 +36,7 @@ public class LiveTradeManager {
      * @return Die neue Session oder null wenn eine Session bereits existiert
      */
     public LiveTradeSession createSession(Player player1, Player player2) {
+        if (plugin.isStopping() || player1 == null || player2 == null || player1.equals(player2)) return null;
         // Prüfe ob einer der Spieler bereits in einer Session ist
         if (isInSession(player1)) {
             return null;
@@ -78,6 +79,7 @@ public class LiveTradeManager {
         // Player Mappings entfernen
         playerToSession.remove(session.getPlayer1().getPlayerId());
         playerToSession.remove(session.getPlayer2().getPlayerId());
+        plugin.flushDeferredConfigReload();
     }
     
     /**

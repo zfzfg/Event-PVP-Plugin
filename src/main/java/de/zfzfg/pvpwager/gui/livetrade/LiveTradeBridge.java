@@ -63,16 +63,19 @@ public class LiveTradeBridge {
 
         // Herausforderer-Einsätze vorbefüllen
         LiveTradePlayer tradePlayer1 = session.getPlayer1();
-        if (request.getWagerItems() != null) {
-            for (ItemStack item : request.getWagerItems()) {
-                if (item != null && !item.getType().isAir()) {
-                    tradePlayer1.addWagerItem(item);
-                }
+        try {
+            if (request.getWagerItems() != null) {
+                if (request.getWagerItems().size() > 12) { session.abort(); return false; }
+                var taken = de.zfzfg.core.reward.StakeService.take(sender.getInventory(), request.getWagerItems());
+                for (ItemStack item : taken) tradePlayer1.addWagerItem(item);
             }
+        } catch (IllegalArgumentException ex) {
+            session.abort();
+            return false;
         }
 
         if (request.getMoney() > 0) {
-            tradePlayer1.setWagerMoney(request.getMoney());
+            if (!tradePlayer1.setWagerMoney(request.getMoney())) { session.abort(); return false; }
         }
 
         // Arena & Equipment übernehmen
@@ -90,12 +93,15 @@ public class LiveTradeBridge {
             }
         }
 
-        // Ausstehende Anfrage aus dem CommandRequestManager entfernen
-        plugin.getCommandRequestManager().removeRequest(sender);
-
-        // GUI-Session für beide Spieler öffnen
-        session.start();
-        return true;
+        try {
+            session.start();
+            plugin.getCommandRequestManager().removeRequest(sender);
+            return true;
+        } catch (Exception ex) {
+            session.abort();
+            plugin.getLogger().log(java.util.logging.Level.WARNING, "Trade initialization failed", ex);
+            return false;
+        }
     }
 
     /**

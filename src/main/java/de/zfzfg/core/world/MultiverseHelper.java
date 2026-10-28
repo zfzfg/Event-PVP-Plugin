@@ -389,7 +389,13 @@ public class MultiverseHelper {
                 // Windows der haeufigste Grund fuer einen Lesefehler.
                 if (entryName.equalsIgnoreCase("session.lock")) continue;
                 zos.putNextEntry(new java.util.zip.ZipEntry(entryName));
-                java.nio.file.Files.copy(path, zos);
+                try (var input = java.nio.file.Files.newInputStream(path)) {
+                    byte[] buffer = new byte[8192]; int n;
+                    while ((n = input.read(buffer)) != -1) {
+                        if (Thread.currentThread().isInterrupted() || plugin.isStopping()) throw new java.io.IOException("Backup interrupted");
+                        zos.write(buffer, 0, n);
+                    }
+                }
                 zos.closeEntry();
                 written++;
             }

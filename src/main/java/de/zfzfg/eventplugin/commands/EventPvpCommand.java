@@ -129,6 +129,8 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
         String sub = args[0].toLowerCase();
         
         switch (sub) {
+            case "payouts":
+                return handlePayouts(sender, args);
             case "reload":
                 return handleReload(sender);
             case "version":
@@ -146,6 +148,28 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
                 showHelp(sender, label);
                 return true;
         }
+    }
+
+    private boolean handlePayouts(CommandSender sender, String[] args) {
+        if (!Permission.EVENTPVP_ADMIN.check(sender)) { sender.sendMessage(payoutMessage("denied")); return true; }
+        var store = plugin.getPendingPayouts();
+        if (store == null) { sender.sendMessage(payoutMessage("failed")); return true; }
+        if (args.length == 2 && args[1].equalsIgnoreCase("list")) {
+            var rows = store.describe(null);
+            if (rows.isEmpty()) sender.sendMessage(payoutMessage("empty"));
+            else rows.forEach(sender::sendMessage);
+        } else if (args.length == 3 && args[1].equalsIgnoreCase("inspect")) {
+            var rows = store.describe(args[2]);
+            if (rows.isEmpty()) sender.sendMessage(payoutMessage("empty")); else rows.forEach(sender::sendMessage);
+        } else if (args.length == 4 && args[1].equalsIgnoreCase("resolve")
+                && (args[3].equalsIgnoreCase("delivered") || args[3].equalsIgnoreCase("retry"))) {
+            boolean ok = store.resolve(args[2], args[3].equalsIgnoreCase("delivered"), sender.getName());
+            sender.sendMessage(payoutMessage(ok ? "resolved" : "failed"));
+        } else sender.sendMessage(payoutMessage("usage"));
+        return true;
+    }
+    private String payoutMessage(String key) {
+        return ColorUtil.color(plugin.getCoreConfigManager().getMessages().getString("messages.payouts." + key, key));
     }
 
     private String getHelpMsg(String key, String placeholder, String value) {
@@ -175,7 +199,8 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("general.no-permission")));
             return true;
         }
-        plugin.getConfigurationService().reloadAll();
+        var reload = plugin.getConfigurationService().reloadAll();
+        if (reload != null && !reload.success()) { sender.sendMessage(String.join("; ", reload.failures())); return true; }
         sender.sendMessage(ColorUtil.color(plugin.getConfigManager().getPrefix() + " " + plugin.getConfigManager().getMessage("reload-success")));
         return true;
     }
@@ -597,7 +622,12 @@ public class EventPvpCommand implements CommandExecutor, TabCompleter {
             }
             if (Permission.EVENTPVP_ADMIN.check(sender)) {
                 completions.add("rescue");
+                completions.add("payouts");
             }
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("payouts") && Permission.EVENTPVP_ADMIN.check(sender)) {
+            completions.addAll(List.of("list", "inspect", "resolve"));
+        } else if (args.length == 4 && args[0].equalsIgnoreCase("payouts") && Permission.EVENTPVP_ADMIN.check(sender)) {
+            completions.addAll(List.of("delivered", "retry"));
         } else if (args.length == 2 && args[0].equalsIgnoreCase("rescue")
                 && Permission.EVENTPVP_ADMIN.check(sender)) {
             completions.addAll(Arrays.asList("list", "clean", "help"));

@@ -503,7 +503,7 @@ public final class ConfigMigrationService {
         }
 
         try {
-            config.save(file);
+            de.zfzfg.core.util.AtomicFiles.write(file.toPath(), config.saveToString());
         } catch (IOException e) {
             logger.warning("Could not save " + file.getName() + " after migrating: "  // i18n-ignore: migration note, runs before language bundle load
                     + e.getMessage() + " - will retry on the next startup. A backup is at " + backup.getName());

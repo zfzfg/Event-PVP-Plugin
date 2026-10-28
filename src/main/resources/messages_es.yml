@@ -1,4 +1,10 @@
 messages:
+  payouts:
+    usage: '&e/eventpvp payouts list | inspect <id> | resolve <id> delivered|retry'
+    denied: '&cPermission denied.'
+    empty: '&7No matching payout records.'
+    resolved: '&aDecision saved. Retry is processed on the next safe delivery attempt.'
+    failed: '&cDecision could not be saved, or record does not require review.'
   equipment:
     debug-no-group: '&c[Debug] No hay un grupo de equipamiento válido configurado:
       &e{group}'

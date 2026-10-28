@@ -1,4 +1,5 @@
 {
+  "confirm.configChanged": "Configuration changed on the server. Reload the latest version? Unsaved local edits will be discarded.",
   "app.title": "Event-PVP Configurator",
   "common.enabled": "Enabled",
   "common.disabled": "Disabled",

@@ -79,7 +79,8 @@ public class EventManager {
     
     public void stopAllEvents() {
         for (EventSession session : activeSessions.values()) {
-            session.forceStop();
+            try { session.forceStop(); }
+            catch (Exception ex) { plugin.getLogger().log(java.util.logging.Level.SEVERE, "Event shutdown failed", ex); }
         }
         activeSessions.clear();
         playerToEventId.clear();

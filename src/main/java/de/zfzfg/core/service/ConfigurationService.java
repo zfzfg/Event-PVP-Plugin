@@ -37,39 +37,43 @@ public class ConfigurationService {
     /**
      * Lädt alle bekannten Konfigurationen neu und aktualisiert abhängige Manager.
      */
-    public void reloadAll() {
+    public record ReloadResult(java.util.List<String> failures) {
+        public boolean success() { return failures.isEmpty(); }
+    }
+    public ReloadResult reloadAll() {
+        java.util.List<String> failures = new java.util.ArrayList<>();
         // Core
         CoreConfigManager core = plugin.getCoreConfigManager();
         if (core != null) {
-            try { core.reloadAll(); } catch (Exception e) { plugin.getLogger().warning("Core reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+            try { core.reloadAll(); } catch (Exception e) { failures.add("Core reload error: " + e.getMessage()); plugin.getLogger().warning("Core reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         // Debug-Stufe aus der frisch geladenen config.yml uebernehmen
         de.zfzfg.core.monitoring.debug.DebugManager debug = plugin.getDebugManager();
         if (debug != null) {
-            try { debug.loadFromConfig(); } catch (Exception e) { plugin.getLogger().warning("Debug reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+            try { debug.loadFromConfig(); } catch (Exception e) { failures.add("Debug reload error: " + e.getMessage()); plugin.getLogger().warning("Debug reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         // Events
         ConfigManager events = plugin.getConfigManager();
         if (events != null) {
-            try { events.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("Event reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+            try { events.reloadConfigs(); } catch (Exception e) { failures.add("Event reload error: " + e.getMessage()); plugin.getLogger().warning("Event reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         // PvP
         de.zfzfg.pvpwager.managers.ConfigManager pvp = plugin.getPvpConfigManager();
         if (pvp != null) {
-            try { pvp.reloadConfigs(); } catch (Exception e) { plugin.getLogger().warning("PvP reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+            try { pvp.reloadConfigs(); } catch (Exception e) { failures.add("PvP reload error: " + e.getMessage()); plugin.getLogger().warning("PvP reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         // Dependent managers
         ArenaManager arenas = plugin.getArenaManager();
         if (arenas != null) {
-            try { arenas.reloadArenas(); } catch (Exception e) { plugin.getLogger().warning("Arenas reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+            try { arenas.reloadArenas(); } catch (Exception e) { failures.add("Arenas reload error: " + e.getMessage()); plugin.getLogger().warning("Arenas reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
         EquipmentManager equip = plugin.getEquipmentManager();
         if (equip != null) {
-            try { equip.reloadEquipmentSets(); } catch (Exception e) { plugin.getLogger().warning("Equipment reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+            try { equip.reloadEquipmentSets(); } catch (Exception e) { failures.add("Equipment reload error: " + e.getMessage()); plugin.getLogger().warning("Equipment reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
         }
 
         WorldStateManager worldState = plugin.getWorldStateManager();
@@ -78,8 +82,9 @@ public class ConfigurationService {
         }
 
         // Inventar-Verwaltung: haelt ihre Werte in final-Feldern, muss also neu gelesen werden.
-        try { plugin.reloadInventoryConfig(); } catch (Exception e) { plugin.getLogger().warning("Inventory config reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
+        try { plugin.reloadInventoryConfig(); } catch (Exception e) { failures.add("Inventory config reload error: " + e.getMessage()); plugin.getLogger().warning("Inventory config reload error: " + e.getMessage()); }  // i18n-ignore: technical exception log
 
-        plugin.getLogger().info(plugin.getConsoleMsg("core-reload-all"));
+        if (failures.isEmpty()) plugin.getLogger().info(plugin.getConsoleMsg("core-reload-all"));
+        return new ReloadResult(java.util.List.copyOf(failures));
     }
 }

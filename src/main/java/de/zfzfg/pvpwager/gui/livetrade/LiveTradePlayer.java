@@ -176,11 +176,10 @@ public class LiveTradePlayer {
     public void returnItems() {
         lock.lock();
         try {
-            for (ItemStack item : wagerItems) {
-                if (item != null && !item.getType().isAir()) {
-                    player.getInventory().addItem(item.clone());
-                }
-            }
+            var result = session.getPlugin().getPendingPayouts().submit(
+                    "trade-return:" + session.getSessionId() + ":" + playerId, playerId, player,
+                    getWagerItems(), 0, "trade-return", player.isOnline(), java.util.List.of(), java.util.List.of());
+            if (!result.accepted()) throw new IllegalStateException("Trade return could not be persisted");
             wagerItems.clear();
         } finally {
             lock.unlock();
@@ -205,7 +204,7 @@ public class LiveTradePlayer {
      * Setzt den Geld-Wager.
      */
     public boolean setWagerMoney(double amount) {
-        if (amount < 0) return false;
+        if (!Double.isFinite(amount) || amount < 0) return false;
         
         lock.lock();
         try {

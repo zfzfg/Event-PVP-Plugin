@@ -28,9 +28,12 @@ class RegenWorldServiceTest {
         RecordingBackend backend = new RecordingBackend();
         service.useBackendForTests(backend);
 
-        MvResult result = service.regenerateWorldNow("arena");
-
-        assertTrue(result.isSuccess());
+        try (var bukkit = org.mockito.Mockito.mockStatic(org.bukkit.Bukkit.class)) {
+            bukkit.when(org.bukkit.Bukkit::getWorlds).thenReturn(List.of());
+            bukkit.when(org.bukkit.Bukkit::getWorldContainer).thenReturn(new java.io.File(System.getProperty("java.io.tmpdir")));
+            MvResult result = service.regenerateWorldNow("arena");
+            assertTrue(result.isSuccess());
+        }
         assertEquals("arena", backend.regenerated);
         assertEquals(0, backend.commands, "weder mv regen noch mv confirm");
     }

@@ -105,6 +105,7 @@ public class EventPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        stopping = false;
         long t0 = System.nanoTime();
         instance = this;
 
@@ -555,6 +556,7 @@ public class EventPlugin extends JavaPlugin {
 
     /** Ob gerade ein Event oder ein Match laeuft, dessen Arena- und Kit-Objekte ein Reload nicht ersetzen darf. */
     public boolean hasLiveGameplay() {
+        if (liveTradeManager != null && liveTradeManager.getActiveSessionCount() > 0) return true;
         if (eventManager != null && !eventManager.getActiveSessions().isEmpty()) {
             return true;
         }
@@ -571,14 +573,15 @@ public class EventPlugin extends JavaPlugin {
      * Ist noch etwas aktiv, bleibt das Merker-Flag stehen.
      */
     public void flushDeferredConfigReload() {
-        if (!deferredConfigReload.get() || hasLiveGameplay()) {
+        if (stopping || !deferredConfigReload.get() || hasLiveGameplay()) {
             return;
         }
         if (!deferredConfigReload.compareAndSet(true, false)) {
             return;
         }
         if (configurationService != null) {
-            configurationService.reloadAll();
+            var result = configurationService.reloadAll();
+            if (!result.success()) deferredConfigReload.set(true);
         }
     }
 
@@ -629,91 +632,35 @@ public class EventPlugin extends JavaPlugin {
         logMviDiagnosis();
     }
 
+    private volatile boolean stopping;
+    public boolean isStopping() { return stopping; }
+
+    private void stopSafely(String name, Runnable cleanup) {
+        try { cleanup.run(); }
+        catch (Exception | LinkageError ex) { getLogger().log(java.util.logging.Level.SEVERE, "Shutdown step failed: " + name, ex); }
+    }
+
     @Override
     public void onDisable() {
-        long t0 = System.nanoTime();
-        
-        // Web-Server stoppen
-        if (webServer != null) {
-            webServer.stop();
-        }
-        
-        // Stoppe laufende Events
-        if (eventManager != null) {
-            eventManager.stopAllEvents();
-        }
-        if (autoEventManager != null) {
-            autoEventManager.stop();
-        }
-
-        // Stoppe laufende Matches (sofortige Rückgabe von Items/Geld)
-        if (matchManager != null) {
-            matchManager.stopAllMatches(true);
-            matchManager.cancelAllTasks();
-            matchManager.clearTransientState();
-        }
-        if (requestManager != null) {
-            requestManager.cleanup();
-        }
-        if (commandRequestManager != null) {
-            commandRequestManager.cleanup();
-        }
-        if (liveTradeManager != null) {
-            liveTradeManager.shutdown();
-        }
-        if (worldStateManager != null) {
-            worldStateManager.clearCache();
-        }
-        // Cleanup throttling map in PvP WorldChangeListener
-        if (pvpWorldChangeListener != null) {
-            try { pvpWorldChangeListener.cleanup(); } catch (Exception ignored) {}
-        }
-
-        if (externalDisplayRefreshTaskId != -1) {
-            Bukkit.getScheduler().cancelTask(externalDisplayRefreshTaskId);
-            externalDisplayRefreshTaskId = -1;
-        }
-        if (externalDisplayBridge != null) {
-            externalDisplayBridge.shutdown();
-        }
-
-        // Speichere Statistiken
-        try {
-            de.zfzfg.pvpwager.storage.PvpStatsStorage.save(this, statsManager.toMap());
-        } catch (Exception e) {
-            getLogger().warning(getConsoleMsg("stats-save-error", "error", e.getMessage()));
-        }
-        try {
-            de.zfzfg.eventplugin.storage.EventStatsStorage.save(this, eventStatsManager.toMap());
-        } catch (Exception e) {
-            getLogger().warning(getConsoleMsg("stats-save-error", "error", e.getMessage()));
-        }
-        // Das Aufraeumen alter Backups gehoert zu InventoryBackup; dessen eigenes Pruning
-        // wird hier bewusst nicht angestossen.
-
-        // Inventar-Journal sichern. Bewusst OHNE Wiederherstellungsversuch: im onDisable
-        // laeuft der Scheduler nicht mehr, ein Future wuerde nie komplettieren. Die offenen
-        // Sitzungen stehen auf der Platte und werden beim naechsten Start abgearbeitet.
-        if (inventorySessions != null) {
-            try {
-                inventorySessions.shutdown();
-            } catch (Exception e) {
-                getLogger().warning(getConsoleMsg("guard-save-failed", "error", String.valueOf(e.getMessage())));
-            }
-        }
-
-        // Rueckkehr-Positionen sichern. Ebenfalls ohne Aufraeumen: wer hier noch einen
-        // Eintrag hat, ist genau der Spieler, der ihn beim naechsten Start braucht.
-        if (returnLocations != null) {
-            try {
-                returnLocations.shutdown();
-            } catch (Exception e) {
-                getLogger().warning(getConsoleMsg("return-save-failed", "error", String.valueOf(e.getMessage())));
-            }
-        }
-
-        long disableMs = (System.nanoTime() - t0) / 1_000_000L;
-        getLogger().info(getConsoleMsg("plugin-disabled", "time", String.valueOf(disableMs)));
+        stopping = true;
+        stopSafely("web", () -> { if (webServer != null) webServer.stop(); });
+        stopSafely("world jobs", () -> { if (mvWorldService != null) mvWorldService.shutdown(); });
+        stopSafely("automatic events", () -> { if (autoEventManager != null) autoEventManager.stop(); });
+        stopSafely("events", () -> { if (eventManager != null) eventManager.stopAllEvents(); });
+        stopSafely("matches", () -> { if (matchManager != null) matchManager.stopAllMatches(true); });
+        stopSafely("match tasks", () -> { if (matchManager != null) { matchManager.cancelAllTasks(); matchManager.clearTransientState(); } });
+        stopSafely("requests", () -> { if (requestManager != null) requestManager.cleanup(); });
+        stopSafely("command requests", () -> { if (commandRequestManager != null) commandRequestManager.cleanup(); });
+        stopSafely("trades", () -> { if (liveTradeManager != null) liveTradeManager.shutdown(); });
+        stopSafely("world cache", () -> { if (worldStateManager != null) worldStateManager.clearCache(); });
+        stopSafely("world listener", () -> { if (pvpWorldChangeListener != null) pvpWorldChangeListener.cleanup(); });
+        stopSafely("display timer", () -> { if (externalDisplayRefreshTaskId != -1) Bukkit.getScheduler().cancelTask(externalDisplayRefreshTaskId); });
+        stopSafely("displays", () -> { if (externalDisplayBridge != null) externalDisplayBridge.shutdown(); });
+        stopSafely("pvp statistics", () -> { if (statsManager != null) de.zfzfg.pvpwager.storage.PvpStatsStorage.save(this, statsManager.toMap()); });
+        stopSafely("event statistics", () -> { if (eventStatsManager != null) de.zfzfg.eventplugin.storage.EventStatsStorage.save(this, eventStatsManager.toMap()); });
+        stopSafely("statistics writer", de.zfzfg.core.util.OrderedFileWriter::shutdown);
+        stopSafely("inventory journal", () -> { if (inventorySessions != null) inventorySessions.shutdown(); });
+        stopSafely("return locations", () -> { if (returnLocations != null) returnLocations.shutdown(); });
     }
 
     private void initCombatIntegration() {

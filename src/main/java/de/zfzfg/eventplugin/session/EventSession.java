@@ -58,6 +58,7 @@ public class EventSession {
     private int countdown;
     private int joinPhaseCountdown;
     private UUID winner;
+    private final UUID rewardRunId = UUID.randomUUID();
     private TeamManager.Team winningTeam;
     // Prevent duplicated scheduling of draw evaluation
     private boolean drawPending = false;
@@ -1536,6 +1537,8 @@ public class EventSession {
             giveRewards(player, rewards);
             return;
         }
+        if (!submitRewards(player, rewards, false))
+            throw new IllegalStateException("Could not persist event reward");
         pendingRewards.put(player.getUniqueId(), rewards);
         player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("rewards.pending")));
     }
@@ -1551,30 +1554,18 @@ public class EventSession {
      *                       vorher lagen sie nur in einer Map, die mit dem Event verschwand.
      */
     private void deliverPendingRewards(Player player, boolean inventoryReady) {
-        EventConfig.RewardConfig rewards = pendingRewards.remove(player.getUniqueId());
-        if (rewards == null) {
-            return;
-        }
-        de.zfzfg.core.inventory.InventorySessionManager sessions = plugin.getInventorySessions();
-        if (sessions != null && !sessions.claimPayout(player.getUniqueId())) {
-            return;
-        }
+        EventConfig.RewardConfig rewards = pendingRewards.get(player.getUniqueId());
+        if (rewards == null) return;
+        if (submitRewards(player, rewards, inventoryReady)) pendingRewards.remove(player.getUniqueId());
+    }
 
-        if (inventoryReady) {
-            giveRewards(player, rewards);
-            return;
-        }
-
-        // Items vormerken. Befehlsbelohnungen laufen weiter ueber die Konsole - sie treffen
-        // meist den Spielernamen und funktionieren auch offline; sie hier zurueckzuhalten
-        // wuerde mehr Faelle verschlechtern als verbessern.
-        if (rewards.areItemsEnabled()) {
-            plugin.getPendingPayouts().queue(player.getUniqueId(), parseRewardItems(rewards), 0,
-                    "event-reward:" + config.getId());  // i18n-ignore: internal payout reason id, not display text
-        }
-        if (rewards.areCommandsEnabled()) {
-            runRewardCommands(player, rewards);
-        }
+    private boolean submitRewards(Player player, EventConfig.RewardConfig rewards, boolean ready) {
+        var items = rewards.areItemsEnabled() ? parseRewardItems(rewards) : java.util.List.<ItemStack>of();
+        var commands = rewards.areCommandsEnabled() ? rewards.getCommands().stream()
+                .map(c -> c.replace("{player}", player.getName())).toList() : java.util.List.<String>of();
+        return plugin.getPendingPayouts().submit("event:" + rewardRunId + ":" + player.getUniqueId(),
+                player.getUniqueId(), player, items, 0, "event-reward:" + config.getId(), ready,
+                java.util.List.of(), commands).accepted();
     }
 
     /**
@@ -1610,18 +1601,7 @@ public class EventSession {
 
     private void giveRewards(Player player, EventConfig.RewardConfig rewards) {
         if (rewards == null) return;
-
-        if (rewards.areItemsEnabled()) {
-            // Ueber giveItems statt addItem: was nicht ins Inventar passt, faellt dem
-            // Spieler vor die Fuesse, statt stillschweigend zu verschwinden.
-            de.zfzfg.pvpwager.utils.InventoryUtil.giveItems(player, parseRewardItems(rewards));
-            player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("rewards.item-received")));
-        }
-
-        if (rewards.areCommandsEnabled()) {
-            runRewardCommands(player, rewards);
-            player.sendMessage(ColorUtil.color(plugin.getConfigManager().getMessage("rewards.command-executed")));
-        }
+        if (!submitRewards(player, rewards, true)) pendingRewards.put(player.getUniqueId(), rewards);
     }
     
     public void stopEvent() {

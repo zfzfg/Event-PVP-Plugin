@@ -926,3 +926,6 @@ Use this to track performance changes after configuration updates.
 ---
 
 For questions, feature requests, or custom arena configurations, contact the plugin author.
+
+
+Implementation and verification notes: [Hardening 1.1.2](docs/HARDENING_1.1.2.md).

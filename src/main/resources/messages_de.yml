@@ -1,4 +1,10 @@
 messages:
+  payouts:
+    usage: '&e/eventpvp payouts list | inspect <id> | resolve <id> delivered|retry'
+    denied: '&cKeine Berechtigung.'
+    empty: '&7Keine passenden Auszahlungsvorgaenge.'
+    resolved: '&aEntscheidung gespeichert. Wiederholung beim naechsten sicheren Zustellversuch.'
+    failed: '&cSpeichern fehlgeschlagen oder Vorgang benoetigt keine Pruefung.'
   equipment:
     debug-no-group: '&c[Debug] Keine gültige Ausrüstungsgruppe konfiguriert: &e{group}'
     debug-retrying: '&7[Debug] Ausrüstung nicht vollständig angewendet, neuer Versuch...'

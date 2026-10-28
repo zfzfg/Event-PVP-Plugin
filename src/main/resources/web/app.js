@@ -1,3 +1,32 @@
+// Dynamic callbacks retain data as values, never as JavaScript inside HTML attributes.
+const PANEL_ACTIONS = new Map();
+let panelActionId = 0;
+function eventAttrs(type, callback) {
+    const id = String(++panelActionId);
+    PANEL_ACTIONS.set(id, callback);
+    return `data-panel-${type}="${id}"`;
+}
+for (const type of ['click', 'change', 'input', 'keydown']) {
+    document.addEventListener(type, event => {
+        const element = event.target.closest(`[data-panel-${type}]`);
+        if (!element) return;
+        const callback = PANEL_ACTIONS.get(element.getAttribute(`data-panel-${type}`));
+        if (callback) callback.call(element, event);
+    });
+}
+new MutationObserver(records => {
+    for (const record of records) for (const node of record.removedNodes) {
+        if (node.nodeType !== 1 || node.isConnected) continue;
+        for (const element of [node, ...node.querySelectorAll('*')]) {
+            for (const type of ['click', 'change', 'input', 'keydown']) {
+                const id = element.getAttribute(`data-panel-${type}`);
+                if (id) PANEL_ACTIONS.delete(id);
+            }
+        }
+    }
+}).observe(document.documentElement, { childList: true, subtree: true });
+const CONFIG_REVISIONS = {};
+
 // ============================================
 // Event-PVP Web Konfigurator - Hauptscript
 // ============================================
@@ -713,7 +742,7 @@ function updateUserDisplay() {
     if (userDisplay && currentPlayer) {
         userDisplay.innerHTML = `
             <span class="user-name">👤 ${escapeHtml(currentPlayer)}</span>
-            <button class="logout-btn" onclick="performLogout()" title="${i18n.t('nav.logout')}">
+            <button class="logout-btn" onclick="performLogout()" title="${escapeAttr(i18n.t('nav.logout'))}">
                 <span>🚪</span>
             </button>
         `;
@@ -816,6 +845,7 @@ async function loadAllConfigs() {
         // API gibt {success: true, data: {...}} zurück - wir brauchen data
         if (configResp && configResp.ok) {
             const configJson = await configResp.json();
+            CONFIG_REVISIONS.settings = configJson.revision;
             CONFIG_STATE.config = configJson.data || configJson;
             console.log('Config loaded:', Object.keys(CONFIG_STATE.config));
         } else {
@@ -824,6 +854,7 @@ async function loadAllConfigs() {
         
         if (worldsResp && worldsResp.ok) {
             const worldsJson = await worldsResp.json();
+            CONFIG_REVISIONS.worlds = worldsJson.revision;
             CONFIG_STATE.worlds = worldsJson.data || worldsJson;
             console.log('Worlds loaded:', Object.keys(CONFIG_STATE.worlds));
         } else {
@@ -832,6 +863,7 @@ async function loadAllConfigs() {
         
         if (equipResp && equipResp.ok) {
             const equipJson = await equipResp.json();
+            CONFIG_REVISIONS.equipment = equipJson.revision;
             CONFIG_STATE.equipment = equipJson.data || equipJson;
             console.log('Equipment loaded:', Object.keys(CONFIG_STATE.equipment));
         } else {
@@ -840,6 +872,7 @@ async function loadAllConfigs() {
         
         if (webResp && webResp.ok) {
             const webJson = await webResp.json();
+            CONFIG_REVISIONS.web = webJson.revision;
             CONFIG_STATE.webConfig = webJson.data || webJson;
             console.log('WebConfig loaded:', Object.keys(CONFIG_STATE.webConfig));
         } else {
@@ -932,14 +965,18 @@ function saveRequest(category, url, data) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ data })
+        body: JSON.stringify({ data, revision: CONFIG_REVISIONS[category] })
     }).then(async (response) => {
         let body = {};
         try { body = await response.json(); } catch (e) { /* Antwort ohne JSON */ }
         console.log('[Save]', category, 'response:', response.status);
+        if (body.revision) CONFIG_REVISIONS[category] = body.revision;
+        if (response.status === 409) {
+            if (confirm(i18n.t('confirm.configChanged'))) loadAllConfigs();
+        }
         return {
             category,
-            ok: response.ok,
+            ok: response.ok && body.success !== false,
             status: response.status,
             reloadDeferred: body.reloadDeferred === true
         };
@@ -994,12 +1031,7 @@ async function saveAllConfigs() {
             console.log('[Save] Speichere web-config.yml...');
             savedCategories.push('web');
             promises.push(
-                fetch('/api/webconfig/save', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ data: CONFIG_STATE.webConfig })
-                }).then(r => { console.log('[Save] webconfig response:', r.status); return { category: 'web', ok: r.ok, status: r.status }; })
+                saveRequest('web', '/api/webconfig/save', CONFIG_STATE.webConfig)
             );
         }
 
@@ -1460,12 +1492,12 @@ function updateAutoEventsSelectionList() {
                 <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--surface); border-radius: 6px; border: 1px solid var(--border);">
                         <span style="color: var(--primary); font-weight: 700; min-width: 2rem; font-size: 1rem;">#${index + 1}</span>
-                        <span style="flex: 1; font-weight: 500;">${displayName}</span>
-                        ${showUpArrow ? `<button class="btn btn-icon btn-secondary" onclick="moveAutoEventUp('${eventId}')" title="${i18n.t('button.moveUp')}"><i class="fas fa-arrow-up"></i></button>` : ''}
-                        ${showDownArrow ? `<button class="btn btn-icon btn-secondary" onclick="moveAutoEventDown('${eventId}')" title="${i18n.t('button.moveDown')}"><i class="fas fa-arrow-down"></i></button>` : ''}
-                        <button class="btn btn-icon btn-danger" onclick="removeAutoEventSelection('${eventId}')" title="${i18n.t('button.remove')}"><i class="fas fa-times"></i></button>
+                        <span style="flex: 1; font-weight: 500;">${escapeHtml(displayName)}</span>
+                        ${showUpArrow ? `<button class="btn btn-icon btn-secondary" ${eventAttrs("click", function(event) { moveAutoEventUp(eventId); })} title="${escapeAttr(i18n.t('button.moveUp'))}"><i class="fas fa-arrow-up"></i></button>` : ''}
+                        ${showDownArrow ? `<button class="btn btn-icon btn-secondary" ${eventAttrs("click", function(event) { moveAutoEventDown(eventId); })} title="${escapeAttr(i18n.t('button.moveDown'))}"><i class="fas fa-arrow-down"></i></button>` : ''}
+                        <button class="btn btn-icon btn-danger" ${eventAttrs("click", function(event) { removeAutoEventSelection(eventId); })} title="${escapeAttr(i18n.t('button.remove'))}"><i class="fas fa-times"></i></button>
                     </div>
-                    ${nextEvent ? `<div style="padding-left: 1rem; color: var(--text-muted); font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fas fa-arrow-down"></i> ${i18n.t('settings.autoEventsThen')}: ${nextEvent}</div>` : ''}
+                    ${nextEvent ? `<div style="padding-left: 1rem; color: var(--text-muted); font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fas fa-arrow-down"></i> ${i18n.t('settings.autoEventsThen')}: ${escapeHtml(nextEvent)}</div>` : ''}
                 </div>
             `;
         } else {
@@ -1473,8 +1505,8 @@ function updateAutoEventsSelectionList() {
             html += `
                 <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--surface); border-radius: 6px; border: 1px solid var(--border);">
                     <i class="fas fa-random" style="color: var(--primary); min-width: 1.5rem;"></i>
-                    <span style="flex: 1;">${displayName}</span>
-                    <button class="btn btn-icon btn-danger" onclick="removeAutoEventSelection('${eventId}')" title="${i18n.t('button.remove')}"><i class="fas fa-times"></i></button>
+                    <span style="flex: 1;">${escapeHtml(displayName)}</span>
+                    <button class="btn btn-icon btn-danger" ${eventAttrs("click", function(event) { removeAutoEventSelection(eventId); })} title="${escapeAttr(i18n.t('button.remove'))}"><i class="fas fa-times"></i></button>
                 </div>
             `;
         }
@@ -1559,34 +1591,34 @@ function createEventCard(eventId, config) {
             <div class="card-header">
                 <div class="card-title">
                     <i class="fas fa-calendar-alt" style="color: ${isEnabled ? 'var(--primary)' : 'var(--text-muted)'};"></i>
-                    <span>${config['display-name'] || eventId}</span>
+                    <span>${escapeHtml(config['display-name'] || eventId)}</span>
                     ${isEnabled ? `<span class="badge badge-success">${i18n.t('card.active')}</span>` : `<span class="badge badge-warning">${i18n.t('card.inactive')}</span>`}
                 </div>
                 <div class="card-actions">
-                    <button class="btn btn-secondary btn-icon" onclick="editEvent('${eventId}')" title="${i18n.t('button.edit')}">
+                    <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { editEvent(eventId); })} title="${escapeAttr(i18n.t('button.edit'))}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger btn-icon" onclick="deleteEvent('${eventId}')" title="${i18n.t('button.delete')}">
+                    <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteEvent(eventId); })} title="${escapeAttr(i18n.t('button.delete'))}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </div>
             <div class="card-body">
                 <div style="margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${eventId}</code>
+                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${escapeHtml(eventId)}</code>
                     <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
                         /event ${command}
                     </span>
                 </div>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">${config.description || i18n.t('card.noDescription')}</p>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">${escapeHtml(config.description || i18n.t('card.noDescription'))}</p>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
                     <div>
                         <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.players')}</span>
-                        <span style="font-size: 0.9rem;">${minPlayers} - ${maxPlayers}</span>
+                        <span style="font-size: 0.9rem;">${escapeHtml(minPlayers)} - ${escapeHtml(maxPlayers)}</span>
                     </div>
                     <div>
                         <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.countdown')}</span>
-                        <span style="font-size: 0.9rem;">${countdown}s</span>
+                        <span style="font-size: 0.9rem;">${escapeHtml(countdown)}s</span>
                     </div>
                     <div>
                         <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.mode')}</span>
@@ -1601,8 +1633,8 @@ function createEventCard(eventId, config) {
                 </div>
                 ${config.worlds ? `
                 <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); display: flex; gap: 1rem;">
-                    ${config.worlds['lobby-world'] ? `<span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-door-open"></i> ${config.worlds['lobby-world']}</span>` : ''}
-                    ${config.worlds['event-world'] ? `<span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-globe"></i> ${config.worlds['event-world']}</span>` : ''}
+                    ${config.worlds['lobby-world'] ? `<span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-door-open"></i> ${escapeHtml(config.worlds['lobby-world'])}</span>` : ''}
+                    ${config.worlds['event-world'] ? `<span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-globe"></i> ${escapeHtml(config.worlds['event-world'])}</span>` : ''}
                 </div>
                 ` : ''}
             </div>
@@ -1687,13 +1719,13 @@ function createWorldCard(worldId, config) {
     let mvActions = '';
     if (MV_STATE.loaded) {
         if (mvStatus.state === 'loaded' && MV_STATE.available) {
-            mvActions = `<button class="btn btn-secondary btn-sm" onclick="mvUnloadWorld('${escapeAttr(worldId)}')">
+            mvActions = `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvUnloadWorld(worldId); })}>
                             <i class="fas fa-eject"></i> ${i18n.t('button.mvUnload')}</button>`;
         } else if (mvStatus.state === 'unloaded' && MV_STATE.available) {
-            mvActions = `<button class="btn btn-secondary btn-sm" onclick="mvLoadWorld('${escapeAttr(worldId)}')">
+            mvActions = `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvLoadWorld(worldId); })}>
                             <i class="fas fa-play"></i> ${i18n.t('button.mvLoad')}</button>`;
         } else if (mvStatus.state === 'placeholder' && MV_STATE.available) {
-            mvActions = `<button class="btn btn-secondary btn-sm" onclick="editWorld('${escapeAttr(worldId)}', 'multiverse')">
+            mvActions = `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { editWorld(worldId, 'multiverse'); })}>
                             <i class="fas fa-wand-magic-sparkles"></i> ${i18n.t('button.mvCreateWorld')}</button>`;
         }
     }
@@ -1703,25 +1735,25 @@ function createWorldCard(worldId, config) {
             <div class="card-header">
                 <div class="card-title">
                     <i class="fas fa-globe" style="color: ${isPvPEnabled ? 'var(--error)' : 'var(--info)'};"></i>
-                    <span>${config['display-name'] || worldId}</span>
+                    <span>${escapeHtml(config['display-name'] || worldId)}</span>
                     ${isPvPEnabled ? `<span class="badge badge-error">${i18n.t('card.pvpActive')}</span>` : `<span class="badge badge-info">${i18n.t('card.eventWorld')}</span>`}
-                    <span class="badge ${mvStatus.badge}" title="${i18n.t('card.mvStatusHint')}">
+                    <span class="badge ${mvStatus.badge}" title="${escapeAttr(i18n.t('card.mvStatusHint'))}">
                         <i class="fas ${mvStatus.icon}"></i> ${mvStatus.label}
                     </span>
                 </div>
                 <div class="card-actions">
                     ${mvActions}
-                    <button class="btn btn-secondary btn-icon" onclick="editWorld('${escapeAttr(worldId)}')" title="${i18n.t('button.edit')}">
+                    <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { editWorld(worldId); })} title="${escapeAttr(i18n.t('button.edit'))}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-danger btn-icon" onclick="deleteWorld('${escapeAttr(worldId)}')" title="${i18n.t('button.delete')}">
+                    <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteWorld(worldId); })} title="${escapeAttr(i18n.t('button.delete'))}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
             </div>
             <div class="card-body">
                 <div style="margin-bottom: 0.5rem; color: var(--text-muted); font-size: 0.85rem;">
-                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px;">${worldId}</code>
+                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px;">${escapeHtml(worldId)}</code>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
                     <div>
@@ -1744,13 +1776,13 @@ function createWorldCard(worldId, config) {
                     </div>
                     <div>
                         <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.spawnType')}</span>
-                        <span>${spawnType}</span>
+                        <span>${escapeHtml(spawnType)}</span>
                     </div>
                 </div>
                 ${config['clone-source-world'] ? `
                 <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
                     <span style="color: var(--text-muted); font-size: 0.75rem;">${i18n.t('card.templateWorld')}:</span>
-                    <code style="margin-left: 0.5rem;">${config['clone-source-world']}</code>
+                    <code style="margin-left: 0.5rem;">${escapeHtml(config['clone-source-world'])}</code>
                 </div>
                 ` : ''}
             </div>
@@ -2219,7 +2251,7 @@ async function loadInventoryGuard() {
                 const phaseClass = session.phase === 'orphaned' ? 'badge-error' : 'badge-warning';
                 return `<div class="form-group" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--border);">
                     <span class="badge ${phaseClass}">${escapeHtml(i18n.t('inventory.phase.' + session.phase))}</span>
-                    <strong style="cursor:pointer;color:var(--primary);" onclick="selectPlayerForInventory('${escapeAttr(session.playerName || session.player)}')">${escapeHtml(session.playerName || session.player)}</strong>
+                    <strong style="cursor:pointer;color:var(--primary);" ${eventAttrs("click", function(event) { selectPlayerForInventory(session.playerName || session.player); })}>${escapeHtml(session.playerName || session.player)}</strong>
                     <span class="form-label-hint">${escapeHtml(i18n.t('inventory.context.' + session.context))}
                         &middot; ${escapeHtml(session.backupId || i18n.t('inventory.noBackup'))}</span>
                     ${session.backupDamaged ? `<span class="badge badge-error">${escapeHtml(i18n.t('inventory.backupDamaged'))}</span>` : ''}
@@ -2236,7 +2268,7 @@ async function loadInventoryGuard() {
             html += returnLocations.map(entry => `
                 <div class="form-group" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--border);">
                     <span class="badge ${entry.online ? 'badge-warning' : ''}">${escapeHtml(entry.world || '?')}</span>
-                    <strong style="cursor:pointer;color:var(--primary);" onclick="selectPlayerForInventory('${escapeAttr(entry.playerName || entry.player)}')">${escapeHtml(entry.playerName || entry.player)}</strong>
+                    <strong style="cursor:pointer;color:var(--primary);" ${eventAttrs("click", function(event) { selectPlayerForInventory(entry.playerName || entry.player); })}>${escapeHtml(entry.playerName || entry.player)}</strong>
                     <span class="form-label-hint">
                         ${escapeHtml(formatReturnCoords(entry))}
                     </span>
@@ -2271,7 +2303,7 @@ function refreshOnlinePlayersList(players) {
 
     quickBar.style.display = 'flex';
     pillsContainer.innerHTML = players.slice(0, 10).map(p => `
-        <div class="inv-player-pill" onclick="selectPlayerForInventory('${escapeAttr(p)}')">
+        <div class="inv-player-pill" ${eventAttrs("click", function(event) { selectPlayerForInventory(p); })}>
             <span class="online-dot"></span>
             <span>${escapeHtml(p)}</span>
         </div>
@@ -2420,7 +2452,7 @@ function renderInventoryBackupList() {
         const badgeClass = typeCategory === 'event' ? 'badge-primary' : (typeCategory === 'pvp_match' ? 'badge-info' : 'badge-secondary');
 
         return `
-            <div class="inv-backup-item ${isActive ? 'active' : ''}" onclick="previewInventoryBackup('${escapeAttr(backup.id)}')">
+            <div class="inv-backup-item ${isActive ? 'active' : ''}" ${eventAttrs("click", function(event) { previewInventoryBackup(backup.id); })}>
                 <div class="inv-backup-header">
                     <span class="badge ${badgeClass}">${escapeHtml(typeLabel)}</span>
                     <span class="inv-backup-date">${escapeHtml(formatBackupDate(backup.createdAt))}</span>
@@ -2431,10 +2463,10 @@ function renderInventoryBackupList() {
                     </span>
                 </div>
                 <div class="inv-backup-actions" onclick="event.stopPropagation()">
-                    <button class="btn btn-primary btn-sm" onclick="openRestoreModal('${escapeAttr(backup.id)}')" title="${escapeHtml(i18n.t('inventory.browser.restore'))}">
+                    <button class="btn btn-primary btn-sm" ${eventAttrs("click", function(event) { openRestoreModal(backup.id); })} title="${escapeHtml(i18n.t('inventory.browser.restore'))}">
                         <i class="fas fa-rotate-left"></i>
                     </button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteInventoryBackup('${escapeAttr(backup.id)}')" title="${escapeHtml(i18n.t('inventory.browser.delete'))}">
+                    <button class="btn btn-danger btn-sm" ${eventAttrs("click", function(event) { deleteInventoryBackup(backup.id); })} title="${escapeHtml(i18n.t('inventory.browser.delete'))}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -2534,7 +2566,7 @@ function renderInventoryBackupPreview(data) {
                      onmousemove="moveMinecraftTooltip(event)"
                      onmouseleave="hideMinecraftTooltip()">
             ${itemIconHtml(item.material, 32)}
-            ${item.amount > 1 ? `<span class="amount">${item.amount}</span>` : ''}
+            ${item.amount > 1 ? `<span class="amount">${escapeHtml(item.amount)}</span>` : ''}
             ${item.enchantments && Object.keys(item.enchantments).length > 0 ? '<span class="enchant-indicator">✨</span>' : ''}
         </div>`;
     };
@@ -2624,7 +2656,7 @@ function renderInventoryBackupPreview(data) {
                     <i class="fas fa-shield-alt"></i>
                     <span data-i18n="inventory.exportEquipment">${escapeHtml(i18n.t('inventory.exportEquipment'))}</span>
                 </button>
-                <button class="btn btn-primary btn-sm" onclick="openRestoreModal('${escapeAttr(data.id)}')">
+                <button class="btn btn-primary btn-sm" ${eventAttrs("click", function(event) { openRestoreModal(data.id); })}>
                     <i class="fas fa-rotate-left"></i>
                     <span data-i18n="inventory.browser.restore">${escapeHtml(i18n.t('inventory.browser.restore'))}</span>
                 </button>
@@ -2661,7 +2693,7 @@ function showMinecraftTooltip(e, item) {
         ${enchantsHtml}
         ${loreHtml ? `<div class="minecraft-tooltip-lore">${loreHtml}</div>` : ''}
         <div class="minecraft-tooltip-meta">
-            <span>${escapeHtml(item.material)} &middot; x${item.amount || 1}</span>
+            <span>${escapeHtml(item.material)} &middot; x${escapeHtml(item.amount || 1)}</span>
         </div>
     `;
 
@@ -3064,9 +3096,9 @@ function renderServerWorldsPanel() {
             : `<div class="mv-usage mv-usage-free"><i class="fas fa-circle-notch"></i> ${i18n.t('mv.unused')}</div>`;
 
         const toggleButton = world.loaded
-            ? `<button class="btn btn-secondary btn-sm" onclick="mvUnloadWorld('${escapeAttr(world.name)}')">
+            ? `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvUnloadWorld(world.name); })}>
                    <i class="fas fa-eject"></i> ${i18n.t('button.mvUnload')}</button>`
-            : `<button class="btn btn-secondary btn-sm" onclick="mvLoadWorld('${escapeAttr(world.name)}')">
+            : `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvLoadWorld(world.name); })}>
                    <i class="fas fa-play"></i> ${i18n.t('button.mvLoad')}</button>`;
 
         return `
@@ -3079,8 +3111,8 @@ function renderServerWorldsPanel() {
                 </div>
                 <div class="mv-world-actions">
                     ${MV_STATE.available ? toggleButton : ''}
-                    <button class="btn btn-danger btn-sm" onclick="openDeleteWorldModal('${escapeAttr(world.name)}', true)"
-                            title="${i18n.t('button.mvDeleteWorldOnly')}">
+                    <button class="btn btn-danger btn-sm" ${eventAttrs("click", function(event) { openDeleteWorldModal(world.name, true); })}
+                            title="${escapeAttr(i18n.t('button.mvDeleteWorldOnly'))}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -3180,11 +3212,11 @@ function renderBackupWorldsPanel() {
                 </div>
                 <div class="mv-world-actions">
                     <button class="btn btn-secondary btn-sm"
-                            onclick="openRestoreBackupModal('${escapeAttr(backup.file)}', '${escapeAttr(backup.worldName || '')}')">
+                            ${eventAttrs("click", function(event) { openRestoreBackupModal(backup.file, backup.worldName || ''); })}>
                         <i class="fas fa-clock-rotate-left"></i> ${i18n.t('button.mvRestore')}
                     </button>
-                    <button class="btn btn-danger btn-icon" onclick="deleteMvBackup('${escapeAttr(backup.file)}')"
-                            title="${i18n.t('button.mvDeleteBackup')}">
+                    <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteMvBackup(backup.file); })}
+                            title="${escapeAttr(i18n.t('button.mvDeleteBackup'))}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -3224,7 +3256,7 @@ function openRestoreBackupModal(file, originalName) {
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeRestoreBackupModal()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-primary" id="restore-backup-submit"
-                        onclick="confirmRestoreBackup('${escapeAttr(file)}')">
+                        ${eventAttrs("click", function(event) { confirmRestoreBackup(file); })}>
                     <i class="fas fa-clock-rotate-left"></i> ${i18n.t('button.mvRestore')}
                 </button>
             </div>
@@ -3346,7 +3378,7 @@ function openDeleteWorldModal(worldId, worldOnly = false) {
                     </div>
                     <label class="toggle">
                         <input type="checkbox" id="delete-world-files" ${canDeleteWorld ? '' : 'disabled'}
-                               onchange="updateDeleteWorldModal('${escapeAttr(worldId)}')">
+                               ${eventAttrs("change", function(event) { updateDeleteWorldModal(worldId); })}>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>`}
@@ -3374,14 +3406,14 @@ function openDeleteWorldModal(worldId, worldOnly = false) {
                     <div class="form-group" style="margin-top: 0.75rem;">
                         <label class="form-label">${i18n.t('confirm.deleteWorldTypeToConfirm', { id: escapeHtml(worldId) })}</label>
                         <input type="text" class="form-control" id="delete-world-confirm-input"
-                               autocomplete="off" oninput="updateDeleteWorldModal('${escapeAttr(worldId)}')">
+                               autocomplete="off" ${eventAttrs("input", function(event) { updateDeleteWorldModal(worldId); })}>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeDeleteWorldModal()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-danger" id="delete-world-submit"
-                        onclick="confirmDeleteWorld('${escapeAttr(worldId)}', ${worldOnly})">
+                        ${eventAttrs("click", function(event) { confirmDeleteWorld(worldId, worldOnly); })}>
                     <i class="fas fa-trash"></i> ${i18n.t('button.delete')}
                 </button>
             </div>
@@ -3635,21 +3667,21 @@ function createEquipmentCard(equipId, config, position = 0, total = 1) {
                     ${!isEnabled ? `<span class="badge badge-warning">${i18n.t('card.inactive')}</span>` : ''}
                 </div>
                 <div class="card-actions">
-                    <button class="btn btn-secondary btn-icon" onclick="moveEquipment('${escapeAttr(equipId)}', -1)"
-                            title="${i18n.t('equipment.moveUp')}" ${position === 0 ? 'disabled' : ''}>
+                    <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { moveEquipment(equipId, -1); })}
+                            title="${escapeAttr(i18n.t('equipment.moveUp'))}" ${position === 0 ? 'disabled' : ''}>
                         <i class="fas fa-arrow-up"></i>
                     </button>
-                    <button class="btn btn-secondary btn-icon" onclick="moveEquipment('${escapeAttr(equipId)}', 1)"
-                            title="${i18n.t('equipment.moveDown')}" ${position >= total - 1 ? 'disabled' : ''}>
+                    <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { moveEquipment(equipId, 1); })}
+                            title="${escapeAttr(i18n.t('equipment.moveDown'))}" ${position >= total - 1 ? 'disabled' : ''}>
                         <i class="fas fa-arrow-down"></i>
                     </button>
-                    <button class="btn btn-secondary btn-icon" onclick="editEquipment('${escapeAttr(equipId)}')" title="${i18n.t('button.edit')}">
+                    <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { editEquipment(equipId); })} title="${escapeAttr(i18n.t('button.edit'))}">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn btn-secondary btn-icon" onclick="duplicateEquipment('${escapeAttr(equipId)}')" title="${i18n.t('button.duplicate')}">
+                    <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { duplicateEquipment(equipId); })} title="${escapeAttr(i18n.t('button.duplicate'))}">
                         <i class="fas fa-copy"></i>
                     </button>
-                    <button class="btn btn-danger btn-icon" onclick="deleteEquipment('${escapeAttr(equipId)}')" title="${i18n.t('button.delete')}">
+                    <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteEquipment(equipId); })} title="${escapeAttr(i18n.t('button.delete'))}">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -3661,7 +3693,7 @@ function createEquipmentCard(equipId, config, position = 0, total = 1) {
                         <i class="fas fa-globe-americas"></i> ${escapeHtml(worldsLabel)}
                     </span>
                 </div>
-                ${config.description ? `<p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">${config.description}</p>` : ''}
+                ${config.description ? `<p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">${escapeHtml(config.description)}</p>` : ''}
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
                     <div>
                         <p style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.5rem; text-transform: uppercase;">${i18n.t('card.armor')} (${armorItems.length}/4)</p>
@@ -4131,7 +4163,7 @@ function showToast(message, type = 'info') {
     toast.className = `toast ${type}`;
     toast.innerHTML = `
         <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
     `;
     
     container.appendChild(toast);

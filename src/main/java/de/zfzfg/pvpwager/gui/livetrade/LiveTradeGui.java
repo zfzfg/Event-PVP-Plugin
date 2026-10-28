@@ -684,7 +684,12 @@ public class LiveTradeGui {
             // Item entfernen und zurückgeben
             ItemStack removed = tradePlayer.removeWagerItem(index);
             if (removed != null) {
-                player.getInventory().addItem(removed);
+                try {
+                    plugin.getPendingPayouts().deliverOrQueue(player, java.util.List.of(removed), 0, "trade-item-return", true);
+                } catch (IllegalStateException ex) {
+                    tradePlayer.addWagerItem(removed);
+                    return;
+                }
                 player.playSound(player.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.5f, 0.8f);
                 session.update();
             }

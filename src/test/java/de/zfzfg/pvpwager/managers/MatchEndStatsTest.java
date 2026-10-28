@@ -64,6 +64,7 @@ class MatchEndStatsTest {
 
         assertEquals(1, stats.getStats(firstId).orElseThrow().getDraws());
         assertEquals(1, stats.getStats(secondId).orElseThrow().getDraws());
+        de.zfzfg.core.util.OrderedFileWriter.flush();
         assertTrue(tempDir.resolve("pvpstats.yml").toFile().isFile(),
                 "pvpstats.yml muss am Match-Ende geschrieben werden, nicht erst nach fuenf Minuten");
     }

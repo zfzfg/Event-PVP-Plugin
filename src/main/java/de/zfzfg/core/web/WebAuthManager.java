@@ -19,8 +19,8 @@ public class WebAuthManager {
     private final SecureRandom secureRandom = new SecureRandom();
     
     // Konfigurierbare Werte
-    private long tokenValidityMinutes = 10;
-    private long sessionValidityMinutes = 60;
+    private volatile long tokenValidityMinutes = 10;
+    private volatile long sessionValidityMinutes = 60;
     /** Session nur von der IP aus gueltig, mit der sie angelegt wurde. */
     private volatile boolean bindSessionToIp = false;
     private final String requiredPermission;
@@ -71,7 +71,8 @@ public class WebAuthManager {
      * @return Session-ID oder null wenn ungültig
      */
     public String validateTokenAndCreateSession(String token, String clientIp) {
-        AuthToken authToken = activeTokens.get(token);
+        if (token == null) return null;
+        AuthToken authToken = activeTokens.remove(token);
         
         if (authToken == null) {
             plugin.getLogger().log(Level.WARNING, "Invalid web token attempt from " + clientIp);  // i18n-ignore: technical auth log
@@ -79,13 +80,11 @@ public class WebAuthManager {
         }
         
         if (System.currentTimeMillis() > authToken.expiresAt) {
-            activeTokens.remove(token);
             plugin.getLogger().log(Level.WARNING, "Expired web token attempt from " + clientIp);  // i18n-ignore: technical auth log
             return null;
         }
         
         // Token ist gültig - erstelle Session
-        activeTokens.remove(token); // Token kann nur einmal verwendet werden
         
         String sessionId = generateSecureToken(32);
         AuthSession session = new AuthSession(
@@ -107,7 +106,7 @@ public class WebAuthManager {
      * @param clientIp Die IP des Clients
      * @return AuthSession oder null wenn ungültig
      */
-    public AuthSession validateSession(String sessionId, String clientIp) {
+    public synchronized AuthSession validateSession(String sessionId, String clientIp) {
         if (sessionId == null || sessionId.isEmpty()) {
             return null;
         }
@@ -137,7 +136,7 @@ public class WebAuthManager {
     /**
      * Beendet eine Session (Logout)
      */
-    public void invalidateSession(String sessionId) {
+    public synchronized void invalidateSession(String sessionId) {
         AuthSession removed = activeSessions.remove(sessionId);
         if (removed != null) {
             plugin.getLogger().log(Level.INFO, "Web session ended for " + removed.playerName);  // i18n-ignore: technical auth log
@@ -147,7 +146,7 @@ public class WebAuthManager {
     /**
      * Beendet alle Sessions eines Spielers
      */
-    public void invalidateAllPlayerSessions(UUID playerUuid) {
+    public synchronized void invalidateAllPlayerSessions(UUID playerUuid) {
         activeSessions.entrySet().removeIf(entry -> 
             entry.getValue().playerUuid.equals(playerUuid));
     }
@@ -155,7 +154,7 @@ public class WebAuthManager {
     /**
      * Entfernt abgelaufene Tokens und Sessions
      */
-    private void cleanupExpired() {
+    private synchronized void cleanupExpired() {
         long now = System.currentTimeMillis();
         
         int tokensRemoved = 0;
@@ -197,6 +196,7 @@ public class WebAuthManager {
      * Setzt die Token-Gültigkeit
      */
     public void setTokenValidityMinutes(long minutes) {
+        if (minutes < 1 || minutes > 10080) throw new IllegalArgumentException("Invalid token lifetime");
         this.tokenValidityMinutes = minutes;
     }
     
@@ -204,6 +204,7 @@ public class WebAuthManager {
      * Setzt die Session-Gültigkeit
      */
     public void setSessionValidityMinutes(long minutes) {
+        if (minutes < 1 || minutes > 10080) throw new IllegalArgumentException("Invalid session lifetime");
         this.sessionValidityMinutes = minutes;
     }
 
@@ -243,7 +244,7 @@ public class WebAuthManager {
         public final UUID playerUuid;
         public final String playerName;
         public final String clientIp;
-        public long expiresAt;
+        public volatile long expiresAt;
         
         AuthSession(UUID playerUuid, String playerName, String clientIp, long expiresAt) {
             this.playerUuid = playerUuid;

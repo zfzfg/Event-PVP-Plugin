@@ -2,6 +2,8 @@ package de.zfzfg.pvpwager.managers;
 
 import de.zfzfg.eventplugin.EventPlugin;
 import de.zfzfg.pvpwager.models.Match;
+import de.zfzfg.pvpwager.models.MatchStartResult;
+import de.zfzfg.core.reward.StakeService;
 import de.zfzfg.pvpwager.models.MatchState;
 import de.zfzfg.pvpwager.models.Arena;
 import de.zfzfg.pvpwager.models.EquipmentSet;
@@ -147,53 +149,18 @@ public class MatchManager {
         Match match = getMatch(player1, player2);
         if (match == null) return;
 
-        // Check arena availability BEFORE deducting wagers
-        if (plugin.getArenaManager().getArenas().isEmpty()) {
-            MessageUtil.sendMessage(player1, getMsg("no-arenas"));
-            MessageUtil.sendMessage(player2, getMsg("no-arenas"));
-            endMatch(match, null, true);
-            return;
-        }
-
-        // Skip validation if no-wager mode
-        if (!match.isNoWagerMode()) {
-            // Verify wager is valid
-            if (!validateWager(match, player1, player2)) {
-                return;
-            }
-
-            // Deduct money from both players if applicable
-            if (plugin.hasEconomy()) {
-                double p1Money = match.getWagerMoney(player1);
-                double p2Money = match.getWagerMoney(player2);
-
-                // Verify both have funds before withdrawing anyone
-                if (p1Money > 0 && !plugin.getEconomy().has(player1, p1Money)) {
-                    MessageUtil.sendMessage(player1, getMsg("not-enough-money"));
-                    endMatch(match, null, true);
-                    return;
-                }
-                if (p2Money > 0 && !plugin.getEconomy().has(player2, p2Money)) {
-                    MessageUtil.sendMessage(player2, getMsg("not-enough-money"));
-                    endMatch(match, null, true);
-                    return;
-                }
-
-                // Now withdraw atomically (both verified)
-                if (p1Money > 0) {
-                    plugin.getEconomy().withdrawPlayer(player1, p1Money);
-                }
-                if (p2Money > 0) {
-                    plugin.getEconomy().withdrawPlayer(player2, p2Money);
-                }
-            }
-        }
-
-        // Start arena selection for command-based matches
-        Arena firstArena = plugin.getArenaManager().getArenas().values().iterator().next();
-        handleArenaSelection(player1, player2, firstArena);
+        if (match.getState() != MatchState.SETUP) return;
+        var arena = plugin.getArenaManager().getArenas().values().stream().findFirst().orElse(null);
+        var equipment = plugin.getEquipmentManager().getEquipmentSets().values().stream().findFirst().orElse(null);
+        if (arena == null || equipment == null) return;
+        CommandRequest request = new CommandRequest(player1, player2);
+        request.setWagerItems(match.getWagerItems(player1)); request.setTargetWagerItems(match.getWagerItems(player2));
+        request.setMoney(match.getWagerMoney(player1)); request.setTargetWagerMoney(match.getWagerMoney(player2));
+        request.setFinalArenaId(arena.getId()); request.setFinalEquipmentId(equipment.getId());
+        dropMatchQuietly(match);
+        startMatchFromCommand(request);
     }
-    
+
     private boolean validateWager(Match match, Player player1, Player player2) {
         // Check minimum wager requirements
         int minItems = plugin.getPvpConfigManager().getConfig().getInt("settings.checks.minimum-bet-items", 1);
@@ -987,26 +954,25 @@ public class MatchManager {
     }
 
     private double stakeMoney(Match match, Player player) {
-        if (!plugin.hasEconomy()) {
-            return 0;
-        }
         return match.getWagerMoney(player);
     }
 
-    /** Gibt einen gerade abgebuchten Einsatz zurueck, noch bevor das Inventar getauscht wurde. */
-    private void returnDebitedStake(Match match, Player player) {
-        try {
-            InventoryUtil.giveItems(player, match.getWagerItems(player));
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to return items after a stake-journal failure: " + e.getMessage());  // i18n-ignore: technical exception log
+    private de.zfzfg.core.reward.PendingPayoutStore.PayoutResult payoutOwnStake(Match match, Player player, boolean ready) {
+        String source = match.getMatchId() + ":" + player.getUniqueId();
+        var result = plugin.getPendingPayouts().submit("refund:" + source, player.getUniqueId(), player,
+                match.getWagerItems(player), match.getWagerMoney(player), "pvp-draw-return", ready,
+                List.of(source), List.of());
+        if (result.accepted()) {
+            if (match.getWagerMoney(player) > 0) plugin.getPendingPayouts().completeDebit("debit:" + source);
+            plugin.getPendingPayouts().completeDebit("item-debit:" + source);
         }
-        try {
-            double money = stakeMoney(match, player);
-            if (money > 0) {
-                plugin.getEconomy().depositPlayer(player, money);
-            }
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to return money after a stake-journal failure: " + e.getMessage());  // i18n-ignore: technical exception log
+        return result;
+    }
+
+    private void returnDebitedStake(Match match, Player player) {
+        if (!payoutOwnStake(match, player, true).accepted()) {
+            plugin.getLogger().severe("[Wagers] Refund requires recovery for " + match.getMatchId());
+            // Pre-debit intent remains durable and is visible to the recovery administrator.
         }
     }
 
@@ -1038,22 +1004,8 @@ public class MatchManager {
      *         Journal-Eintrag stehen und der naechste Start erstattet ihn.
      */
     private boolean returnStakeOnShutdown(Match match, Player player) {
-        try {
-            InventoryUtil.giveItems(player, match.getWagerItems(player));
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to return items on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
-            return false;
-        }
-        try {
-            double money = stakeMoney(match, player);
-            if (money > 0) {
-                plugin.getEconomy().depositPlayer(player, money);
-            }
-        } catch (Exception e) {
-            plugin.getLogger().severe("Failed to return money on shutdown: " + e.getMessage());  // i18n-ignore: technical exception log
-            return false;
-        }
-        return true;
+        // The survival inventory may still be restored on the next join.
+        return payoutOwnStake(match, player, false).accepted();
     }
 
     public void endMatch(Match match, Player winner, boolean isDraw) {
@@ -1182,6 +1134,15 @@ public class MatchManager {
     }
     
     private void distributeWinnings(Match match, Player winner) {
+        List<ItemStack> wonItems = new ArrayList<>(match.getWagerItems(match.getPlayer1()));
+        wonItems.addAll(match.getWagerItems(match.getPlayer2()));
+        var secured = plugin.getPendingPayouts().submit("win:" + match.getMatchId(), winner.getUniqueId(), winner,
+                wonItems, match.getWagerMoney(match.getPlayer1()) + match.getWagerMoney(match.getPlayer2()), "pvp-win", false,
+                List.of(match.getMatchId() + ":" + match.getPlayer1().getUniqueId(),
+                        match.getMatchId() + ":" + match.getPlayer2().getUniqueId()), List.of());
+        if (!secured.accepted()) throw new IllegalStateException("Could not secure winning payout " + match.getMatchId());
+        forgetWagerStake(match.getPlayer1().getUniqueId());
+        forgetWagerStake(match.getPlayer2().getUniqueId());
         Player loser = match.getOpponent(winner);
         untagCombat(winner);
         untagCombat(loser);
@@ -1198,27 +1159,21 @@ public class MatchManager {
         // im selben Tick wieder loeschen. Die Wartezeit kommt aus der Multiverse-Bridge
         // und ist ohne Multiverse-Inventories 0.
         Bukkit.getScheduler().runTaskLater(plugin, () -> restoreInventoryAfterMatch(winner, inventoryReady -> {
-            if (!plugin.getInventorySessions().claimPayout(winner.getUniqueId())) {
-                // Bereits ausgeschuettet (z. B. durch den Shutdown-Pfad) - nicht doppelt.
-                // Das Journal darf trotzdem zu: der andere Pfad hat den Pot uebernommen.
-                forgetWagerStake(match.getPlayer1().getUniqueId());
-                forgetWagerStake(match.getPlayer2().getUniqueId());
-                return;
-            }
             List<ItemStack> allItems = new ArrayList<>();
             allItems.addAll(match.getWagerItems(match.getPlayer1()));
             allItems.addAll(match.getWagerItems(match.getPlayer2()));
 
-            double totalMoney = 0;
-            if (plugin.hasEconomy()) {
-                totalMoney = match.getWagerMoney(match.getPlayer1()) + match.getWagerMoney(match.getPlayer2());
-            }
+            double totalMoney = match.getWagerMoney(match.getPlayer1()) + match.getWagerMoney(match.getPlayer2());
 
             // Konnte das Inventar nicht wiederhergestellt werden - Spieler offline oder
             // Restore fehlgeschlagen -, wandert der gesamte Gewinn in den Auffangspeicher
             // und wird beim naechsten Join nachgereicht. Direkt ausgeben hiesse: weg.
-            boolean handedOut = plugin.getPendingPayouts().deliverOrQueue(
-                    winner, allItems, totalMoney, "pvp-win", inventoryReady);
+            var payout = plugin.getPendingPayouts().submit("win:" + match.getMatchId(), winner.getUniqueId(),
+                    winner, allItems, totalMoney, "pvp-win", inventoryReady,
+                    List.of(match.getMatchId() + ":" + match.getPlayer1().getUniqueId(),
+                            match.getMatchId() + ":" + match.getPlayer2().getUniqueId()), List.of());
+            if (!payout.accepted()) return;
+            boolean handedOut = payout == de.zfzfg.core.reward.PendingPayoutStore.PayoutResult.DELIVERED;
             // Ausgezahlt oder in pending-payouts.yml vorgemerkt: der Pot lebt nicht mehr
             // nur im Match. Das Journal muss weg, sonst erstattet der naechste Start ihn
             // zusaetzlich zurueck.
@@ -1312,16 +1267,10 @@ public class MatchManager {
      *                       frueher fiel er in diesem Fall ersatzlos weg.
      */
     private void returnOwnStake(Match match, Player player, boolean inventoryReady) {
-        if (plugin.getInventorySessions() != null
-                && !plugin.getInventorySessions().claimPayout(player.getUniqueId())) {
-            forgetWagerStake(player.getUniqueId());
-            return;
-        }
-
-        double money = plugin.hasEconomy() ? match.getWagerMoney(player) : 0;
-        boolean handedOut = plugin.getPendingPayouts().deliverOrQueue(
-                player, match.getWagerItems(player), money, "pvp-draw-return", inventoryReady);
+        var payout = payoutOwnStake(match, player, inventoryReady);
+        if (!payout.accepted()) return;
         forgetWagerStake(player.getUniqueId());
+        boolean handedOut = payout == de.zfzfg.core.reward.PendingPayoutStore.PayoutResult.DELIVERED;
 
         if (handedOut) {
             MessageUtil.sendMessage(player, getMsg("wager-returned"));
@@ -1497,8 +1446,12 @@ public class MatchManager {
 
         int count = matches.size();
         for (Match match : new ArrayList<>(getMatches().values())) {
-            match.broadcast(getMsg("server-shutdown"));
-            endMatchOnShutdown(match);
+            try {
+                match.broadcast(getMsg("server-shutdown"));
+                endMatchOnShutdown(match);
+            } catch (Exception ex) {
+                plugin.getLogger().log(java.util.logging.Level.SEVERE, "[Wagers] Shutdown failed for " + match.getMatchId() + "; journal retained", ex);
+            }
         }
         // Flüchtige Zustände direkt säubern
         clearTransientState();
@@ -1557,10 +1510,6 @@ public class MatchManager {
             // Restore-Versuch hier - die offenen Sitzungen stehen im Guard-Journal und werden
             // beim naechsten Serverstart abgearbeitet. Nur die Ausschuettung wird vermerkt,
             // damit der Wiederanlauf sie nicht ein zweites Mal vornimmt.
-            if (plugin.getInventorySessions() != null) {
-                plugin.getInventorySessions().claimPayout(player1.getUniqueId());
-                plugin.getInventorySessions().claimPayout(player2.getUniqueId());
-            }
             if (returnStakeOnShutdown(match, player1)) {
                 forgetWagerStake(player1.getUniqueId());
             }
@@ -1666,70 +1615,100 @@ public class MatchManager {
 
     // Command-based match start (OHNE Countdown, DIREKT starten)
     public void startMatchFromCommand(CommandRequest request) {
-        Player player1 = request.getSender();
-        Player player2 = request.getTarget();
+        MatchStartResult result = startPreparedMatch(request, false);
+        if (result != MatchStartResult.ACCEPTED && request != null && plugin.getCoreConfigManager() != null) {
+            String message = getMsg("messages.livetrade.broadcast-error-match-start");
+            if (request.getSender() != null) MessageUtil.sendMessage(request.getSender(), message);
+            if (request.getTarget() != null) MessageUtil.sendMessage(request.getTarget(), message);
+        }
+    }
 
-        // Validate arena and equipment BEFORE deducting wagers to prevent item/money loss
+    public MatchStartResult startHeldTrade(CommandRequest request) {
+        return startPreparedMatch(request, true);
+    }
+
+    private boolean debit(Match match, Player player, double amount) {
+        if (amount == 0) return true;
+        String id = "debit:" + match.getMatchId() + ":" + player.getUniqueId();
+        if (!plugin.getPendingPayouts().beginDebit(id, player.getUniqueId(), amount)) return false;
+        try {
+            var response = plugin.getEconomy().withdrawPlayer(player, amount);
+            if (response == null) return false; // unknown external outcome remains under review
+            if (!response.transactionSuccess()) { plugin.getPendingPayouts().completeDebit(id); return false; }
+            match.getWagerMoney().put(player.getUniqueId(), amount);
+            return true;
+        } catch (Exception ex) {
+            plugin.getLogger().log(java.util.logging.Level.SEVERE, "[Wagers] Uncertain debit " + id, ex);
+            return false;
+        }
+    }
+
+    private MatchStartResult startPreparedMatch(CommandRequest request, boolean held) {
+        if (!Bukkit.isPrimaryThread()) throw new IllegalStateException("Match start requires main thread");
+        if (request == null || plugin.isStopping()) return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
+        Player player1 = request.getSender(), player2 = request.getTarget();
+        if (player1 == null || player2 == null || !player1.isOnline() || !player2.isOnline()
+                || player1.equals(player2) || isPlayerInMatch(player1) || isPlayerInMatch(player2))
+            return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
+        if (!held && plugin.getLiveTradeManager() != null && (plugin.getLiveTradeManager().isInSession(player1)
+                || plugin.getLiveTradeManager().isInSession(player2))) return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
         Arena arena = plugin.getArenaManager().getArenaOptional(request.getFinalArenaId()).orElse(null);
         EquipmentSet p1Equipment = plugin.getEquipmentManager().getEquipmentSet(request.getFinalEquipmentId());
-        EquipmentSet p2Equipment = plugin.getEquipmentManager().getEquipmentSet(request.getFinalEquipmentId());
-
-        if (arena == null) {
-            MessageUtil.sendMessage(player1, getMsg("arena-not-exists"));
-            MessageUtil.sendMessage(player2, getMsg("arena-not-exists"));
-            return;
-        }
-
-        // Create match
+        EquipmentSet p2Equipment = p1Equipment;
+        if (arena == null || p1Equipment == null) return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
+        try {
+            double maximum = plugin.getPvpConfigManager().getConfig().getDouble("settings.checks.max-bet-money", 100000);
+            de.zfzfg.core.util.InputValidator.validateMoney(String.valueOf(request.getMoney()), 0,
+                    maximum <= 0 || player1.hasPermission("pvpwager.bypass.betlimit") ? Double.MAX_VALUE : maximum);
+            de.zfzfg.core.util.InputValidator.validateMoney(String.valueOf(request.getTargetWagerMoney()), 0,
+                    maximum <= 0 || player2.hasPermission("pvpwager.bypass.betlimit") ? Double.MAX_VALUE : maximum);
+            if (!Double.isFinite(request.getMoney() + request.getTargetWagerMoney()))
+                return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
+            if ((request.getMoney() > 0 || request.getTargetWagerMoney() > 0) && !plugin.hasEconomy())
+                return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
+        } catch (IllegalArgumentException ex) { return MatchStartResult.REJECTED_CALLER_OWNS_STAKE; }
         Match match = new Match(player1, player2);
+        match.setArena(arena); match.setPlayer1Equipment(p1Equipment); match.setPlayer2Equipment(p2Equipment);
+        String itemIntent1 = "item-debit:" + match.getMatchId() + ":" + player1.getUniqueId();
+        String itemIntent2 = "item-debit:" + match.getMatchId() + ":" + player2.getUniqueId();
+        if (!plugin.getPendingPayouts().beginDebit(itemIntent1, player1.getUniqueId(), request.getWagerItems(), 0))
+            return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
+        if (!plugin.getPendingPayouts().beginDebit(itemIntent2, player2.getUniqueId(), request.getTargetWagerItems(), 0)) {
+            plugin.getPendingPayouts().completeDebit(itemIntent1);
+            return MatchStartResult.REJECTED_CALLER_OWNS_STAKE;
+        }
+        try {
+            if (held) {
+                match.getWagerItems().put(player1.getUniqueId(), new ArrayList<>(request.getWagerItems()));
+                match.getWagerItems().put(player2.getUniqueId(), new ArrayList<>(request.getTargetWagerItems()));
+            } else {
+                try { match.getWagerItems().put(player1.getUniqueId(), StakeService.take(player1.getInventory(), request.getWagerItems())); }
+                catch (IllegalArgumentException ex) {
+                    plugin.getPendingPayouts().completeDebit(itemIntent1);
+                    plugin.getPendingPayouts().completeDebit(itemIntent2);
+                    throw ex;
+                }
+                try { match.getWagerItems().put(player2.getUniqueId(), StakeService.take(player2.getInventory(), request.getTargetWagerItems())); }
+                catch (IllegalArgumentException ex) { plugin.getPendingPayouts().completeDebit(itemIntent2); throw ex; }
+            }
+            if (!debit(match, player1, request.getMoney()) || !debit(match, player2, request.getTargetWagerMoney()))
+                throw new IllegalStateException("Stake debit rejected or requires review");
+        } catch (Exception ex) {
+            returnDebitedStake(match, player1); returnDebitedStake(match, player2);
+            return MatchStartResult.RETURNED_OR_DURABLY_QUEUED;
+        }
+        boolean hasWager = request.getMoney() > 0 || request.getTargetWagerMoney() > 0
+                || !request.getWagerItems().isEmpty() || !request.getTargetWagerItems().isEmpty();
+        match.setNoWagerMode(!hasWager);
+        if (hasWager && !commitWagerJournal(match)) return MatchStartResult.RETURNED_OR_DURABLY_QUEUED;
+        plugin.getPendingPayouts().completeDebit("debit:" + match.getMatchId() + ":" + player1.getUniqueId());
+        plugin.getPendingPayouts().completeDebit("debit:" + match.getMatchId() + ":" + player2.getUniqueId());
+        plugin.getPendingPayouts().completeDebit(itemIntent1);
+        plugin.getPendingPayouts().completeDebit(itemIntent2);
         matches.put(match.getMatchId(), match);
-        // Index participants for O(1) lookup
         playerToMatchId.put(player1.getUniqueId(), match.getMatchId());
         playerToMatchId.put(player2.getUniqueId(), match.getMatchId());
-
-        match.setArena(arena);
-        match.setPlayer1Equipment(p1Equipment);
-        match.setPlayer2Equipment(p2Equipment);
-
-        // Set no-wager mode if both wagers are empty
-        boolean hasWager = (request.getMoney() > 0 || !request.getWagerItems().isEmpty()) ||
-                          (request.getTargetWagerMoney() > 0 || !request.getTargetWagerItems().isEmpty());
-
-        if (!hasWager) {
-            match.setNoWagerMode(true);
-        } else {
-            // Set wagers
-            match.getWagerItems().put(player1.getUniqueId(), new ArrayList<>(request.getWagerItems()));
-            match.getWagerItems().put(player2.getUniqueId(), new ArrayList<>(request.getTargetWagerItems()));
-            match.getWagerMoney().put(player1.getUniqueId(), request.getMoney());
-            match.getWagerMoney().put(player2.getUniqueId(), request.getTargetWagerMoney());
-
-            // Remove items from inventories
-            for (ItemStack item : request.getWagerItems()) {
-                player1.getInventory().removeItem(item);
-            }
-            for (ItemStack item : request.getTargetWagerItems()) {
-                player2.getInventory().removeItem(item);
-            }
-
-            // Deduct money if applicable
-            if (plugin.hasEconomy()) {
-                if (request.getMoney() > 0) {
-                    plugin.getEconomy().withdrawPlayer(player1, request.getMoney());
-                }
-                if (request.getTargetWagerMoney() > 0) {
-                    plugin.getEconomy().withdrawPlayer(player2, request.getTargetWagerMoney());
-                }
-            }
-
-            // Erst das Journal, dann der Start. Scheitert die Datei, ist der Einsatz
-            // schon abgebucht und muss denselben Weg zurueck, sonst startet ein Match,
-            // dessen Pot ein Absturz nicht mehr kennt.
-            if (!commitWagerJournal(match)) {
-                return;
-            }
-        }
-        
+        try {
         // KRITISCH: Verwende die Original-Locations aus dem Request!
         // Diese wurden gespeichert als der Request erstellt wurde - BEVOR
         // die Spieler irgendwohin teleportiert wurden.
@@ -1776,6 +1755,11 @@ public class MatchManager {
         
         // Start match WITHOUT GUI - DIRECT START
         startMatchDirectly(match);
+            return MatchStartResult.ACCEPTED;
+        } catch (Exception ex) {
+            endMatch(match, null, true);
+            return MatchStartResult.RETURNED_OR_DURABLY_QUEUED;
+        }
     }
     
     // Neue Methode: Match direkt starten OHNE Countdown

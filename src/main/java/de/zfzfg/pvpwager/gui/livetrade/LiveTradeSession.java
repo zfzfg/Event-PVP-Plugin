@@ -239,8 +239,7 @@ public class LiveTradeSession {
         // GUIs schließen
         closeGuis();
         
-        // Session aus Manager entfernen BEVOR Match startet
-        removeFromManager();
+        // Keep participant reservations until the stake handoff is acknowledged.
         
         // Match über MatchManager starten
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -270,13 +269,21 @@ public class LiveTradeSession {
                 }
                 
                 // Match starten
-                plugin.getMatchManager().startMatchFromCommand(request);
+                var result = plugin.getMatchManager().startHeldTrade(request);
+                if (result == de.zfzfg.pvpwager.models.MatchStartResult.REJECTED_CALLER_OWNS_STAKE) {
+                    returnAllItems();
+                    broadcast(getMsg("broadcast-error-match-start"));
+                } else {
+                    player1.clearWagerItems(); player2.clearWagerItems();
+                }
+                removeFromManager();
                 
             } catch (Exception e) {
                 plugin.getLogger().log(java.util.logging.Level.SEVERE, plugin.getConsoleMsg("livetrade-start-error"), e);
                 
                 // Items zurückgeben bei Fehler
                 returnAllItems();
+                removeFromManager();
                 broadcast(getMsg("broadcast-error-match-start"));
             }
         });

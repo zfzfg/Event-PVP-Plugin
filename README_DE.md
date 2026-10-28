@@ -100,3 +100,6 @@ Das Plugin verwendet zentrale, übersichtliche Dateien im Plugin-Ordner `plugins
 ## 📄 Lizenz
 
 Dieses Projekt steht unter der [MIT-Lizenz](LICENSE).
+
+
+Implementierungs- und Prüfhinweise: [Hardening 1.1.2](docs/HARDENING_1.1.2.md).

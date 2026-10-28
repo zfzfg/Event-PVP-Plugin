@@ -1,4 +1,5 @@
 {
+  "confirm.configChanged": "サーバーの設定が変更されました。最新の設定を読み込みますか？未保存のローカル変更は失われます。",
   "app.title": "Event-PVP コンフィギュレーター",
   "common.enabled": "有効",
   "common.disabled": "無効",

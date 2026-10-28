@@ -167,4 +167,19 @@ class WebAuthManagerTest {
         assertThat(authManager.validateSession(sessionId, "10.0.0.2")).isNull();
         assertThat(authManager.validateSession(sessionId, "10.0.0.1")).isNotNull();
     }
+    @Test
+    void concurrentTokenRedemptionCreatesExactlyOneSession() throws Exception {
+        Player player = mock(Player.class);
+        when(player.getUniqueId()).thenReturn(UUID.randomUUID());
+        when(player.getName()).thenReturn("admin"); when(player.isOp()).thenReturn(true);
+        String token = authManager.generateToken(player);
+        try (var pool = java.util.concurrent.Executors.newFixedThreadPool(12)) {
+            var start = new java.util.concurrent.CountDownLatch(1);
+            var futures = new java.util.ArrayList<java.util.concurrent.Future<String>>();
+            for (int i = 0; i < 12; i++) futures.add(pool.submit(() -> { start.await(); return authManager.validateTokenAndCreateSession(token, "127.0.0.1"); }));
+            start.countDown(); int sessions = 0;
+            for (var future : futures) if (future.get(5, java.util.concurrent.TimeUnit.SECONDS) != null) sessions++;
+            assertThat(sessions).isEqualTo(1);
+        }
+    }
 }
