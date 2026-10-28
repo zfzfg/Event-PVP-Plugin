@@ -33,11 +33,11 @@ web:
     # Sekundäre Akzentfarbe
     secondary-color: "#66bb6a"
     # Hintergrundfarbe (dunkelgrau)
-    background-color: "#1a1a1a"
+    background-color: "#141414"
     # Zweiter Hintergrund für Panels
-    surface-color: "#2d2d2d"
+    surface-color: "#1c1c1c"
     # Dritter Hintergrund für Karten
-    card-color: "#3a3a3a"
+    card-color: "#242424"
     # Textfarbe
     text-color: "#e0e0e0"
     # Sekundäre Textfarbe

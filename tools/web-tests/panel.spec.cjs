@@ -302,3 +302,109 @@ test('an old write cannot expire a new login session', async ({ page }) => {
     expect(await page.evaluate(()=>[isAuthenticated,currentPlayer,CONFIG_STATE.isSaving])).toEqual([true,'New login',false]);
     await expect(page.locator('#login-screen')).toBeHidden();
 });
+
+test('local SVGs, keyboard navigation, translated action names and theme roundtrip', async ({ page }) => {
+    const saved = {};
+    const errors = await setup(page, async (route, url) => {
+        if (url.pathname === '/api/webconfig/get') {
+            await route.fulfill({json:{success:true,data:{web:{theme:saved.theme || {'background-color':'#182028','text-secondary':'#ccddee'}}},revision:'r1'}}); return true;
+        }
+        if (url.pathname === '/api/webconfig/save') {
+            const body = route.request().postDataJSON();
+            saved.theme = body.data?.web?.theme || body.web?.theme;
+            await route.fulfill({json:{success:true,revision:'r2'}}); return true;
+        }
+    });
+    await expect(page.locator('.nav-item')).toHaveCount(7);
+    for (const section of ['settings','events','worlds','equipment','inventories','expert','theme']) {
+        const nav = page.locator(`.nav-item[data-section="${section}"]`);
+        await nav.focus(); await page.keyboard.press('Enter');
+        await expect(nav).toHaveAttribute('aria-current','page');
+        await expect(nav.locator('svg')).toHaveCount(1);
+    }
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--background').trim())).toBe('#182028');
+    await page.evaluate(() => updateThemeColor('text-secondary','#abcdef'));
+    expect(await page.evaluate(() => CONFIG_STATE.webConfig.web.theme['text-secondary'])).toBe('#abcdef');
+    expect(await page.evaluate(() => CONFIG_STATE.webConfig.web.theme['text-secondary-color'])).toBeUndefined();
+    await page.evaluate(() => updateThemeColor('background','#202830'));
+    await expect(page.locator('#theme-background')).toHaveValue('#202830');
+    await page.evaluate(() => saveAllConfigs());
+    expect(saved.theme['background-color']).toBe('#202830');
+    await page.reload();
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--background').trim())).toBe('#202830');
+    await page.evaluate(() => { showSection('theme'); resetTheme(); });
+    await expect(page.locator('#theme-background')).toHaveValue('#141414');
+    await expect(page.locator('#theme-background').locator('..').locator('.color-input')).toHaveValue('#141414');
+    await showBackup(page);
+    await expect(page.locator('.enchant-indicator svg')).toHaveCount(1);
+    expect(await page.locator('body').innerText()).not.toContain('${panelIcon');
+    expect(await page.locator('link[href*="cdnjs"]').count()).toBe(0);
+    expect(await page.locator('button').evaluateAll(buttons => buttons.filter(b => b.getClientRects().length && !b.textContent.trim() && !b.getAttribute('aria-label')).map(b => b.outerHTML))).toEqual([]);
+    expect(errors).toEqual([]);
+});
+
+test('design screenshots cover all areas, dialogs, narrow widths and reduced motion', async ({ page }) => {
+    const errors = await setup(page);
+    for (const width of [320,360,768,1024,1440]) {
+        await page.setViewportSize({width,height:950});
+        for (const section of ['settings','events','worlds','equipment','inventories','expert','theme']) {
+            await page.evaluate(section => showSection(section),section);
+            expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `${section} at ${width}`).toBeTruthy();
+            await page.screenshot({path:`../../target/design-${section}-${width}.png`,fullPage:true});
+        }
+        await showBackup(page);
+        await page.screenshot({path:`../../target/design-inventory-${width}.png`,fullPage:true});
+        await page.evaluate(() => { equipmentSets().design = {'display-name':'Design',armor:{},inventory:[]}; editEquipment('design'); });
+        await page.screenshot({path:`../../target/design-equipment-dialog-${width}.png`,fullPage:true});
+        await page.keyboard.press('Escape');
+        await page.locator('.inv-actions-toolbar .btn-primary').click();
+        await page.screenshot({path:`../../target/design-restore-dialog-${width}.png`,fullPage:false});
+        await page.keyboard.press('Escape');
+    }
+    await page.evaluate(() => document.documentElement.style.zoom = '2');
+    for (const section of ['settings','events','worlds','equipment','inventories','expert','theme']) {
+        await page.evaluate(section => showSection(section),section);
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),`zoom ${section}`).toBeTruthy();
+        await page.screenshot({path:`../../target/design-zoom-${section}.png`,fullPage:true});
+    }
+    await page.emulateMedia({reducedMotion:'reduce'});
+    await page.evaluate(() => { CONFIG_STATE.isSaving = true; updateSyncStatusUI(); });
+    expect(await page.locator('#sync-status-icon svg').evaluate(e => getComputedStyle(e).animationName)).toBe('none');
+    await page.evaluate(() => { document.documentElement.style.zoom = ''; showLoginScreen(); });
+    await page.setViewportSize({width:320,height:800});
+    await expect(page.locator('#login-screen')).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+    await page.screenshot({path:'../../target/design-login-320.png',fullPage:true});
+    expect(errors).toEqual([]);
+});
+
+test('primary button contrast, theme validation and keyboard inventory editing', async ({page}) => {
+    await setup(page);
+    const contrast = () => page.locator('#btn-save-all').evaluate(button => {
+        const color = value => {
+            const c = value.match(/[\d.]+/g).slice(0,3).map(Number).map(v => v/255).map(v => v <= .04045 ? v/12.92 : ((v+.055)/1.055)**2.4);
+            return c[0]*.2126+c[1]*.7152+c[2]*.0722;
+        };
+        const style = getComputedStyle(button), a = color(style.color), b = color(style.backgroundColor);
+        return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+    });
+    for (const accent of ['#4caf50','#112233','#ffffff']) {
+        await page.evaluate(accent => updateThemeColor('primary',accent),accent);
+        expect(await contrast()).toBeGreaterThanOrEqual(4.5);
+        await page.locator('#btn-save-all').hover();
+        expect(await contrast()).toBeGreaterThanOrEqual(4.5);
+        await page.mouse.down(); expect(await contrast()).toBeGreaterThanOrEqual(4.5); await page.mouse.up();
+    }
+    await page.evaluate(() => updateThemeColor('primary','invalid'));
+    expect(await page.evaluate(() => CONFIG_STATE.webConfig.web.theme['primary-color'])).toBe('#ffffff');
+    await page.evaluate(() => { equipmentSets().keyboard = {'display-name':'Keyboard',armor:{},inventory:[{slot:0,item:'STONE',amount:1}]}; editEquipment('keyboard'); });
+    // Native keyboard activation also works for the existing custom editor tabs.
+    const inventoryTab = page.locator('#equipment-editor-modal .tab').nth(2);
+    await inventoryTab.focus(); await page.keyboard.press('Enter');
+    const slot = page.locator('#inv-slot-0');
+    await expect(slot).toBeVisible();
+    await slot.focus(); await page.keyboard.press('Enter');
+    await expect(page.locator('#item-edit-modal')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(slot).toBeFocused();
+});

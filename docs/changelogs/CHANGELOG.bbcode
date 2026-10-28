@@ -10,7 +10,9 @@
 [*][B]Configuration saves:[/B] retry failed loads independently, preserve edits made during saving, record partial successes and confirm before reloading after revision conflicts.
 [*][B]Sessions:[/B] clean up pending reads and status timers on logout; old write responses cannot expire a new login. Writes are never retried automatically.
 [*][B]Accessibility and languages:[/B] keyboard-accessible tooltips, dialog focus management and Escape handling; editor inputs survive language changes. New messages cover all seven languages.
-[*][B]Verification:[/B] 447 Java tests, 15 Chromium browser tests and 3 web safety tests passed. Browser tests use simulated API replies; live-server restoration was not exercised.
+[*][B]Webviewer design:[/B] darker default surfaces, readable metadata and solid primary buttons; local SVGs replace the external icon font and decorative emojis in all seven languages. Saved custom themes remain intact.
+[*][B]Keyboard and themes:[/B] native navigation buttons, keyboard-accessible editor tabs and inventory editing, accessible action and switch labels, synchronized theme fields and corrected secondary-text mapping. Reduced motion is respected; dialogs and narrow layouts retain stable controls.
+[*][B]Verification:[/B] 18 Chromium browser tests and 3 web safety tests passed for the design update, including 320–1440 pixel layouts, 200% zoom, theme roundtrips and button contrast. Earlier backend verification passed 447 Java tests; Java tests and JAR packaging were not rerun for this frontend-only update. Browser tests use simulated API replies; live-server restoration was not exercised.
 [*][B]Compatibility:[/B] existing API endpoints, configuration formats and dark/green design are preserved. No new configuration migration.
 [/LIST]
 

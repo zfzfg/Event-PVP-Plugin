@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event-PVP Konfigurator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #4caf50;
             --primary-dark: #388e3c;
             --primary-light: #66bb6a;
             --secondary: #81c784;
-            --background: #1a1a1a;
-            --surface: #2d2d2d;
-            --card: #3a3a3a;
-            --card-hover: #454545;
+            --background: #141414;
+            --surface: #1c1c1c;
+            --card: #242424;
+            --card-hover: #303030;
             --text: #e0e0e0;
             --text-secondary: #b0b0b0;
-            --text-muted: #808080;
+            --text-muted: var(--text-secondary);
             --error: #f44336;
             --warning: #ff9800;
             --success: #4caf50;
@@ -25,7 +24,7 @@
             --border: #404040;
             --border-light: #505050;
             --shadow: rgba(0, 0, 0, 0.3);
-            --transition: 0.2s ease;
+            --transition: 150ms ease;
         }
 
         * {
@@ -107,7 +106,7 @@
             gap: 0.4rem;
             padding: 0.35rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.78rem;
+            font-size: .8125rem;
             font-weight: 600;
             transition: all var(--transition);
             user-select: none;
@@ -209,7 +208,7 @@
 
         .btn-sm {
             padding: 0.35rem 0.65rem;
-            font-size: 0.8rem;
+            font-size: .8125rem;
             border-radius: 6px;
         }
 
@@ -305,7 +304,7 @@
         .badge-counter {
             background: #f59e0b;
             color: #000;
-            font-size: 0.7rem;
+            font-size: .8125rem;
             font-weight: 700;
             padding: 0.15rem 0.45rem;
             border-radius: 10px;
@@ -347,7 +346,7 @@
         }
 
         .sidebar-title {
-            font-size: 0.75rem;
+            font-size: .8125rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.1em;
@@ -388,7 +387,7 @@
             margin-left: auto;
             background: var(--primary);
             color: white;
-            font-size: 0.7rem;
+            font-size: .8125rem;
             padding: 0.2rem 0.5rem;
             border-radius: 10px;
         }
@@ -528,7 +527,7 @@
         .form-label-hint {
             font-weight: 400;
             color: var(--text-muted);
-            font-size: 0.8rem;
+            font-size: .8125rem;
             margin-left: 0.5rem;
         }
 
@@ -583,7 +582,7 @@
         }
 
         .toggle-label span:last-child {
-            font-size: 0.8rem;
+            font-size: .8125rem;
             color: var(--text-muted);
         }
 
@@ -676,7 +675,7 @@
         }
 
         .coord-input label {
-            font-size: 0.75rem;
+            font-size: .8125rem;
             color: var(--text-muted);
             margin-bottom: 0.25rem;
             text-transform: uppercase;
@@ -725,7 +724,7 @@
         }
 
         .item-type {
-            font-size: 0.8rem;
+            font-size: .8125rem;
             color: var(--text-muted);
         }
 
@@ -801,7 +800,7 @@
 
         /* Zwischenueberschrift innerhalb einer Karte */
         .form-section-title {
-            font-size: 0.75rem;
+            font-size: .8125rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -876,7 +875,7 @@
             align-items: flex-start;
             gap: 0.4rem;
             margin-top: 0.35rem;
-            font-size: 0.8rem;
+            font-size: .8125rem;
             color: var(--warning);
         }
 
@@ -1045,7 +1044,7 @@
         }
 
         .inv-status-label {
-            font-size: 0.75rem;
+            font-size: .8125rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -1102,7 +1101,7 @@
         }
 
         .inv-quick-label {
-            font-size: 0.8rem;
+            font-size: .8125rem;
             color: var(--text-muted);
             display: inline-flex;
             align-items: center;
@@ -1120,7 +1119,7 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 0.2rem 0.65rem;
-            font-size: 0.78rem;
+            font-size: .8125rem;
             color: var(--text);
             cursor: pointer;
             display: inline-flex;
@@ -1205,7 +1204,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.78rem;
+            font-size: .8125rem;
             color: var(--text-muted);
         }
 
@@ -1252,7 +1251,7 @@
         }
 
         .inv-armor-label {
-            font-size: 0.75rem;
+            font-size: .8125rem;
             color: var(--text-muted);
             min-width: 60px;
         }
@@ -1334,7 +1333,7 @@
         }
 
         .inv-stat-label {
-            font-size: 0.72rem;
+            font-size: .8125rem;
             color: var(--text-muted);
             text-transform: uppercase;
         }
@@ -1395,7 +1394,7 @@
 
         .minecraft-tooltip-meta {
             color: #808080;
-            font-size: 0.75rem;
+            font-size: .8125rem;
             margin-top: 6px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 4px;
@@ -1444,7 +1443,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: .8125rem;
             font-weight: bold;
             cursor: pointer;
         }
@@ -1848,7 +1847,7 @@
             display: inline-flex;
             align-items: center;
             padding: 0.2rem 0.6rem;
-            font-size: 0.75rem;
+            font-size: .8125rem;
             font-weight: 500;
             border-radius: 4px;
             text-transform: uppercase;
@@ -1896,7 +1895,7 @@
         .form-help {
             display: block;
             margin-top: 0.35rem;
-            font-size: 0.8rem;
+            font-size: .8125rem;
             color: var(--text-muted);
         }
 
@@ -1947,7 +1946,7 @@
         }
 
         .mv-world-env {
-            font-size: 0.75rem;
+            font-size: .8125rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -1960,7 +1959,7 @@
         }
 
         .mv-usage {
-            font-size: 0.78rem;
+            font-size: .8125rem;
             color: var(--text-muted);
             flex-basis: 100%;
         }
@@ -2238,7 +2237,7 @@
             <p class="login-subtitle" data-i18n="auth.subtitle">Authentication required</p>
             
             <div class="login-instruction">
-                <div class="login-instruction-title" data-i18n="auth.tokenInstructionTitle">📋 How to get a token:</div>
+                <div class="login-instruction-title"><i class="icon ui-copy"></i> <span data-i18n="auth.tokenInstructionTitle"> How to get a token:</span></div>
                 <div class="login-instruction-text" data-i18n-html="auth.tokenInstruction">Run the command<br><code>/eventpvp webtoken</code><br>in-game as admin and paste the token here.</div>
             </div>
             
@@ -2250,7 +2249,7 @@
             </div>
             
             <button id="login-button" onclick="performLogin()">
-                <span aria-hidden="true">🔓</span> <span data-i18n="auth.login">Login</span>
+                <i class="icon ui-lock" aria-hidden="true"></i> <span data-i18n="auth.login">Login</span>
             </button>
         </div>
     </div>
@@ -2272,8 +2271,8 @@
                         <span id="status-text" data-i18n="status.initializing">Initializing...</span>
                     </div>
                     <!-- Live Server-Sync Status Indicator -->
-                    <div id="sync-status-badge" class="sync-badge sync-synced" data-i18n-title="sync.syncedTitle">
-                        <i class="fas fa-check-circle" id="sync-status-icon"></i>
+                    <div id="sync-status-badge" role="status" aria-live="polite" class="sync-badge sync-synced" data-i18n-title="sync.syncedTitle">
+                        <i class="icon ui-check-circle" id="sync-status-icon"></i>
                         <span id="sync-status-text" data-i18n="sync.synced">Synced with Server</span>
                     </div>
                 </div>
@@ -2287,37 +2286,37 @@
             <!-- Undo / Redo Button Group -->
             <div class="btn-group">
                 <button class="btn btn-secondary disabled" id="btn-undo" onclick="undoChange()" data-i18n-title="button.undo">
-                    <i class="fas fa-undo"></i>
+                    <i class="icon ui-undo"></i>
                 </button>
                 <button class="btn btn-secondary disabled" id="btn-redo" onclick="redoChange()" data-i18n-title="button.redo">
-                    <i class="fas fa-redo"></i>
+                    <i class="icon ui-redo"></i>
                 </button>
             </div>
 
             <!-- Tools Dropdown -->
             <div class="dropdown" id="tools-dropdown">
                 <button class="btn btn-secondary" onclick="toggleToolsDropdown(event)">
-                    <i class="fas fa-tools"></i>
+                    <i class="icon ui-tools"></i>
                     <span data-i18n="header.tools">Tools</span>
-                    <i class="fas fa-chevron-down" style="font-size: 0.75rem; margin-left: 0.2rem;"></i>
+                    <i class="icon ui-chevron-down" style="font-size: .8125rem; margin-left: 0.2rem;"></i>
                 </button>
                 <div class="dropdown-menu">
                     <div class="dropdown-item" onclick="showYamlPreview(); closeToolsDropdown();">
-                        <i class="fas fa-code" style="width: 16px;"></i>
+                        <i class="icon ui-code" style="width: 16px;"></i>
                         <span data-i18n="header.yamlPreview">YAML Preview</span>
                     </div>
                     <label class="dropdown-item" style="cursor: pointer; margin: 0;">
-                        <i class="fas fa-file-import" style="width: 16px;"></i>
+                        <i class="icon ui-file-import" style="width: 16px;"></i>
                         <span data-i18n="button.import">Import Configuration</span>
                         <input type="file" accept=".json" onchange="importConfig(event); closeToolsDropdown();" style="display: none;">
                     </label>
                     <div class="dropdown-item" onclick="exportConfig(); closeToolsDropdown();">
-                        <i class="fas fa-file-export" style="width: 16px;"></i>
+                        <i class="icon ui-file-export" style="width: 16px;"></i>
                         <span data-i18n="button.export">Export Configuration</span>
                     </div>
                     <div class="dropdown-divider"></div>
                     <div class="dropdown-item" onclick="loadAllConfigs(); closeToolsDropdown();" data-i18n-title="header.pullServerDesc">
-                        <i class="fas fa-cloud-download-alt" style="width: 16px;"></i>
+                        <i class="icon ui-cloud-download-alt" style="width: 16px;"></i>
                         <span data-i18n="header.pullServer">Reload from Server</span>
                     </div>
                 </div>
@@ -2327,13 +2326,13 @@
 
             <!-- Server Reload Action -->
             <button class="btn btn-secondary" onclick="reloadServer()" data-i18n-title="header.reloadServer" title="Plugin auf Minecraft-Server neu laden">
-                <i class="fas fa-sync-alt"></i>
+                <i class="icon ui-sync-alt"></i>
                 <span data-i18n="header.reloadServer">Server Reload</span>
             </button>
 
             <!-- Save All Changes (Primary Action) -->
             <button class="btn btn-primary" id="btn-save-all" onclick="saveAllConfigs()">
-                <i class="fas fa-save"></i>
+                <i class="icon ui-save"></i>
                 <span data-i18n="button.save">Speichern</span>
                 <span id="save-counter-badge" class="badge-counter" style="display: none;">0</span>
             </button>
@@ -2343,7 +2342,7 @@
     <!-- Globale Konfliktwarnung: sichtbar, sobald Multiverse-Inventories laeuft und das
          Plugin die Inventare selbst verwaltet. Gefuellt von renderGlobalMviBanner(). -->
     <div id="global-mvi-banner" class="global-banner" style="display: none;">
-        <i class="fas fa-triangle-exclamation global-banner-icon"></i>
+        <i class="icon ui-triangle-exclamation global-banner-icon"></i>
         <div class="global-banner-body">
             <div class="global-banner-title" data-i18n="inventory.globalMviBannerTitle">Multiverse-Inventories detected</div>
             <div class="global-banner-text" data-i18n="inventory.globalMviBannerText">This plugin manages inventories itself and no longer needs Multiverse-Inventories. As long as the mode is not set to Multiverse-Inventories, both swap the same inventory and can conflict.</div>
@@ -2352,7 +2351,7 @@
         <button type="button" class="global-banner-toggle" id="global-mvi-banner-toggle"
                 onclick="toggleGlobalMviBanner()" data-i18n-title="inventory.globalMviBannerCollapse"
                 title="Collapse">
-            <i class="fas fa-chevron-up"></i>
+            <i class="icon ui-chevron-up"></i>
         </button>
     </div>
 
@@ -2361,49 +2360,49 @@
         <aside class="sidebar">
             <div class="sidebar-section">
                 <div class="sidebar-title" data-i18n="sidebar.configuration">Configuration</div>
-                <a class="nav-item active" data-section="settings" onclick="showSection('settings')">
-                    <i class="fas fa-cog"></i>
+                <button type="button" class="nav-item active" aria-current="page" data-section="settings" onclick="showSection('settings')">
+                    <i class="icon ui-cog"></i>
                     <span data-i18n="nav.general">General Settings</span>
-                </a>
-                <a class="nav-item" data-section="events" onclick="showSection('events')">
-                    <i class="fas fa-calendar-alt"></i>
+                </button>
+                <button type="button" class="nav-item" data-section="events" onclick="showSection('events')">
+                    <i class="icon ui-calendar-alt"></i>
                     <span data-i18n="nav.events">Events</span>
                     <span class="nav-badge" id="events-count">0</span>
-                </a>
-                <a class="nav-item" data-section="worlds" onclick="showSection('worlds')">
-                    <i class="fas fa-globe"></i>
+                </button>
+                <button type="button" class="nav-item" data-section="worlds" onclick="showSection('worlds')">
+                    <i class="icon ui-globe"></i>
                     <span data-i18n="nav.worlds">Worlds & Arenas</span>
                     <span class="nav-badge" id="worlds-count">0</span>
-                </a>
-                <a class="nav-item" data-section="equipment" onclick="showSection('equipment')">
-                    <i class="fas fa-shield-alt"></i>
+                </button>
+                <button type="button" class="nav-item" data-section="equipment" onclick="showSection('equipment')">
+                    <i class="icon ui-shield-alt"></i>
                     <span data-i18n="nav.equipment">Equipment</span>
                     <span class="nav-badge" id="equipment-count">0</span>
-                </a>
-                <a class="nav-item" data-section="inventories" onclick="showSection('inventories')">
-                    <i class="fas fa-boxes-stacked"></i>
+                </button>
+                <button type="button" class="nav-item" data-section="inventories" onclick="showSection('inventories')">
+                    <i class="icon ui-boxes-stacked"></i>
                     <span data-i18n="nav.inventories">Inventories & Backups</span>
                     <span class="nav-badge" id="inventories-count" style="display: none;">0</span>
-                </a>
+                </button>
             </div>
 
             <div class="sidebar-section">
                 <div class="sidebar-title" data-i18n="sidebar.advanced">Advanced</div>
-                <a class="nav-item" data-section="expert" onclick="showSection('expert')">
-                    <i class="fas fa-wrench"></i>
+                <button type="button" class="nav-item" data-section="expert" onclick="showSection('expert')">
+                    <i class="icon ui-wrench"></i>
                     <span data-i18n="nav.expert">Expert Settings</span>
-                </a>
-                <a class="nav-item" data-section="theme" onclick="showSection('theme')">
-                    <i class="fas fa-palette"></i>
+                </button>
+                <button type="button" class="nav-item" data-section="theme" onclick="showSection('theme')">
+                    <i class="icon ui-palette"></i>
                     <span data-i18n="nav.theme">Theme & Colors</span>
-                </a>
+                </button>
             </div>
 
             <div class="sidebar-section" id="server-info-section" style="margin-top: 1rem; padding: 0.75rem; background: var(--background); border-radius: 8px;">
-                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;" data-i18n="sidebar.serverInfo">Server Info</div>
-                <div id="server-info" style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                    <p><i class="fas fa-users" style="width: 16px;"></i> <span id="online-players">-</span> <span data-i18n="label.serverPlayers">Players</span></p>
-                    <p><i class="fas fa-tachometer-alt" style="width: 16px;"></i> <span id="server-tps">-</span> <span data-i18n="label.serverTps">TPS</span></p>
+                <div style="font-size: .8125rem; color: var(--text-muted); text-transform: uppercase;" data-i18n="sidebar.serverInfo">Server Info</div>
+                <div id="server-info" style="font-size: .8125rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                    <p><i class="icon ui-users" style="width: 16px;"></i> <span id="online-players">-</span> <span data-i18n="label.serverPlayers">Players</span></p>
+                    <p><i class="icon ui-tachometer-alt" style="width: 16px;"></i> <span id="server-tps">-</span> <span data-i18n="label.serverTps">TPS</span></p>
                 </div>
             </div>
         </aside>
@@ -2423,7 +2422,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-sliders-h"></i>
+                            <i class="icon ui-sliders-h"></i>
                             <span data-i18n="settings.base">Basic Settings</span>
                         </div>
                     </div>
@@ -2476,7 +2475,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-eye"></i>
+                            <i class="icon ui-eye"></i>
                             <span data-i18n="settings.spectatorsTitle">Spectator system</span>
                         </div>
                     </div>
@@ -2521,7 +2520,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-swords"></i>
+                            <i class="icon ui-swords"></i>
                             <span data-i18n="settings.matchSettings">Match settings</span>
                         </div>
                     </div>
@@ -2564,7 +2563,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-clock"></i>
+                            <i class="icon ui-clock"></i>
                             <span data-i18n="settings.autoEventsTitle">Auto-Event System</span>
                         </div>
                     </div>
@@ -2646,7 +2645,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-coins"></i>
+                            <i class="icon ui-coins"></i>
                             <span data-i18n="settings.wagerLimitsTitle">Wager limits</span>
                         </div>
                     </div>
@@ -2679,7 +2678,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-plug"></i>
+                            <i class="icon ui-plug"></i>
                             <span data-i18n="settings.integrationsTitle">Integrations</span>
                         </div>
                     </div>
@@ -2723,7 +2722,7 @@
                 </div>
 
                 <p class="content-subtitle" style="margin-top: 1rem;">
-                    <i class="fas fa-wrench"></i>
+                    <i class="icon ui-wrench"></i>
                     <span data-i18n="general.expertHint">Looking for a setting? Advanced options are under "Expert Settings".</span>
                 </p>
             </section>
@@ -2736,7 +2735,7 @@
                         <p class="content-subtitle" data-i18n="events.subtitle">Configure your event types</p>
                     </div>
                     <button class="btn btn-primary" onclick="createNewEvent()">
-                        <i class="fas fa-plus"></i> <span data-i18n="events.new">New Event</span>
+                        <i class="icon ui-plus"></i> <span data-i18n="events.new">New Event</span>
                     </button>
                 </div>
 
@@ -2753,7 +2752,7 @@
                         <p class="content-subtitle" data-i18n="worlds.subtitle">PvP worlds and arena settings</p>
                     </div>
                     <button class="btn btn-primary" onclick="createNewWorld()">
-                        <i class="fas fa-plus"></i> <span data-i18n="worlds.new">New World</span>
+                        <i class="icon ui-plus"></i> <span data-i18n="worlds.new">New World</span>
                     </button>
                 </div>
 
@@ -2762,7 +2761,7 @@
                      darunter der Standardblick bleibt. -->
                 <details class="mv-panel" id="server-worlds-panel" ontoggle="if(this.open) renderServerWorldsPanel()">
                     <summary class="mv-panel-summary">
-                        <i class="fas fa-server"></i>
+                        <i class="icon ui-server"></i>
                         <span data-i18n="mv.serverWorlds">Server worlds</span>
                         <span id="server-worlds-backend" class="badge badge-secondary"></span>
                     </summary>
@@ -2775,7 +2774,7 @@
                      und Loeschen. Baugleich zum Server-Welten-Panel, laedt beim Aufklappen. -->
                 <details class="mv-panel" id="backup-worlds-panel" ontoggle="if(this.open) loadMvBackups()">
                     <summary class="mv-panel-summary">
-                        <i class="fas fa-box-archive"></i>
+                        <i class="icon ui-box-archive"></i>
                         <span data-i18n="mv.backupWorlds">Backup worlds</span>
                         <span id="backup-worlds-count" class="badge badge-secondary"></span>
                     </summary>
@@ -2797,12 +2796,12 @@
                         <p class="content-subtitle" data-i18n="equipment.subtitle">Armor and inventory configurations</p>
                     </div>
                     <button class="btn btn-primary" onclick="createNewEquipment()">
-                        <i class="fas fa-plus"></i> <span data-i18n="equipment.new">New Equipment Set</span>
+                        <i class="icon ui-plus"></i> <span data-i18n="equipment.new">New Equipment Set</span>
                     </button>
                 </div>
 
                 <div class="form-hint-inline" style="margin-bottom: 1rem;">
-                    <i class="fas fa-arrows-up-down"></i>
+                    <i class="icon ui-arrows-up-down"></i>
                     <span data-i18n="equipment.orderHint">The order of this list is the order the sets appear in the PvP wager menu. Use the arrow buttons to change it.</span>
                 </div>
 
@@ -2820,7 +2819,7 @@
                     </div>
                     <div class="header-actions">
                         <button class="btn btn-secondary btn-sm" onclick="refreshInventorySection()">
-                            <i class="fas fa-rotate"></i>
+                            <i class="icon ui-rotate"></i>
                             <span data-i18n="inventory.guardRefresh">Refresh</span>
                         </button>
                     </div>
@@ -2829,21 +2828,21 @@
                 <!-- KPI / Status Quick Bar -->
                 <div class="inv-status-bar">
                     <div class="inv-status-item">
-                        <div class="inv-status-icon"><i class="fas fa-server"></i></div>
+                        <div class="inv-status-icon"><i class="icon ui-server"></i></div>
                         <div class="inv-status-info">
                             <span class="inv-status-label" data-i18n="inventory.modeLabel">Mode</span>
                             <span class="inv-status-value" id="inv-kpi-provider">-</span>
                         </div>
                     </div>
                     <div class="inv-status-item">
-                        <div class="inv-status-icon"><i class="fas fa-user-clock"></i></div>
+                        <div class="inv-status-icon"><i class="icon ui-user-clock"></i></div>
                         <div class="inv-status-info">
                             <span class="inv-status-label" data-i18n="inventory.guardTitle">Open sessions</span>
                             <span class="inv-status-value" id="inv-kpi-sessions">0</span>
                         </div>
                     </div>
                     <div class="inv-status-item">
-                        <div class="inv-status-icon"><i class="fas fa-shield-halved"></i></div>
+                        <div class="inv-status-icon"><i class="icon ui-shield-halved"></i></div>
                         <div class="inv-status-info">
                             <span class="inv-status-label" data-i18n="inventory.safetyBackups">Safety backups</span>
                             <span class="inv-status-value" id="inv-kpi-safety">-</span>
@@ -2853,7 +2852,7 @@
 
                 <!-- Warnings Container -->
                 <div id="inventory-coexistence-warning" class="alert alert-warning" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="icon ui-exclamation-triangle"></i>
                     <div>
                         <span data-i18n="inventory.coexistenceWarning">Multiverse-Inventories is running alongside the plugin's own management. Both swapping inventories at the same time gives unpredictable results — remove the world groups or switch to legacy mode.</span>
                         <!-- Wird von renderInventoryCoexistence() gefuellt: die konkreten Weltkollisionen -->
@@ -2861,23 +2860,23 @@
                     </div>
                 </div>
                 <div id="inventory-missing-warning" class="alert alert-error" style="display: none;">
-                    <i class="fas fa-circle-exclamation"></i>
+                    <i class="icon ui-circle-exclamation"></i>
                     <span data-i18n="inventory.missingWarning">The InventoryBackup API is not available. Matches and events are refused until it is, so that no inventory is cleared without a backup.</span>
                 </div>
 
                 <!-- Tab Navigation -->
                 <div class="inv-tabs-nav">
                     <button class="inv-tab-btn active" id="inv-tab-btn-explorer" onclick="switchInventoryTab('explorer')">
-                        <i class="fas fa-magnifying-glass"></i>
+                        <i class="icon ui-magnifying-glass"></i>
                         <span data-i18n="inventory.tabExplorer">Backup Explorer</span>
                     </button>
                     <button class="inv-tab-btn" id="inv-tab-btn-sessions" onclick="switchInventoryTab('sessions')">
-                        <i class="fas fa-shield-virus"></i>
+                        <i class="icon ui-shield-virus"></i>
                         <span data-i18n="inventory.tabSessions">Live Sessions & Guard</span>
                         <span class="nav-badge" id="inv-tab-sessions-badge" style="display: none;">0</span>
                     </button>
                     <button class="inv-tab-btn" id="inv-tab-btn-settings" onclick="switchInventoryTab('settings')">
-                        <i class="fas fa-sliders"></i>
+                        <i class="icon ui-sliders"></i>
                         <span data-i18n="inventory.tabSettings">Settings & Policies</span>
                     </button>
                 </div>
@@ -2891,7 +2890,7 @@
                                 <label class="form-label" data-i18n="inventory.browser.player">Player</label>
                                 <div class="inv-search-row">
                                     <div class="inv-search-input-wrapper">
-                                        <i class="fas fa-user-tag inv-search-icon"></i>
+                                        <i class="icon ui-user-tag inv-search-icon"></i>
                                         <input type="text" class="form-control inv-search-input" id="inventory-browser-player"
                                                placeholder="Steve" data-i18n-placeholder="inventory.browser.playerPlaceholder"
                                                list="inv-recent-players-list"
@@ -2899,7 +2898,7 @@
                                         <datalist id="inv-recent-players-list"></datalist>
                                     </div>
                                     <button class="btn btn-primary" onclick="loadInventoryBackups()">
-                                        <i class="fas fa-search"></i>
+                                        <i class="icon ui-search"></i>
                                         <span data-i18n="inventory.browser.search">Search</span>
                                     </button>
                                 </div>
@@ -2907,7 +2906,7 @@
                                 <p class="form-label-hint" data-i18n="inventory.browser.hint" style="margin: 0.25rem 0 0 0;">Look up a player's saved inventories, preview them and restore or delete a single backup.</p>
                                 <!-- Online Players Quick-Select Bar -->
                                 <div class="inv-online-quick-bar" id="inv-online-quick-bar" style="display: none;">
-                                    <span class="inv-quick-label"><i class="fas fa-signal"></i> <span data-i18n="inventory.onlinePlayers">Online Players</span>:</span>
+                                    <span class="inv-quick-label"><i class="icon ui-signal"></i> <span data-i18n="inventory.onlinePlayers">Online Players</span>:</span>
                                     <div class="inv-quick-pills" id="inv-online-players-list"></div>
                                 </div>
                             </div>
@@ -2920,7 +2919,7 @@
                         <div class="card inv-backups-card">
                             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
                                 <div class="card-title">
-                                    <i class="fas fa-clock-rotate-left"></i>
+                                    <i class="icon ui-clock-rotate-left"></i>
                                     <span data-i18n="inventory.browser.title">Inventory backups</span>
                                 </div>
                                 <div id="inv-filter-container" style="display: none;">
@@ -2935,7 +2934,7 @@
                             <div class="card-body inv-backups-body">
                                 <div id="inventory-browser-list">
                                     <div class="inv-empty-state">
-                                        <i class="fas fa-boxes-packing"></i>
+                                        <i class="icon ui-boxes-packing"></i>
                                         <p data-i18n="inventory.searchHint">Search for a player above to explore their saved backups.</p>
                                     </div>
                                 </div>
@@ -2946,13 +2945,13 @@
                         <div class="card inv-viewer-card">
                             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                                 <div class="card-title">
-                                    <i class="fas fa-cube"></i>
+                                    <i class="icon ui-cube"></i>
                                     <span data-i18n="inventory.browser.previewTitle">Backup contents</span>
                                 </div>
                             </div>
                             <div class="card-body inv-viewer-body" id="inventory-browser-preview">
                                 <div class="inv-empty-state">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="icon ui-eye"></i>
                                     <p data-i18n="inventory.selectBackupHint">Select a backup on the left to view detailed inventory contents.</p>
                                 </div>
                             </div>
@@ -2965,11 +2964,11 @@
                     <div class="card">
                         <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                             <div class="card-title">
-                                <i class="fas fa-shield-virus"></i>
+                                <i class="icon ui-shield-virus"></i>
                                 <span data-i18n="inventory.guardTitle">Open sessions</span>
                             </div>
                             <button class="btn btn-secondary btn-sm" onclick="loadInventoryGuard()">
-                                <i class="fas fa-rotate"></i>
+                                <i class="icon ui-rotate"></i>
                                 <span data-i18n="inventory.guardRefresh">Refresh</span>
                             </button>
                         </div>
@@ -2985,7 +2984,7 @@
                     <div class="card">
                         <div class="card-header">
                             <div class="card-title">
-                                <i class="fas fa-sliders"></i>
+                                <i class="icon ui-sliders"></i>
                                 <span data-i18n="inventory.title">Inventory management</span>
                             </div>
                         </div>
@@ -3006,7 +3005,7 @@
                             <p id="inventory-api-diagnostic" class="form-label-hint"></p>
 
                             <div id="inventory-legacy-warning" class="alert alert-warning" style="display: none;">
-                                <i class="fas fa-exclamation-triangle"></i>
+                                <i class="icon ui-exclamation-triangle"></i>
                                 <span data-i18n="inventory.legacyWarning">Legacy mode: Multiverse-Inventories handles the inventory swap. The plugin never restores on its own — if the world groups are missing or wrong, that is real item loss.</span>
                             </div>
 
@@ -3016,7 +3015,7 @@
                                         <span data-i18n="inventory.safetyBackups">Safety backups</span>
                                         <span data-i18n="inventory.safetyBackupsHint">Still copies every inventory through InventoryBackup before the arena/lobby teleport. Never restored automatically — an admin picks it up by hand if something goes wrong.</span>
                                         <span class="field-warning" id="inventory-warn-legacy-safety" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <i class="icon ui-exclamation-triangle"></i>
                                             <span data-i18n="inventory.safetyBackupsWarning">Turning this off leaves legacy mode without any net of its own.</span>
                                         </span>
                                     </div>
@@ -3036,7 +3035,7 @@
                                         <span data-i18n="inventory.restoreMatchEnd">After match end</span>
                                         <span data-i18n="inventory.restoreMatchEndHint">Gives the survival inventory back when a PvP match finishes</span>
                                         <span class="field-warning" id="inventory-warn-match-end" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <i class="icon ui-exclamation-triangle"></i>
                                             <span data-i18n="inventory.warnMatchEndOff">Off: the inventory is still backed up, but never given back after a match. Players keep the kit until an admin restores it by hand.</span>
                                         </span>
                                     </div>
@@ -3052,7 +3051,7 @@
                                         <span data-i18n="inventory.restoreEventEnd">After event end</span>
                                         <span data-i18n="inventory.restoreEventEndHint">Gives the survival inventory back when an event finishes</span>
                                         <span class="field-warning" id="inventory-warn-event-end" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <i class="icon ui-exclamation-triangle"></i>
                                             <span data-i18n="inventory.warnEventEndOff">Off: participants leave the event with the kit. Their survival inventory stays in the backup until an admin restores it by hand.</span>
                                         </span>
                                     </div>
@@ -3068,7 +3067,7 @@
                                         <span data-i18n="inventory.restoreRespawn">After respawn</span>
                                         <span data-i18n="inventory.restoreRespawnHint">Restores the inventory of a player who died in an arena</span>
                                         <span class="field-warning" id="inventory-warn-respawn" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <i class="icon ui-exclamation-triangle"></i>
                                             <span data-i18n="inventory.warnRespawnOff">Off: whoever dies in an arena respawns without their survival inventory. It only exists in the backup from then on.</span>
                                         </span>
                                     </div>
@@ -3084,7 +3083,7 @@
                                         <span data-i18n="inventory.restoreRejoin">On rejoin</span>
                                         <span data-i18n="inventory.restoreRejoinHint">Restores the inventory of a player who disconnected mid-match</span>
                                         <span class="field-warning" id="inventory-warn-rejoin" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <i class="icon ui-exclamation-triangle"></i>
                                             <span data-i18n="inventory.warnRejoinOff">Off: anyone who loses connection mid-match gets nothing back on their next join. Of the four switches this is the one that loses the most items.</span>
                                         </span>
                                     </div>
@@ -3103,7 +3102,7 @@
                                         <option value="warn" data-i18n="inventory.failureWarn">Continue and warn</option>
                                     </select>
                                     <span class="field-warning" id="inventory-warn-failure-policy" style="display: none;">
-                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <i class="icon ui-exclamation-triangle"></i>
                                         <span data-i18n="inventory.warnFailurePolicyWarn">"Continue and warn": matches start even when no backup reached the disk. The only remaining net is the in-memory copy, and it does not survive a server restart.</span>
                                     </span>
                                 </div>
@@ -3113,7 +3112,7 @@
                                         <span data-i18n="inventory.cleanupAfterMatch">Delete backup after success</span>
                                         <span data-i18n="inventory.cleanupAfterMatchHint">Off keeps the backup as an archive</span>
                                         <span class="field-warning" id="inventory-warn-cleanup" style="display: none;">
-                                            <i class="fas fa-exclamation-triangle"></i>
+                                            <i class="icon ui-exclamation-triangle"></i>
                                             <span data-i18n="inventory.warnCleanupOn">On: the backup is deleted the moment the restore succeeds. If the restore put back the wrong state, there is no way back.</span>
                                         </span>
                                     </div>
@@ -3141,7 +3140,7 @@
                 <!-- Warning Banner -->
                 <div class="card" style="border-left: 4px solid var(--warning);">
                     <div class="card-body" style="display: flex; gap: 0.75rem; align-items: flex-start;">
-                        <i class="fas fa-exclamation-triangle" style="color: var(--warning); margin-top: 0.2rem;"></i>
+                        <i class="icon ui-exclamation-triangle" style="color: var(--warning); margin-top: 0.2rem;"></i>
                         <div>
                             <div style="font-weight: 600;" data-i18n="expert.warningTitle">For advanced users</div>
                             <div style="color: var(--text-secondary); font-size: 0.9rem;" data-i18n="expert.warningText">These settings rarely need changing. The defaults work for most servers.</div>
@@ -3153,7 +3152,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-user-shield"></i>
+                            <i class="icon ui-user-shield"></i>
                             <span data-i18n="settings.playerDataTitle">Player data protection</span>
                         </div>
                     </div>
@@ -3163,7 +3162,7 @@
                                 <span data-i18n="settings.saveLocation">Save player position</span>
                                 <span data-i18n="settings.saveLocationHint">Saves the position before events/matches</span>
                                 <span class="field-warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <i class="icon ui-exclamation-triangle"></i>
                                     <span data-i18n="settings.saveLocationWarning">Turning this off is experimental — players can lose their position.</span>
                                 </span>
                             </div>
@@ -3180,7 +3179,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-globe-americas"></i>
+                            <i class="icon ui-globe-americas"></i>
                             <span data-i18n="settings.worldManagement">World management</span>
                         </div>
                     </div>
@@ -3229,7 +3228,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-sync"></i>
+                            <i class="icon ui-sync"></i>
                             <span data-i18n="settings.arenaRegenTitle">Arena regeneration</span>
                         </div>
                     </div>
@@ -3264,7 +3263,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-shield-check"></i>
+                            <i class="icon ui-shield-check"></i>
                             <span data-i18n="settings.securityChecks">Security checks</span>
                         </div>
                     </div>
@@ -3288,7 +3287,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-tachometer-alt"></i>
+                            <i class="icon ui-tachometer-alt"></i>
                             <span data-i18n="settings.performanceTitle">Performance</span>
                         </div>
                     </div>
@@ -3309,7 +3308,7 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-server"></i>
+                            <i class="icon ui-server"></i>
                             <span data-i18n="web.settingsTitle">Web server settings</span>
                         </div>
                     </div>
@@ -3324,7 +3323,7 @@
                             <label class="form-label" data-i18n="web.publicUrl">Public URL</label>
                             <input type="text" class="form-control" id="web-public-url" placeholder="http://localhost"
                                    onchange="updatePublicUrl(this.value)">
-                            <small class="form-hint" style="display: block; margin-top: 0.35rem; color: var(--text-muted); font-size: 0.8rem;" data-i18n="web.publicUrlHint">Address displayed in the /eventpvp webtoken command. The port ({port}) is appended automatically.</small>
+                            <small class="form-hint" style="display: block; margin-top: 0.35rem; color: var(--text-muted); font-size: .8125rem;" data-i18n="web.publicUrlHint">Address displayed in the /eventpvp webtoken command. The port ({port}) is appended automatically.</small>
                         </div>
                     </div>
                 </div>
@@ -3338,14 +3337,14 @@
                         <p class="content-subtitle" data-i18n="theme.subtitle">Adjust the look of the web interface</p>
                     </div>
                     <button class="btn btn-secondary" onclick="resetTheme()">
-                        <i class="fas fa-undo"></i> <span data-i18n="theme.resetButton">Restore default</span>
+                        <i class="icon ui-undo"></i> <span data-i18n="theme.resetButton">Restore default</span>
                     </button>
                 </div>
 
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-paint-brush"></i>
+                            <i class="icon ui-paint-brush"></i>
                             <span data-i18n="theme.colorScheme">Color scheme</span>
                         </div>
                     </div>
@@ -3356,7 +3355,7 @@
                                 <input type="color" class="color-preview" id="theme-primary" value="#4caf50"
                                        onchange="updateThemeColor('primary', this.value)">
                                 <input type="text" class="form-control color-input" value="#4caf50"
-                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-primary').value = this.value; document.documentElement.style.setProperty('--primary', this.value); }"
+                                       oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-primary').value = this.value; document.documentElement.style.setProperty('--primary', this.value); syncPrimaryInk(); }"
                                        onchange="updateThemeColor('primary', this.value)">
                             </div>
                         </div>
@@ -3375,9 +3374,9 @@
                         <div class="form-group">
                             <label class="form-label" data-i18n="theme.background">Background color</label>
                             <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-background" value="#1a1a1a"
+                                <input type="color" class="color-preview" id="theme-background" value="#141414"
                                        onchange="updateThemeColor('background', this.value)">
-                                <input type="text" class="form-control color-input" value="#1a1a1a"
+                                <input type="text" class="form-control color-input" value="#141414"
                                        oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-background').value = this.value; document.documentElement.style.setProperty('--background', this.value); }"
                                        onchange="updateThemeColor('background', this.value)">
                             </div>
@@ -3386,9 +3385,9 @@
                         <div class="form-group">
                             <label class="form-label" data-i18n="theme.surface">Surface color</label>
                             <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-surface" value="#2d2d2d"
+                                <input type="color" class="color-preview" id="theme-surface" value="#1c1c1c"
                                        onchange="updateThemeColor('surface', this.value)">
-                                <input type="text" class="form-control color-input" value="#2d2d2d"
+                                <input type="text" class="form-control color-input" value="#1c1c1c"
                                        oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-surface').value = this.value; document.documentElement.style.setProperty('--surface', this.value); }"
                                        onchange="updateThemeColor('surface', this.value)">
                             </div>
@@ -3397,9 +3396,9 @@
                         <div class="form-group">
                             <label class="form-label" data-i18n="theme.card">Card color</label>
                             <div class="color-picker-wrapper">
-                                <input type="color" class="color-preview" id="theme-card" value="#3a3a3a"
+                                <input type="color" class="color-preview" id="theme-card" value="#242424"
                                        onchange="updateThemeColor('card', this.value)">
-                                <input type="text" class="form-control color-input" value="#3a3a3a"
+                                <input type="text" class="form-control color-input" value="#242424"
                                        oninput="if (/^#[0-9a-fA-F]{6}$/.test(this.value)) { document.getElementById('theme-card').value = this.value; document.documentElement.style.setProperty('--card', this.value); }"
                                        onchange="updateThemeColor('card', this.value)">
                             </div>
@@ -3432,7 +3431,7 @@
             <div class="modal-header">
                 <h3 class="modal-title" data-i18n="modal.yamlPreview">YAML preview</h3>
                 <button class="modal-close" onclick="closeYamlPreview()">
-                    <i class="fas fa-times"></i>
+                    <i class="icon ui-times"></i>
                 </button>
             </div>
             <div class="modal-body">
@@ -3445,7 +3444,7 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="copyYaml()">
-                    <i class="fas fa-copy"></i> <span data-i18n="button.copy">Copy</span>
+                    <i class="icon ui-copy"></i> <span data-i18n="button.copy">Copy</span>
                 </button>
                 <button class="btn btn-primary" onclick="closeYamlPreview()" data-i18n="button.close">Close</button>
             </div>
@@ -3457,11 +3456,11 @@
         <div class="modal" style="max-width: 520px;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-rotate-left" style="color: var(--primary); margin-right: 0.5rem;"></i>
+                    <i class="icon ui-rotate-left" style="color: var(--primary); margin-right: 0.5rem;"></i>
                     <span data-i18n="inventory.modal.restoreTitle">Restore Inventory Backup</span>
                 </h3>
                 <button class="modal-close" onclick="closeRestoreModal()">
-                    <i class="fas fa-times"></i>
+                    <i class="icon ui-times"></i>
                 </button>
             </div>
             <div class="modal-body">
@@ -3470,9 +3469,9 @@
                 </p>
 
                 <div class="inv-modal-player-card">
-                    <div class="form-label" data-i18n="inventory.modal.targetPlayer" style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Target Player</div>
+                    <div class="form-label" data-i18n="inventory.modal.targetPlayer" style="font-size: .8125rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Target Player</div>
                     <div style="font-weight: 600; font-size: 1.05rem;" id="modal-restore-player-name">-</div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); font-family: monospace;" id="modal-restore-player-uuid">-</div>
+                    <div style="font-size: .8125rem; color: var(--text-muted); font-family: monospace;" id="modal-restore-player-uuid">-</div>
                     <div id="modal-restore-player-status" style="margin-top: 0.35rem;"></div>
                 </div>
 
@@ -3498,7 +3497,7 @@
                     <span data-i18n="inventory.modal.cancel">Cancel</span>
                 </button>
                 <button class="btn btn-primary" onclick="executeRestoreFromModal()">
-                    <i class="fas fa-rotate-left"></i>
+                    <i class="icon ui-rotate-left"></i>
                     <span data-i18n="inventory.modal.confirm">Restore Now</span>
                 </button>
             </div>
@@ -3515,16 +3514,17 @@
     <div class="quick-actions hidden" id="quick-actions">
         <span style="color: var(--text-secondary);" data-i18n="quick.unsavedChanges">Unsaved changes</span>
         <button class="btn btn-secondary btn-icon" onclick="discardChanges()" data-i18n="quick.discard" title="Discard">
-            <i class="fas fa-times"></i>
+            <i class="icon ui-times"></i>
         </button>
         <button class="btn btn-primary" onclick="saveAllConfigs()">
-            <i class="fas fa-save"></i> <span data-i18n="button.save">Save</span>
+            <i class="icon ui-save"></i> <span data-i18n="button.save">Save</span>
         </button>
     </div>
 
     </div><!-- End #main-content -->
 
     <!-- items.js zuerst: liefert Item-Katalog und Icon-Aufloesung, die app.js und editors.js nutzen. -->
+    <script src="icons.js"></script>
     <script src="items.js"></script>
     <script src="panel-runtime.js"></script>
     <script src="app.js"></script>

@@ -27,3 +27,9 @@ while saving, revision conflicts, retries, session expiry, duplicate mutations,
 dialog focus, tooltips and translation completeness. Screenshots are written to
 `target/panel-*.png`. These tests do not replace a live-server integration check
 for actual restore operations.
+
+Design verification also covers local SVG rendering after dynamic updates, keyboard
+navigation and inventory editing, translated action names, theme roundtrip and reset,
+primary button contrast, reduced motion, and screenshots down to 320 pixels.
+The detailed implementation and review notes are in
+`docs/web/WEBVIEWER_DESIGN_IMPLEMENTATION.md`.

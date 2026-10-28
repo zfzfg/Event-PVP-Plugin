@@ -21,19 +21,7 @@ console.log('editors.js loading...');
 // selbst. Die Funktionsnamen bleiben, damit der uebrige Editor unveraendert weiterlaeuft.
 
 /** Symbole fuer die gaengigen Verzauberungen; alles andere bekommt ein neutrales Zeichen. */
-const ENCHANTMENT_ICONS = {
-    PROTECTION: '🛡️', FIRE_PROTECTION: '🔥', BLAST_PROTECTION: '💥', PROJECTILE_PROTECTION: '🏹',
-    FEATHER_FALLING: '🪶', RESPIRATION: '💨', AQUA_AFFINITY: '💧', THORNS: '🌵',
-    DEPTH_STRIDER: '🏊', FROST_WALKER: '❄️', SOUL_SPEED: '👻', SWIFT_SNEAK: '🐈',
-    SHARPNESS: '⚔️', SMITE: '☠️', BANE_OF_ARTHROPODS: '🕷️', KNOCKBACK: '👊',
-    FIRE_ASPECT: '🔥', LOOTING: '💰', SWEEPING: '🌪️', SWEEPING_EDGE: '🌪️',
-    EFFICIENCY: '⚡', SILK_TOUCH: '🪶', FORTUNE: '🍀',
-    POWER: '🏹', PUNCH: '👊', FLAME: '🔥', INFINITY: '♾️',
-    MULTISHOT: '🎯', QUICK_CHARGE: '⏩', PIERCING: '🗡️',
-    LOYALTY: '🔁', IMPALING: '🔱', RIPTIDE: '🌊', CHANNELING: '⚡',
-    LUCK_OF_THE_SEA: '🍀', LURE: '🎣', MENDING: '🔧', UNBREAKING: '🔨',
-    VANISHING_CURSE: '💀', BINDING_CURSE: '⛓️', DENSITY: '🪨', BREACH: '🛠️', WIND_BURST: '🌬️'
-};
+const ENCHANTMENT_ICONS = { PROTECTION: 'shield', FIRE_PROTECTION: 'flame', FIRE_ASPECT: 'flame', SHARPNESS: 'sword', POWER: 'bow', EFFICIENCY: 'wrench', MENDING: 'wrench' };
 
 /**
  * Verzauberungen, die auf dieses Item passen.
@@ -47,7 +35,7 @@ function getAvailableEnchantments(itemName) {
         id: enchant.key,
         name: enchant.label,
         maxLevel: enchant.maxLevel || 1,
-        icon: ENCHANTMENT_ICONS[enchant.key] || '✨'
+        icon: panelIcon(ENCHANTMENT_ICONS[enchant.key] || 'sparkles')
     }));
 }
 
@@ -163,7 +151,7 @@ function renderConfiguredWorldOptions(currentValue, excludeWorldId = null) {
         if (excludeWorldId && w.id.toLowerCase() === excludeWorldId.toLowerCase()) continue;
         const selected = Boolean(currentValue && w.id.toLowerCase() === currentValue.toLowerCase());
         if (selected) hasCurrent = true;
-        const regenIcon = w.isRegen ? ' 🔄' : '';
+        const regenIcon = w.isRegen ? ' ' : '';
         const label = (w.displayName && w.displayName !== w.id) ? `${w.id} (${w.displayName})${regenIcon}` : `${w.id}${regenIcon}`;
         html += `<option value="${escapeAttr(w.id)}" ${selected ? 'selected' : ''}>${label}</option>`;
     }
@@ -321,11 +309,11 @@ function openEventEditor(eventConfig) {
         <div class="modal" style="max-width: 900px; max-height: 90vh;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-calendar-alt"></i>
+                    <i class="icon ui-calendar-alt"></i>
                     Event Editor: ${escapeHtml(eventConfig['display-name'])}
                 </h3>
                 <button class="modal-close" onclick="closeEventEditor()">
-                    <i class="fas fa-times"></i>
+                    <i class="icon ui-times"></i>
                 </button>
             </div>
             <div class="modal-body" style="max-height: calc(90vh - 140px); overflow-y: auto;">
@@ -337,7 +325,7 @@ function openEventEditor(eventConfig) {
                     <div class="tab" onclick="switchEventTab('mechanics')">${i18n.t('editor.tabMechanics')}</div>
                     <div class="tab" onclick="switchEventTab('messages')">${i18n.t('editor.tabMessages')}</div>
                     <div class="tab" onclick="switchEventTab('rewards')">${i18n.t('editor.tabRewards')}</div>
-                    <div class="tab" onclick="switchEventTab('expert')"><i class="fas fa-wrench"></i> ${i18n.t('editor.tabExpert')}</div>
+                    <div class="tab" onclick="switchEventTab('expert')"><i class="icon ui-wrench"></i> ${i18n.t('editor.tabExpert')}</div>
                 </div>
 
                 <div id="event-tab-basic" class="tab-content active">
@@ -409,13 +397,13 @@ function openEventEditor(eventConfig) {
 
                         <!-- Validation warning if lobby enabled but no lobby world selected -->
                         <div id="lobby-world-required-warning" class="alert alert-warning" style="margin-top: 0.5rem; ${eventConfig.worlds['use-lobby'] !== false && !eventConfig.worlds['lobby-world'] ? 'display: flex;' : 'display: none;'}">
-                            <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
+                            <i class="icon ui-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
                             <span>${i18n.t('editor.lobbyWorldRequiredWarning')}</span>
                         </div>
 
                         <!-- Info if lobby phase disabled -->
                         <div id="lobby-world-disabled-info" class="alert alert-info" style="margin-top: 0.5rem; ${eventConfig.worlds['use-lobby'] === false ? 'display: flex;' : 'display: none;'}">
-                            <i class="fas fa-info-circle" style="margin-right: 0.5rem; margin-top: 0.2rem;"></i>
+                            <i class="icon ui-info-circle" style="margin-right: 0.5rem; margin-top: 0.2rem;"></i>
                             <span>${i18n.t('editor.lobbyWorldDisabledInfo')}</span>
                         </div>
                     </div>
@@ -431,7 +419,7 @@ function openEventEditor(eventConfig) {
 
                         <!-- Validation warning if no event world selected -->
                         <div id="event-world-required-warning" class="alert alert-warning" style="margin-top: 0.5rem; ${!eventConfig.worlds['event-world'] ? 'display: flex;' : 'display: none;'}">
-                            <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
+                            <i class="icon ui-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
                             <span>${i18n.t('editor.eventWorldRequiredWarning')}</span>
                         </div>
                     </div>
@@ -510,7 +498,7 @@ function openEventEditor(eventConfig) {
                     <div class="card" style="margin: 1rem 0; background: var(--background);">
                         <div class="card-header" style="padding: 0.75rem;">
                             <div class="card-title" style="font-size: 0.9rem;">
-                                <i class="fas fa-trophy"></i> ${i18n.t('editor.winCondition')}
+                                <i class="icon ui-trophy"></i> ${i18n.t('editor.winCondition')}
                             </div>
                         </div>
                         <div class="card-body" style="padding: 0.75rem;">
@@ -611,7 +599,7 @@ function openEventEditor(eventConfig) {
                     </div>
 
                     <div id="event-world-regen-lock-notice" class="alert alert-info" style="margin-top: 0.75rem; ${globalRegen ? 'display: flex;' : 'display: none;'}">
-                        <i class="fas fa-lock" style="margin-right: 0.5rem; margin-top: 0.2rem;"></i>
+                        <i class="icon ui-lock" style="margin-right: 0.5rem; margin-top: 0.2rem;"></i>
                         <span id="event-world-regen-lock-text">${i18n.t('editor.regenLockedByWorldHint', { world: eventConfig.worlds['event-world'] || '' })}</span>
                     </div>
 
@@ -627,7 +615,7 @@ function openEventEditor(eventConfig) {
 
                     <!-- Warning if no clone source is configured -->
                     <div id="event-no-clone-warning" class="alert alert-warning" style="margin-top: 0.75rem; ${!eventConfig.worlds['clone-source-event-world'] ? 'display: flex;' : 'display: none;'}">
-                        <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
+                        <i class="icon ui-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
                         <div>
                             <strong>${i18n.t('editor.noCloneSourceWarningTitle')}</strong><br>
                             <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('editor.noCloneSourceWarningText')}</span>
@@ -636,7 +624,7 @@ function openEventEditor(eventConfig) {
 
                     <!-- Info if clone source is configured -->
                     <div id="event-clone-active-info" class="alert alert-success" style="margin-top: 0.75rem; ${eventConfig.worlds['clone-source-event-world'] ? 'display: flex;' : 'display: none;'}">
-                        <i class="fas fa-check-circle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--success, #10b981);"></i>
+                        <i class="icon ui-check-circle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--success, #10b981);"></i>
                         <div>
                             <strong>${i18n.t('editor.cloneSourceActiveTitle')}</strong><br>
                             <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('editor.cloneSourceActiveText')}</span>
@@ -710,7 +698,7 @@ function renderWinConditionOptions(winCondition) {
                            placeholder="${escapeAttr(i18n.t('editor.customItemPlaceholder'))}"
                            value="${escapeAttr(isCustomItem ? currentItem : '')}"
                            onchange="currentEditingEvent['win-condition'].item = this.value.toUpperCase().trim()">
-                    <small style="font-size: 0.7rem; color: var(--text-muted);">${i18n.t('editor.customItemHint')}</small>
+                    <small style="font-size: .8125rem; color: var(--text-muted);">${i18n.t('editor.customItemHint')}</small>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label class="form-label" style="font-size: 0.85rem;">${i18n.t('editor.requiredAmount')}</label>
@@ -718,8 +706,8 @@ function renderWinConditionOptions(winCondition) {
                            value="${escapeAttr(winCondition?.amount || 1)}"
                            onchange="currentEditingEvent['win-condition'].amount = parseInt(this.value)">
                 </div>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
-                    <i class="fas fa-info-circle"></i> ${i18n.t('editor.winConditionPickupDesc')}
+                <p style="font-size: .8125rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    <i class="icon ui-info-circle"></i> ${i18n.t('editor.winConditionPickupDesc')}
                 </p>
             `;
 
@@ -731,8 +719,8 @@ function renderWinConditionOptions(winCondition) {
                            value="${escapeAttr(winCondition?.kills || 5)}"
                            onchange="currentEditingEvent['win-condition'].kills = parseInt(this.value)">
                 </div>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
-                    <i class="fas fa-info-circle"></i> ${i18n.t('editor.winConditionKillDesc')}
+                <p style="font-size: .8125rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    <i class="icon ui-info-circle"></i> ${i18n.t('editor.winConditionKillDesc')}
                 </p>
             `;
 
@@ -744,8 +732,8 @@ function renderWinConditionOptions(winCondition) {
                            value="${escapeAttr(winCondition?.time || 300)}"
                            onchange="currentEditingEvent['win-condition'].time = parseInt(this.value)">
                 </div>
-                <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
-                    <i class="fas fa-info-circle"></i> ${i18n.t('editor.winConditionTimeDesc')}
+                <p style="font-size: .8125rem; color: var(--text-muted); margin-top: 0.5rem;">
+                    <i class="icon ui-info-circle"></i> ${i18n.t('editor.winConditionTimeDesc')}
                 </p>
             `;
 
@@ -753,7 +741,7 @@ function renderWinConditionOptions(winCondition) {
         default:
             return `
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0;">
-                    <i class="fas fa-skull-crossbones"></i> ${i18n.t('editor.winConditionLastDesc')}
+                    <i class="icon ui-skull-crossbones"></i> ${i18n.t('editor.winConditionLastDesc')}
                 </p>
             `;
     }
@@ -841,7 +829,7 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-map-marker-alt"></i> ${i18n.t('spawn.singlePoint')}
+                            <i class="icon ui-map-marker-alt"></i> ${i18n.t('spawn.singlePoint')}
                         </div>
                     </div>
                     <div class="card-body">
@@ -886,7 +874,7 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-circle"></i> ${i18n.t('spawn.randomRadiusTitle')}
+                            <i class="icon ui-circle"></i> ${i18n.t('spawn.randomRadiusTitle')}
                         </div>
                     </div>
                     <div class="card-body">
@@ -929,7 +917,7 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-vector-square"></i> ${i18n.t('spawn.randomAreaTitle')}
+                            <i class="icon ui-vector-square"></i> ${i18n.t('spawn.randomAreaTitle')}
                         </div>
                     </div>
                     <div class="card-body">
@@ -987,7 +975,7 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-cube"></i> ${i18n.t('spawn.randomCubeTitle')}
+                            <i class="icon ui-cube"></i> ${i18n.t('spawn.randomCubeTitle')}
                         </div>
                     </div>
                     <div class="card-body">
@@ -1044,10 +1032,10 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-map-signs"></i> ${i18n.t('spawn.multipleSpawnsTitle')}
+                            <i class="icon ui-map-signs"></i> ${i18n.t('spawn.multipleSpawnsTitle')}
                         </div>
                         <button class="btn btn-secondary" onclick="addEventSpawnPoint()">
-                            <i class="fas fa-plus"></i> ${i18n.t('spawn.addSpawn')}
+                            <i class="icon ui-plus"></i> ${i18n.t('spawn.addSpawn')}
                         </button>
                     </div>
                     <div class="card-body">
@@ -1068,7 +1056,7 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-users"></i> ${i18n.t('spawn.teamSpawnsTitle')}
+                            <i class="icon ui-users"></i> ${i18n.t('spawn.teamSpawnsTitle')}
                         </div>
                     </div>
                     <div class="card-body">
@@ -1078,15 +1066,15 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                         <div class="collapsible open">
                             <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background: rgba(33, 150, 243, 0.1);">
                                 <div class="collapsible-title" style="color: var(--info);">
-                                    <i class="fas fa-users"></i>
+                                    <i class="icon ui-users"></i>
                                     <span>Team 1 Spawns</span>
                                     <span class="nav-badge">${teamSpawns.team1?.length || 0}</span>
                                 </div>
-                                <i class="fas fa-chevron-down collapsible-icon"></i>
+                                <i class="icon ui-chevron-down collapsible-icon"></i>
                             </div>
                             <div class="collapsible-content">
                                 <button class="btn btn-secondary" onclick="addTeamSpawnPoint('team1')" style="margin-bottom: 1rem;">
-                                    <i class="fas fa-plus"></i> ${i18n.t('spawn.addSpawn')}
+                                    <i class="icon ui-plus"></i> ${i18n.t('spawn.addSpawn')}
                                 </button>
                                 <div id="team1-spawns">
                                     ${(teamSpawns.team1 || []).map((spawn, i) => renderTeamSpawnPoint('team1', spawn, i)).join('')}
@@ -1096,15 +1084,15 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                         <div class="collapsible open">
                             <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background: rgba(244, 67, 54, 0.1);">
                                 <div class="collapsible-title" style="color: var(--error);">
-                                    <i class="fas fa-users"></i>
+                                    <i class="icon ui-users"></i>
                                     <span>Team 2 Spawns</span>
                                     <span class="nav-badge">${teamSpawns.team2?.length || 0}</span>
                                 </div>
-                                <i class="fas fa-chevron-down collapsible-icon"></i>
+                                <i class="icon ui-chevron-down collapsible-icon"></i>
                             </div>
                             <div class="collapsible-content">
                                 <button class="btn btn-secondary" onclick="addTeamSpawnPoint('team2')" style="margin-bottom: 1rem;">
-                                    <i class="fas fa-plus"></i> ${i18n.t('spawn.addSpawn')}
+                                    <i class="icon ui-plus"></i> ${i18n.t('spawn.addSpawn')}
                                 </button>
                                 <div id="team2-spawns">
                                     ${(teamSpawns.team2 || []).map((spawn, i) => renderTeamSpawnPoint('team2', spawn, i)).join('')}
@@ -1121,7 +1109,7 @@ function renderEventSpawnConfig(spawnType, spawnSettings) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-terminal"></i> ${i18n.t('spawn.commandTitle')}
+                            <i class="icon ui-terminal"></i> ${i18n.t('spawn.commandTitle')}
                         </div>
                     </div>
                     <div class="card-body">
@@ -1151,7 +1139,7 @@ function renderEventSpawnPoint(spawn, index) {
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                     <span style="font-weight: 500;">Spawn #${index + 1}</span>
                     <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { removeEventSpawnPoint(index); })}>
-                        <i class="fas fa-trash"></i>
+                        <i class="icon ui-trash"></i>
                     </button>
                 </div>
                 <div class="coords-grid">
@@ -1199,7 +1187,7 @@ function renderTeamSpawnPoint(team, spawn, index) {
             <input type="number" class="form-control" value="${escapeAttr(spawn.yaw || 0)}" step="1" placeholder="Yaw" style="width: 60px;"
                    ${eventAttrs("change", function(event) { updateTeamSpawnCoord(team, index, 'yaw', parseFloat(this.value)); })}>
             <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { removeTeamSpawnPoint(team, index); })}>
-                <i class="fas fa-times"></i>
+                <i class="icon ui-times"></i>
             </button>
         </div>
     `;
@@ -1367,12 +1355,12 @@ function renderWorldIdStatus(worldId) {
 
     const status = getMvStatus(worldId);
     if (status.state === 'placeholder') {
-        return `<span class="mv-hint mv-hint-muted"><i class="fas fa-circle-info"></i> ${i18n.t('editor.mvStatusPlaceholder')}</span>`;
+        return `<span class="mv-hint mv-hint-muted"><i class="icon ui-circle-info"></i> ${i18n.t('editor.mvStatusPlaceholder')}</span>`;
     }
     if (status.state === 'loaded') {
-        return `<span class="mv-hint mv-hint-ok"><i class="fas fa-circle-check"></i> ${i18n.t('editor.mvStatusLoaded')}</span>`;
+        return `<span class="mv-hint mv-hint-ok"><i class="icon ui-circle-check"></i> ${i18n.t('editor.mvStatusLoaded')}</span>`;
     }
-    return `<span class="mv-hint mv-hint-warn"><i class="fas fa-circle-pause"></i> ${i18n.t('editor.mvStatusUnloaded')}</span>`;
+    return `<span class="mv-hint mv-hint-warn"><i class="icon ui-circle-pause"></i> ${i18n.t('editor.mvStatusUnloaded')}</span>`;
 }
 
 /**
@@ -1387,20 +1375,20 @@ function renderWorldMultiverseTab(worldId) {
         // Kein Erstellen-Formular auf Basis veralteter Daten: die Welt koennte laengst existieren.
         return `
             <div class="alert alert-warning" style="display: flex; gap: 0.5rem;">
-                <i class="fas fa-triangle-exclamation" style="margin-top: 0.2rem;"></i>
+                <i class="icon ui-triangle-exclamation" style="margin-top: 0.2rem;"></i>
                 <div>
                     <strong>${i18n.t('mv.staleTitle')}</strong><br>
                     <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('mv.staleHint')}</span>
                 </div>
             </div>
             <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="refreshMvWorlds()">
-                <i class="fas fa-rotate"></i> ${i18n.t('button.mvRetry')}
+                <i class="icon ui-rotate"></i> ${i18n.t('button.mvRetry')}
             </button>`;
     }
     if (!MV_STATE.available) {
         return `
             <div class="alert alert-warning" style="display: flex; gap: 0.5rem;">
-                <i class="fas fa-plug-circle-xmark" style="margin-top: 0.2rem;"></i>
+                <i class="icon ui-plug-circle-xmark" style="margin-top: 0.2rem;"></i>
                 <div>
                     <strong>${i18n.t('mv.backendMissing')}</strong><br>
                     <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('mv.backendMissingHint')}</span>
@@ -1420,7 +1408,7 @@ function renderWorldMultiverseTab(worldId) {
     if (status.state !== 'placeholder') {
         return `
             <div class="alert alert-success" style="display: flex; gap: 0.5rem;">
-                <i class="fas fa-circle-check" style="margin-top: 0.2rem;"></i>
+                <i class="icon ui-circle-check" style="margin-top: 0.2rem;"></i>
                 <div>
                     <strong>${i18n.t('editor.mvWorldExistsTitle', { id: worldId })}</strong><br>
                     <span style="font-size: 0.85rem; opacity: 0.9;">
@@ -1432,11 +1420,11 @@ function renderWorldMultiverseTab(worldId) {
             <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
                 ${status.state === 'loaded'
                     ? `<button class="btn btn-secondary" ${eventAttrs("click", function(event) { mvUnloadWorld(worldId); })}>
-                           <i class="fas fa-eject"></i> ${i18n.t('button.mvUnload')}</button>`
+                           <i class="icon ui-eject"></i> ${i18n.t('button.mvUnload')}</button>`
                     : `<button class="btn btn-secondary" ${eventAttrs("click", function(event) { mvLoadWorld(worldId); })}>
-                           <i class="fas fa-play"></i> ${i18n.t('button.mvLoad')}</button>`}
+                           <i class="icon ui-play"></i> ${i18n.t('button.mvLoad')}</button>`}
                 <button class="btn btn-danger" ${eventAttrs("click", function(event) { openDeleteWorldModal(worldId, true); })}>
-                    <i class="fas fa-trash"></i> ${i18n.t('button.mvDeleteWorldOnly')}
+                    <i class="icon ui-trash"></i> ${i18n.t('button.mvDeleteWorldOnly')}
                 </button>
             </div>
             <p class="form-help" style="margin-top: 0.5rem;">${i18n.t('editor.mvDeleteWorldOnlyHint')}</p>`;
@@ -1444,7 +1432,7 @@ function renderWorldMultiverseTab(worldId) {
 
     return `
         <div class="alert alert-info" style="display: flex; gap: 0.5rem;">
-            <i class="fas fa-circle-info" style="margin-top: 0.2rem;"></i>
+            <i class="icon ui-circle-info" style="margin-top: 0.2rem;"></i>
             <div>
                 <strong>${i18n.t('editor.mvStatusPlaceholder')}</strong><br>
                 <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('editor.mvCreateOptional')}</span>
@@ -1526,7 +1514,7 @@ function renderWorldMultiverseTab(worldId) {
 
         <button class="btn btn-primary" style="margin-top: 1rem;" id="mv-create-button"
                 ${eventAttrs("click", function(event) { createMvWorldFromEditor(worldId); })}>
-            <i class="fas fa-wand-magic-sparkles"></i> ${i18n.t('button.mvCreateWorldNow')}
+            <i class="icon ui-wand-magic-sparkles"></i> ${i18n.t('button.mvCreateWorldNow')}
         </button>
         <p class="form-help" style="margin-top: 0.5rem;">${i18n.t('editor.mvCreateHint')}</p>`;
 }
@@ -1541,7 +1529,7 @@ async function createMvWorldFromEditor(worldId) {
     const button = document.getElementById('mv-create-button');
     if (button) {
         button.disabled = true;
-        button.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${i18n.t('editor.mvCreating')}`;
+        button.innerHTML = `<i class="icon ui-spinner ui-spin"></i> ${i18n.t('editor.mvCreating')}`;
     }
 
     const spec = Object.assign({ world: worldId }, currentWorldCreateSpec || defaultWorldCreateSpec());
@@ -1554,7 +1542,7 @@ async function createMvWorldFromEditor(worldId) {
         renderServerWorldsPanel();
     } else if (button) {
         button.disabled = false;
-        button.innerHTML = `<i class="fas fa-wand-magic-sparkles"></i> ${i18n.t('button.mvCreateWorldNow')}`;
+        button.innerHTML = `<i class="icon ui-wand-magic-sparkles"></i> ${i18n.t('button.mvCreateWorldNow')}`;
     }
 }
 
@@ -1625,11 +1613,11 @@ function openWorldEditor(worldConfig, isNew = false) {
         <div class="modal" style="max-width: 900px; max-height: 90vh;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-globe"></i>
+                    <i class="icon ui-globe"></i>
                     ${escapeHtml(isNew ? i18n.t('editor.newWorld') : i18n.t('editor.editWorld') + ' ' + worldConfig['display-name'])}
                 </h3>
                 <button class="modal-close" onclick="closeWorldEditor()">
-                    <i class="fas fa-times"></i>
+                    <i class="icon ui-times"></i>
                 </button>
             </div>
             <div class="modal-body" style="max-height: calc(90vh - 140px); overflow-y: auto;">
@@ -1637,8 +1625,8 @@ function openWorldEditor(worldConfig, isNew = false) {
                     <div class="tab active" onclick="switchWorldTab('basic')">${i18n.t('editor.tabBase')}</div>
                     <div class="tab" onclick="switchWorldTab('spawns')">${i18n.t('editor.tabSpawns')}</div>
                     <div class="tab" onclick="switchWorldTab('settings')">${i18n.t('editor.tabSettings')}</div>
-                    <div class="tab" onclick="switchWorldTab('multiverse')"><i class="fas fa-earth-europe"></i> ${i18n.t('editor.tabMultiverse')}</div>
-                    <div class="tab" onclick="switchWorldTab('expert')"><i class="fas fa-wrench"></i> ${i18n.t('editor.tabExpert')}</div>
+                    <div class="tab" onclick="switchWorldTab('multiverse')"><i class="icon ui-earth-europe"></i> ${i18n.t('editor.tabMultiverse')}</div>
+                    <div class="tab" onclick="switchWorldTab('expert')"><i class="icon ui-wrench"></i> ${i18n.t('editor.tabExpert')}</div>
                 </div>
 
                 <!-- Basic Tab -->
@@ -1727,7 +1715,7 @@ function openWorldEditor(worldConfig, isNew = false) {
 
                     <!-- Warning if no clone source is configured -->
                     <div id="world-no-clone-warning" class="alert alert-warning" style="margin-top: 0.75rem; ${!worldConfig['clone-source-world'] ? 'display: flex;' : 'display: none;'}">
-                        <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
+                        <i class="icon ui-exclamation-triangle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--warning, #f59e0b);"></i>
                         <div>
                             <strong>${i18n.t('editor.noCloneSourceWarningTitle')}</strong><br>
                             <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('editor.noCloneSourceWarningText')}</span>
@@ -1736,7 +1724,7 @@ function openWorldEditor(worldConfig, isNew = false) {
 
                     <!-- Info if clone source is configured -->
                     <div id="world-clone-active-info" class="alert alert-success" style="margin-top: 0.75rem; ${worldConfig['clone-source-world'] ? 'display: flex;' : 'display: none;'}">
-                        <i class="fas fa-check-circle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--success, #10b981);"></i>
+                        <i class="icon ui-check-circle" style="margin-right: 0.5rem; margin-top: 0.2rem; color: var(--success, #10b981);"></i>
                         <div>
                             <strong>${i18n.t('editor.cloneSourceActiveTitle')}</strong><br>
                             <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('editor.cloneSourceActiveText')}</span>
@@ -1770,7 +1758,7 @@ function openWorldEditor(worldConfig, isNew = false) {
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeWorldEditor()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-primary" onclick="saveWorldEditor()">
-                    <i class="fas fa-save"></i> ${i18n.t('button.save')}
+                    <i class="icon ui-save"></i> ${i18n.t('button.save')}
                 </button>
             </div>
         </div>
@@ -1793,7 +1781,7 @@ function renderWorldSpawnConfig(spawnType, spawns) {
             <div class="card" style="margin-bottom: 1rem;">
                 <div class="card-header" style="background: rgba(255, 152, 0, 0.1);">
                     <div class="card-title" style="color: var(--warning);">
-                        <i class="fas fa-eye"></i> ${i18n.t('spawn.spectator')}
+                        <i class="icon ui-eye"></i> ${i18n.t('spawn.spectator')}
                     </div>
                 </div>
                 <div class="card-body">
@@ -1830,7 +1818,7 @@ function renderWorldSpawnConfig(spawnType, spawns) {
             <div class="card" style="margin-bottom: 1rem;">
                 <div class="card-header" style="background: rgba(33, 150, 243, 0.1);">
                     <div class="card-title" style="color: var(--info);">
-                        <i class="fas fa-user"></i> ${i18n.t('spawn.player1')}
+                        <i class="icon ui-user"></i> ${i18n.t('spawn.player1')}
                     </div>
                 </div>
                 <div class="card-body">
@@ -1867,7 +1855,7 @@ function renderWorldSpawnConfig(spawnType, spawns) {
             <div class="card">
                 <div class="card-header" style="background: rgba(244, 67, 54, 0.1);">
                     <div class="card-title" style="color: var(--error);">
-                        <i class="fas fa-user"></i> ${i18n.t('spawn.player2')}
+                        <i class="icon ui-user"></i> ${i18n.t('spawn.player2')}
                     </div>
                 </div>
                 <div class="card-body">
@@ -1908,7 +1896,7 @@ function renderWorldSpawnConfig(spawnType, spawns) {
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="fas fa-circle"></i> ${i18n.t('label.randomSpawnRadius')}
+                        <i class="icon ui-circle"></i> ${i18n.t('label.randomSpawnRadius')}
                     </div>
                 </div>
                 <div class="card-body">
@@ -1950,7 +1938,7 @@ function renderWorldSpawnConfig(spawnType, spawns) {
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">
-                        <i class="fas fa-vector-square"></i> ${i18n.t('spawn.randomAreaTitle')}
+                        <i class="icon ui-vector-square"></i> ${i18n.t('spawn.randomAreaTitle')}
                     </div>
                 </div>
                 <div class="card-body">
@@ -2197,11 +2185,11 @@ function openEquipmentEditor(equipConfig, isNew = false) {
         <div class="modal" style="max-width: 1000px; max-height: 90vh;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-shield-alt"></i>
+                    <i class="icon ui-shield-alt"></i>
                     ${escapeHtml(isNew ? i18n.t('editor.newEquipment') : i18n.t('editor.editEquipment') + ' ' + equipConfig['display-name'])}
                 </h3>
                 <button class="modal-close" onclick="closeEquipmentEditor()">
-                    <i class="fas fa-times"></i>
+                    <i class="icon ui-times"></i>
                 </button>
             </div>
             <div class="modal-body" style="max-height: calc(90vh - 140px); overflow-y: auto;">
@@ -2234,7 +2222,7 @@ function openEquipmentEditor(equipConfig, isNew = false) {
                         <label class="form-label">${i18n.t('editor.equipmentIcon')}</label>
                         <div style="display:flex;align-items:center;gap:0.75rem;">
                             <div class="item-picker-item" style="width:44px;height:44px;flex:0 0 auto;" id="equipment-icon-preview">
-                                ${equipConfig.icon ? itemIconHtml(equipConfig.icon, 36) : '<i class="fas fa-wand-magic-sparkles" style="color:var(--text-muted);"></i>'}
+                                ${equipConfig.icon ? itemIconHtml(equipConfig.icon, 36) : '<i class="icon ui-wand-magic-sparkles" style="color:var(--text-muted);"></i>'}
                             </div>
                             <input type="text" class="form-control" id="equipment-icon" value="${escapeAttr(equipConfig.icon || '')}"
                                    placeholder="${escapeAttr(i18n.t('editor.equipmentIconAuto'))}"
@@ -2298,7 +2286,7 @@ function openEquipmentEditor(equipConfig, isNew = false) {
                 <!-- Armor Tab -->
                 <div id="equipment-tab-armor" class="tab-content">
                     <div class="form-hint-inline">
-                        <i class="fas fa-lightbulb"></i> ${i18n.t('editor.armorClickHint')}
+                        <i class="icon ui-lightbulb"></i> ${i18n.t('editor.armorClickHint')}
                     </div>
                     <div class="equipment-preview">
                         <div class="armor-slots">
@@ -2313,7 +2301,7 @@ function openEquipmentEditor(equipConfig, isNew = false) {
                         </div>
                         <div style="flex: 1;">
                             <div class="search-box" style="margin-bottom: 1rem;">
-                                <i class="fas fa-search"></i>
+                                <i class="icon ui-search"></i>
                                 <input type="text" class="form-control" placeholder="${escapeAttr(i18n.t('editor.searchItem'))}"
                                        id="equipment-armor-search" oninput="filterArmorItems(this.value)">
                             </div>
@@ -2327,7 +2315,7 @@ function openEquipmentEditor(equipConfig, isNew = false) {
                 <!-- Inventory Tab -->
                 <div id="equipment-tab-inventory" class="tab-content">
                     <div class="form-hint-inline">
-                        <i class="fas fa-lightbulb"></i> ${i18n.t('editor.inventoryDoubleClickHint')}
+                        <i class="icon ui-lightbulb"></i> ${i18n.t('editor.inventoryDoubleClickHint')}
                     </div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
                         <div>
@@ -2337,14 +2325,14 @@ function openEquipmentEditor(equipConfig, isNew = false) {
                             </div>
                             <div style="margin-top: 1rem;">
                                 <button class="btn btn-secondary" onclick="clearEquipmentInventory()">
-                                    <i class="fas fa-trash"></i> ${i18n.t('editor.clearInventory')}
+                                    <i class="icon ui-trash"></i> ${i18n.t('editor.clearInventory')}
                                 </button>
                             </div>
                         </div>
                         <div>
                             <p style="color: var(--text-secondary); margin-bottom: 1rem;">${i18n.t('equipment.addItem')}</p>
                             <div class="search-box" style="margin-bottom: 1rem;">
-                                <i class="fas fa-search"></i>
+                                <i class="icon ui-search"></i>
                                 <input type="text" class="form-control" placeholder="${escapeAttr(i18n.t('editor.searchItem'))}"
                                        id="equipment-item-search" oninput="filterEquipmentItems(this.value)">
                             </div>
@@ -2358,7 +2346,7 @@ function openEquipmentEditor(equipConfig, isNew = false) {
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeEquipmentEditor()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-primary" onclick="saveEquipmentEditor()">
-                    <i class="fas fa-save"></i> ${i18n.t('button.save')}
+                    <i class="icon ui-save"></i> ${i18n.t('button.save')}
                 </button>
             </div>
         </div>
@@ -2496,7 +2484,7 @@ const onEquipmentIconInput = debounce(function (value) {
     if (icon) {
         icon.innerHTML = known
             ? itemIconHtml(name, 36)
-            : '<i class="fas fa-wand-magic-sparkles" style="color:var(--text-muted);"></i>';
+            : '<i class="icon ui-wand-magic-sparkles" style="color:var(--text-muted);"></i>';
     }
 
     const suggestions = document.getElementById('equipment-icon-suggestions');
@@ -2546,10 +2534,10 @@ function renderArmorSlot(slotType, currentItem, label) {
             ${hasItem ? `
                 ${itemIconHtml(currentItem, 40)}
             ` : `
-                <i class="fas fa-${getSlotIcon(slotType)}" style="color: var(--text-muted);"></i>
+                <i class="icon ui-${getSlotIcon(slotType)}" style="color: var(--text-muted);"></i>
             `}
         </div>
-        <small style="color: var(--text-muted); font-size: 0.7rem;">${label}</small>
+        <small style="color: var(--text-muted); font-size: .8125rem;">${label}</small>
     `;
 }
 
@@ -2617,14 +2605,14 @@ function renderPickerSection(label, entries, clickHandler, expanded) {
                     <span>${label}</span>
                     <span class="nav-badge">${entries.length}</span>
                 </div>
-                <i class="fas fa-chevron-down collapsible-icon"></i>
+                <i class="icon ui-chevron-down collapsible-icon"></i>
             </div>
             <div class="collapsible-content">
                 <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
                     ${body}
                     <div class="item-picker-item" style="width: 40px; height: 40px; background: rgba(244, 67, 54, 0.2);"
                          ${eventAttrs("click", function(event) { clickHandler(null); })} title="${escapeAttr(i18n.t('tooltip.remove'))}">
-                        <i class="fas fa-times" style="color: var(--error);"></i>
+                        <i class="icon ui-times" style="color: var(--error);"></i>
                     </div>
                 </div>
             </div>
@@ -2712,7 +2700,7 @@ function renderInventorySlot(inventory, slotIndex, isHotbar) {
             ${hasItem ? `
                 ${itemIconHtml(item.item, 32)}
                 ${item.amount > 1 ? `<span class="amount">${escapeHtml(item.amount)}</span>` : ''}
-                ${hasEnchants ? `<span class="enchant-indicator">✨</span>` : ''}
+                ${hasEnchants ? `<span class="enchant-indicator">${panelIcon("sparkles")}</span>` : ''}
             ` : ''}
         </div>
     `;
@@ -3217,7 +3205,7 @@ function updateSlotContent(slotEl, item, slotIndex) {
         slotEl.innerHTML = `
             ${itemIconHtml(item.item, 32)}
             ${item.amount > 1 ? `<span class="amount">${escapeHtml(item.amount)}</span>` : ''}
-            ${hasEnchants ? `<span class="enchant-indicator">✨</span>` : ''}
+            ${hasEnchants ? `<span class="enchant-indicator">${panelIcon("sparkles")}</span>` : ''}
         `;
     } else {
         slotEl.innerHTML = '';
@@ -3263,7 +3251,7 @@ function renderItemCategories(term) {
 
     if (!ITEM_CATALOG.ready) {
         return `<div style="padding:1rem;color:var(--text-muted);">
-            <i class="fas fa-circle-notch fa-spin"></i> ${i18n.t('picker.loading')}
+            <i class="icon ui-circle-notch ui-spin"></i> ${i18n.t('picker.loading')}
         </div>`;
     }
 
@@ -3289,7 +3277,7 @@ function renderItemCategories(term) {
                         <span>${i18n.t('picker.category.' + category)}</span>
                         <span class="nav-badge">${all.length}</span>
                     </div>
-                    <i class="fas fa-chevron-down collapsible-icon"></i>
+                    <i class="icon ui-chevron-down collapsible-icon"></i>
                 </div>
                 <div class="collapsible-content">
                     <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
@@ -3314,7 +3302,7 @@ function renderItemCategories(term) {
 
     if (totalMatches === 0) {
         return `<div style="padding:2rem;text-align:center;color:var(--text-muted);">
-            <i class="fas fa-search"></i> ${i18n.t('picker.noResults')}
+            <i class="icon ui-search"></i> ${i18n.t('picker.noResults')}
         </div>`;
     }
     return html;
@@ -3407,7 +3395,7 @@ function setArmorItem(itemName) {
             `;
         } else {
             slot.classList.remove('filled');
-            slot.innerHTML = `<i class="fas fa-${getSlotIcon(selectedArmorSlot)}" style="color: var(--text-muted);"></i>`;
+            slot.innerHTML = `<i class="icon ui-${getSlotIcon(selectedArmorSlot)}" style="color: var(--text-muted);"></i>`;
         }
     }
 
@@ -3483,7 +3471,7 @@ function editArmorSlot(slotType) {
                     ${slotLabels[slotType]}: ${itemName}
                 </h3>
                 <button class="modal-close" onclick="closeArmorEditModal()">
-                    <i class="fas fa-times"></i>
+                    <i class="icon ui-times"></i>
                 </button>
             </div>
             <div class="modal-body">
@@ -3518,17 +3506,17 @@ function editArmorSlot(slotType) {
                     </div>
                 ` : `
                     <div style="color: var(--text-muted); font-style: italic; padding: 1rem; text-align: center;">
-                        <i class="fas fa-info-circle"></i> ${i18n.t('label.noEnchantments')}
+                        <i class="icon ui-info-circle"></i> ${i18n.t('label.noEnchantments')}
                     </div>
                 `}
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger" ${eventAttrs("click", function(event) { removeArmorItem(slotType); })}>
-                    <i class="fas fa-trash"></i> ${i18n.t('button.remove')}
+                    <i class="icon ui-trash"></i> ${i18n.t('button.remove')}
                 </button>
                 <button class="btn btn-secondary" onclick="closeArmorEditModal()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-primary" ${eventAttrs("click", function(event) { saveArmorEdit(slotType); })}>
-                    <i class="fas fa-check"></i> ${i18n.t('button.save')}
+                    <i class="icon ui-check"></i> ${i18n.t('button.save')}
                 </button>
             </div>
         </div>
@@ -3605,7 +3593,7 @@ function removeArmorItem(slotType) {
     const slot = document.getElementById(`armor-slot-${slotType}`);
     if (slot) {
         slot.classList.remove('filled');
-        slot.innerHTML = `<i class="fas fa-${getSlotIcon(slotType)}" style="color: var(--text-muted);"></i>`;
+        slot.innerHTML = `<i class="icon ui-${getSlotIcon(slotType)}" style="color: var(--text-muted);"></i>`;
     }
 
     closeArmorEditModal();
@@ -3678,7 +3666,7 @@ function updateInventorySlotUI(slotIndex) {
         slotEl.innerHTML = `
             ${itemIconHtml(item.item, 32)}
             ${item.amount > 1 ? `<span class="amount">${escapeHtml(item.amount)}</span>` : ''}
-            ${hasEnchants ? `<span class="enchant-indicator">✨</span>` : ''}
+            ${hasEnchants ? `<span class="enchant-indicator">${panelIcon("sparkles")}</span>` : ''}
         `;
     } else if (slotEl) {
         slotEl.classList.remove('filled');
@@ -3737,7 +3725,7 @@ function openItemEditModal(item, slotIndex) {
                     ${escapeHtml(itemDisplayName(material))}
                 </h3>
                 <button class="modal-close" onclick="closeItemEditModal()">
-                    <i class="fas fa-times"></i>
+                    <i class="icon ui-times"></i>
                 </button>
             </div>
             <div class="modal-body" style="max-height: calc(90vh - 160px); overflow-y: auto;">
@@ -3756,7 +3744,7 @@ function openItemEditModal(item, slotIndex) {
                         </div>
                     ` : `
                         <div style="color: var(--text-muted); font-style: italic;">
-                            <i class="fas fa-info-circle"></i> ${i18n.t('label.notStackable')}
+                            <i class="icon ui-info-circle"></i> ${i18n.t('label.notStackable')}
                         </div>
                         <input type="hidden" id="item-amount" value="1">
                     `}
@@ -3780,11 +3768,11 @@ function openItemEditModal(item, slotIndex) {
                     </div>
                 ` : `
                     <div style="color: var(--text-muted); font-style: italic; padding: 0.75rem; text-align: center;">
-                        <i class="fas fa-info-circle"></i> ${i18n.t('label.noEnchantments')}
+                        <i class="icon ui-info-circle"></i> ${i18n.t('label.noEnchantments')}
                     </div>
                 `}
 
-                ${itemSection('lore', 'fa-align-left', i18n.t('item.section.lore'), i18n.t('item.help.lore'), `
+                ${itemSection('lore', 'ui-align-left', i18n.t('item.section.lore'), i18n.t('item.help.lore'), `
                     <textarea id="item-lore" class="form-control" rows="4"
                               placeholder="${escapeAttr(i18n.t('item.placeholder.lore'))}"
                               oninput="updateItemTextPreview()">${escapeHtml((item.lore || []).join('\n'))}</textarea>
@@ -3794,7 +3782,7 @@ function openItemEditModal(item, slotIndex) {
                     </div>
                 `)}
 
-                ${maxDurability > 0 ? itemSection('durability', 'fa-hammer', i18n.t('item.section.durability'), i18n.t('item.help.durability'), `
+                ${maxDurability > 0 ? itemSection('durability', 'ui-hammer', i18n.t('item.section.durability'), i18n.t('item.help.durability'), `
                     <div class="toggle-wrapper">
                         <div class="toggle-label">
                             <span>${i18n.t('item.label.unbreakable')}</span>
@@ -3816,7 +3804,7 @@ function openItemEditModal(item, slotIndex) {
                     </div>
                 `) : ''}
 
-                ${itemSection('display', 'fa-eye', i18n.t('item.section.display'), i18n.t('item.help.display'), `
+                ${itemSection('display', 'ui-eye', i18n.t('item.section.display'), i18n.t('item.help.display'), `
                     <div class="form-group">
                         <label>${i18n.t('item.label.customModelData')}</label>
                         <input type="number" id="item-custom-model-data" class="form-control" min="0" step="1"
@@ -3832,16 +3820,16 @@ function openItemEditModal(item, slotIndex) {
                     </div>
                 `)}
 
-                ${isPotion ? itemSection('potion', 'fa-flask', i18n.t('item.section.potion'), i18n.t('item.help.potion'),
+                ${isPotion ? itemSection('potion', 'ui-flask', i18n.t('item.section.potion'), i18n.t('item.help.potion'),
                     renderPotionEditor(item.potion || {})) : ''}
             </div>
             <div class="modal-footer">
                 <button class="btn btn-danger" ${eventAttrs("click", function(event) { removeInventoryItem(slotIndex); })}>
-                    <i class="fas fa-trash"></i> ${i18n.t('button.remove')}
+                    <i class="icon ui-trash"></i> ${i18n.t('button.remove')}
                 </button>
                 <button class="btn btn-secondary" onclick="closeItemEditModal()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-primary" ${eventAttrs("click", function(event) { saveItemEdit(slotIndex); })}>
-                    <i class="fas fa-check"></i> ${i18n.t('button.save')}
+                    <i class="icon ui-check"></i> ${i18n.t('button.save')}
                 </button>
             </div>
         </div>
@@ -3860,10 +3848,10 @@ function itemSection(id, icon, title, help, body) {
         <div class="collapsible" style="margin-bottom: 0.75rem;" id="item-section-${id}">
             <div class="collapsible-header" onclick="toggleCollapsible(this)">
                 <div class="collapsible-title">
-                    <i class="fas ${icon}" style="margin-right:0.5rem;color:var(--text-muted);"></i>
+                    <i class="icon ${icon}" style="margin-right:0.5rem;color:var(--text-muted);"></i>
                     <span>${title}</span>
                 </div>
-                <i class="fas fa-chevron-down collapsible-icon"></i>
+                <i class="icon ui-chevron-down collapsible-icon"></i>
             </div>
             <div class="collapsible-content">
                 <p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 0.75rem 0;">${help}</p>
@@ -3927,7 +3915,7 @@ function renderPotionEditor(potion) {
                 ${(potion['custom-effects'] || []).map(renderPotionEffectRow).join('')}
             </div>
             <button type="button" class="btn btn-secondary btn-sm" style="margin-top:0.5rem;" onclick="addPotionEffectRow()">
-                <i class="fas fa-plus"></i> ${i18n.t('item.button.addEffect')}
+                <i class="icon ui-plus"></i> ${i18n.t('item.button.addEffect')}
             </button>
         </div>
     `;
@@ -3951,7 +3939,7 @@ function renderPotionEffectRow(effect) {
             <input type="number" class="form-control effect-amplifier" min="1" max="255" step="1"
                    value="${escapeAttr((data.amplifier || 0) + 1)}" title="${escapeAttr(i18n.t('item.label.effectLevel'))}">
             <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.potion-effect-row').remove()">
-                <i class="fas fa-times"></i>
+                <i class="icon ui-times"></i>
             </button>
         </div>
     `;
@@ -4324,17 +4312,17 @@ function renderRewardsEditor(rewards) {
         <div class="collapsible open">
             <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background: rgba(255, 215, 0, 0.1);">
                 <div class="collapsible-title" style="color: #ffd700;">
-                    <i class="fas fa-trophy"></i>
+                    <i class="icon ui-trophy"></i>
                     <span>${i18n.t('rewards.winnerRewards')}</span>
                 </div>
-                <i class="fas fa-chevron-down collapsible-icon"></i>
+                <i class="icon ui-chevron-down collapsible-icon"></i>
             </div>
             <div class="collapsible-content">
                 <!-- Items -->
                 <div class="card" style="margin-bottom: 1rem;">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-box"></i> ${i18n.t('rewards.itemRewards')}
+                            <i class="icon ui-box"></i> ${i18n.t('rewards.itemRewards')}
                         </div>
                         <label class="toggle">
                             <input type="checkbox" ${winner.items?.enabled ? 'checked' : ''}
@@ -4347,7 +4335,7 @@ function renderRewardsEditor(rewards) {
                             ${renderRewardItems('winner', winner.items?.items || [])}
                         </div>
                         <button class="btn btn-secondary" onclick="addRewardItem('winner')" style="margin-top: 0.5rem;">
-                            <i class="fas fa-plus"></i> ${i18n.t('rewards.addItem')}
+                            <i class="icon ui-plus"></i> ${i18n.t('rewards.addItem')}
                         </button>
                     </div>
                 </div>
@@ -4356,7 +4344,7 @@ function renderRewardsEditor(rewards) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-terminal"></i> ${i18n.t('rewards.commandRewards')}
+                            <i class="icon ui-terminal"></i> ${i18n.t('rewards.commandRewards')}
                         </div>
                         <label class="toggle">
                             <input type="checkbox" ${winner.commands?.enabled ? 'checked' : ''}
@@ -4369,7 +4357,7 @@ function renderRewardsEditor(rewards) {
                             ${renderRewardCommands('winner', winner.commands?.commands || [])}
                         </div>
                         <button class="btn btn-secondary" onclick="addRewardCommand('winner')" style="margin-top: 0.5rem;">
-                            <i class="fas fa-plus"></i> ${i18n.t('rewards.addCommand')}
+                            <i class="icon ui-plus"></i> ${i18n.t('rewards.addCommand')}
                         </button>
                     </div>
                 </div>
@@ -4380,17 +4368,17 @@ function renderRewardsEditor(rewards) {
         <div class="collapsible open">
             <div class="collapsible-header" onclick="toggleCollapsible(this)" style="background: rgba(192, 192, 192, 0.1);">
                 <div class="collapsible-title" style="color: #c0c0c0;">
-                    <i class="fas fa-medal"></i>
+                    <i class="icon ui-medal"></i>
                     <span>${i18n.t('rewards.participationRewards')}</span>
                 </div>
-                <i class="fas fa-chevron-down collapsible-icon"></i>
+                <i class="icon ui-chevron-down collapsible-icon"></i>
             </div>
             <div class="collapsible-content">
                 <!-- Items -->
                 <div class="card" style="margin-bottom: 1rem;">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-box"></i> ${i18n.t('rewards.itemRewards')}
+                            <i class="icon ui-box"></i> ${i18n.t('rewards.itemRewards')}
                         </div>
                         <label class="toggle">
                             <input type="checkbox" ${participation.items?.enabled ? 'checked' : ''}
@@ -4403,7 +4391,7 @@ function renderRewardsEditor(rewards) {
                             ${renderRewardItems('participation', participation.items?.items || [])}
                         </div>
                         <button class="btn btn-secondary" onclick="addRewardItem('participation')" style="margin-top: 0.5rem;">
-                            <i class="fas fa-plus"></i> ${i18n.t('rewards.addItem')}
+                            <i class="icon ui-plus"></i> ${i18n.t('rewards.addItem')}
                         </button>
                     </div>
                 </div>
@@ -4412,7 +4400,7 @@ function renderRewardsEditor(rewards) {
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">
-                            <i class="fas fa-terminal"></i> ${i18n.t('rewards.commandRewards')}
+                            <i class="icon ui-terminal"></i> ${i18n.t('rewards.commandRewards')}
                         </div>
                         <label class="toggle">
                             <input type="checkbox" ${participation.commands?.enabled ? 'checked' : ''}
@@ -4425,7 +4413,7 @@ function renderRewardsEditor(rewards) {
                             ${renderRewardCommands('participation', participation.commands?.commands || [])}
                         </div>
                         <button class="btn btn-secondary" onclick="addRewardCommand('participation')" style="margin-top: 0.5rem;">
-                            <i class="fas fa-plus"></i> ${i18n.t('rewards.addCommand')}
+                            <i class="icon ui-plus"></i> ${i18n.t('rewards.addCommand')}
                         </button>
                     </div>
                 </div>
@@ -4449,7 +4437,7 @@ function renderRewardItems(type, items) {
             <input type="number" class="form-control" value="${escapeAttr(item.amount || 1)}" min="1" max="64" style="width: 60px;"
                    ${eventAttrs("change", function(event) { updateRewardItem(type, i, 'amount', parseInt(this.value)); })}>
             <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { removeRewardItem(type, i); })}>
-                <i class="fas fa-times"></i>
+                <i class="icon ui-times"></i>
             </button>
         </div>
     `).join('');
@@ -4466,7 +4454,7 @@ function renderRewardCommands(type, commands) {
             <input type="text" class="form-control" value="${escapeAttr(cmd)}" placeholder="eco give {player} 100" style="flex: 1;"
                    ${eventAttrs("change", function(event) { updateRewardCommand(type, i, this.value); })}>
             <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { removeRewardCommand(type, i); })}>
-                <i class="fas fa-times"></i>
+                <i class="icon ui-times"></i>
             </button>
         </div>
     `).join('');
@@ -4666,7 +4654,7 @@ window.saveItemEdit = saveItemEdit;
 window.closeItemEditModal = closeItemEditModal;
 
 // Debug: Bestätige dass Registrierung erfolgreich war
-console.log('✓ Editor-Funktionen global registriert:', {
+console.log(' Editor-Funktionen global registriert:', {
     createNewEvent: typeof window.createNewEvent,
     editEvent: typeof window.editEvent,
     createNewWorld: typeof window.createNewWorld,

@@ -48,7 +48,7 @@ const i18n = {
                 const data = await response.json();
                 this.availableLanguages = data.available || [];
                 this.defaultLanguage = data.default || 'en';
-                console.log('✓ Available languages:', this.availableLanguages.map(l => l.code).join(', '));
+                console.log(' Available languages:', this.availableLanguages.map(l => l.code).join(', '));
             }
         } catch (error) {
             console.warn('Could not load languages.json, using defaults');
@@ -76,7 +76,7 @@ const i18n = {
             }
             this.strings = await response.json();
             this.current = language;
-            console.log(`✓ Language loaded: ${language}`);
+            console.log(` Language loaded: ${language}`);
             
             // Update language selector if it exists
             this.updateLanguageSelector();
@@ -747,9 +747,9 @@ function updateUserDisplay() {
     const userDisplay = document.getElementById('user-display');
     if (userDisplay && currentPlayer) {
         userDisplay.innerHTML = `
-            <span class="user-name">👤 ${escapeHtml(currentPlayer)}</span>
+            <span class="user-name">${panelIcon("person")} ${escapeHtml(currentPlayer)}</span>
             <button class="logout-btn" onclick="performLogout()" title="${escapeAttr(i18n.t('nav.logout'))}">
-                <span>🚪</span>
+                ${panelIcon("logout")}
             </button>
         `;
         userDisplay.style.display = 'flex';
@@ -1014,7 +1014,8 @@ function showSection(sectionName) {
     });
     
     // Remove active from all nav items
-    allNavItems.forEach(n => n.classList.remove('active'));
+    allNavItems.forEach(n => { n.classList.remove('active'); n.removeAttribute('aria-current'); });
+    document.querySelector(`.nav-item[data-section="${sectionName}"]`)?.setAttribute('aria-current', 'page');
 
     // Show selected section
     const section = document.getElementById(`section-${sectionName}`);
@@ -1378,20 +1379,20 @@ function updateAutoEventsSelectionList() {
                     <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--surface); border-radius: 6px; border: 1px solid var(--border);">
                         <span style="color: var(--primary); font-weight: 700; min-width: 2rem; font-size: 1rem;">#${index + 1}</span>
                         <span style="flex: 1; font-weight: 500;">${escapeHtml(displayName)}</span>
-                        ${showUpArrow ? `<button class="btn btn-icon btn-secondary" ${eventAttrs("click", function(event) { moveAutoEventUp(eventId); })} title="${escapeAttr(i18n.t('button.moveUp'))}"><i class="fas fa-arrow-up"></i></button>` : ''}
-                        ${showDownArrow ? `<button class="btn btn-icon btn-secondary" ${eventAttrs("click", function(event) { moveAutoEventDown(eventId); })} title="${escapeAttr(i18n.t('button.moveDown'))}"><i class="fas fa-arrow-down"></i></button>` : ''}
-                        <button class="btn btn-icon btn-danger" ${eventAttrs("click", function(event) { removeAutoEventSelection(eventId); })} title="${escapeAttr(i18n.t('button.remove'))}"><i class="fas fa-times"></i></button>
+                        ${showUpArrow ? `<button class="btn btn-icon btn-secondary" ${eventAttrs("click", function(event) { moveAutoEventUp(eventId); })} title="${escapeAttr(i18n.t('button.moveUp'))}"><i class="icon ui-arrow-up"></i></button>` : ''}
+                        ${showDownArrow ? `<button class="btn btn-icon btn-secondary" ${eventAttrs("click", function(event) { moveAutoEventDown(eventId); })} title="${escapeAttr(i18n.t('button.moveDown'))}"><i class="icon ui-arrow-down"></i></button>` : ''}
+                        <button class="btn btn-icon btn-danger" ${eventAttrs("click", function(event) { removeAutoEventSelection(eventId); })} title="${escapeAttr(i18n.t('button.remove'))}"><i class="icon ui-times"></i></button>
                     </div>
-                    ${nextEvent ? `<div style="padding-left: 1rem; color: var(--text-muted); font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem;"><i class="fas fa-arrow-down"></i> ${i18n.t('settings.autoEventsThen')}: ${escapeHtml(nextEvent)}</div>` : ''}
+                    ${nextEvent ? `<div style="padding-left: 1rem; color: var(--text-muted); font-size: .8125rem; display: flex; align-items: center; gap: 0.25rem;"><i class="icon ui-arrow-down"></i> ${i18n.t('settings.autoEventsThen')}: ${escapeHtml(nextEvent)}</div>` : ''}
                 </div>
             `;
         } else {
             // Random mode: simple list without order
             html += `
                 <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; background: var(--surface); border-radius: 6px; border: 1px solid var(--border);">
-                    <i class="fas fa-random" style="color: var(--primary); min-width: 1.5rem;"></i>
+                    <i class="icon ui-random" style="color: var(--primary); min-width: 1.5rem;"></i>
                     <span style="flex: 1;">${escapeHtml(displayName)}</span>
-                    <button class="btn btn-icon btn-danger" ${eventAttrs("click", function(event) { removeAutoEventSelection(eventId); })} title="${escapeAttr(i18n.t('button.remove'))}"><i class="fas fa-times"></i></button>
+                    <button class="btn btn-icon btn-danger" ${eventAttrs("click", function(event) { removeAutoEventSelection(eventId); })} title="${escapeAttr(i18n.t('button.remove'))}"><i class="icon ui-times"></i></button>
                 </div>
             `;
         }
@@ -1443,10 +1444,10 @@ function renderEventsList() {
     if (Object.keys(events).length === 0) {
         container.innerHTML = `
             <div class="list-empty">
-                <i class="fas fa-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <i class="icon ui-calendar-alt" style="font-size: 2rem; margin-bottom: 1rem;"></i>
                 <p>${i18n.t('label.noEvents')}</p>
                 <button class="btn btn-primary" style="margin-top: 1rem;" onclick="createNewEvent()">
-                    <i class="fas fa-plus"></i> ${i18n.t('button.createEvent')}
+                    <i class="icon ui-plus"></i> ${i18n.t('button.createEvent')}
                 </button>
             </div>
         `;
@@ -1475,42 +1476,42 @@ function createEventCard(eventId, config) {
         <div class="card" style="${!isEnabled ? 'opacity: 0.7;' : ''}">
             <div class="card-header">
                 <div class="card-title">
-                    <i class="fas fa-calendar-alt" style="color: ${isEnabled ? 'var(--primary)' : 'var(--text-muted)'};"></i>
+                    <i class="icon ui-calendar-alt" style="color: ${isEnabled ? 'var(--primary)' : 'var(--text-muted)'};"></i>
                     <span>${escapeHtml(config['display-name'] || eventId)}</span>
                     ${isEnabled ? `<span class="badge badge-success">${i18n.t('card.active')}</span>` : `<span class="badge badge-warning">${i18n.t('card.inactive')}</span>`}
                 </div>
                 <div class="card-actions">
                     <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { editEvent(eventId); })} title="${escapeAttr(i18n.t('button.edit'))}">
-                        <i class="fas fa-edit"></i>
+                        <i class="icon ui-edit"></i>
                     </button>
                     <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteEvent(eventId); })} title="${escapeAttr(i18n.t('button.delete'))}">
-                        <i class="fas fa-trash"></i>
+                        <i class="icon ui-trash"></i>
                     </button>
                 </div>
             </div>
             <div class="card-body">
                 <div style="margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${escapeHtml(eventId)}</code>
-                    <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem;">
+                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: .8125rem;">${escapeHtml(eventId)}</code>
+                    <span style="background: var(--primary); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: .8125rem;">
                         /event ${command}
                     </span>
                 </div>
                 <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">${escapeHtml(config.description || i18n.t('card.noDescription'))}</p>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.players')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.players')}</span>
                         <span style="font-size: 0.9rem;">${escapeHtml(minPlayers)} - ${escapeHtml(maxPlayers)}</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.countdown')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.countdown')}</span>
                         <span style="font-size: 0.9rem;">${escapeHtml(countdown)}s</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.mode')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.mode')}</span>
                         <span style="font-size: 0.9rem;">${formatGameMode(gameMode)}</span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.pvp')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.pvp')}</span>
                         <span style="color: ${config.mechanics?.['pvp-enabled'] !== false ? 'var(--success)' : 'var(--error)'}; font-size: 0.9rem;">
                             ${config.mechanics?.['pvp-enabled'] !== false ? i18n.t('card.pvpOn') : i18n.t('card.pvpOff')}
                         </span>
@@ -1518,8 +1519,8 @@ function createEventCard(eventId, config) {
                 </div>
                 ${config.worlds ? `
                 <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); display: flex; gap: 1rem;">
-                    ${config.worlds['lobby-world'] ? `<span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-door-open"></i> ${escapeHtml(config.worlds['lobby-world'])}</span>` : ''}
-                    ${config.worlds['event-world'] ? `<span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fas fa-globe"></i> ${escapeHtml(config.worlds['event-world'])}</span>` : ''}
+                    ${config.worlds['lobby-world'] ? `<span style="font-size: .8125rem; color: var(--text-muted);"><i class="icon ui-door-open"></i> ${escapeHtml(config.worlds['lobby-world'])}</span>` : ''}
+                    ${config.worlds['event-world'] ? `<span style="font-size: .8125rem; color: var(--text-muted);"><i class="icon ui-globe"></i> ${escapeHtml(config.worlds['event-world'])}</span>` : ''}
                 </div>
                 ` : ''}
             </div>
@@ -1572,10 +1573,10 @@ function renderWorldsList() {
     if (Object.keys(worlds).length === 0) {
         container.innerHTML = `
             <div class="list-empty">
-                <i class="fas fa-globe" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <i class="icon ui-globe" style="font-size: 2rem; margin-bottom: 1rem;"></i>
                 <p>${i18n.t('label.noWorlds')}</p>
                 <button class="btn btn-primary" style="margin-top: 1rem;" onclick="createNewWorld()">
-                    <i class="fas fa-plus"></i> ${i18n.t('button.createWorld')}
+                    <i class="icon ui-plus"></i> ${i18n.t('button.createWorld')}
                 </button>
             </div>
         `;
@@ -1605,13 +1606,13 @@ function createWorldCard(worldId, config) {
     if (MV_STATE.loaded) {
         if (mvStatus.state === 'loaded' && MV_STATE.available) {
             mvActions = `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvUnloadWorld(worldId); })}>
-                            <i class="fas fa-eject"></i> ${i18n.t('button.mvUnload')}</button>`;
+                            <i class="icon ui-eject"></i> ${i18n.t('button.mvUnload')}</button>`;
         } else if (mvStatus.state === 'unloaded' && MV_STATE.available) {
             mvActions = `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvLoadWorld(worldId); })}>
-                            <i class="fas fa-play"></i> ${i18n.t('button.mvLoad')}</button>`;
+                            <i class="icon ui-play"></i> ${i18n.t('button.mvLoad')}</button>`;
         } else if (mvStatus.state === 'placeholder' && MV_STATE.available) {
             mvActions = `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { editWorld(worldId, 'multiverse'); })}>
-                            <i class="fas fa-wand-magic-sparkles"></i> ${i18n.t('button.mvCreateWorld')}</button>`;
+                            <i class="icon ui-wand-magic-sparkles"></i> ${i18n.t('button.mvCreateWorld')}</button>`;
         }
     }
 
@@ -1619,20 +1620,20 @@ function createWorldCard(worldId, config) {
         <div class="card">
             <div class="card-header">
                 <div class="card-title">
-                    <i class="fas fa-globe" style="color: ${isPvPEnabled ? 'var(--error)' : 'var(--info)'};"></i>
+                    <i class="icon ui-globe" style="color: ${isPvPEnabled ? 'var(--error)' : 'var(--info)'};"></i>
                     <span>${escapeHtml(config['display-name'] || worldId)}</span>
                     ${isPvPEnabled ? `<span class="badge badge-error">${i18n.t('card.pvpActive')}</span>` : `<span class="badge badge-info">${i18n.t('card.eventWorld')}</span>`}
                     <span class="badge ${mvStatus.badge}" title="${escapeAttr(i18n.t('card.mvStatusHint'))}">
-                        <i class="fas ${mvStatus.icon}"></i> ${mvStatus.label}
+                        <i class="icon ${mvStatus.icon}"></i> ${mvStatus.label}
                     </span>
                 </div>
                 <div class="card-actions">
                     ${mvActions}
                     <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { editWorld(worldId); })} title="${escapeAttr(i18n.t('button.edit'))}">
-                        <i class="fas fa-edit"></i>
+                        <i class="icon ui-edit"></i>
                     </button>
                     <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteWorld(worldId); })} title="${escapeAttr(i18n.t('button.delete'))}">
-                        <i class="fas fa-trash"></i>
+                        <i class="icon ui-trash"></i>
                     </button>
                 </div>
             </div>
@@ -1642,31 +1643,31 @@ function createWorldCard(worldId, config) {
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.pvpWorld')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.pvpWorld')}</span>
                         <span style="color: ${isPvPEnabled ? 'var(--success)' : 'var(--text-secondary)'};">
                             ${isPvPEnabled ? i18n.t('card.enabled') : i18n.t('card.disabled')}
                         </span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.building')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.building')}</span>
                         <span style="color: ${buildAllowed ? 'var(--success)' : 'var(--text-secondary)'};">
                             ${buildAllowed ? i18n.t('card.allowed') : i18n.t('card.forbidden')}
                         </span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.regeneration')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.regeneration')}</span>
                         <span style="color: ${regenerateWorld ? 'var(--success)' : 'var(--text-secondary)'};">
                             ${regenerateWorld ? i18n.t('card.active') : i18n.t('card.inactive')}
                         </span>
                     </div>
                     <div>
-                        <span style="color: var(--text-muted); font-size: 0.75rem; display: block;">${i18n.t('card.spawnType')}</span>
+                        <span style="color: var(--text-muted); font-size: .8125rem; display: block;">${i18n.t('card.spawnType')}</span>
                         <span>${escapeHtml(spawnType)}</span>
                     </div>
                 </div>
                 ${config['clone-source-world'] ? `
                 <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
-                    <span style="color: var(--text-muted); font-size: 0.75rem;">${i18n.t('card.templateWorld')}:</span>
+                    <span style="color: var(--text-muted); font-size: .8125rem;">${i18n.t('card.templateWorld')}:</span>
                     <code style="margin-left: 0.5rem;">${escapeHtml(config['clone-source-world'])}</code>
                 </div>
                 ` : ''}
@@ -1753,16 +1754,16 @@ function getMvStatus(worldId) {
     // Ohne verlaesslichen Serverstand darf hier nicht "Platzhalter" behauptet werden -- das
     // ist eine Aussage ueber die Welt, die wir gerade nicht treffen koennen.
     if (!MV_STATE.loaded || MV_STATE.stale) {
-        return { state: 'unknown', label: i18n.t('card.mvUnknown'), badge: 'badge-secondary', icon: 'fa-circle-question' };
+        return { state: 'unknown', label: i18n.t('card.mvUnknown'), badge: 'badge-secondary', icon: 'ui-circle-question' };
     }
     const world = getMvWorld(worldId);
     if (!world) {
-        return { state: 'placeholder', label: i18n.t('card.mvPlaceholder'), badge: 'badge-secondary', icon: 'fa-circle' };
+        return { state: 'placeholder', label: i18n.t('card.mvPlaceholder'), badge: 'badge-secondary', icon: 'ui-circle' };
     }
     if (world.loaded) {
-        return { state: 'loaded', label: i18n.t('card.mvLoaded'), badge: 'badge-success', icon: 'fa-circle-check' };
+        return { state: 'loaded', label: i18n.t('card.mvLoaded'), badge: 'badge-success', icon: 'ui-circle-check' };
     }
-    return { state: 'unloaded', label: i18n.t('card.mvUnloaded'), badge: 'badge-warning', icon: 'fa-circle-pause' };
+    return { state: 'unloaded', label: i18n.t('card.mvUnloaded'), badge: 'badge-warning', icon: 'ui-circle-pause' };
 }
 
 /** Fasst usedBy-Eintraege zu einem lesbaren "belegt von ..."-Text zusammen. */
@@ -2028,7 +2029,7 @@ function renderGlobalMviBanner() {
     banner.classList.toggle('is-collapsed', collapsed);
     const icon = document.querySelector('#global-mvi-banner-toggle i');
     if (icon) {
-        icon.className = collapsed ? 'fas fa-chevron-down' : 'fas fa-chevron-up';
+        icon.className = collapsed ? 'icon ui-chevron-down' : 'icon ui-chevron-up';
     }
 }
 
@@ -2253,14 +2254,14 @@ async function loadInventoryBackups() {
     INVENTORY_BROWSER.backups = [];
     INVENTORY_BROWSER.playerInput = query;
     if (!query) {
-        list.innerHTML = `<div class="inv-empty-state"><i class="fas fa-boxes-packing"></i><p>${escapeHtml(i18n.t('inventory.searchHint'))}</p></div>`;
+        list.innerHTML = `<div class="inv-empty-state"><i class="icon ui-boxes-packing"></i><p>${escapeHtml(i18n.t('inventory.searchHint'))}</p></div>`;
         if (preview) {
-            preview.innerHTML = `<div class="inv-empty-state"><i class="fas fa-eye"></i><p>${escapeHtml(i18n.t('inventory.selectBackupHint'))}</p></div>`;
+            preview.innerHTML = `<div class="inv-empty-state"><i class="icon ui-eye"></i><p>${escapeHtml(i18n.t('inventory.selectBackupHint'))}</p></div>`;
         }
         return;
     }
 
-    list.innerHTML = `<p class="form-label-hint" style="padding:1rem;"><i class="fas fa-circle-notch fa-spin"></i> ${escapeHtml(i18n.t('inventory.browser.loading'))}</p>`;
+    list.innerHTML = `<p class="form-label-hint" style="padding:1rem;"><i class="icon ui-circle-notch ui-spin"></i> ${escapeHtml(i18n.t('inventory.browser.loading'))}</p>`;
 
     try {
         const json = await panelRequest(`/api/inventories/list?player=${encodeURIComponent(query)}`,
@@ -2291,7 +2292,7 @@ async function loadInventoryBackups() {
         if (INVENTORY_BROWSER.backups.length > 0) {
             previewInventoryBackup(INVENTORY_BROWSER.backups[0].id);
         } else if (preview) {
-            preview.innerHTML = `<div class="inv-empty-state"><i class="fas fa-box-open"></i><p>${escapeHtml(i18n.t('inventory.browser.empty'))}</p></div>`;
+            preview.innerHTML = `<div class="inv-empty-state"><i class="icon ui-box-open"></i><p>${escapeHtml(i18n.t('inventory.browser.empty'))}</p></div>`;
         }
     } catch (error) {
         if (generation !== inventoryListGeneration || session !== panelSessionGeneration) return;
@@ -2323,7 +2324,7 @@ function renderInventoryBackupList() {
     }
 
     if (INVENTORY_BROWSER.backups.length === 0) {
-        list.innerHTML = `<div class="inv-empty-state"><i class="fas fa-box-open"></i><p>${escapeHtml(i18n.t('inventory.browser.empty'))}</p></div>`;
+        list.innerHTML = `<div class="inv-empty-state"><i class="icon ui-box-open"></i><p>${escapeHtml(i18n.t('inventory.browser.empty'))}</p></div>`;
         return;
     }
 
@@ -2342,7 +2343,7 @@ function renderInventoryBackupList() {
     });
 
     if (filtered.length === 0) {
-        list.innerHTML = `<div class="inv-empty-state"><i class="fas fa-filter"></i><p>${escapeHtml(i18n.t('picker.noResults'))}</p></div>`;
+        list.innerHTML = `<div class="inv-empty-state"><i class="icon ui-filter"></i><p>${escapeHtml(i18n.t('picker.noResults'))}</p></div>`;
         return;
     }
 
@@ -2374,10 +2375,10 @@ function renderInventoryBackupList() {
                 </div>
                 <div class="inv-backup-actions">
                     <button class="btn btn-primary btn-sm" ${eventAttrs("click", function(event) { openRestoreModal(backup.id); })} title="${escapeHtml(i18n.t('inventory.browser.restore'))}">
-                        <i class="fas fa-rotate-left"></i>
+                        <i class="icon ui-rotate-left"></i>
                     </button>
                     <button class="btn btn-danger btn-sm" ${eventAttrs("click", function(event) { deleteInventoryBackup(backup.id); })} title="${escapeHtml(i18n.t('inventory.browser.delete'))}">
-                        <i class="fas fa-trash"></i>
+                        <i class="icon ui-trash"></i>
                     </button>
                 </div>
             </div>
@@ -2405,7 +2406,7 @@ async function previewInventoryBackup(backupId) {
     INVENTORY_BROWSER.selectedBackupId = backupId;
     renderInventoryBackupList();
 
-    preview.innerHTML = `<p class="form-label-hint" style="padding:2rem;text-align:center;"><i class="fas fa-circle-notch fa-spin"></i> ${escapeHtml(i18n.t('inventory.browser.loading'))}</p>`;
+    preview.innerHTML = `<p class="form-label-hint" style="padding:2rem;text-align:center;"><i class="icon ui-circle-notch ui-spin"></i> ${escapeHtml(i18n.t('inventory.browser.loading'))}</p>`;
 
     try {
         const json = await panelRequest(`/api/inventories/get?player=${encodeURIComponent(player)}&id=${encodeURIComponent(backupId)}`,
@@ -2481,7 +2482,7 @@ function renderInventoryBackupPreview(data) {
                      onmouseleave="hideMinecraftTooltip()">
             ${itemIconHtml(item.material, 32)}
             ${item.amount > 1 ? `<span class="amount">${escapeHtml(item.amount)}</span>` : ''}
-            ${item.enchantments && Object.keys(item.enchantments).length > 0 ? '<span class="enchant-indicator">✨</span>' : ''}
+            ${item.enchantments && Object.keys(item.enchantments).length > 0 ? `<span class="enchant-indicator">${panelIcon("sparkles")}</span>` : ''}
         </div>`;
     };
 
@@ -2497,10 +2498,10 @@ function renderInventoryBackupPreview(data) {
     const armorBySlot = new Map();
     (data.armor || []).forEach(item => armorBySlot.set(item.slot, item));
     const armorOrder = [
-        { slot: 3, label: i18n.t('editor.helmet'), icon: 'fa-hat-wizard' },
-        { slot: 2, label: i18n.t('editor.chestplate'), icon: 'fa-vest' },
-        { slot: 1, label: i18n.t('editor.leggings'), icon: 'fa-socks' },
-        { slot: 0, label: i18n.t('editor.boots'), icon: 'fa-shoe-prints' }
+        { slot: 3, label: i18n.t('editor.helmet'), icon: 'ui-hat-wizard' },
+        { slot: 2, label: i18n.t('editor.chestplate'), icon: 'ui-vest' },
+        { slot: 1, label: i18n.t('editor.leggings'), icon: 'ui-socks' },
+        { slot: 0, label: i18n.t('editor.boots'), icon: 'ui-shoe-prints' }
     ];
 
     preview.innerHTML = `
@@ -2563,15 +2564,15 @@ function renderInventoryBackupPreview(data) {
             <!-- Action Toolbar -->
             <div class="inv-actions-toolbar" >
                 <button class="btn btn-secondary btn-sm" onclick="copyCurrentBackupJson()" title="${escapeAttr(i18n.t('inventory.rawJson'))}">
-                    <i class="fas fa-copy"></i>
+                    <i class="icon ui-copy"></i>
                     <span data-i18n="inventory.copyJson">${escapeHtml(i18n.t('inventory.copyJson'))}</span>
                 </button>
                 <button class="btn btn-secondary btn-sm" onclick="exportCurrentBackupToEquipment()">
-                    <i class="fas fa-shield-alt"></i>
+                    <i class="icon ui-shield-alt"></i>
                     <span data-i18n="inventory.exportEquipment">${escapeHtml(i18n.t('inventory.exportEquipment'))}</span>
                 </button>
                 <button class="btn btn-primary btn-sm" ${eventAttrs("click", function(event) { openRestoreModal(data.id); })}>
-                    <i class="fas fa-rotate-left"></i>
+                    <i class="icon ui-rotate-left"></i>
                     <span data-i18n="inventory.browser.restore">${escapeHtml(i18n.t('inventory.browser.restore'))}</span>
                 </button>
             </div>
@@ -2592,7 +2593,7 @@ function showMinecraftTooltip(e, item) {
     if (item.enchantments && Object.keys(item.enchantments).length > 0) {
         enchantsHtml = Object.entries(item.enchantments).map(([k, lvl]) => `
             <div class="minecraft-tooltip-enchant">
-                <i class="fas fa-sparkles"></i> ${escapeHtml(itemDisplayName(k))} ${escapeHtml(String(lvl))}
+                <i class="icon ui-sparkles"></i> ${escapeHtml(itemDisplayName(k))} ${escapeHtml(String(lvl))}
             </div>
         `).join('');
     }
@@ -2794,7 +2795,7 @@ async function deleteInventoryBackup(backupId) {
             INVENTORY_BROWSER.selectedBackupData = null;
             const preview = document.getElementById('inventory-browser-preview');
             if (preview) {
-                preview.innerHTML = `<div class="inv-empty-state"><i class="fas fa-eye"></i><p>${escapeHtml(i18n.t('inventory.selectBackupHint'))}</p></div>`;
+                preview.innerHTML = `<div class="inv-empty-state"><i class="icon ui-eye"></i><p>${escapeHtml(i18n.t('inventory.selectBackupHint'))}</p></div>`;
             }
         }
         INVENTORY_BROWSER.backups = INVENTORY_BROWSER.backups.filter(b => b.id !== backupId);
@@ -3010,13 +3011,13 @@ function renderServerWorldsPanel() {
     // aktuellen Stand auszugeben waere eine Falschaussage ueber den Server.
     const staleBanner = MV_STATE.stale ? `
         <div class="alert alert-warning" style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-            <i class="fas fa-triangle-exclamation" style="margin-top: 0.2rem;"></i>
+            <i class="icon ui-triangle-exclamation" style="margin-top: 0.2rem;"></i>
             <div style="flex: 1;">
                 <strong>${i18n.t('mv.staleTitle')}</strong><br>
                 <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('mv.staleHint')}</span>
             </div>
             <button class="btn btn-secondary btn-sm" onclick="refreshMvWorlds()">
-                <i class="fas fa-rotate"></i> ${i18n.t('button.mvRetry')}
+                <i class="icon ui-rotate"></i> ${i18n.t('button.mvRetry')}
             </button>
         </div>` : '';
 
@@ -3032,14 +3033,14 @@ function renderServerWorldsPanel() {
             : `<span class="badge badge-warning">${i18n.t('card.mvUnloaded')}</span>`;
         const usage = describeMvUsage(world, null);
         const usageHtml = usage
-            ? `<div class="mv-usage"><i class="fas fa-link"></i> ${i18n.t('mv.usedBy')}: ${escapeHtml(usage)}</div>`
-            : `<div class="mv-usage mv-usage-free"><i class="fas fa-circle-notch"></i> ${i18n.t('mv.unused')}</div>`;
+            ? `<div class="mv-usage"><i class="icon ui-link"></i> ${i18n.t('mv.usedBy')}: ${escapeHtml(usage)}</div>`
+            : `<div class="mv-usage mv-usage-free"><i class="icon ui-circle-notch"></i> ${i18n.t('mv.unused')}</div>`;
 
         const toggleButton = world.loaded
             ? `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvUnloadWorld(world.name); })}>
-                   <i class="fas fa-eject"></i> ${i18n.t('button.mvUnload')}</button>`
+                   <i class="icon ui-eject"></i> ${i18n.t('button.mvUnload')}</button>`
             : `<button class="btn btn-secondary btn-sm" ${eventAttrs("click", function(event) { mvLoadWorld(world.name); })}>
-                   <i class="fas fa-play"></i> ${i18n.t('button.mvLoad')}</button>`;
+                   <i class="icon ui-play"></i> ${i18n.t('button.mvLoad')}</button>`;
 
         return `
             <div class="mv-world-row">
@@ -3053,7 +3054,7 @@ function renderServerWorldsPanel() {
                     ${MV_STATE.available ? toggleButton : ''}
                     <button class="btn btn-danger btn-sm" ${eventAttrs("click", function(event) { openDeleteWorldModal(world.name, true); })}
                             title="${escapeAttr(i18n.t('button.mvDeleteWorldOnly'))}">
-                        <i class="fas fa-trash"></i>
+                        <i class="icon ui-trash"></i>
                     </button>
                 </div>
             </div>`;
@@ -3153,11 +3154,11 @@ function renderBackupWorldsPanel() {
                 <div class="mv-world-actions">
                     <button class="btn btn-secondary btn-sm"
                             ${eventAttrs("click", function(event) { openRestoreBackupModal(backup.file, backup.worldName || ''); })}>
-                        <i class="fas fa-clock-rotate-left"></i> ${i18n.t('button.mvRestore')}
+                        <i class="icon ui-clock-rotate-left"></i> ${i18n.t('button.mvRestore')}
                     </button>
                     <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteMvBackup(backup.file); })}
                             title="${escapeAttr(i18n.t('button.mvDeleteBackup'))}">
-                        <i class="fas fa-trash"></i>
+                        <i class="icon ui-trash"></i>
                     </button>
                 </div>
             </div>`;
@@ -3179,9 +3180,9 @@ function openRestoreBackupModal(file, originalName) {
         <div class="modal" style="max-width: 520px;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-clock-rotate-left"></i> ${i18n.t('confirm.restoreTitle')}
+                    <i class="icon ui-clock-rotate-left"></i> ${i18n.t('confirm.restoreTitle')}
                 </h3>
-                <button class="modal-close" onclick="closeRestoreBackupModal()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" onclick="closeRestoreBackupModal()"><i class="icon ui-times"></i></button>
             </div>
             <div class="modal-body">
                 <p>${i18n.t('confirm.restorePrompt', { file: escapeHtml(file) })}</p>
@@ -3197,7 +3198,7 @@ function openRestoreBackupModal(file, originalName) {
                 <button class="btn btn-secondary" onclick="closeRestoreBackupModal()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-primary" id="restore-backup-submit"
                         ${eventAttrs("click", function(event) { confirmRestoreBackup(file); })}>
-                    <i class="fas fa-clock-rotate-left"></i> ${i18n.t('button.mvRestore')}
+                    <i class="icon ui-clock-rotate-left"></i> ${i18n.t('button.mvRestore')}
                 </button>
             </div>
         </div>`;
@@ -3221,9 +3222,9 @@ function updateRestoreBackupModal() {
         if (!name) {
             status.innerHTML = '';
         } else if (!validName) {
-            status.innerHTML = `<span class="mv-hint mv-hint-warn"><i class="fas fa-circle-exclamation"></i> ${i18n.t('mv.error.invalidName')}</span>`;
+            status.innerHTML = `<span class="mv-hint mv-hint-warn"><i class="icon ui-circle-exclamation"></i> ${i18n.t('mv.error.invalidName')}</span>`;
         } else if (taken) {
-            status.innerHTML = `<span class="mv-hint mv-hint-warn"><i class="fas fa-circle-exclamation"></i> ${i18n.t('mv.error.restoreTargetExists')}</span>`;
+            status.innerHTML = `<span class="mv-hint mv-hint-warn"><i class="icon ui-circle-exclamation"></i> ${i18n.t('mv.error.restoreTargetExists')}</span>`;
         } else {
             status.innerHTML = '';
         }
@@ -3298,10 +3299,10 @@ function openDeleteWorldModal(worldId, worldOnly = false) {
         <div class="modal" style="max-width: 560px;">
             <div class="modal-header">
                 <h3 class="modal-title">
-                    <i class="fas fa-triangle-exclamation" style="color: var(--error);"></i>
+                    <i class="icon ui-triangle-exclamation" style="color: var(--error);"></i>
                     ${worldOnly ? i18n.t('confirm.deleteWorldOnlyTitle') : i18n.t('confirm.deleteWorldTitle')}
                 </h3>
-                <button class="modal-close" onclick="closeDeleteWorldModal()"><i class="fas fa-times"></i></button>
+                <button class="modal-close" onclick="closeDeleteWorldModal()"><i class="icon ui-times"></i></button>
             </div>
             <div class="modal-body">
                 <p>${worldOnly
@@ -3325,7 +3326,7 @@ function openDeleteWorldModal(worldId, worldOnly = false) {
 
                 <div id="delete-world-danger" style="${worldOnly ? '' : 'display: none;'} margin-top: 1rem;">
                     <div class="alert alert-error" style="display: flex; gap: 0.5rem;">
-                        <i class="fas fa-triangle-exclamation" style="margin-top: 0.2rem;"></i>
+                        <i class="icon ui-triangle-exclamation" style="margin-top: 0.2rem;"></i>
                         <div>
                             <strong>${i18n.t('confirm.deleteWorldWarningTitle')}</strong><br>
                             <span style="font-size: 0.85rem; opacity: 0.9;">${i18n.t('confirm.deleteWorldWarningText')}</span>
@@ -3354,7 +3355,7 @@ function openDeleteWorldModal(worldId, worldOnly = false) {
                 <button class="btn btn-secondary" onclick="closeDeleteWorldModal()">${i18n.t('button.cancel')}</button>
                 <button class="btn btn-danger" id="delete-world-submit"
                         ${eventAttrs("click", function(event) { confirmDeleteWorld(worldId, worldOnly); })}>
-                    <i class="fas fa-trash"></i> ${i18n.t('button.delete')}
+                    <i class="icon ui-trash"></i> ${i18n.t('button.delete')}
                 </button>
             </div>
         </div>`;
@@ -3495,10 +3496,10 @@ function renderEquipmentList() {
     if (Object.keys(equipment).length === 0) {
         container.innerHTML = `
             <div class="list-empty">
-                <i class="fas fa-shield-alt" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                <i class="icon ui-shield-alt" style="font-size: 2rem; margin-bottom: 1rem;"></i>
                 <p>${i18n.t('label.noEquipment')}</p>
                 <button class="btn btn-primary" style="margin-top: 1rem;" onclick="createNewEquipment()">
-                    <i class="fas fa-plus"></i> ${i18n.t('button.createEquipment')}
+                    <i class="icon ui-plus"></i> ${i18n.t('button.createEquipment')}
                 </button>
             </div>
         `;
@@ -3594,7 +3595,7 @@ function createEquipmentCard(equipId, config, position = 0, total = 1) {
     const icon = config.icon || (config['gui-item'] && config['gui-item'].material);
     const titleIcon = icon
         ? itemIconHtml(icon, 20)
-        : `<i class="fas fa-shield-alt" style="color: ${isEnabled ? 'var(--success)' : 'var(--text-muted)'};"></i>`;
+        : `<i class="icon ui-shield-alt" style="color: ${isEnabled ? 'var(--success)' : 'var(--text-muted)'};"></i>`;
 
     return `
         <div class="card" style="${!isEnabled ? 'opacity: 0.7;' : ''}">
@@ -3609,50 +3610,50 @@ function createEquipmentCard(equipId, config, position = 0, total = 1) {
                 <div class="card-actions">
                     <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { moveEquipment(equipId, -1); })}
                             title="${escapeAttr(i18n.t('equipment.moveUp'))}" ${position === 0 ? 'disabled' : ''}>
-                        <i class="fas fa-arrow-up"></i>
+                        <i class="icon ui-arrow-up"></i>
                     </button>
                     <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { moveEquipment(equipId, 1); })}
                             title="${escapeAttr(i18n.t('equipment.moveDown'))}" ${position >= total - 1 ? 'disabled' : ''}>
-                        <i class="fas fa-arrow-down"></i>
+                        <i class="icon ui-arrow-down"></i>
                     </button>
                     <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { editEquipment(equipId); })} title="${escapeAttr(i18n.t('button.edit'))}">
-                        <i class="fas fa-edit"></i>
+                        <i class="icon ui-edit"></i>
                     </button>
                     <button class="btn btn-secondary btn-icon" ${eventAttrs("click", function(event) { duplicateEquipment(equipId); })} title="${escapeAttr(i18n.t('button.duplicate'))}">
-                        <i class="fas fa-copy"></i>
+                        <i class="icon ui-copy"></i>
                     </button>
                     <button class="btn btn-danger btn-icon" ${eventAttrs("click", function(event) { deleteEquipment(equipId); })} title="${escapeAttr(i18n.t('button.delete'))}">
-                        <i class="fas fa-trash"></i>
+                        <i class="icon ui-trash"></i>
                     </button>
                 </div>
             </div>
             <div class="card-body">
                 <div style="margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
-                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">${escapeHtml(equipId)}</code>
-                    <span style="color: var(--text-muted); font-size: 0.8rem;">
-                        <i class="fas fa-globe-americas"></i> ${escapeHtml(worldsLabel)}
+                    <code style="background: var(--background); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: .8125rem;">${escapeHtml(equipId)}</code>
+                    <span style="color: var(--text-muted); font-size: .8125rem;">
+                        <i class="icon ui-globe-americas"></i> ${escapeHtml(worldsLabel)}
                     </span>
                 </div>
                 ${config.description ? `<p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">${escapeHtml(config.description)}</p>` : ''}
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
                     <div>
-                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.5rem; text-transform: uppercase;">${i18n.t('card.armor')} (${armorItems.length}/4)</p>
+                        <p style="color: var(--text-muted); font-size: .8125rem; margin-bottom: 0.5rem; text-transform: uppercase;">${i18n.t('card.armor')} (${armorItems.length}/4)</p>
                         <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
-                            ${armor.helmet ? `<span class="badge badge-info" style="font-size: 0.7rem;">${formatItemName(armor.helmet)}</span>` : ''}
-                            ${armor.chestplate ? `<span class="badge badge-info" style="font-size: 0.7rem;">${formatItemName(armor.chestplate)}</span>` : ''}
-                            ${armor.leggings ? `<span class="badge badge-info" style="font-size: 0.7rem;">${formatItemName(armor.leggings)}</span>` : ''}
-                            ${armor.boots ? `<span class="badge badge-info" style="font-size: 0.7rem;">${formatItemName(armor.boots)}</span>` : ''}
-                            ${armorItems.length === 0 ? `<span style="color: var(--text-muted); font-size: 0.8rem;">${i18n.t('card.noArmor')}</span>` : ''}
+                            ${armor.helmet ? `<span class="badge badge-info" style="font-size: .8125rem;">${formatItemName(armor.helmet)}</span>` : ''}
+                            ${armor.chestplate ? `<span class="badge badge-info" style="font-size: .8125rem;">${formatItemName(armor.chestplate)}</span>` : ''}
+                            ${armor.leggings ? `<span class="badge badge-info" style="font-size: .8125rem;">${formatItemName(armor.leggings)}</span>` : ''}
+                            ${armor.boots ? `<span class="badge badge-info" style="font-size: .8125rem;">${formatItemName(armor.boots)}</span>` : ''}
+                            ${armorItems.length === 0 ? `<span style="color: var(--text-muted); font-size: .8125rem;">${i18n.t('card.noArmor')}</span>` : ''}
                         </div>
                     </div>
                     <div>
-                        <p style="color: var(--text-muted); font-size: 0.75rem; margin-bottom: 0.5rem; text-transform: uppercase;">${i18n.t('card.inventory')} (${inventory.length} ${i18n.t('card.items')})</p>
+                        <p style="color: var(--text-muted); font-size: .8125rem; margin-bottom: 0.5rem; text-transform: uppercase;">${i18n.t('card.inventory')} (${inventory.length} ${i18n.t('card.items')})</p>
                         ${inventory.length > 0 ? `
                             <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
-                                ${inventory.slice(0, 6).map(item => `<span class="badge badge-success" style="font-size: 0.7rem;">${formatItemName(item.item)}${item.amount > 1 ? ' x' + item.amount : ''}</span>`).join('')}
-                                ${inventory.length > 6 ? `<span class="badge badge-warning" style="font-size: 0.7rem;">${i18n.t('card.more', { count: inventory.length - 6 })}</span>` : ''}
+                                ${inventory.slice(0, 6).map(item => `<span class="badge badge-success" style="font-size: .8125rem;">${formatItemName(item.item)}${item.amount > 1 ? ' x' + item.amount : ''}</span>`).join('')}
+                                ${inventory.length > 6 ? `<span class="badge badge-warning" style="font-size: .8125rem;">${i18n.t('card.more', { count: inventory.length - 6 })}</span>` : ''}
                             </div>
-                        ` : `<span style="color: var(--text-muted); font-size: 0.8rem;">${i18n.t('card.emptyInventory')}</span>`}
+                        ` : `<span style="color: var(--text-muted); font-size: .8125rem;">${i18n.t('card.emptyInventory')}</span>`}
                     </div>
                 </div>
             </div>
@@ -3712,11 +3713,25 @@ function deleteEquipment(equipId) {
 // Theme Management
 // ============================================
 
+// Pick readable button ink while leaving the user's persisted accent untouched.
+function syncPrimaryInk() {
+    const value = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+    if (!/^#[0-9a-fA-F]{6}$/.test(value)) return;
+    const channels = [1, 3, 5].map(offset => parseInt(value.slice(offset, offset + 2), 16) / 255)
+        .map(channel => channel <= .04045 ? channel / 12.92 : ((channel + .055) / 1.055) ** 2.4);
+    const luminance = channels[0] * .2126 + channels[1] * .7152 + channels[2] * .0722;
+    const darkLuminance = .010329823;
+    const darkContrast = (luminance + .05) / (darkLuminance + .05);
+    const lightContrast = 1.05 / (luminance + .05);
+    document.documentElement.style.setProperty('--primary-ink', darkContrast >= lightContrast ? '#1a1a1a' : '#ffffff');
+}
+
 function updateThemeColor(colorType, colorValue) {
+    if (!/^#[0-9a-fA-F]{6}$/.test(colorValue)) return;
     const cssVar = `--${colorType}`;
     document.documentElement.style.setProperty(cssVar, colorValue);
-
-    const path = `web.theme.${colorType}-color`;
+    syncPrimaryInk();
+    const path = `web.theme.${colorType === 'text-secondary' ? colorType : colorType + '-color'}`;
     const currentValue = getNestedValue(CONFIG_STATE.webConfig, path);
     if (isDeepEqual(currentValue, colorValue)) {
         return;
@@ -3724,6 +3739,7 @@ function updateThemeColor(colorType, colorValue) {
 
     setNestedValue(CONFIG_STATE.webConfig, path, colorValue);
     recordChange('web', path, colorValue);
+    populateWebConfigForm();
     updateQuickActionsPanel();
 }
 
@@ -3750,15 +3766,16 @@ function loadThemeFromConfig() {
             document.documentElement.style.setProperty(`--${cssVar}`, colorValue);
         }
     }
+    syncPrimaryInk();
 }
 
 function resetTheme() {
     const defaultTheme = {
         'primary-color': '#4caf50',
         'secondary-color': '#66bb6a',
-        'background-color': '#1a1a1a',
-        'surface-color': '#2d2d2d',
-        'card-color': '#3a3a3a',
+        'background-color': '#141414',
+        'surface-color': '#1c1c1c',
+        'card-color': '#242424',
         'text-color': '#e0e0e0',
         'text-secondary': '#b0b0b0',
         'error-color': '#f44336',
@@ -3772,15 +3789,17 @@ function resetTheme() {
 
     document.documentElement.style.setProperty('--primary', '#4caf50');
     document.documentElement.style.setProperty('--secondary', '#66bb6a');
-    document.documentElement.style.setProperty('--background', '#1a1a1a');
-    document.documentElement.style.setProperty('--surface', '#2d2d2d');
-    document.documentElement.style.setProperty('--card', '#3a3a3a');
+    document.documentElement.style.setProperty('--background', '#141414');
+    document.documentElement.style.setProperty('--surface', '#1c1c1c');
+    document.documentElement.style.setProperty('--card', '#242424');
     document.documentElement.style.setProperty('--text', '#e0e0e0');
     document.documentElement.style.setProperty('--text-secondary', '#b0b0b0');
     document.documentElement.style.setProperty('--error', '#f44336');
     document.documentElement.style.setProperty('--warning', '#ff9800');
     document.documentElement.style.setProperty('--success', '#4caf50');
     document.documentElement.style.setProperty('--info', '#2196f3');
+
+    syncPrimaryInk();
 
     // Farbfelder auf die Defaults nachziehen, sonst zeigen sie weiter die alten Werte
     populateWebConfigForm();
@@ -4043,25 +4062,25 @@ function updateSyncStatusUI() {
     if (badge && icon && text) {
         if (CONFIG_STATE.isSaving) {
             badge.className = 'sync-badge sync-saving';
-            icon.className = 'fas fa-circle-notch fa-spin';
+            icon.className = 'icon ui-circle-notch ui-spin';
             icon.style.animation = '';
             text.textContent = i18n.t('sync.saving');
             badge.title = i18n.t('sync.saving');
         } else if (CONFIG_STATE.isOffline) {
             badge.className = 'sync-badge sync-error';
-            icon.className = 'fas fa-exclamation-triangle';
+            icon.className = 'icon ui-exclamation-triangle';
             icon.style.animation = '';
             text.textContent = i18n.t('sync.error');
             badge.title = i18n.t('sync.error');
         } else if (changeCount > 0) {
             badge.className = 'sync-badge sync-unsaved';
-            icon.className = 'fas fa-dot-circle';
-            icon.style.animation = 'pulse 1.5s infinite';
+            icon.className = 'icon ui-dot-circle';
+            icon.style.animation = 'none';
             text.textContent = i18n.t('sync.unsaved', { count: changeCount });
             badge.title = i18n.t('sync.unsaved', { count: changeCount });
         } else {
             badge.className = 'sync-badge sync-synced';
-            icon.className = 'fas fa-check-circle';
+            icon.className = 'icon ui-check-circle';
             icon.style.animation = 'none';
             text.textContent = i18n.t('sync.synced');
             badge.title = i18n.t('sync.synced');
@@ -4102,7 +4121,7 @@ function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.innerHTML = `
-        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+        <i class="icon ui-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
         <span>${escapeHtml(message)}</span>
     `;
     
@@ -4229,7 +4248,7 @@ window.addEventListener('load', () => {
 // ============================================
 
 function debugState() {
-    console.group('📊 CONFIG_STATE Debug');
+    console.group(' CONFIG_STATE Debug');
     console.log('Config:', CONFIG_STATE.config);
     console.log('Events:', CONFIG_STATE.config?.events);
     console.log('Worlds:', CONFIG_STATE.worlds?.worlds);
@@ -4349,7 +4368,7 @@ window.formatMinecraftColorCodes = formatMinecraftColorCodes;
 window.loadItemCatalog = loadItemCatalog;
 window.applyTextureSettings = applyTextureSettings;
 
-console.log('✓ App.js Funktionen global registriert');
+console.log(' App.js Funktionen global registriert');
 
 // ============================================
 // Import Config

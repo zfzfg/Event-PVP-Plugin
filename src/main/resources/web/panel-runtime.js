@@ -138,3 +138,56 @@ document.addEventListener('click', event => {
     if (!event.target.closest('.inventory-slot, #minecraft-tooltip')) hideMinecraftTooltip();
 });
 window.addEventListener('resize', () => hideMinecraftTooltip());
+// Keep icon-only actions and paired theme inputs named in the current language.
+let panelControlLabelId = 0;
+function namePanelControls(root = document) {
+    for (const input of root.querySelectorAll('.toggle input')) {
+        const label = input.closest('.toggle-wrapper')?.querySelector('.toggle-label');
+        if (!label) continue;
+        if (!label.id) label.id = `panel-control-label-${++panelControlLabelId}`;
+        input.setAttribute('aria-labelledby', label.id);
+    }
+    for (const control of root.querySelectorAll('[onclick], [ondblclick], [data-panel-click]')) {
+        if (control.matches('button, input, select, textarea, a[href]')) continue;
+        if (!control.hasAttribute('tabindex')) control.tabIndex = 0;
+        if (!control.hasAttribute('role')) control.setAttribute('role', 'button');
+        if (control.title) control.setAttribute('aria-label', control.title);
+    }
+    for (const button of root.querySelectorAll('button')) {
+        if (button.dataset.panelLabelKey) { button.setAttribute('aria-label', i18n.t(button.dataset.panelLabelKey)); continue; }
+        if (button.textContent.trim() || button.title || button.hasAttribute('aria-label')) continue;
+        const key = button.querySelector('.ui-trash') ? 'button.delete' :
+            button.querySelector('.ui-times') ? 'button.close' : null;
+        if (key && typeof i18n !== 'undefined') { button.dataset.panelLabelKey = key; button.setAttribute('aria-label', i18n.t(key)); }
+    }
+    for (const button of root.querySelectorAll('button[title]')) {
+        if (!button.textContent.trim()) button.setAttribute('aria-label', button.title);
+    }
+    for (const group of root.querySelectorAll('.color-picker-wrapper')) {
+        const label = group.closest('.form-group')?.querySelector('.form-label')?.textContent;
+        if (label) for (const input of group.querySelectorAll('input')) input.setAttribute('aria-label', label.trim());
+    }
+}
+document.addEventListener('DOMContentLoaded', () => {
+    namePanelControls();
+    new MutationObserver(() => namePanelControls()).observe(document.body,
+        {subtree:true, childList:true, characterData:true, attributes:true, attributeFilter:['title']});
+});
+
+// Match pointer activation without interpreting generated handler source.
+document.addEventListener('keydown', event => {
+    const control = event.target;
+    if (event.defaultPrevented || !['Enter', ' '].includes(event.key) ||
+        !control.matches('[role="button"]') || control.matches('button, [data-panel-keydown]')) return;
+    if (control.matches('[ondblclick]')) {
+        event.preventDefault();
+        control.dispatchEvent(new MouseEvent('dblclick', {bubbles:true}));
+    } else if (control.matches('[onclick], [data-panel-click]')) {
+        event.preventDefault(); control.click();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('.header');
+    if (header) new ResizeObserver(() => document.documentElement.style.setProperty('--panel-header-height', `${header.offsetHeight}px`)).observe(header);
+});
