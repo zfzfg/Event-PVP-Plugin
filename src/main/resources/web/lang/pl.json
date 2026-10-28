@@ -774,5 +774,14 @@
   "inventory.apiIncompatible": "Wymagane InventoryBackup API 2",
   "inventory.lastError": "Ostatni błąd",
   "inventory.backupDamaged": "Kopia brakująca lub uszkodzona",
-  "inventory.error.lookupFailed": "Nie udało się wyszukać gracza; sprawdź dziennik serwera."
+  "inventory.error.lookupFailed": "Nie udało się wyszukać gracza; sprawdź dziennik serwera.",
+  "panel.invalidResponse": "Serwer zwrócił nieprawidłową odpowiedź.",
+  "panel.requestFailed": "Żądanie nie powiodło się (HTTP {status}).",
+  "panel.close": "Zamknij",
+  "panel.emptySlot": "Puste miejsce",
+  "panel.copyFailed": "Kopiowanie nie powiodło się. Sprawdź dostęp do schowka.",
+  "panel.configLoadFailed": "Nie wczytano: {categories}. Spróbuj ponownie przed zapisem.",
+  "panel.retry": "Spróbuj ponownie",
+  "panel.saveUnavailable": "Niektóre konfiguracje nie zostały wczytane i nie mogą być zapisane.",
+  "panel.reloadConflict": "Konfiguracja serwera się zmieniła. Wczytać wszystko ponownie i odrzucić niezapisane zmiany?"
 }

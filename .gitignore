@@ -22,3 +22,7 @@ Push-To-GitHub.ps1
 Push-To-GitHub.bat
 # CocoIndex Code (ccc)
 /.cocoindex_code/
+
+node_modules/
+playwright-report/
+test-results/

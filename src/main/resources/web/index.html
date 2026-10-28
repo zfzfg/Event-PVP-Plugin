@@ -965,48 +965,6 @@
             background: rgba(76, 175, 80, 0.1);
         }
 
-        .inventory-grid {
-            display: grid;
-            grid-template-columns: repeat(9, 1fr);
-            gap: 4px;
-        }
-
-        .inventory-slot {
-            aspect-ratio: 1;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            position: relative;
-            transition: all var(--transition);
-        }
-
-        .inventory-slot:hover {
-            border-color: var(--primary);
-        }
-
-        .inventory-slot.filled {
-            background: rgba(76, 175, 80, 0.1);
-        }
-
-        .inventory-slot img {
-            width: 80%;
-            height: 80%;
-            image-rendering: pixelated;
-        }
-
-        .inventory-slot .amount {
-            position: absolute;
-            bottom: 2px;
-            right: 4px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            text-shadow: 1px 1px 1px black;
-        }
-
         /* Inventory Section Tabs */
         .inv-tabs-nav {
             display: flex;
@@ -2267,6 +2225,7 @@
             min-height: 100vh;
         }
     </style>
+    <link rel="stylesheet" href="panel.css">
 </head>
 <body>
     <!-- Login Screen -->
@@ -2990,11 +2949,6 @@
                                     <i class="fas fa-cube"></i>
                                     <span data-i18n="inventory.browser.previewTitle">Backup contents</span>
                                 </div>
-                                <div id="inv-viewer-header-actions" style="display: none;">
-                                    <button class="btn btn-secondary btn-sm" onclick="exportCurrentBackupToEquipment()" title="" data-i18n-title="inventory.exportEquipment">
-                                        <i class="fas fa-shield-alt"></i> <span data-i18n="inventory.exportEquipment">Export as Equipment Set</span>
-                                    </button>
-                                </div>
                             </div>
                             <div class="card-body inv-viewer-body" id="inventory-browser-preview">
                                 <div class="inv-empty-state">
@@ -3572,6 +3526,7 @@
 
     <!-- items.js zuerst: liefert Item-Katalog und Icon-Aufloesung, die app.js und editors.js nutzen. -->
     <script src="items.js"></script>
+    <script src="panel-runtime.js"></script>
     <script src="app.js"></script>
     <script src="editors.js"></script>
 </body>

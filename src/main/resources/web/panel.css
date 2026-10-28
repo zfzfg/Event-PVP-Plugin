@@ -1,0 +1,213 @@
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 4px;
+}
+
+.inventory-slot {
+    aspect-ratio: 1;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition);
+}
+
+.inventory-slot:hover {
+    border-color: var(--primary);
+}
+
+.inventory-slot.filled {
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.inventory-slot img {
+    width: 80%;
+    height: 80%;
+    image-rendering: pixelated;
+}
+
+.inventory-slot .amount {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px black;
+}
+
+
+.minecraft-inventory {
+    background: #2d2d2d;
+    border: 2px solid #1a1a1a;
+    border-radius: 8px;
+    padding: 12px;
+    width: fit-content;
+}
+.inventory-main {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.inventory-row {
+    display: flex;
+    gap: 2px;
+}
+.hotbar-separator {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 8px 0;
+}
+.inventory-hotbar {
+    display: flex;
+    gap: 2px;
+}
+.minecraft-inventory .inventory-slot {
+    width: 40px;
+    height: 40px;
+    background: #3a3a3a;
+    border: 2px solid #1a1a1a;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.minecraft-inventory .inventory-slot:hover {
+    border-color: var(--primary);
+    background: #454545;
+}
+.minecraft-inventory .inventory-slot.hotbar-slot {
+    background: linear-gradient(135deg, #3a3a3a 0%, #4a4a4a 100%);
+    border-color: #555;
+}
+.minecraft-inventory .inventory-slot.hotbar-slot::after {
+    content: attr(data-slot);
+    position: absolute;
+    bottom: 1px;
+    right: 3px;
+    font-size: 8px;
+    color: var(--text-muted);
+    font-weight: bold;
+}
+.minecraft-inventory .inventory-slot.filled {
+    background: #404040;
+}
+.minecraft-inventory .inventory-slot.enchanted {
+    background: linear-gradient(135deg, #404040 0%, #4a3a5a 100%);
+    border-color: #8b5cf6;
+}
+.minecraft-inventory .inventory-slot.drag-over {
+    border-color: var(--success) !important;
+    background: rgba(76, 175, 80, 0.2) !important;
+}
+.minecraft-inventory .inventory-slot.dragging {
+    opacity: 0.5;
+}
+.minecraft-inventory .inventory-slot img {
+    width: 32px;
+    height: 32px;
+    image-rendering: pixelated;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+.minecraft-inventory .inventory-slot .amount {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 1px black, -1px -1px 1px black, 1px -1px 1px black, -1px 1px 1px black;
+    pointer-events: none;
+    user-select: none;
+}
+.minecraft-inventory .inventory-slot .enchant-indicator {
+    position: absolute;
+    top: 1px;
+    left: 2px;
+    font-size: 10px;
+    pointer-events: none;
+    user-select: none;
+}
+.item-source {
+    cursor: grab;
+}
+.item-source:active {
+    cursor: grabbing;
+}
+.item-source.dragging {
+    opacity: 0.5;
+}
+
+/* Shared inventory geometry, independent of which editor has been opened. */
+:root { --inventory-slot-size: 42px; --inventory-gap: 4px; }
+.inventory-slot, .minecraft-inventory .inventory-slot {
+    width: var(--inventory-slot-size); height: var(--inventory-slot-size);
+    min-width: var(--inventory-slot-size); flex: 0 0 var(--inventory-slot-size);
+    box-sizing: border-box; position: relative;
+}
+.inventory-slot img { max-width: 80%; max-height: 80%; object-fit: contain; }
+.inventory-slot .enchant-indicator {
+    position: absolute; top: 1px; left: 2px; font-size: 10px; pointer-events: none;
+}
+.inventory-grid, .minecraft-inventory .inventory-row, .minecraft-inventory .inventory-hotbar {
+    display: grid; grid-template-columns: repeat(9, var(--inventory-slot-size));
+    gap: var(--inventory-gap); width: max-content;
+}
+.minecraft-inventory .inventory-main { gap: var(--inventory-gap); }
+.inv-layout-wrapper { align-items: flex-start; gap: 1rem; min-width: 0; }
+.inv-main-storage-container { min-width: 0; max-width: 100%; overflow-x: auto; }
+.inv-armor-offhand-col { flex: 0 0 auto; }
+.inv-armor-slot-row { min-height: var(--inventory-slot-size); }
+.inv-armor-label { overflow-wrap: anywhere; }
+.inv-explorer-grid { grid-template-columns: minmax(240px, 320px) minmax(0, 1fr); }
+.content, .card, .card-body, .inv-viewer-card, .inv-minecraft-canvas,
+.equipment-preview > *, .form-group { min-width: 0; }
+.content { overflow-wrap: anywhere; }
+.card-header, .modal-footer, .inv-actions-toolbar { flex-wrap: wrap; gap: .75rem; }
+.btn { white-space: normal; }
+.inv-actions-toolbar { display: flex; justify-content: flex-end; margin-top: .75rem;
+    padding-top: .75rem; border-top: 1px solid var(--border); }
+#equipment-inventory-grid { display: block; max-width: 100%; overflow-x: auto; }
+.modal { max-height: calc(100dvh - 2rem); max-width: calc(100vw - 2rem); display: flex; flex-direction: column; }
+.modal-body { overflow-y: auto; min-height: 0; }
+.modal-header, .modal-footer { flex-shrink: 0; }
+:focus-visible { outline: 2px solid var(--primary-light); outline-offset: 3px; }
+.minecraft-tooltip { max-width: min(360px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); overflow: auto; overflow-wrap: anywhere; }
+.panel-load-errors { padding: 1rem; border: 1px solid var(--error); border-radius: 8px; margin-bottom: 1rem; }
+.panel-load-errors:empty { display: none; }
+[aria-busy="true"] { cursor: progress; }
+@media (max-width: 1200px) { .inv-explorer-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 768px) {
+    .sidebar { order: 0; position: static; height: auto; width: 100%; padding: .75rem; }
+    .sidebar-section { margin: 0; }
+    .content { order: 1; width: 100%; padding: .75rem; }
+    .card-body, .inv-minecraft-canvas { padding: .75rem; }
+    .inv-layout-wrapper { justify-content: flex-start; }
+    .header { position: static; padding: .75rem; }
+    .inv-search-row { flex-wrap: wrap; }
+    .inv-search-input-wrapper { min-width: 0; }
+    .inv-status-bar, .inv-stats-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.header-actions { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+.header-actions > .btn { flex-shrink: 0; }
+.section-header { flex-wrap: wrap; gap: .75rem; }
+.toast-container { max-width: calc(100vw - 2rem); }
+.toast { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 768px) {
+    .header-actions { width: 100%; }
+    .toast-container { right: 1rem; bottom: 1rem; }
+}
+.content-header { flex-wrap: wrap; gap: .75rem; }
+.content-header > :first-child { min-width: 0; flex: 1 1 260px; }
+.content-header .header-actions { width: auto; }
+
+.armor-slot { width: var(--inventory-slot-size); height: var(--inventory-slot-size); flex: 0 0 var(--inventory-slot-size); }

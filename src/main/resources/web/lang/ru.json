@@ -774,5 +774,14 @@
   "inventory.apiIncompatible": "Требуется InventoryBackup API 2",
   "inventory.lastError": "Последняя ошибка",
   "inventory.backupDamaged": "Копия отсутствует или повреждена",
-  "inventory.error.lookupFailed": "Не удалось найти игрока; смотрите журнал сервера."
+  "inventory.error.lookupFailed": "Не удалось найти игрока; смотрите журнал сервера.",
+  "panel.invalidResponse": "Сервер вернул некорректный ответ.",
+  "panel.requestFailed": "Ошибка запроса (HTTP {status}).",
+  "panel.close": "Закрыть",
+  "panel.emptySlot": "Пустая ячейка",
+  "panel.copyFailed": "Не удалось скопировать. Проверьте доступ к буферу обмена.",
+  "panel.configLoadFailed": "Не загружено: {categories}. Повторите загрузку перед сохранением.",
+  "panel.retry": "Повторить",
+  "panel.saveUnavailable": "Некоторые конфигурации не загружены и не могут быть сохранены.",
+  "panel.reloadConflict": "Конфигурация сервера изменилась. Загрузить всё заново и отменить несохранённые изменения?"
 }

@@ -774,5 +774,14 @@
   "inventory.apiIncompatible": "InventoryBackup API 2 wird benötigt",
   "inventory.lastError": "Letzter Fehler",
   "inventory.backupDamaged": "Sicherung fehlt oder ist beschädigt",
-  "inventory.error.lookupFailed": "Spielerabfrage fehlgeschlagen; siehe Serverlog."
+  "inventory.error.lookupFailed": "Spielerabfrage fehlgeschlagen; siehe Serverlog.",
+  "panel.invalidResponse": "Der Server hat eine ungültige Antwort zurückgegeben.",
+  "panel.requestFailed": "Anfrage fehlgeschlagen (HTTP {status}).",
+  "panel.close": "Schließen",
+  "panel.emptySlot": "Leerer Platz",
+  "panel.copyFailed": "Kopieren fehlgeschlagen. Bitte Zugriff auf die Zwischenablage prüfen.",
+  "panel.configLoadFailed": "Nicht geladen: {categories}. Diese Bereiche vor dem Speichern erneut laden.",
+  "panel.retry": "Erneut versuchen",
+  "panel.saveUnavailable": "Einige Konfigurationen sind nicht geladen und können nicht gespeichert werden.",
+  "panel.reloadConflict": "Die Serverkonfiguration wurde geändert. Alle Konfigurationen neu laden und deine ungespeicherten Änderungen verwerfen?"
 }

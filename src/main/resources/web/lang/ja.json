@@ -774,5 +774,14 @@
   "inventory.apiIncompatible": "InventoryBackup API 2が必要です",
   "inventory.lastError": "最後のエラー",
   "inventory.backupDamaged": "バックアップが見つからないか破損しています",
-  "inventory.error.lookupFailed": "プレイヤーの検索に失敗しました。サーバーログを確認してください。"
+  "inventory.error.lookupFailed": "プレイヤーの検索に失敗しました。サーバーログを確認してください。",
+  "panel.invalidResponse": "サーバーから無効な応答が返されました。",
+  "panel.requestFailed": "リクエストに失敗しました（HTTP {status}）。",
+  "panel.close": "閉じる",
+  "panel.emptySlot": "空のスロット",
+  "panel.copyFailed": "コピーできませんでした。クリップボードへのアクセスを確認してください。",
+  "panel.configLoadFailed": "読み込めませんでした: {categories}。保存する前に再試行してください。",
+  "panel.retry": "再試行",
+  "panel.saveUnavailable": "一部の設定が読み込まれていないため保存できません。",
+  "panel.reloadConflict": "サーバーの設定が変更されました。すべて再読み込みして未保存の変更を破棄しますか？"
 }

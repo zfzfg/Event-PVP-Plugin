@@ -1,5 +1,19 @@
 [CENTER][SIZE=6][B]Changelog[/B][/SIZE][/CENTER]
 
+[SIZE=5][B][[COLOR=#5b9bd5]1.1.3[/COLOR]] - 2026-10-28[/B][/SIZE]
+[HR][/HR]
+
+[LIST]
+[*][B]Inventory display:[/B] consistent square slots, aligned hotbar and storage rows, visible empty armor slots and correctly positioned enchantment indicators. Opening the equipment editor no longer changes backup preview styling.
+[*][B]Responsive panel:[/B] improved headers, buttons, notifications and dialogs; inventory scrolling stays inside its container. Mobile navigation remains before page content.
+[*][B]Reliable requests:[/B] stale player and backup replies are ignored. Restore and delete actions retain their original target and prevent duplicate submissions.
+[*][B]Configuration saves:[/B] retry failed loads independently, preserve edits made during saving, record partial successes and confirm before reloading after revision conflicts.
+[*][B]Sessions:[/B] clean up pending reads and status timers on logout; old write responses cannot expire a new login. Writes are never retried automatically.
+[*][B]Accessibility and languages:[/B] keyboard-accessible tooltips, dialog focus management and Escape handling; editor inputs survive language changes. New messages cover all seven languages.
+[*][B]Verification:[/B] 447 Java tests, 15 Chromium browser tests and 3 web safety tests passed. Browser tests use simulated API replies; live-server restoration was not exercised.
+[*][B]Compatibility:[/B] existing API endpoints, configuration formats and dark/green design are preserved. No new configuration migration.
+[/LIST]
+
 [SIZE=5][B][[COLOR=#5b9bd5]1.1.1[/COLOR]] - 2026-09-23[/B][/SIZE]
 [HR][/HR]
 

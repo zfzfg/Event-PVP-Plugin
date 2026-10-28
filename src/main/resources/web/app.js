@@ -6,7 +6,7 @@ function eventAttrs(type, callback) {
     PANEL_ACTIONS.set(id, callback);
     return `data-panel-${type}="${id}"`;
 }
-for (const type of ['click', 'change', 'input', 'keydown']) {
+for (const type of ['click', 'change', 'input', 'keydown', 'mouseover', 'focusin']) {
     document.addEventListener(type, event => {
         const element = event.target.closest(`[data-panel-${type}]`);
         if (!element) return;
@@ -18,7 +18,7 @@ new MutationObserver(records => {
     for (const record of records) for (const node of record.removedNodes) {
         if (node.nodeType !== 1 || node.isConnected) continue;
         for (const element of [node, ...node.querySelectorAll('*')]) {
-            for (const type of ['click', 'change', 'input', 'keydown']) {
+            for (const type of ['click', 'change', 'input', 'keydown', 'mouseover', 'focusin']) {
                 const id = element.getAttribute(`data-panel-${type}`);
                 if (id) PANEL_ACTIONS.delete(id);
             }
@@ -151,7 +151,7 @@ function applyTranslations() {
 async function fetchServerLanguage() {
     try {
         console.log('[Language] Fetching server language...');
-        const response = await fetch('/api/language/get', {
+        const response = await panelFetch('/api/language/get', {
             method: 'GET',
             credentials: 'include'
         });
@@ -180,7 +180,7 @@ async function fetchServerLanguage() {
  */
 async function saveServerLanguage(lang) {
     try {
-        const response = await fetch('/api/language/save', {
+        const response = await panelFetch('/api/language/save', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -225,13 +225,15 @@ async function changeLanguage(lang) {
             } else {
                 CONFIG_BASELINE.config.settings = { language: lang };
             }
-            localStorage.setItem('config_backup', JSON.stringify(CONFIG_STATE.config));
+            cacheConfig('config_backup', CONFIG_BASELINE.config);
         }
         
         // Re-render dynamic content
-        if (typeof renderEventsList === 'function') renderEventsList();
-        if (typeof renderWorldsList === 'function') renderWorldsList();
-        if (typeof renderEquipmentList === 'function') renderEquipmentList();
+        if (!document.querySelector('.modal-overlay.active')) {
+            renderEventsList(); renderWorldsList(); renderEquipmentList();
+        }
+        if (currentInventoryBackup()) renderInventoryBackupPreview(currentInventoryBackup());
+        renderConfigLoadErrors();
         updateSyncStatusUI();
         showToast(i18n.t('success.saved'), 'success');
     } catch (error) {
@@ -506,7 +508,7 @@ window.addEventListener('DOMContentLoaded', async () => {
  */
 async function checkAuthentication() {
     try {
-        const response = await fetch('/api/auth/validate', {
+        const response = await panelFetch('/api/auth/validate', {
             method: 'GET',
             credentials: 'include' // Cookies mitsenden
         });
@@ -595,7 +597,7 @@ async function performLogin() {
     }
     
     try {
-        const response = await fetch('/api/auth/login', {
+        const response = await panelFetch('/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -664,8 +666,9 @@ function hideLoginError() {
  * Führt den Logout durch
  */
 async function performLogout() {
+    stopPanelSession();
     try {
-        await fetch('/api/auth/logout', {
+        await panelFetch('/api/auth/logout', {
             method: 'POST',
             credentials: 'include'
         });
@@ -684,6 +687,7 @@ async function performLogout() {
  */
 async function initializeApp() {
     console.log('Initializing app after authentication...');
+    const session = panelSessionGeneration;
     
     // Initiale Sektion anzeigen
     showSection('settings');
@@ -696,6 +700,7 @@ async function initializeApp() {
     
     // Configs laden mit Timeout
     const loadTimeout = setTimeout(() => {
+        if (session !== panelSessionGeneration) return;
         console.warn('Config loading timeout - might have failed');
         updateConnectionStatus('inactive', i18n.t('status.timeout'));
     }, 10000);
@@ -703,6 +708,7 @@ async function initializeApp() {
     try {
         await loadAllConfigs();
         clearTimeout(loadTimeout);
+        if (session !== panelSessionGeneration) return;
         console.log('Configs loaded successfully');
         
         // NICHT die Sprache aus der geladenen Config überschreiben!
@@ -731,7 +737,7 @@ async function initializeApp() {
     }
     
     // Regelmäßig Status prüfen (alle 60 Sekunden)
-    setInterval(checkServerStatus, 60000);
+    if (isAuthenticated && session === panelSessionGeneration) startPanelStatus();
 }
 
 /**
@@ -820,111 +826,76 @@ window.addEventListener('beforeunload', (e) => {
 // Config Loading & Saving
 // ============================================
 
-async function loadAllConfigs() {
-    console.log('=== loadAllConfigs starting ===');
+const PANEL_CONFIGS = {
+    settings: { key: 'config', path: 'config', cache: 'config_backup' },
+    worlds: { key: 'worlds', path: 'worlds', cache: 'worlds_backup' },
+    equipment: { key: 'equipment', path: 'equipment', cache: 'equipment_backup' },
+    web: { key: 'webConfig', path: 'webconfig', cache: 'webconfig_backup' }
+};
+const CONFIG_LOAD_STATE = {};
+let configLoadGeneration = 0;
+function cacheConfig(name, value) {
+    try { localStorage.setItem(name, JSON.stringify(value)); } catch (_) { /* Optional local cache. */ }
+}
+function renderConfigLoadErrors() {
+    let banner = document.getElementById('panel-load-errors');
+    if (!banner) {
+        banner = document.createElement('div');
+        banner.id = 'panel-load-errors';
+        banner.className = 'panel-load-errors';
+        banner.setAttribute('role', 'status');
+        document.querySelector('.content')?.prepend(banner);
+    }
+    const failed = Object.keys(PANEL_CONFIGS).filter(category => CONFIG_LOAD_STATE[category] === 'error');
+    banner.innerHTML = failed.length ? `<p>${escapeHtml(i18n.t('panel.configLoadFailed', { categories: failed.join(', ') }))}</p>
+        <button class="btn btn-secondary" ${eventAttrs('click', () => loadAllConfigs({ retryOnly: true }))}>${escapeHtml(i18n.t('panel.retry'))}</button>` : '';
+}
+async function loadAllConfigs({ retryOnly = false } = {}) {
+    const generation = ++configLoadGeneration;
+    const session = panelSessionGeneration;
+    const categories = Object.keys(PANEL_CONFIGS).filter(category => !retryOnly || CONFIG_LOAD_STATE[category] === 'error');
+    if (!categories.length) return;
+    showLoading(true);
+    for (const category of categories) CONFIG_LOAD_STATE[category] = 'loading';
     try {
-        updateConnectionStatus('connecting', i18n.t('status.loadingConfigs'));
-        showLoading(true);
-        
-        console.log('Fetching configs from API...');
-        
-        const [configResp, worldsResp, equipResp, webResp] = await Promise.all([
-            fetch('/api/config/get').catch(e => { console.error('config fetch error:', e); return null; }),
-            fetch('/api/worlds/get').catch(e => { console.error('worlds fetch error:', e); return null; }),
-            fetch('/api/equipment/get').catch(e => { console.error('equipment fetch error:', e); return null; }),
-            fetch('/api/webconfig/get').catch(e => { console.error('webconfig fetch error:', e); return null; })
-        ]);
-
-        console.log('API responses received:', {
-            config: configResp?.status,
-            worlds: worldsResp?.status,
-            equipment: equipResp?.status,
-            webconfig: webResp?.status
+        const results = await Promise.allSettled(categories.map(async category => {
+            const descriptor = PANEL_CONFIGS[category];
+            const json = await panelRequest(`/api/${descriptor.path}/get`);
+            const data = json.data || json;
+            if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error(i18n.t('panel.invalidResponse'));
+            return { category, data, revision: json.revision };
+        }));
+        if (generation !== configLoadGeneration || session !== panelSessionGeneration) return;
+        const loaded = new Set();
+        results.forEach((result, index) => {
+            const category = categories[index];
+            if (result.status !== 'fulfilled') { CONFIG_LOAD_STATE[category] = 'error'; return; }
+            const { data, revision } = result.value;
+            const descriptor = PANEL_CONFIGS[category];
+            CONFIG_STATE[descriptor.key] = data;
+            CONFIG_BASELINE[descriptor.key] = deepClone(data);
+            CONFIG_REVISIONS[category] = revision;
+            CONFIG_LOAD_STATE[category] = 'ready';
+            cacheConfig(descriptor.cache, data);
+            loaded.add(category);
         });
-
-        // API gibt {success: true, data: {...}} zurück - wir brauchen data
-        if (configResp && configResp.ok) {
-            const configJson = await configResp.json();
-            CONFIG_REVISIONS.settings = configJson.revision;
-            CONFIG_STATE.config = configJson.data || configJson;
-            console.log('Config loaded:', Object.keys(CONFIG_STATE.config));
-        } else {
-            console.warn('Config response not OK or null');
-        }
-        
-        if (worldsResp && worldsResp.ok) {
-            const worldsJson = await worldsResp.json();
-            CONFIG_REVISIONS.worlds = worldsJson.revision;
-            CONFIG_STATE.worlds = worldsJson.data || worldsJson;
-            console.log('Worlds loaded:', Object.keys(CONFIG_STATE.worlds));
-        } else {
-            console.warn('Worlds response not OK or null');
-        }
-        
-        if (equipResp && equipResp.ok) {
-            const equipJson = await equipResp.json();
-            CONFIG_REVISIONS.equipment = equipJson.revision;
-            CONFIG_STATE.equipment = equipJson.data || equipJson;
-            console.log('Equipment loaded:', Object.keys(CONFIG_STATE.equipment));
-        } else {
-            console.warn('Equipment response not OK or null');
-        }
-        
-        if (webResp && webResp.ok) {
-            const webJson = await webResp.json();
-            CONFIG_REVISIONS.web = webJson.revision;
-            CONFIG_STATE.webConfig = webJson.data || webJson;
-            console.log('WebConfig loaded:', Object.keys(CONFIG_STATE.webConfig));
-        } else {
-            console.warn('WebConfig response not OK or null');
-        }
-
-        // Baseline für Deep-Dirty-Tracking & Backup für Undo/Redo speichern
-        CONFIG_BASELINE.config = deepClone(CONFIG_STATE.config);
-        CONFIG_BASELINE.worlds = deepClone(CONFIG_STATE.worlds);
-        CONFIG_BASELINE.equipment = deepClone(CONFIG_STATE.equipment);
-        CONFIG_BASELINE.webConfig = deepClone(CONFIG_STATE.webConfig);
-
-        localStorage.setItem('config_backup', JSON.stringify(CONFIG_STATE.config));
-        localStorage.setItem('worlds_backup', JSON.stringify(CONFIG_STATE.worlds));
-        localStorage.setItem('equipment_backup', JSON.stringify(CONFIG_STATE.equipment));
-        localStorage.setItem('webconfig_backup', JSON.stringify(CONFIG_STATE.webConfig));
-
-        CONFIG_STATE.changes = [];
-        CONFIG_STATE.changeIndex = -1;
-
-        // Item-Katalog laden, sobald die Web-Config da ist: aus ihr stammt der optionale
-        // Remote-Fallback fuer Texturen. Muss vor jedem Rendern stehen, das Icons zeichnet.
-        applyTextureSettings();
+        if (!retryOnly) { CONFIG_STATE.changes = []; CONFIG_STATE.changeIndex = -1; }
+        if (loaded.has('web')) applyTextureSettings();
         await loadItemCatalog();
-
-        // Warnen, falls equipment.yml noch eine Alt-Sektion enthaelt - dann lief die
-        // Migration mangels Serverneustart noch nicht.
-        checkEquipmentSchema();
-
-        // Serverwelten erst nach den Configs holen: der Belegungs-Index der API liest die
-        // gespeicherten YAMLs, und die Weltkarten brauchen beides zum Rendern.
-        await loadMvWorlds();
-        await loadInventoryStatus();
-        await loadInventoryGuard();
-
-        console.log('Rendering UI components...');
-        populateSettingsForm();
-        renderEventsList();
-        renderWorldsList();
-        renderServerWorldsPanel();
-        renderEquipmentList();
-
-        showLoading(false);
-        updateConnectionStatus('active', i18n.t('status.connected'));
-        showToast(i18n.t('success.loadedConfigs'), 'success');
-        console.log('=== loadAllConfigs completed successfully ===');
+        if (generation !== configLoadGeneration || session !== panelSessionGeneration) return;
+        if (loaded.has('settings')) { populateSettingsForm(); renderEventsList(); }
+        if (loaded.has('worlds')) renderWorldsList();
+        if (loaded.has('equipment')) { checkEquipmentSchema(); renderEquipmentList(); }
+        renderConfigLoadErrors();
+        updateSyncStatusUI();
+        const failed = Object.values(CONFIG_LOAD_STATE).includes('error');
+        if (!failed) showToast(i18n.t('success.loadedConfigs'), 'success');
+        await Promise.allSettled([loadMvWorlds(), loadInventoryStatus(), loadInventoryGuard()]);
+        if (session === panelSessionGeneration) renderServerWorldsPanel();
     } catch (error) {
-        console.error('Error loading configs:', error);
-        console.error('Stack:', error.stack);
-        showLoading(false);
-        updateConnectionStatus('inactive', i18n.t('auth.connectionError'));
-        showToast(i18n.t('error.loadFailedWithReason', { message: error.message || '' }), 'error');
+        if (session === panelSessionGeneration) showToast(i18n.t('error.loadFailedWithReason', { message: error.message || '' }), 'error');
+    } finally {
+        if (generation === configLoadGeneration) showLoading(false);
     }
 }
 
@@ -960,151 +931,64 @@ function updateConnectionStatus(status, text) {
     updateSyncStatusUI();
 }
 
-function saveRequest(category, url, data) {
-    return fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ data, revision: CONFIG_REVISIONS[category] })
-    }).then(async (response) => {
-        let body = {};
-        try { body = await response.json(); } catch (e) { /* Antwort ohne JSON */ }
-        console.log('[Save]', category, 'response:', response.status);
-        if (body.revision) CONFIG_REVISIONS[category] = body.revision;
-        if (response.status === 409) {
-            if (confirm(i18n.t('confirm.configChanged'))) loadAllConfigs();
-        }
-        return {
-            category,
-            ok: response.ok && body.success !== false,
-            status: response.status,
-            reloadDeferred: body.reloadDeferred === true
-        };
-    });
+async function saveRequest(category, url, data) {
+    try {
+        const body = await panelRequest(url, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data, revision: CONFIG_REVISIONS[category] })
+        });
+        return { category, ok: true, revision: body.revision, reloadDeferred: body.reloadDeferred === true };
+    } catch (error) { return { category, ok: false, status: error.status }; }
 }
 
 async function saveAllConfigs() {
+    if (CONFIG_STATE.isSaving) return;
+    const changed = Object.keys(PANEL_CONFIGS).filter(hasConfigChanged);
+    const categories = changed.filter(category => CONFIG_LOAD_STATE[category] === 'ready');
+    if (changed.length !== categories.length) {
+        showToast(i18n.t('panel.saveUnavailable'), 'warning');
+    }
+    if (!categories.length) {
+        if (!changed.length) showToast(i18n.t('info.noChanges'), 'info');
+        return;
+    }
+    if (categories.includes('web')) {
+        const curPort = CONFIG_STATE.webConfig?.web?.port;
+        const basePort = CONFIG_BASELINE.webConfig?.web?.port;
+        if (curPort !== undefined && basePort !== undefined && curPort !== basePort &&
+            !confirm(i18n.t('web.portChangeWarning', { oldPort: basePort, newPort: curPort }))) return;
+    }
+    const snapshots = Object.fromEntries(categories.map(category => [category, deepClone(CONFIG_STATE[PANEL_CONFIGS[category].key])]));
+    const session = panelSessionGeneration;
+    CONFIG_STATE.isSaving = true;
+    updateSyncStatusUI();
     try {
-        // Port-Änderungswarnung: Prüfen, ob der Port geändert wurde
-        if (hasConfigChanged('web')) {
-            const curPort = CONFIG_STATE.webConfig?.web?.port;
-            const basePort = CONFIG_BASELINE.webConfig?.web?.port;
-            if (curPort !== undefined && basePort !== undefined && curPort !== basePort) {
-                const warningMsg = i18n.t('web.portChangeWarning', {
-                    oldPort: basePort,
-                    newPort: curPort
-                });
-                if (!confirm(warningMsg)) {
-                    return; // Speichern abgebrochen
-                }
-            }
+        const results = await Promise.all(categories.map(category => saveRequest(category,
+            `/api/${PANEL_CONFIGS[category].path}/save`, snapshots[category])));
+        if (session !== panelSessionGeneration) return;
+        for (const result of results) {
+            if (!result.ok) continue;
+            const descriptor = PANEL_CONFIGS[result.category];
+            CONFIG_BASELINE[descriptor.key] = deepClone(snapshots[result.category]);
+            if (result.revision !== undefined) CONFIG_REVISIONS[result.category] = result.revision;
+            cacheConfig(descriptor.cache, snapshots[result.category]);
         }
-
-        CONFIG_STATE.isSaving = true;
-        updateSyncStatusUI();
-        showLoading(true);
-        
-        const promises = [];
-        const savedCategories = [];
-        
-        console.log('[Save] Checking changes against baseline...');
-        
-        if (hasConfigChanged('settings')) {
-            console.log('[Save] Speichere config.yml...');
-            savedCategories.push('settings');
-            promises.push(saveRequest('settings', '/api/config/save', CONFIG_STATE.config));
+        if (results.some(result => result.ok)) CONFIG_STATE.lastSave = new Date();
+        if (!Object.keys(PANEL_CONFIGS).some(hasConfigChanged)) {
+            CONFIG_STATE.changes = []; CONFIG_STATE.changeIndex = -1;
         }
-
-        if (hasConfigChanged('worlds')) {
-            console.log('[Save] Speichere worlds.yml...');
-            savedCategories.push('worlds');
-            promises.push(saveRequest('worlds', '/api/worlds/save', CONFIG_STATE.worlds));
+        updateQuickActionsPanel();
+        const success = results.every(result => result.ok) && categories.length === changed.length;
+        showToast(i18n.t(success ? 'success.savedAll' : 'error.savePartial'), success ? 'success' : 'error');
+        if (results.some(result => result.reloadDeferred)) showToast(i18n.t('success.savedReloadDeferred'), 'warning');
+        if (results.some(result => result.status === 409) && confirm(i18n.t('panel.reloadConflict'))) {
+            await loadAllConfigs();
         }
-
-        if (hasConfigChanged('equipment')) {
-            console.log('[Save] Speichere equipment.yml...');
-            savedCategories.push('equipment');
-            promises.push(saveRequest('equipment', '/api/equipment/save', CONFIG_STATE.equipment));
-        }
-
-        if (hasConfigChanged('web')) {
-            console.log('[Save] Speichere web-config.yml...');
-            savedCategories.push('web');
-            promises.push(
-                saveRequest('web', '/api/webconfig/save', CONFIG_STATE.webConfig)
-            );
-        }
-
-        if (promises.length === 0) {
-            showToast(i18n.t('info.noChanges'), 'info');
+    } finally {
+        if (session === panelSessionGeneration) {
             CONFIG_STATE.isSaving = false;
             updateSyncStatusUI();
-            showLoading(false);
-            return;
         }
-        
-        console.log('[Save] Sende', promises.length, 'Save-Requests...');
-
-        const results = await Promise.all(promises);
-        const allSuccess = results.every(r => r.ok);
-
-        if (allSuccess) {
-            // Baseline und Backups für die gespeicherten Kategorien synchronisieren
-            if (savedCategories.includes('settings')) {
-                CONFIG_BASELINE.config = deepClone(CONFIG_STATE.config);
-                localStorage.setItem('config_backup', JSON.stringify(CONFIG_STATE.config));
-            }
-            if (savedCategories.includes('worlds')) {
-                CONFIG_BASELINE.worlds = deepClone(CONFIG_STATE.worlds);
-                localStorage.setItem('worlds_backup', JSON.stringify(CONFIG_STATE.worlds));
-            }
-            if (savedCategories.includes('equipment')) {
-                CONFIG_BASELINE.equipment = deepClone(CONFIG_STATE.equipment);
-                localStorage.setItem('equipment_backup', JSON.stringify(CONFIG_STATE.equipment));
-            }
-            if (savedCategories.includes('web')) {
-                CONFIG_BASELINE.webConfig = deepClone(CONFIG_STATE.webConfig);
-                localStorage.setItem('webconfig_backup', JSON.stringify(CONFIG_STATE.webConfig));
-            }
-            
-            CONFIG_STATE.changes = [];
-            CONFIG_STATE.changeIndex = -1;
-            CONFIG_STATE.lastSave = new Date();
-            updateQuickActionsPanel();
-            showToast(i18n.t('success.savedAll'), 'success');
-            if (results.some(r => r.reloadDeferred)) {
-                showToast(i18n.t('success.savedReloadDeferred'), 'warning');
-            }
-        } else {
-            results.forEach(res => {
-                if (res.ok) {
-                    if (res.category === 'settings') {
-                        CONFIG_BASELINE.config = deepClone(CONFIG_STATE.config);
-                        localStorage.setItem('config_backup', JSON.stringify(CONFIG_STATE.config));
-                    } else if (res.category === 'worlds') {
-                        CONFIG_BASELINE.worlds = deepClone(CONFIG_STATE.worlds);
-                        localStorage.setItem('worlds_backup', JSON.stringify(CONFIG_STATE.worlds));
-                    } else if (res.category === 'equipment') {
-                        CONFIG_BASELINE.equipment = deepClone(CONFIG_STATE.equipment);
-                        localStorage.setItem('equipment_backup', JSON.stringify(CONFIG_STATE.equipment));
-                    } else if (res.category === 'web') {
-                        CONFIG_BASELINE.webConfig = deepClone(CONFIG_STATE.webConfig);
-                        localStorage.setItem('webconfig_backup', JSON.stringify(CONFIG_STATE.webConfig));
-                    }
-                }
-            });
-            showToast(i18n.t('error.savePartial'), 'error');
-        }
-
-        CONFIG_STATE.isSaving = false;
-        updateSyncStatusUI();
-        showLoading(false);
-    } catch (error) {
-        console.error('Error saving configs:', error);
-        CONFIG_STATE.isSaving = false;
-        updateSyncStatusUI();
-        showLoading(false);
-        showToast(i18n.t('error.saveFailed'), 'error');
     }
 }
 
@@ -1113,6 +997,7 @@ async function saveAllConfigs() {
 // ============================================
 
 function showSection(sectionName) {
+    hideMinecraftTooltip();
     console.log('showSection called with:', sectionName);
     
     // Get all sections and nav items
@@ -1820,7 +1705,7 @@ const MV_STATE = {
  */
 async function loadMvWorlds() {
     try {
-        const response = await fetch('/api/mvworlds/list', { credentials: 'include' });
+        const response = await panelFetch('/api/mvworlds/list', { credentials: 'include' });
         const json = response.ok ? await response.json() : null;
         if (!json || json.success === false) {
             MV_STATE.stale = true;
@@ -1944,7 +1829,7 @@ function switchInventoryTab(tabId) {
  */
 async function loadInventoryStatus() {
     try {
-        const response = await fetch('/api/inventories/status', { credentials: 'include' });
+        const response = await panelFetch('/api/inventories/status', { credentials: 'include' });
         const json = response.ok ? await response.json() : null;
         if (!json || json.success === false) {
             return false;
@@ -2184,7 +2069,7 @@ async function setInventoryProvider(mode) {
     }
 
     try {
-        const response = await fetch('/api/inventories/provider', {
+        const response = await panelFetch('/api/inventories/provider', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -2206,7 +2091,7 @@ async function setInventoryProvider(mode) {
             CONFIG_BASELINE.config.settings['inventory-management'].provider = mode;
         }
         if (CONFIG_STATE.config) {
-            localStorage.setItem('config_backup', JSON.stringify(CONFIG_STATE.config));
+            cacheConfig('config_backup', CONFIG_BASELINE.config);
         }
         updateSyncStatusUI();
         showToast(i18n.t('inventory.switched', { mode: i18n.t('inventory.provider.' + mode) }), 'success');
@@ -2222,7 +2107,7 @@ async function loadInventoryGuard() {
     if (!container) return;
 
     try {
-        const response = await fetch('/api/inventories/guard', { credentials: 'include' });
+        const response = await panelFetch('/api/inventories/guard', { credentials: 'include' });
         const json = response.ok ? await response.json() : null;
         if (!json || json.success === false) {
             container.innerHTML = `<p class="form-label-hint">${escapeHtml(inventoryErrorText(json))}</p>`;
@@ -2332,6 +2217,25 @@ const INVENTORY_BROWSER = {
     activeFilter: 'ALL'
 };
 
+let inventoryListController = null;
+let inventoryPreviewController = null;
+let inventoryListGeneration = 0;
+let inventoryPreviewGeneration = 0;
+const inventoryMutations = new Set();
+function invalidateInventoryPreview() {
+    inventoryPreviewGeneration++;
+    inventoryPreviewController?.abort();
+    INVENTORY_BROWSER.selectedBackupId = null;
+    INVENTORY_BROWSER.selectedBackupData = null;
+    hideMinecraftTooltip();
+    const preview = document.getElementById('inventory-browser-preview');
+    if (preview) preview.innerHTML = `<div class="inv-empty-state">${escapeHtml(i18n.t('inventory.selectBackupHint'))}</div>`;
+}
+function currentInventoryBackup() {
+    const data = INVENTORY_BROWSER.selectedBackupData;
+    return data && data.id === INVENTORY_BROWSER.selectedBackupId ? data : null;
+}
+
 /** Sucht die Backups eines Spielers. */
 async function loadInventoryBackups() {
     const input = document.getElementById('inventory-browser-player');
@@ -2340,6 +2244,14 @@ async function loadInventoryBackups() {
     if (!input || !list) return;
 
     const query = input.value.trim();
+    const generation = ++inventoryListGeneration;
+    const session = panelSessionGeneration;
+    inventoryListController?.abort();
+    inventoryListController = new AbortController();
+    invalidateInventoryPreview();
+    INVENTORY_BROWSER.player = null;
+    INVENTORY_BROWSER.backups = [];
+    INVENTORY_BROWSER.playerInput = query;
     if (!query) {
         list.innerHTML = `<div class="inv-empty-state"><i class="fas fa-boxes-packing"></i><p>${escapeHtml(i18n.t('inventory.searchHint'))}</p></div>`;
         if (preview) {
@@ -2351,13 +2263,10 @@ async function loadInventoryBackups() {
     list.innerHTML = `<p class="form-label-hint" style="padding:1rem;"><i class="fas fa-circle-notch fa-spin"></i> ${escapeHtml(i18n.t('inventory.browser.loading'))}</p>`;
 
     try {
-        const response = await fetch(`/api/inventories/list?player=${encodeURIComponent(query)}`,
-            { credentials: 'include' });
-        const json = response.ok ? await response.json() : null;
-        if (!json || json.success === false) {
-            list.innerHTML = `<p class="form-label-hint" style="padding:1rem;color:var(--error);">${escapeHtml(inventoryErrorText(json))}</p>`;
-            return;
-        }
+        const json = await panelRequest(`/api/inventories/list?player=${encodeURIComponent(query)}`,
+            { signal: inventoryListController.signal });
+        if (generation !== inventoryListGeneration || session !== panelSessionGeneration) return;
+        if (!json.data || !json.data.player || !Array.isArray(json.data.backups)) throw new Error(i18n.t('panel.invalidResponse'));
 
         INVENTORY_BROWSER.player = json.data.player;
         INVENTORY_BROWSER.playerInput = query;
@@ -2385,6 +2294,7 @@ async function loadInventoryBackups() {
             preview.innerHTML = `<div class="inv-empty-state"><i class="fas fa-box-open"></i><p>${escapeHtml(i18n.t('inventory.browser.empty'))}</p></div>`;
         }
     } catch (error) {
+        if (generation !== inventoryListGeneration || session !== panelSessionGeneration) return;
         console.error('Inventory backup list failed:', error);
         list.innerHTML = `<p class="form-label-hint" style="padding:1rem;color:var(--error);">${escapeHtml(i18n.t('inventory.error.unavailable'))}</p>`;
     }
@@ -2452,7 +2362,7 @@ function renderInventoryBackupList() {
         const badgeClass = typeCategory === 'event' ? 'badge-primary' : (typeCategory === 'pvp_match' ? 'badge-info' : 'badge-secondary');
 
         return `
-            <div class="inv-backup-item ${isActive ? 'active' : ''}" ${eventAttrs("click", function(event) { previewInventoryBackup(backup.id); })}>
+            <div class="inv-backup-item ${isActive ? 'active' : ''}" tabindex="0" role="button" ${eventAttrs("keydown", function(event) { if (event.target === this && (event.key === "Enter" || event.key === " ")) { event.preventDefault(); previewInventoryBackup(backup.id); } })} ${eventAttrs("click", function(event) { previewInventoryBackup(backup.id); })}>
                 <div class="inv-backup-header">
                     <span class="badge ${badgeClass}">${escapeHtml(typeLabel)}</span>
                     <span class="inv-backup-date">${escapeHtml(formatBackupDate(backup.createdAt))}</span>
@@ -2462,7 +2372,7 @@ function renderInventoryBackupList() {
                         ${escapeHtml(backup.id)}
                     </span>
                 </div>
-                <div class="inv-backup-actions" onclick="event.stopPropagation()">
+                <div class="inv-backup-actions">
                     <button class="btn btn-primary btn-sm" ${eventAttrs("click", function(event) { openRestoreModal(backup.id); })} title="${escapeHtml(i18n.t('inventory.browser.restore'))}">
                         <i class="fas fa-rotate-left"></i>
                     </button>
@@ -2486,23 +2396,26 @@ async function previewInventoryBackup(backupId) {
     const preview = document.getElementById('inventory-browser-preview');
     if (!preview) return;
 
+    const player = INVENTORY_BROWSER.player;
+    if (!player) return;
+    invalidateInventoryPreview();
+    const generation = inventoryPreviewGeneration;
+    const session = panelSessionGeneration;
+    inventoryPreviewController = new AbortController();
     INVENTORY_BROWSER.selectedBackupId = backupId;
     renderInventoryBackupList();
 
     preview.innerHTML = `<p class="form-label-hint" style="padding:2rem;text-align:center;"><i class="fas fa-circle-notch fa-spin"></i> ${escapeHtml(i18n.t('inventory.browser.loading'))}</p>`;
 
     try {
-        const url = `/api/inventories/get?player=${encodeURIComponent(INVENTORY_BROWSER.player)}`
-            + `&id=${encodeURIComponent(backupId)}`;
-        const response = await fetch(url, { credentials: 'include' });
-        const json = response.ok ? await response.json() : null;
-        if (!json || json.success === false) {
-            preview.innerHTML = `<p class="form-label-hint" style="padding:2rem;color:var(--error);text-align:center;">${escapeHtml(inventoryErrorText(json))}</p>`;
-            return;
-        }
-        INVENTORY_BROWSER.selectedBackupData = json.data;
-        renderInventoryBackupPreview(json.data);
+        const json = await panelRequest(`/api/inventories/get?player=${encodeURIComponent(player)}&id=${encodeURIComponent(backupId)}`,
+            { signal: inventoryPreviewController.signal });
+        if (generation !== inventoryPreviewGeneration || session !== panelSessionGeneration || player !== INVENTORY_BROWSER.player) return;
+        if (!json.data || json.data.id !== backupId) throw new Error(i18n.t('panel.invalidResponse'));
+        INVENTORY_BROWSER.selectedBackupData = normalizedBackup(json.data);
+        renderInventoryBackupPreview(INVENTORY_BROWSER.selectedBackupData);
     } catch (error) {
+        if (generation !== inventoryPreviewGeneration || session !== panelSessionGeneration) return;
         console.error('Inventory backup preview failed:', error);
         preview.innerHTML = `<p class="form-label-hint" style="padding:2rem;color:var(--error);text-align:center;">${escapeHtml(i18n.t('inventory.error.loadFailed'))}</p>`;
     }
@@ -2513,9 +2426,8 @@ async function previewInventoryBackup(backupId) {
  */
 function renderInventoryBackupPreview(data) {
     const preview = document.getElementById('inventory-browser-preview');
-    const headerActions = document.getElementById('inv-viewer-header-actions');
     if (!preview) return;
-    if (headerActions) headerActions.style.display = '';
+    data = normalizedBackup(data);
 
     const bySlot = new Map();
     (data.contents || []).forEach(item => bySlot.set(item.slot, item));
@@ -2558,11 +2470,13 @@ function renderInventoryBackupPreview(data) {
 
     const cell = (item, slotIndex) => {
         if (!item || !item.material) {
-            return `<div class="inventory-slot" data-slot="${slotIndex != null ? slotIndex : ''}"></div>`;
+            return `<div class="inventory-slot" aria-label="${escapeAttr(i18n.t('panel.emptySlot'))}" data-slot="${slotIndex != null ? slotIndex : ''}"></div>`;
         }
-        const itemJsonAttr = escapeAttr(JSON.stringify(item));
-        return `<div class="inventory-slot filled" data-slot="${slotIndex != null ? slotIndex : ''}"
-                     onmouseenter="showMinecraftTooltip(event, ${itemJsonAttr})"
+        return `<div class="inventory-slot filled" tabindex="0" role="button" aria-label="${escapeAttr(itemDisplayName(item.material))}" data-slot="${slotIndex != null ? slotIndex : ''}"
+                     ${eventAttrs("mouseover", function(event) { showMinecraftTooltip(event, item); })}
+                     ${eventAttrs("focusin", function(event) { showMinecraftTooltip(event, item); })}
+                     ${eventAttrs("click", function(event) { showMinecraftTooltip(event, item); })}
+                     onblur="hideMinecraftTooltip()"
                      onmousemove="moveMinecraftTooltip(event)"
                      onmouseleave="hideMinecraftTooltip()">
             ${itemIconHtml(item.material, 32)}
@@ -2647,7 +2561,7 @@ function renderInventoryBackupPreview(data) {
             </div>
 
             <!-- Action Toolbar -->
-            <div class="inv-actions-toolbar" style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:flex-end;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #333336;">
+            <div class="inv-actions-toolbar" >
                 <button class="btn btn-secondary btn-sm" onclick="copyCurrentBackupJson()" title="${escapeAttr(i18n.t('inventory.rawJson'))}">
                     <i class="fas fa-copy"></i>
                     <span data-i18n="inventory.copyJson">${escapeHtml(i18n.t('inventory.copyJson'))}</span>
@@ -2705,14 +2619,15 @@ function moveMinecraftTooltip(e) {
     const tooltip = document.getElementById('minecraft-tooltip');
     if (!tooltip || tooltip.style.display === 'none') return;
 
-    const x = e.clientX + 16;
-    const y = e.clientY + 16;
+    const rect = e.target?.closest?.('.inventory-slot')?.getBoundingClientRect() || e.target?.getBoundingClientRect?.();
+    const x = (e.clientX || rect?.left || 0) + 16;
+    const y = (e.clientY || rect?.bottom || 0) + 16;
     const pad = 12;
     const maxX = window.innerWidth - tooltip.offsetWidth - pad;
     const maxY = window.innerHeight - tooltip.offsetHeight - pad;
 
-    tooltip.style.left = `${Math.min(x, maxX)}px`;
-    tooltip.style.top = `${Math.min(y, maxY)}px`;
+    tooltip.style.left = `${Math.max(pad, Math.min(x, maxX))}px`;
+    tooltip.style.top = `${Math.max(pad, Math.min(y, maxY))}px`;
 }
 
 function hideMinecraftTooltip() {
@@ -2746,8 +2661,12 @@ function formatMinecraftColorCodes(text) {
 // ============================================
 
 let CURRENT_RESTORE_BACKUP_ID = null;
+let currentRestoreTarget = null;
 
 function openRestoreModal(backupId) {
+    if (!INVENTORY_BROWSER.player) return;
+    currentRestoreTarget = { player: INVENTORY_BROWSER.player, backupId,
+        name: INVENTORY_BROWSER.playerInput || INVENTORY_BROWSER.player };
     CURRENT_RESTORE_BACKUP_ID = backupId;
     const modal = document.getElementById('modal-restore-inventory');
     const nameEl = document.getElementById('modal-restore-player-name');
@@ -2777,20 +2696,24 @@ function openRestoreModal(backupId) {
     }
 
     modal.classList.add('active');
-    setTimeout(() => { if (inputEl) inputEl.focus(); }, 100);
+    queueMicrotask(() => { if (modal.classList.contains('active') && inputEl) inputEl.focus(); });
 }
 
 function closeRestoreModal() {
     const modal = document.getElementById('modal-restore-inventory');
     if (modal) modal.classList.remove('active');
     CURRENT_RESTORE_BACKUP_ID = null;
+    currentRestoreTarget = null;
 }
 
 async function executeRestoreFromModal() {
-    const backupId = CURRENT_RESTORE_BACKUP_ID || INVENTORY_BROWSER.selectedBackupId;
-    if (!backupId) return;
+    const target = currentRestoreTarget;
+    if (!target) return;
+    const { player, backupId } = target;
+    const mutationKey = `restore:${player}:${backupId}`;
+    if (inventoryMutations.has(mutationKey)) return;
 
-    const expected = (INVENTORY_BROWSER.playerInput || INVENTORY_BROWSER.player || '').trim().toLowerCase();
+    const expected = target.name.trim().toLowerCase();
     const inputEl = document.getElementById('modal-restore-confirm-input');
     const typed = (inputEl ? inputEl.value : '').trim().toLowerCase();
 
@@ -2800,24 +2723,28 @@ async function executeRestoreFromModal() {
     }
 
     const clearBox = document.getElementById('modal-restore-clear-before');
+    const session = panelSessionGeneration;
+    inventoryMutations.add(mutationKey);
+    const restoreButton = document.querySelector('#modal-restore-inventory .btn-primary');
+    if (restoreButton) restoreButton.disabled = true;
     try {
-        const response = await fetch('/api/inventories/restore', {
+        const json = await panelRequest('/api/inventories/restore', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
             body: JSON.stringify({
-                player: INVENTORY_BROWSER.player,
+                player,
                 backupId: backupId,
                 clearBefore: clearBox ? clearBox.checked : true
             })
         });
-        const json = await response.json();
+        if (session !== panelSessionGeneration) return;
         if (!json.success) {
             showToast(inventoryErrorText(json), 'error');
             return;
         }
 
-        closeRestoreModal();
+        if (currentRestoreTarget === target) closeRestoreModal();
         if (json.data && json.data.queued) {
             showToast(i18n.t('inventory.browser.queued'), 'info');
         } else {
@@ -2825,8 +2752,12 @@ async function executeRestoreFromModal() {
         }
         loadInventoryGuard();
     } catch (error) {
+        if (session !== panelSessionGeneration) return;
         console.error('Inventory restore failed:', error);
-        showToast(i18n.t('inventory.error.restoreFailed'), 'error');
+        showToast(error.body ? inventoryErrorText(error.body) : i18n.t('inventory.error.restoreFailed'), 'error');
+    } finally {
+        inventoryMutations.delete(mutationKey);
+        if (restoreButton) restoreButton.disabled = false;
     }
 }
 
@@ -2835,22 +2766,30 @@ async function restoreInventoryBackup(backupId) {
 }
 
 async function deleteInventoryBackup(backupId) {
+    const player = INVENTORY_BROWSER.player;
+    if (!player) return;
+    const mutationKey = `delete:${player}:${backupId}`;
+    if (inventoryMutations.has(mutationKey)) return;
     if (!confirm(i18n.t('inventory.browser.confirmDelete'))) return;
 
+    const session = panelSessionGeneration;
+    inventoryMutations.add(mutationKey);
     try {
-        const response = await fetch('/api/inventories/delete', {
+        const json = await panelRequest('/api/inventories/delete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ player: INVENTORY_BROWSER.player, backupId: backupId })
+            body: JSON.stringify({ player, backupId: backupId })
         });
-        const json = await response.json();
+        if (session !== panelSessionGeneration) return;
         if (!json.success) {
             showToast(inventoryErrorText(json), 'error');
             return;
         }
         showToast(i18n.t('inventory.browser.deleted'), 'success');
+        if (player !== INVENTORY_BROWSER.player) return;
         if (INVENTORY_BROWSER.selectedBackupId === backupId) {
+            invalidateInventoryPreview();
             INVENTORY_BROWSER.selectedBackupId = null;
             INVENTORY_BROWSER.selectedBackupData = null;
             const preview = document.getElementById('inventory-browser-preview');
@@ -2861,9 +2800,10 @@ async function deleteInventoryBackup(backupId) {
         INVENTORY_BROWSER.backups = INVENTORY_BROWSER.backups.filter(b => b.id !== backupId);
         renderInventoryBackupList();
     } catch (error) {
+        if (session !== panelSessionGeneration) return;
         console.error('Inventory delete failed:', error);
-        showToast(i18n.t('inventory.error.deleteFailed'), 'error');
-    }
+        showToast(error.body ? inventoryErrorText(error.body) : i18n.t('inventory.error.deleteFailed'), 'error');
+    } finally { inventoryMutations.delete(mutationKey); }
 }
 
 // ============================================
@@ -2871,7 +2811,7 @@ async function deleteInventoryBackup(backupId) {
 // ============================================
 
 function exportCurrentBackupToEquipment() {
-    const data = INVENTORY_BROWSER.selectedBackupData;
+    const data = currentInventoryBackup();
     if (!data) return;
 
     const baseName = INVENTORY_BROWSER.playerInput || 'Player';
@@ -2920,15 +2860,15 @@ function exportCurrentBackupToEquipment() {
 }
 
 function copyCurrentBackupJson() {
-    const data = INVENTORY_BROWSER.selectedBackupData;
+    const data = currentInventoryBackup();
     if (!data) return;
 
     const text = JSON.stringify(data, null, 2);
-    navigator.clipboard.writeText(text).then(() => {
+    Promise.resolve().then(() => navigator.clipboard.writeText(text)).then(() => {
         showToast(i18n.t('inventory.jsonCopied'), 'success');
     }).catch(err => {
         console.error('Failed to copy JSON:', err);
-        showToast('Copy failed', 'error');
+        showToast(i18n.t('panel.copyFailed'), 'error');
     });
 }
 
@@ -2977,7 +2917,7 @@ function mvErrorText(source) {
 
 async function runMvJob(url, payload, pendingMessage) {
     try {
-        const response = await fetch(url, {
+        const response = await panelFetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -3015,7 +2955,7 @@ async function pollMvJob(jobId, maxAttempts = 120) {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         try {
-            const response = await fetch(`/api/mvworlds/job?id=${encodeURIComponent(jobId)}`, { credentials: 'include' });
+            const response = await panelFetch(`/api/mvworlds/job?id=${encodeURIComponent(jobId)}`, { credentials: 'include' });
             if (!response.ok) continue;
             const json = await response.json();
             if (!json.success) continue;
@@ -3148,7 +3088,7 @@ const MV_BACKUPS_STATE = { backups: [], loaded: false };
 
 async function loadMvBackups() {
     try {
-        const response = await fetch('/api/mvworlds/backups', { credentials: 'include' });
+        const response = await panelFetch('/api/mvworlds/backups', { credentials: 'include' });
         const json = response.ok ? await response.json() : null;
         if (!json || json.success === false) {
             showToast(i18n.t('toast.mvFailed', { message: mvErrorText(json) }), 'error');
@@ -3312,7 +3252,7 @@ async function confirmRestoreBackup(file) {
 async function deleteMvBackup(file) {
     if (!confirm(i18n.t('confirm.deleteBackupPrompt', { file: file }))) return;
     try {
-        const response = await fetch('/api/mvworlds/backup-action', {
+        const response = await panelFetch('/api/mvworlds/backup-action', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -4013,7 +3953,7 @@ function discardChanges() {
             CONFIG_STATE.equipment = deepClone(CONFIG_BASELINE.equipment);
             CONFIG_STATE.webConfig = deepClone(CONFIG_BASELINE.webConfig);
             
-            localStorage.setItem('config_backup', JSON.stringify(CONFIG_STATE.config));
+            cacheConfig('config_backup', CONFIG_BASELINE.config);
             localStorage.setItem('worlds_backup', JSON.stringify(CONFIG_STATE.worlds));
             localStorage.setItem('equipment_backup', JSON.stringify(CONFIG_STATE.equipment));
             localStorage.setItem('webconfig_backup', JSON.stringify(CONFIG_STATE.webConfig));
@@ -4187,7 +4127,7 @@ async function reloadServer() {
     if (confirm(i18n.t('server.reloadConfirm'))) {
         try {
             console.log('[Reload] Sende Reload-Request...');
-            const response = await fetch('/api/reload', { 
+            const response = await panelFetch('/api/reload', {
                 method: 'POST',
                 credentials: 'include'
             });
@@ -4277,7 +4217,7 @@ function decrementValue(elementId, step = 1) {
 
 // Initialize backups for undo/redo
 window.addEventListener('load', () => {
-    localStorage.setItem('config_backup', JSON.stringify(CONFIG_STATE.config));
+    cacheConfig('config_backup', CONFIG_BASELINE.config);
     localStorage.setItem('worlds_backup', JSON.stringify(CONFIG_STATE.worlds));
     localStorage.setItem('equipment_backup', JSON.stringify(CONFIG_STATE.equipment));
     localStorage.setItem('webconfig_backup', JSON.stringify(CONFIG_STATE.webConfig));
@@ -4446,12 +4386,16 @@ function importConfig(event) {
 // ============================================
 
 async function checkServerStatus() {
+    if (panelStatusPending || !isAuthenticated) return null;
+    panelStatusPending = true;
+    const generation = panelSessionGeneration;
     try {
-        const response = await fetch('/api/status', {
+        const response = await panelFetch('/api/status', {
             credentials: 'include'
         });
         if (response.ok) {
             const data = await response.json();
+            if (generation !== panelSessionGeneration) return null;
             const status = data.data || data;
             
             console.log('Server Status:', status);
@@ -4471,9 +4415,10 @@ async function checkServerStatus() {
             
             return status;
         }
+        if (generation === panelSessionGeneration) updateConnectionStatus('inactive', i18n.t('status.notConnected'));
     } catch (error) {
         console.warn('Server status check failed:', error);
-        updateConnectionStatus('inactive', i18n.t('status.notConnected'));
-    }
+        if (generation === panelSessionGeneration) updateConnectionStatus('inactive', i18n.t('status.notConnected'));
+    } finally { panelStatusPending = false; }
     return null;
 }

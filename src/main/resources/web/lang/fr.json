@@ -774,5 +774,14 @@
   "inventory.apiIncompatible": "InventoryBackup API 2 est nécessaire",
   "inventory.lastError": "Dernière erreur",
   "inventory.backupDamaged": "Sauvegarde absente ou endommagée",
-  "inventory.error.lookupFailed": "La recherche du joueur a échoué ; consultez le journal du serveur."
+  "inventory.error.lookupFailed": "La recherche du joueur a échoué ; consultez le journal du serveur.",
+  "panel.invalidResponse": "Le serveur a renvoyé une réponse non valide.",
+  "panel.requestFailed": "Échec de la requête (HTTP {status}).",
+  "panel.close": "Fermer",
+  "panel.emptySlot": "Emplacement vide",
+  "panel.copyFailed": "Échec de la copie. Vérifiez l’accès au presse-papiers.",
+  "panel.configLoadFailed": "Chargement impossible : {categories}. Réessayez avant de les enregistrer.",
+  "panel.retry": "Réessayer",
+  "panel.saveUnavailable": "Certaines configurations ne sont pas chargées et ne peuvent pas être enregistrées.",
+  "panel.reloadConflict": "La configuration du serveur a changé. Tout recharger et abandonner vos modifications non enregistrées ?"
 }

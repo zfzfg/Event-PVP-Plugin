@@ -12,6 +12,7 @@ Willkommen in der Dokumentation des **Event-PVP-Plugins**. Alle Dokumente, Anlei
 ### 1. 🔄 [Changelogs](changelogs/)
 Versionshistorie und detaillierte Changelogs für alle Versionen.
 - [`CHANGELOG.md`](changelogs/CHANGELOG.md) – Vollständiger Versionsverlauf
+- [`CHANGELOG_1.1.3.md`](changelogs/CHANGELOG_1.1.3.md) – Webpanel: Inventaranzeige, Lade- und Speicherabläufe, Bedienung und Regressionstests
 - [`VERSION_DIFF_1.0.9_TO_1.1.0.md`](changelogs/VERSION_DIFF_1.0.9_TO_1.1.0.md) – **Detaillierter Git-Diff & Vergleichsbericht 1.0.9 ➔ 1.1.0**
 - [`CHANGELOG_1.1.0.md`](changelogs/CHANGELOG_1.1.0.md) – Änderungen in 1.1.0
 - [`CHANGELOG_1.0.9.md`](changelogs/CHANGELOG_1.0.9.md) – Änderungen in 1.0.9

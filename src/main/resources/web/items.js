@@ -83,7 +83,7 @@ async function loadItemCatalog() {
 
 async function loadMaterialsFromServer() {
     try {
-        const response = await fetch('/api/materials', { credentials: 'include' });
+        const response = await panelFetch('/api/materials', { credentials: 'include' });
         if (!response.ok) return;
         const json = await response.json();
         if (!json.success || !json.data) {
@@ -126,7 +126,7 @@ async function loadAssetManifest() {
  */
 async function loadTextureOverrides() {
     try {
-        const response = await fetch('/api/textures/overrides', { credentials: 'include' });
+        const response = await panelFetch('/api/textures/overrides', { credentials: 'include' });
         if (!response.ok) return;
         const json = await response.json();
         if (!json.success || !json.data) return;

@@ -774,5 +774,14 @@
   "inventory.apiIncompatible": "InventoryBackup API 2 is required",
   "inventory.lastError": "Last error",
   "inventory.backupDamaged": "Backup unavailable or damaged",
-  "inventory.error.lookupFailed": "Could not look up the player; see the server log."
+  "inventory.error.lookupFailed": "Could not look up the player; see the server log.",
+  "panel.invalidResponse": "The server returned an invalid response.",
+  "panel.requestFailed": "Request failed (HTTP {status}).",
+  "panel.close": "Close",
+  "panel.emptySlot": "Empty slot",
+  "panel.copyFailed": "Copy failed. Please check clipboard access.",
+  "panel.configLoadFailed": "Could not load: {categories}. Retry before saving these categories.",
+  "panel.retry": "Retry",
+  "panel.saveUnavailable": "Some configurations are not loaded and cannot be saved.",
+  "panel.reloadConflict": "The server configuration has changed. Reload all configurations and discard your unsaved changes?"
 }

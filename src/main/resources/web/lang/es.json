@@ -774,5 +774,14 @@
   "inventory.apiIncompatible": "Se requiere InventoryBackup API 2",
   "inventory.lastError": "Último error",
   "inventory.backupDamaged": "Copia ausente o dañada",
-  "inventory.error.lookupFailed": "No se pudo buscar al jugador; consulta el registro del servidor."
+  "inventory.error.lookupFailed": "No se pudo buscar al jugador; consulta el registro del servidor.",
+  "panel.invalidResponse": "El servidor devolvió una respuesta no válida.",
+  "panel.requestFailed": "La solicitud falló (HTTP {status}).",
+  "panel.close": "Cerrar",
+  "panel.emptySlot": "Espacio vacío",
+  "panel.copyFailed": "No se pudo copiar. Comprueba el acceso al portapapeles.",
+  "panel.configLoadFailed": "No se pudo cargar: {categories}. Reintenta antes de guardar estas categorías.",
+  "panel.retry": "Reintentar",
+  "panel.saveUnavailable": "Algunas configuraciones no están cargadas y no se pueden guardar.",
+  "panel.reloadConflict": "La configuración del servidor ha cambiado. ¿Recargar todo y descartar los cambios sin guardar?"
 }
