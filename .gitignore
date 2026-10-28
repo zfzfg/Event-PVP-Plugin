@@ -20,3 +20,5 @@ __pycache__/
 # Local automation scripts (do not push to github)
 Push-To-GitHub.ps1
 Push-To-GitHub.bat
+# CocoIndex Code (ccc)
+/.cocoindex_code/
